@@ -2,404 +2,339 @@
 <html lang="uz">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Radar Alerts — Joylashuv va Ogohlantirish</title>
-
-  <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    crossorigin=""
-  />
-
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Radar Mobile + Voice — Ogohlantirish va Hushyorlik</title>
+  <meta name="theme-color" content="#0ea5e9">
   <style>
     :root{
-      --bg:#f4f7fb; --panel:#ffffff; --accent:#1d4ed8; --danger:#ef4444;
-      --muted:#475569; --radius:12px;
+      --bg:#f8fbff;--card:#fff;--accent:#0ea5e9;--accent-700:#0284c7;
+      --danger:#ef4444;--warn:#f59e0b;--muted:#475569;--radius:14px;
     }
-    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;}
-    .app{height:100vh;display:flex;gap:12px;background:linear-gradient(180deg,#f8fbff, #eef4ff);padding:12px;}
-    .sidebar{width:360px;max-width:40%;background:var(--panel);border-radius:var(--radius);box-shadow:0 8px 24px rgba(15,23,42,.08);padding:16px;display:flex;flex-direction:column;gap:12px;overflow:auto}
-    .mapwrap{flex:1;border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.06)}
-    #map{height:100%}
-    h2{margin:0;font-size:18px;color:#0f172a}
-    h3{margin:8px 0 6px 0}
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    button{background:var(--accent);color:white;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
-    button:disabled{opacity:.6;cursor:not-allowed}
-    .btn-ghost{background:transparent;color:var(--accent);border:1px solid rgba(29,78,216,.12)}
-    .radar-item{border:1px solid #eef2ff;padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-    .radar-meta{display:flex;flex-direction:column}
-    .muted{color:var(--muted);font-size:13px}
-    .danger{color:var(--danger);font-weight:700}
-    .status{padding:8px;border-radius:8px}
-    .alert{background:#fff7ed;border-left:4px solid #f59e0b}
-    .urgent{background:#fff1f2;border-left:4px solid #ef4444}
-    input[type="number"]{width:100%;padding:8px;border:1px solid #e6eef9;border-radius:8px}
-    .row{display:flex;gap:8px}
-    .small{font-size:13px;color:var(--muted)}
-    .controls-bottom{display:flex;gap:8px;align-items:center}
-    .ghost{background:transparent;border:0;color:var(--muted);cursor:pointer}
-    footer{font-size:12px;color:var(--muted);text-align:center;padding:8px;}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#eef9ff,#f2f9ff)}
+    .app{display:flex;flex-direction:column;height:100vh;gap:8px;padding:10px}
+    header{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:12px;background:var(--card);box-shadow:0 6px 20px rgba(2,6,23,.06)}
+    .brand .title{font-weight:800;font-size:16px}
+    .brand .sub{font-size:12px;color:var(--muted)}
+    .mapwrap{flex:1;border-radius:12px;overflow:hidden;box-shadow:0 10px 34px rgba(2,6,23,.06)}
+    #map{height:100%;min-height:320px}
+    .panel{background:var(--card);border-radius:14px;padding:12px;box-shadow:0 16px 40px rgba(2,6,23,.12)}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .btn{background:var(--accent);color:#fff;border:0;padding:12px 14px;border-radius:12px;font-weight:700}
+    .btn.ghost{background:transparent;color:var(--accent);border:2px solid rgba(14,165,233,.15)}
+    .small{font-size:12px;color:var(--muted)}
+    .alert{padding:10px;border-radius:10px;margin-top:8px}
+    .a500{background:#f0f9ff;border-left:6px solid #0ea5e9;color:#0369a1}
+    .a300{background:#fff7ed;border-left:6px solid #f59e0b;color:#b45309}
+    .a100{background:#fff1f2;border-left:6px solid #ef4444;color:#991b1b}
+    .list{max-height:180px;overflow:auto;margin-top:8px;display:flex;flex-direction:column;gap:6px}
+    .item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid #eaf2f9;border-radius:10px}
+    input[type="file"]{display:none}
+    input[type="number"]{padding:8px;border:1px solid #e6eef9;border-radius:10px;width:90px}
   </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 </head>
 <body>
   <div class="app">
-    <div class="sidebar">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <h2>Radar Manager</h2>
-          <div class="small">Radar joylashuvini qoʻshing va tezlikni belgilang</div>
-        </div>
-        <div style="text-align:right">
-          <div class="small">Hozir:</div>
-          <div id="current-speed" class="muted">— km/h</div>
-        </div>
+    <header>
+      <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(180deg,#06b6d4,#0284c7);display:flex;align-items:center;justify-content:center;color:white;font-weight:800">R</div>
+      <div class="brand">
+        <div class="title">Radar Mobile + Voice</div>
+        <div class="sub">500m / 300m / 100m + hushyorlik ovozlari</div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div class="small">Tezlik: <span id="sp">—</span> km/h</div>
+        <div class="small" id="gps">GPS: kutilyapti…</div>
+      </div>
+    </header>
+
+    <div class="mapwrap"><div id="map"></div></div>
+
+    <div class="panel">
+      <div class="row">
+        <button id="start" class="btn">Boshlash</button>
+        <button id="add" class="btn ghost">Joylashuvni qoʻsh</button>
+        <button id="center" class="btn ghost">Markazga</button>
+        <button id="clear" class="btn ghost">Oʻchirish</button>
       </div>
 
-      <div class="controls">
-        <button id="btn-add" disabled>Joylashuvni qoʻsh (Hozirgi joy)</button>
-        <button id="btn-center" class="btn-ghost">Markazga</button>
-        <button id="btn-clear" class="btn-ghost">Hammasini o'chirish</button>
+      <div class="row" style="margin-top:8px">
+        <label for="alert-voice" class="btn ghost">Ogohlantirish ovozi (1x)</label>
+        <input id="alert-voice" type="file" accept="audio/*">
+        <label for="drowsy-voices" class="btn ghost">Hushyorlik MP3 (navbat bilan)</label>
+        <input id="drowsy-voices" type="file" accept="audio/*" multiple>
+        <span class="small">Interval (daq):</span>
+        <input id="drowsy-min" type="number" min="1" value="5">
+        <button id="drowsy-toggle" class="btn ghost">Hushyorlik: OFF</button>
       </div>
 
-      <div id="alerts-area"></div>
+      <div id="alerts"></div>
 
-      <div>
-        <h3>Saqlangan radarlar</h3>
-        <div id="radar-list"></div>
-      </div>
-
-      <div style="margin-top:auto">
-        <div class="small">Qoʻllab-quvvatlash:</div>
-        <ul style="padding-left:16px;margin:6px 0">
-          <li class="small">Brauzer: HTTPS yoki localhost kerak</li>
-          <li class="small">GPS ruxsatini bering</li>
-          <li class="small">Radarlarga masofa hisoblanadi (metr)</li>
-        </ul>
-      </div>
-
-      <footer>Made for you — saqlash localStorage ga amalga oshiriladi.</footer>
-    </div>
-
-    <div class="mapwrap">
-      <div id="map"></div>
+      <div class="list" id="list"></div>
     </div>
   </div>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-
   <script>
-    // ======= Utility =======
-    function haversineDistance(lat1, lon1, lat2, lon2) {
-      // returns meters
-      const toRad = v => v * Math.PI / 180;
-      const R = 6371000;
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
+  (function(){
+    // ===== Config =====
+    const TH = { A500:500, A300:300, A100:100 }; // meters
+    const STORAGE = 'radars_voice_v1';
+
+    // ===== State =====
+    let map, userMarker, userCircle, watchId=null, lastPos=null, lastSpeed=null;
+    let audioReady=false;
+    let alertVoice=null; // one-shot alert file
+    let drowsyFiles=[];  // playlist
+    let drowsyIndex=0, drowsyTimer=null;
+
+    const sp = document.getElementById('sp');
+    const gps = document.getElementById('gps');
+    const list = document.getElementById('list');
+    const alerts = document.getElementById('alerts');
+
+    // Buttons / inputs
+    const btnStart = document.getElementById('start');
+    const btnAdd = document.getElementById('add');
+    const btnCenter = document.getElementById('center');
+    const btnClear = document.getElementById('clear');
+    const inpAlert = document.getElementById('alert-voice');
+    const inpDrowsy = document.getElementById('drowsy-voices');
+    const inpDMin = document.getElementById('drowsy-min');
+    const btnDToggle = document.getElementById('drowsy-toggle');
+
+    // ===== Utils =====
+    function toRad(v){return v*Math.PI/180;}
+    function dist(aLat,aLon,bLat,bLon){
+      const R=6371000, dLat=toRad(bLat-aLat), dLon=toRad(bLon-aLon);
+      const A=Math.sin(dLat/2)**2 + Math.cos(toRad(aLat))*Math.cos(toRad(bLat))*Math.sin(dLon/2)**2;
+      return R*(2*Math.atan2(Math.sqrt(A),Math.sqrt(1-A)));
+    }
+    function mps2kmh(m){return Math.round(m*3.6*10)/10;}
+    function uid(){return 'r'+Date.now()+Math.random().toString(36).slice(2,8);}
+
+    // ===== Storage =====
+    function load(){try{return JSON.parse(localStorage.getItem(STORAGE))||[]}catch(e){return []}}
+    function save(a){localStorage.setItem(STORAGE, JSON.stringify(a));}
+
+    // ===== Map =====
+    function initMap(){
+      map = L.map('map',{zoomControl:false, attributionControl:false}).setView([41.311081,69.240562],13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+      map.on('contextmenu', e=>quickAdd(e.latlng.lat, e.latlng.lng));
+      renderRadars();
     }
 
-    function kmhFromMps(mps) {
-      if (mps === null || mps === undefined || isNaN(mps)) return null;
-      return Math.round(mps * 3.6 * 10) / 10;
-    }
-
-    // ======= Map & State =======
-    const map = L.map('map', {zoomControl:true}).setView([41.311081, 69.240562], 12); // default Tashkent
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
-
-    let userMarker = null;
-    let userCircle = null;
-    let watchId = null;
-    let lastPos = null; // {lat,lon,ts}
-    let lastComputedSpeed = null; // m/s estimated
-    const radarLayers = {}; // id -> {marker,c500,c100,meta}
-
-    // localStorage key
-    const STORAGE_KEY = 'savedRadars_v1';
-
-    // get DOM
-    const btnAdd = document.getElementById('btn-add');
-    const btnCenter = document.getElementById('btn-center');
-    const btnClear = document.getElementById('btn-clear');
-    const radarListEl = document.getElementById('radar-list');
-    const alertsArea = document.getElementById('alerts-area');
-    const currentSpeedEl = document.getElementById('current-speed');
-
-    // load saved radars
-    function loadRadars() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      try { return JSON.parse(raw) } catch(e){ return [] }
-    }
-    function saveRadars(arr) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-    }
-
-    // render radar list & map
-    function refreshRadarsOnMap() {
-      // remove existing radar layers
-      for (const k in radarLayers) {
-        const lay = radarLayers[k];
-        if (lay.marker) map.removeLayer(lay.marker);
-        if (lay.c500) map.removeLayer(lay.c500);
-        if (lay.c100) map.removeLayer(lay.c100);
-      }
-      Object.keys(radarLayers).forEach(k => delete radarLayers[k]);
-
-      const arr = loadRadars();
-      radarListEl.innerHTML = '';
-      arr.forEach((r, idx) => {
-        // create marker and circles
-        const marker = L.marker([r.lat, r.lon]).addTo(map);
-        marker.bindPopup(`<strong>Radar #${idx+1}</strong><br>Max tezlik: ${r.limit} km/h`);
-        const c500 = L.circle([r.lat, r.lon], {radius:500, color:'#f59e0b', fill:false, dashArray:'6 6'}).addTo(map);
-        const c100 = L.circle([r.lat, r.lon], {radius:100, color:'#ef4444', fill:false, dashArray:'3 3'}).addTo(map);
-        radarLayers[r.id] = {marker, c500, c100, meta:r};
-
-        // add to sidebar list
-        const div = document.createElement('div');
-        div.className = 'radar-item';
-        div.innerHTML = `
-          <div class="radar-meta">
-            <div><strong>Radar #${idx+1}</strong></div>
-            <div class="muted">${r.lat.toFixed(5)}, ${r.lon.toFixed(5)}</div>
-            <div class="muted">Limit: <strong>${r.limit} km/h</strong></div>
-            <div class="small">ID: ${r.id}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <button class="btn-ghost btn-center-radar small" data-id="${r.id}">Markazga</button>
-            <button class="ghost btn-delete small" data-id="${r.id}">O'chirish</button>
-          </div>
-        `;
-        radarListEl.appendChild(div);
+    const layers={}; // id -> {marker,c500,c300,c100,meta}
+    function clearLayers(){
+      Object.values(layers).forEach(Ly=>{
+        if(Ly.marker) map.removeLayer(Ly.marker);
+        if(Ly.c500) map.removeLayer(Ly.c500);
+        if(Ly.c300) map.removeLayer(Ly.c300);
+        if(Ly.c100) map.removeLayer(Ly.c100);
       });
+      for(const k in layers) delete layers[k];
+    }
+    function renderRadars(){
+      clearLayers(); list.innerHTML='';
+      const arr = load();
+      arr.forEach((r,i)=>{
+        const m = L.marker([r.lat,r.lon]).addTo(map).bindPopup(`<b>Radar #${i+1}</b><br>Limit: ${r.limit} km/h`);
+        const c500=L.circle([r.lat,r.lon],{radius:TH.A500,color:'#0ea5e9',fill:false}).addTo(map);
+        const c300=L.circle([r.lat,r.lon],{radius:TH.A300,color:'#f59e0b',fill:false}).addTo(map);
+        const c100=L.circle([r.lat,r.lon],{radius:TH.A100,color:'#ef4444',fill:false}).addTo(map);
+        layers[r.id]={marker:m,c500,c300,c100,meta:r};
 
-      // attach handlers
-      document.querySelectorAll('.btn-delete').forEach(b=>{
-        b.onclick = ()=> {
-          const id = b.dataset.id;
-          const arr = loadRadars().filter(x=>x.id !== id);
-          saveRadars(arr);
-          refreshRadarsOnMap();
-        };
+        const row=document.createElement('div'); row.className='item';
+        row.innerHTML = `<div><b>Radar #${i+1}</b><div class="small">${r.lat.toFixed(5)}, ${r.lon.toFixed(5)}</div><div class="small">Limit: ${r.limit} km/h</div></div>`;
+        const right=document.createElement('div');
+        const b1=document.createElement('button'); b1.className='btn ghost'; b1.textContent='Markaz'; b1.onclick=()=>map.setView([r.lat,r.lon],16);
+        const b2=document.createElement('button'); b2.className='btn ghost'; b2.textContent='Oʻchir'; b2.onclick=()=>{ const a=load().filter(x=>x.id!==r.id); save(a); renderRadars(); };
+        right.appendChild(b1); right.appendChild(b2);
+        row.appendChild(right); list.appendChild(row);
       });
-      document.querySelectorAll('.btn-center-radar').forEach(b=>{
-        b.onclick = ()=>{
-          const id = b.dataset.id;
-          const r = loadRadars().find(x=>x.id===id);
-          if (r) map.setView([r.lat, r.lon], 16);
+    }
+
+    function addRadar(lat,lon,limit){
+      const Lm=parseInt(limit); if(isNaN(Lm)||Lm<=0){alert('Limit notoʻgʻri'); return;}
+      const arr=load(); arr.push({id:uid(),lat,lon,limit:Lm,created:Date.now()}); save(arr); renderRadars();
+    }
+    function quickAdd(lat,lon){
+      const lim=prompt('Radar maksimal tezligi (km/h)','70'); if(lim===null) return; addRadar(lat,lon,lim);
+    }
+
+    // ===== Geolocation =====
+    function startWatch(){
+      if(watchId!==null) return;
+      if(!navigator.geolocation){alert('Brauzer geolocation ni qoʻllamaydi'); return;}
+      gps.textContent='GPS: izlanmoqda…';
+      watchId = navigator.geolocation.watchPosition(onPos, onGeoErr, {enableHighAccuracy:true, maximumAge:500, timeout:10000});
+    }
+    function onGeoErr(err){ gps.textContent='GPS xatoligi: ' + (err.message||err.code); }
+    function onPos(p){
+      const lat=p.coords.latitude, lon=p.coords.longitude, ts=p.timestamp||Date.now();
+      if(!userMarker){ userMarker=L.circleMarker([lat,lon],{radius:8,color:'#0284c7',fillColor:'#06b6d4',fillOpacity:.9}).addTo(map);
+                       userCircle=L.circle([lat,lon],{radius:10,color:'#93c5fd',fillColor:'#dbeafe',fillOpacity:.25}).addTo(map); }
+      else { userMarker.setLatLng([lat,lon]); userCircle.setLatLng([lat,lon]); }
+      // speed
+      let s=null;
+      if(p.coords.speed!=null && !isNaN(p.coords.speed)) s=p.coords.speed;
+      else if(lastPos){ const d=dist(lastPos.lat,lastPos.lon,lat,lon); const dt=(ts-lastPos.ts)/1000; if(dt>0) s=d/dt; }
+      if(s!=null) lastSpeed=s;
+      const kmh = lastSpeed? mps2kmh(lastSpeed):null; sp.textContent = kmh? kmh : '—';
+
+      gps.textContent='GPS: ok';
+      // check
+      handleAlerts({lat,lon,kmh});
+      // after-pass check
+      handlePassed({lat,lon});
+      lastPos={lat,lon,ts};
+    }
+
+    // ===== Alerts =====
+    const lastFired = {}; // id+level -> timestamp (to rate-limit)
+    const crossed = {};   // id -> {minDist: number, passed: boolean}
+    function handleAlerts({lat,lon,kmh}){
+      const arr = load(); alerts.innerHTML='';
+      const msgs=[];
+      arr.forEach(r=>{
+        const d = Math.round(dist(lat,lon,r.lat,r.lon));
+        if(!crossed[r.id]) crossed[r.id]={minDist:Infinity,passed:false};
+        // update min distance (to detect passing)
+        if(d < crossed[r.id].minDist) crossed[r.id].minDist = d;
+        // pick level
+        let level=null;
+        if(d<=TH.A100) level='A100';
+        else if(d<=TH.A300) level='A300';
+        else if(d<=TH.A500) level='A500';
+        if(level){
+          msgs.push({id:r.id,d,limit:r.limit,level});
+          renderAlertCard({d,limit:r.limit,level});
+          maybeSound({id:r.id,level});
+          // if wants 200m optional intermediate beep, you can duplicate for 200m here
         }
       });
     }
 
-    // ======= Add radar flow =======
-    async function addRadarAtCurrentPosition() {
-      if (!lastPos) {
-        alert('Hozirgi joyni aniqlash uchun GPS signali kerak. GPS ruxsatini bering va kuting.');
-        return;
-      }
-      const label = prompt('Radar maksimal tezligini kiriting (km/h). Masalan: 70', '70');
-      if (label === null) return;
-      let limit = parseInt(label);
-      if (isNaN(limit) || limit <= 0) {
-        alert('Iltimos, toʻgʻri butun son kiriting (masalan: 70).');
-        return;
-      }
-      const id = 'r' + Date.now() + Math.random().toString(36).slice(2,8);
-      const arr = loadRadars();
-      arr.push({id, lat:lastPos.lat, lon:lastPos.lon, limit});
-      saveRadars(arr);
-      refreshRadarsOnMap();
-      alert('Radar saqlandi.');
+    function renderAlertCard({d,limit,level}){
+      const div=document.createElement('div');
+      if(level==='A100') div.className='alert a100';
+      else if(level==='A300') div.className='alert a300';
+      else div.className='alert a500';
+      const title = level==='A100' ? '100 m: Xavf! Radar juda yaqin' :
+                     level==='A300' ? '300 m: Tezlikni pasaytiring' :
+                                       '500 m: Radar yaqin';
+      div.innerHTML = `<b>${title}</b><div class="small">${d} m qoldi — max ${limit} km/h</div>`;
+      alerts.appendChild(div);
     }
 
-    // ======= Distance checking & alerts =======
-    function checkRadarsAgainst(position) {
-      const arr = loadRadars();
-      const messages = [];
-      arr.forEach(r => {
-        const d = haversineDistance(position.lat, position.lon, r.lat, r.lon);
-        if (d <= 100) {
-          messages.push({type:'urgent', d:Math.round(d), limit:r.limit, id:r.id});
-        } else if (d <= 500) {
-          messages.push({type:'warning', d:Math.round(d), limit:r.limit, id:r.id});
-        }
-      });
-
-      // update alerts UI
-      alertsArea.innerHTML = '';
-      if (messages.length === 0) return;
-      // sort by distance asc
-      messages.sort((a,b)=>a.d - b.d);
-      messages.forEach(m=>{
-        const box = document.createElement('div');
-        box.className = 'status ' + (m.type==='urgent' ? 'urgent' : 'alert');
-        box.style.marginBottom = '8px';
-        box.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <div style="font-weight:700">${m.type==='urgent' ? 'Xavf! Radar juda yaqin' : 'Ogohlantirish: Radar yaqin'}</div>
-              <div class="muted">${m.d} m qoldi — tavsiya: ${m.limit} km/h gacha kamaytiring</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-weight:700">${m.d} m</div>
-              <div class="small">max ${m.limit} km/h</div>
-            </div>
-          </div>
-        `;
-        alertsArea.appendChild(box);
-      });
-
-      // optional: play sound/vibrate on urgent
-      const hasUrgent = messages.some(m=>m.type==='urgent');
-      if (hasUrgent) {
-        try { navigator.vibrate && navigator.vibrate([200,100,200]) } catch(e){}
-        // tiny beep
-        beep(0.05, 440, 0.15);
-      } else if (messages.length>0) {
-        beep(0.02, 880, 0.08);
-      }
+    function maybeSound({id,level}){
+      if(!audioReady) return;
+      const key = id+'-'+level;
+      const now = Date.now();
+      if((now - (lastFired[key]||0)) < 6000) return; // rate-limit 6s
+      lastFired[key]=now;
+      // 3 soniya ogohlantirish signali (beep)
+      tone(level);
+      // 1 marta yuklangan ogohlantirish ovozi
+      if(alertVoice){ playOnce(alertVoice); }
     }
 
-    // tiny beep util using WebAudio
-    function beep(vol=0.05, freq=440, duration=0.1) {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'sine'; o.frequency.value = freq;
-        g.gain.value = vol;
+    function tone(level){
+      // 3 sekundlik beep (chastota levelga qarab)
+      const freq = level==='A100' ? 520 : (level==='A300' ? 440 : 360);
+      const dur = 3.0;
+      try{
+        const ctx = new (window.AudioContext||window.webkitAudioContext)();
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.type='sine'; o.frequency.value=freq; g.gain.value=0.06;
         o.connect(g); g.connect(ctx.destination);
-        o.start(0);
-        setTimeout(()=>{ o.stop(); ctx.close(); }, duration*1000);
-      } catch(e){}
+        o.start(0); setTimeout(()=>{ o.stop(); ctx.close(); }, dur*1000);
+        if(navigator.vibrate){ navigator.vibrate([200,100,200]); }
+      }catch(e){}
+    }
+    function playOnce(file){
+      const url = URL.createObjectURL(file);
+      const a = new Audio(url);
+      a.play().finally(()=> URL.revokeObjectURL(url));
     }
 
-    // ======= Geolocation watch =======
-    function startWatch() {
-      if (!navigator.geolocation) {
-        alert('Sizning brauzeringiz Geolocation (joylashuv) ni qoʻllab-quvvatlamaydi.');
-        return;
-      }
-      if (watchId !== null) return; // already running
-
-      watchId = navigator.geolocation.watchPosition(pos=>{
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const ts = pos.timestamp || Date.now();
-
-        // show on map
-        if (!userMarker) {
-          userMarker = L.circleMarker([lat, lon], {radius:7, color:'#2563eb', fillColor:'#3b82f6', fillOpacity:0.6}).addTo(map);
-        } else {
-          userMarker.setLatLng([lat, lon]);
+    // ===== After passing radar: 100 m keyin ovoz =====
+    function handlePassed({lat,lon}){
+      const arr = load();
+      arr.forEach(r=>{
+        const d = Math.round(dist(lat,lon,r.lat,r.lon));
+        const c = crossed[r.id];
+        if(!c) return;
+        // passed if we were closer before and now moving away (> c.minDist + 100)
+        if(!c.passed && c.minDist<=30 && d>=100){
+          c.passed=true;
+          // play short voice/beep to say "radardan o'tdingiz, 100 m"
+          if(audioReady){
+            tone('A500'); // short neutral tone
+            if(alertVoice) playOnce(alertVoice);
+          }
         }
-        if (!userCircle) {
-          userCircle = L.circle([lat, lon], {radius:15, color:'#93c5fd', fillColor:'#dbeafe', fillOpacity:0.25}).addTo(map);
-        } else {
-          userCircle.setLatLng([lat, lon]);
-        }
-
-        // compute speed: prefer coords.speed if available (m/s), else compute from lastPos
-        let speedMps = null;
-        if (pos.coords.speed !== null && !isNaN(pos.coords.speed)) {
-          speedMps = pos.coords.speed;
-        } else if (lastPos) {
-          const dist = haversineDistance(lastPos.lat, lastPos.lon, lat, lon);
-          const dt = (ts - lastPos.ts) / 1000;
-          if (dt > 0) speedMps = dist / dt;
-        }
-        if (speedMps !== null) lastComputedSpeed = speedMps;
-
-        const speedKmh = lastComputedSpeed ? kmhFromMps(lastComputedSpeed) : null;
-        currentSpeedEl.textContent = speedKmh ? `${speedKmh} km/h` : '— km/h';
-
-        // store lastPos
-        lastPos = {lat, lon, ts};
-
-        // check radars
-        checkRadarsAgainst({lat, lon});
-      }, err=>{
-        console.error('watchPosition error', err);
-        alert('GPS xatoligi: ' + (err.message || err.code));
-      }, {enableHighAccuracy:true, maximumAge:1000, timeout:10000});
+        // reset if far away to allow next pass in future
+        if(c.passed && d>TH.A500+200){ crossed[r.id]={minDist:Infinity,passed:false}; }
+      });
     }
 
-    // stop watch (not used now)
-    function stopWatch() {
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-      }
+    // ===== Drowsiness playlist (hushyorlik) =====
+    function startDrowsy(){
+      stopDrowsy();
+      const mins = Math.max(1, parseInt(inpDMin.value)||5);
+      if(drowsyFiles.length===0){ alert('Hushyorlik uchun MP3 fayllarni tanlang'); return; }
+      btnDToggle.textContent='Hushyorlik: ON';
+      drowsyTimer = setInterval(()=>{
+        if(!audioReady) return;
+        const file = drowsyFiles[drowsyIndex % drowsyFiles.length];
+        drowsyIndex++;
+        playOnce(file);
+      }, mins*60000);
+    }
+    function stopDrowsy(){
+      if(drowsyTimer){ clearInterval(drowsyTimer); drowsyTimer=null; }
+      btnDToggle.textContent='Hushyorlik: OFF';
     }
 
-    // center to user
-    function centerToUser() {
-      if (lastPos) map.setView([lastPos.lat, lastPos.lon], 15);
-      else alert('Avval GPS signalini kuting (pozitsiya aniqlanmaguncha).');
-    }
-
-    // clear all saved radars
-    function clearAllRadars() {
-      if (!confirm('Hamma radarlarni oʻchirib tashlamoqchimisiz?')) return;
-      localStorage.removeItem(STORAGE_KEY);
-      refreshRadarsOnMap();
-    }
-
-    // ======= Init =======
-    function init() {
-      refreshRadarsOnMap();
-      // request geolocation permission and start watching
-      if (navigator.geolocation) {
-        try {
-          navigator.geolocation.getCurrentPosition(p=>{
-            lastPos = {lat:p.coords.latitude, lon:p.coords.longitude, ts:p.timestamp||Date.now()};
-            map.setView([lastPos.lat, lastPos.lon], 14);
-            btnAdd.disabled = false;
-            startWatch();
-          }, err=>{
-            console.warn('Initial geolocation denied or failed', err);
-            startWatch();
-            // enable add after first fix location comes in
-          }, {enableHighAccuracy:true, timeout:8000});
-        } catch(e){ startWatch(); }
-      }
-    }
-
-    // ======= Buttons =======
-    btnAdd.onclick = addRadarAtCurrentPosition;
-    btnCenter.onclick = centerToUser;
-    btnClear.onclick = clearAllRadars;
-
-    // init on load
-    init();
-
-    // refresh radars if storage changes (another tab)
-    window.addEventListener('storage', ()=> refreshRadarsOnMap());
-
-    // right-click to add radar at clicked location
-    map.on('contextmenu', function(e) {
-      const ok = confirm('Bu joyda radar qoʻshilsinmi?');
-      if (!ok) return;
-      const label = prompt('Radar maksimal tezligini kiriting (km/h). Masalan: 70', '70');
-      if (label === null) return;
-      const limit = parseInt(label);
-      if (isNaN(limit) || limit<=0) { alert('Notoʻgʻri limit'); return; }
-      const id = 'r' + Date.now() + Math.random().toString(36).slice(2,8);
-      const arr = loadRadars();
-      arr.push({id, lat:e.latlng.lat, lon:e.latlng.lng, limit});
-      saveRadars(arr);
-      refreshRadarsOnMap();
-      alert('Radar qoʻshildi.');
+    // ===== Events =====
+    btnStart.addEventListener('click',()=>{ audioReady=true; startWatch(); btnStart.disabled=true; btnStart.textContent='Ishlayapti'; });
+    btnAdd.addEventListener('click',()=>{
+      if(!lastPos){ alert('Avval GPSni ishga tushiring'); return; }
+      const lim=prompt('Radar maksimal tezligi (km/h)','70'); if(lim===null) return;
+      addRadar(lastPos.lat,lastPos.lon,lim);
     });
+    btnCenter.addEventListener('click',()=>{ if(lastPos) map.setView([lastPos.lat,lastPos.lon],15); });
+    btnClear.addEventListener('click',()=>{ if(confirm('Hamma radarlarni o‘chirilsinmi?')){ localStorage.removeItem(STORAGE); renderRadars(); } });
+
+    inpAlert.addEventListener('change',e=>{ alertVoice = e.target.files[0]||null; });
+    inpDrowsy.addEventListener('change',e=>{ drowsyFiles = Array.from(e.target.files||[]); drowsyIndex=0; });
+    btnDToggle.addEventListener('click',()=>{ if(drowsyTimer) stopDrowsy(); else startDrowsy(); });
+
+    function startWatch(){
+      if(watchId!==null) return;
+      if(!navigator.geolocation){ alert('Geolocation yo‘q'); return; }
+      watchId = navigator.geolocation.watchPosition(p=>{
+        const lat=p.coords.latitude, lon=p.coords.longitude, ts=p.timestamp||Date.now();
+        if(!userMarker){
+          userMarker=L.circleMarker([lat,lon],{radius:8,color:'#0284c7',fillColor:'#06b6d4',fillOpacity:.9}).addTo(map);
+          userCircle=L.circle([lat,lon],{radius:10,color:'#93c5fd',fillColor:'#dbeafe',fillOpacity:.25}).addTo(map);
+          map.setView([lat,lon],15);
+        } else { userMarker.setLatLng([lat,lon]); userCircle.setLatLng([lat,lon]); }
+        let s=null;
+        if(p.coords.speed!=null && !isNaN(p.coords.speed)) s=p.coords.speed;
+        else if(lastPos){ const d=dist(lastPos.lat,lastPos.lon,lat,lon); const dt=(ts-lastPos.ts)/1000; if(dt>0) s=d/dt; }
+        if(s!=null) lastSpeed=s; sp.textContent = lastSpeed? mps2kmh(lastSpeed):'—';
+        gps.textContent='GPS: ok';
+        handleAlerts({lat,lon,kmh:lastSpeed?mps2kmh(lastSpeed):null});
+        handlePassed({lat,lon});
+        lastPos={lat,lon,ts};
+      }, onGeoErr, {enableHighAccuracy:true,maximumAge:500,timeout:10000});
+    }
+
+    initMap();
+  })();
   </script>
 </body>
 </html>
