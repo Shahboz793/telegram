@@ -1,71 +1,405 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <title>Tugmani top o‘yini</title>
-    <style>
-        body {
-            background: linear-gradient(135deg, #00c3ff, #ffff1c);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            font-family: sans-serif;
-            overflow: hidden;
-        }
-        #game-area {
-            position: relative;
-            width: 600px;
-            height: 400px;
-            border: 4px solid white;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.2);
-        }
-        #target {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: red;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        #score {
-            font-size: 24px;
-            color: white;
-            margin-bottom: 10px;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Radar Alerts — Joylashuv va Ogohlantirish</title>
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  />
+
+  <style>
+    :root{
+      --bg:#f4f7fb; --panel:#ffffff; --accent:#1d4ed8; --danger:#ef4444;
+      --muted:#475569; --radius:12px;
+    }
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+    .app{height:100vh;display:flex;gap:12px;background:linear-gradient(180deg,#f8fbff, #eef4ff);padding:12px;}
+    .sidebar{width:360px;max-width:40%;background:var(--panel);border-radius:var(--radius);box-shadow:0 8px 24px rgba(15,23,42,.08);padding:16px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+    .mapwrap{flex:1;border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+    #map{height:100%}
+    h2{margin:0;font-size:18px;color:#0f172a}
+    h3{margin:8px 0 6px 0}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    button{background:var(--accent);color:white;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .btn-ghost{background:transparent;color:var(--accent);border:1px solid rgba(29,78,216,.12)}
+    .radar-item{border:1px solid #eef2ff;padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .radar-meta{display:flex;flex-direction:column}
+    .muted{color:var(--muted);font-size:13px}
+    .danger{color:var(--danger);font-weight:700}
+    .status{padding:8px;border-radius:8px}
+    .alert{background:#fff7ed;border-left:4px solid #f59e0b}
+    .urgent{background:#fff1f2;border-left:4px solid #ef4444}
+    input[type="number"]{width:100%;padding:8px;border:1px solid #e6eef9;border-radius:8px}
+    .row{display:flex;gap:8px}
+    .small{font-size:13px;color:var(--muted)}
+    .controls-bottom{display:flex;gap:8px;align-items:center}
+    .ghost{background:transparent;border:0;color:var(--muted);cursor:pointer}
+    footer{font-size:12px;color:var(--muted);text-align:center;padding:8px;}
+  </style>
 </head>
 <body>
-    <h1 style="color:white;">🎯 Tugmani top o‘yini</h1>
-    <div id="score">Ball: 0</div>
-    <div id="game-area">
-        <div id="target"></div>
+  <div class="app">
+    <div class="sidebar">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2>Radar Manager</h2>
+          <div class="small">Radar joylashuvini qoʻshing va tezlikni belgilang</div>
+        </div>
+        <div style="text-align:right">
+          <div class="small">Hozir:</div>
+          <div id="current-speed" class="muted">— km/h</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="btn-add" disabled>Joylashuvni qoʻsh (Hozirgi joy)</button>
+        <button id="btn-center" class="btn-ghost">Markazga</button>
+        <button id="btn-clear" class="btn-ghost">Hammasini o'chirish</button>
+      </div>
+
+      <div id="alerts-area"></div>
+
+      <div>
+        <h3>Saqlangan radarlar</h3>
+        <div id="radar-list"></div>
+      </div>
+
+      <div style="margin-top:auto">
+        <div class="small">Qoʻllab-quvvatlash:</div>
+        <ul style="padding-left:16px;margin:6px 0">
+          <li class="small">Brauzer: HTTPS yoki localhost kerak</li>
+          <li class="small">GPS ruxsatini bering</li>
+          <li class="small">Radarlarga masofa hisoblanadi (metr)</li>
+        </ul>
+      </div>
+
+      <footer>Made for you — saqlash localStorage ga amalga oshiriladi.</footer>
     </div>
 
-    <script>
-        const target = document.getElementById("target");
-        const gameArea = document.getElementById("game-area");
-        const scoreDisplay = document.getElementById("score");
-        let score = 0;
+    <div class="mapwrap">
+      <div id="map"></div>
+    </div>
+  </div>
 
-        function moveTarget() {
-            const x = Math.random() * (gameArea.clientWidth - target.clientWidth);
-            const y = Math.random() * (gameArea.clientHeight - target.clientHeight);
-            target.style.left = `${x}px`;
-            target.style.top = `${y}px`;
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <script>
+    // ======= Utility =======
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+      // returns meters
+      const toRad = v => v * Math.PI / 180;
+      const R = 6371000;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    function kmhFromMps(mps) {
+      if (mps === null || mps === undefined || isNaN(mps)) return null;
+      return Math.round(mps * 3.6 * 10) / 10;
+    }
+
+    // ======= Map & State =======
+    const map = L.map('map', {zoomControl:true}).setView([41.311081, 69.240562], 12); // default Tashkent
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    let userMarker = null;
+    let userCircle = null;
+    let watchId = null;
+    let lastPos = null; // {lat,lon,ts}
+    let lastComputedSpeed = null; // m/s estimated
+    const radarLayers = {}; // id -> {marker,c500,c100,meta}
+
+    // localStorage key
+    const STORAGE_KEY = 'savedRadars_v1';
+
+    // get DOM
+    const btnAdd = document.getElementById('btn-add');
+    const btnCenter = document.getElementById('btn-center');
+    const btnClear = document.getElementById('btn-clear');
+    const radarListEl = document.getElementById('radar-list');
+    const alertsArea = document.getElementById('alerts-area');
+    const currentSpeedEl = document.getElementById('current-speed');
+
+    // load saved radars
+    function loadRadars() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      try { return JSON.parse(raw) } catch(e){ return [] }
+    }
+    function saveRadars(arr) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    }
+
+    // render radar list & map
+    function refreshRadarsOnMap() {
+      // remove existing radar layers
+      for (const k in radarLayers) {
+        const lay = radarLayers[k];
+        if (lay.marker) map.removeLayer(lay.marker);
+        if (lay.c500) map.removeLayer(lay.c500);
+        if (lay.c100) map.removeLayer(lay.c100);
+      }
+      Object.keys(radarLayers).forEach(k => delete radarLayers[k]);
+
+      const arr = loadRadars();
+      radarListEl.innerHTML = '';
+      arr.forEach((r, idx) => {
+        // create marker and circles
+        const marker = L.marker([r.lat, r.lon]).addTo(map);
+        marker.bindPopup(`<strong>Radar #${idx+1}</strong><br>Max tezlik: ${r.limit} km/h`);
+        const c500 = L.circle([r.lat, r.lon], {radius:500, color:'#f59e0b', fill:false, dashArray:'6 6'}).addTo(map);
+        const c100 = L.circle([r.lat, r.lon], {radius:100, color:'#ef4444', fill:false, dashArray:'3 3'}).addTo(map);
+        radarLayers[r.id] = {marker, c500, c100, meta:r};
+
+        // add to sidebar list
+        const div = document.createElement('div');
+        div.className = 'radar-item';
+        div.innerHTML = `
+          <div class="radar-meta">
+            <div><strong>Radar #${idx+1}</strong></div>
+            <div class="muted">${r.lat.toFixed(5)}, ${r.lon.toFixed(5)}</div>
+            <div class="muted">Limit: <strong>${r.limit} km/h</strong></div>
+            <div class="small">ID: ${r.id}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn-ghost btn-center-radar small" data-id="${r.id}">Markazga</button>
+            <button class="ghost btn-delete small" data-id="${r.id}">O'chirish</button>
+          </div>
+        `;
+        radarListEl.appendChild(div);
+      });
+
+      // attach handlers
+      document.querySelectorAll('.btn-delete').forEach(b=>{
+        b.onclick = ()=> {
+          const id = b.dataset.id;
+          const arr = loadRadars().filter(x=>x.id !== id);
+          saveRadars(arr);
+          refreshRadarsOnMap();
+        };
+      });
+      document.querySelectorAll('.btn-center-radar').forEach(b=>{
+        b.onclick = ()=>{
+          const id = b.dataset.id;
+          const r = loadRadars().find(x=>x.id===id);
+          if (r) map.setView([r.lat, r.lon], 16);
+        }
+      });
+    }
+
+    // ======= Add radar flow =======
+    async function addRadarAtCurrentPosition() {
+      if (!lastPos) {
+        alert('Hozirgi joyni aniqlash uchun GPS signali kerak. GPS ruxsatini bering va kuting.');
+        return;
+      }
+      const label = prompt('Radar maksimal tezligini kiriting (km/h). Masalan: 70', '70');
+      if (label === null) return;
+      let limit = parseInt(label);
+      if (isNaN(limit) || limit <= 0) {
+        alert('Iltimos, toʻgʻri butun son kiriting (masalan: 70).');
+        return;
+      }
+      const id = 'r' + Date.now() + Math.random().toString(36).slice(2,8);
+      const arr = loadRadars();
+      arr.push({id, lat:lastPos.lat, lon:lastPos.lon, limit});
+      saveRadars(arr);
+      refreshRadarsOnMap();
+      alert('Radar saqlandi.');
+    }
+
+    // ======= Distance checking & alerts =======
+    function checkRadarsAgainst(position) {
+      const arr = loadRadars();
+      const messages = [];
+      arr.forEach(r => {
+        const d = haversineDistance(position.lat, position.lon, r.lat, r.lon);
+        if (d <= 100) {
+          messages.push({type:'urgent', d:Math.round(d), limit:r.limit, id:r.id});
+        } else if (d <= 500) {
+          messages.push({type:'warning', d:Math.round(d), limit:r.limit, id:r.id});
+        }
+      });
+
+      // update alerts UI
+      alertsArea.innerHTML = '';
+      if (messages.length === 0) return;
+      // sort by distance asc
+      messages.sort((a,b)=>a.d - b.d);
+      messages.forEach(m=>{
+        const box = document.createElement('div');
+        box.className = 'status ' + (m.type==='urgent' ? 'urgent' : 'alert');
+        box.style.marginBottom = '8px';
+        box.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-weight:700">${m.type==='urgent' ? 'Xavf! Radar juda yaqin' : 'Ogohlantirish: Radar yaqin'}</div>
+              <div class="muted">${m.d} m qoldi — tavsiya: ${m.limit} km/h gacha kamaytiring</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:700">${m.d} m</div>
+              <div class="small">max ${m.limit} km/h</div>
+            </div>
+          </div>
+        `;
+        alertsArea.appendChild(box);
+      });
+
+      // optional: play sound/vibrate on urgent
+      const hasUrgent = messages.some(m=>m.type==='urgent');
+      if (hasUrgent) {
+        try { navigator.vibrate && navigator.vibrate([200,100,200]) } catch(e){}
+        // tiny beep
+        beep(0.05, 440, 0.15);
+      } else if (messages.length>0) {
+        beep(0.02, 880, 0.08);
+      }
+    }
+
+    // tiny beep util using WebAudio
+    function beep(vol=0.05, freq=440, duration=0.1) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = freq;
+        g.gain.value = vol;
+        o.connect(g); g.connect(ctx.destination);
+        o.start(0);
+        setTimeout(()=>{ o.stop(); ctx.close(); }, duration*1000);
+      } catch(e){}
+    }
+
+    // ======= Geolocation watch =======
+    function startWatch() {
+      if (!navigator.geolocation) {
+        alert('Sizning brauzeringiz Geolocation (joylashuv) ni qoʻllab-quvvatlamaydi.');
+        return;
+      }
+      if (watchId !== null) return; // already running
+
+      watchId = navigator.geolocation.watchPosition(pos=>{
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const ts = pos.timestamp || Date.now();
+
+        // show on map
+        if (!userMarker) {
+          userMarker = L.circleMarker([lat, lon], {radius:7, color:'#2563eb', fillColor:'#3b82f6', fillOpacity:0.6}).addTo(map);
+        } else {
+          userMarker.setLatLng([lat, lon]);
+        }
+        if (!userCircle) {
+          userCircle = L.circle([lat, lon], {radius:15, color:'#93c5fd', fillColor:'#dbeafe', fillOpacity:0.25}).addTo(map);
+        } else {
+          userCircle.setLatLng([lat, lon]);
         }
 
-        target.addEventListener("click", () => {
-            score++;
-            scoreDisplay.textContent = `Ball: ${score}`;
-            target.style.backgroundColor = `hsl(${Math.random()*360}, 80%, 50%)`;
-            moveTarget();
-        });
+        // compute speed: prefer coords.speed if available (m/s), else compute from lastPos
+        let speedMps = null;
+        if (pos.coords.speed !== null && !isNaN(pos.coords.speed)) {
+          speedMps = pos.coords.speed;
+        } else if (lastPos) {
+          const dist = haversineDistance(lastPos.lat, lastPos.lon, lat, lon);
+          const dt = (ts - lastPos.ts) / 1000;
+          if (dt > 0) speedMps = dist / dt;
+        }
+        if (speedMps !== null) lastComputedSpeed = speedMps;
 
-        moveTarget();
-    </script>
+        const speedKmh = lastComputedSpeed ? kmhFromMps(lastComputedSpeed) : null;
+        currentSpeedEl.textContent = speedKmh ? `${speedKmh} km/h` : '— km/h';
+
+        // store lastPos
+        lastPos = {lat, lon, ts};
+
+        // check radars
+        checkRadarsAgainst({lat, lon});
+      }, err=>{
+        console.error('watchPosition error', err);
+        alert('GPS xatoligi: ' + (err.message || err.code));
+      }, {enableHighAccuracy:true, maximumAge:1000, timeout:10000});
+    }
+
+    // stop watch (not used now)
+    function stopWatch() {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+    }
+
+    // center to user
+    function centerToUser() {
+      if (lastPos) map.setView([lastPos.lat, lastPos.lon], 15);
+      else alert('Avval GPS signalini kuting (pozitsiya aniqlanmaguncha).');
+    }
+
+    // clear all saved radars
+    function clearAllRadars() {
+      if (!confirm('Hamma radarlarni oʻchirib tashlamoqchimisiz?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      refreshRadarsOnMap();
+    }
+
+    // ======= Init =======
+    function init() {
+      refreshRadarsOnMap();
+      // request geolocation permission and start watching
+      if (navigator.geolocation) {
+        try {
+          navigator.geolocation.getCurrentPosition(p=>{
+            lastPos = {lat:p.coords.latitude, lon:p.coords.longitude, ts:p.timestamp||Date.now()};
+            map.setView([lastPos.lat, lastPos.lon], 14);
+            btnAdd.disabled = false;
+            startWatch();
+          }, err=>{
+            console.warn('Initial geolocation denied or failed', err);
+            startWatch();
+            // enable add after first fix location comes in
+          }, {enableHighAccuracy:true, timeout:8000});
+        } catch(e){ startWatch(); }
+      }
+    }
+
+    // ======= Buttons =======
+    btnAdd.onclick = addRadarAtCurrentPosition;
+    btnCenter.onclick = centerToUser;
+    btnClear.onclick = clearAllRadars;
+
+    // init on load
+    init();
+
+    // refresh radars if storage changes (another tab)
+    window.addEventListener('storage', ()=> refreshRadarsOnMap());
+
+    // right-click to add radar at clicked location
+    map.on('contextmenu', function(e) {
+      const ok = confirm('Bu joyda radar qoʻshilsinmi?');
+      if (!ok) return;
+      const label = prompt('Radar maksimal tezligini kiriting (km/h). Masalan: 70', '70');
+      if (label === null) return;
+      const limit = parseInt(label);
+      if (isNaN(limit) || limit<=0) { alert('Notoʻgʻri limit'); return; }
+      const id = 'r' + Date.now() + Math.random().toString(36).slice(2,8);
+      const arr = loadRadars();
+      arr.push({id, lat:e.latlng.lat, lon:e.latlng.lng, limit});
+      saveRadars(arr);
+      refreshRadarsOnMap();
+      alert('Radar qoʻshildi.');
+    });
+  </script>
 </body>
 </html>
