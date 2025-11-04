@@ -1,15 +1,12 @@
-<!-- Save this file as radar-auth.html and open in browser (HTTPS / localhost recommended) -->
 <!doctype html>
 <html lang="uz">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Radar — Admin (2768) / Guest</title>
+<title>Radar — Admin (2768) / Guest (Fast Fix)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-:root{
-  --bg:#f7fbff; --card:#fff; --accent:#0ea5e9; --danger:#ef4444; --muted:#475569; --radius:12px;
-}
+:root{ --bg:#f7fbff; --card:#fff; --accent:#0ea5e9; --danger:#ef4444; --muted:#475569; --radius:12px; }
 *{box-sizing:border-box}
 body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg)}
 .app{display:flex;flex-direction:column;height:100vh}
@@ -19,17 +16,21 @@ body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg)}
 .mapwrap{flex:1;position:relative}
 #map{height:100%}
 .panel{position:fixed;left:10px;right:10px;bottom:12px;background:var(--card);padding:10px;border-radius:12px;box-shadow:0 12px 36px rgba(2,6,23,.12);display:flex;flex-direction:column;gap:8px}
-.row{display:flex;gap:8px;align-items:center}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .btn{padding:10px 12px;border-radius:10px;border:0;background:var(--accent);color:#fff;font-weight:700}
 .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(14,165,233,.12)}
-.toggle{padding:8px;border-radius:999px;background:#fff;border:1px solid #eef6fb}
-.centerOverlay{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);z-index:1200;background:rgba(0,0,0,.8);color:#fff;padding:16px;border-radius:12px;display:none;font-weight:800;font-size:20px}
+.centerOverlay{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);z-index:1200;background:rgba(0,0,0,.8);color:#fff;padding:16px 20px;border-radius:12px;display:none;font-weight:800;font-size:20px}
+.badge{padding:6px 10px;border-radius:10px;background:#fff;border:1px solid #eef6fb;font-weight:800}
+
+/* Modal (blocks interaction until choice) */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:2000}
 .card{background:#fff;padding:18px;border-radius:12px;max-width:420px;width:92%}
 .input{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef9;margin-top:8px}
 .small-muted{font-size:12px;color:var(--muted);margin-top:6px}
-.admin-only{display:none}
-.badge{padding:6px 10px;border-radius:10px;background:#fff;border:1px solid #eef6fb;font-weight:800}
+
+/* Disable app until login */
+.disabled-cover{position:fixed;inset:0;z-index:1500;background:transparent;pointer-events:auto}
+.hidden{display:none}
 </style>
 </head>
 <body>
@@ -46,21 +47,22 @@ body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg)}
 
   <div class="panel">
     <div class="row">
-      <button id="startBtn" class="btn">Boshlash</button>
-      <button id="guestBtn" class="btn ghost">Oddiy (guest)</button>
+      <button id="startBtn" class="btn" disabled>BOSHLASH</button>
+      <button id="guestBtn" class="btn ghost" disabled>Oddiy (guest)</button>
       <div style="margin-left:auto" class="small">Limit: <span id="curLimit">—</span></div>
     </div>
 
-    <div id="controlsGuest" class="row">
-      <button id="centerBtn" class="btn ghost">Markazga</button>
-      <button id="clearBtn" class="btn ghost">Hammasini o'chirish</button>
+    <!-- Guest controls -->
+    <div id="guestControls" class="row">
+      <button id="centerBtn" class="btn ghost" disabled>Markazga</button>
+      <button id="clearBtn" class="btn ghost" disabled>Hammasini o'chirish</button>
     </div>
 
-    <!-- Admin controls (hidden until code correct) -->
-    <div id="adminPanel" class="admin-only">
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button id="addBtn" class="btn ghost">Joylashuv qo'sh</button>
-        <button id="delModeBtn" class="btn ghost">O'chirish rejimi: OFF</button>
+    <!-- Admin controls -->
+    <div id="adminPanel" class="hidden">
+      <div class="row">
+        <button id="addBtn" class="btn ghost" disabled>Joylashuv qo'sh</button>
+        <button id="delModeBtn" class="btn ghost" disabled>O'chirish rejimi: OFF</button>
         <label class="btn ghost" style="display:inline-block;padding:8px;">
           Upload alert (1x)
           <input id="alertFile" type="file" accept="audio/*" style="display:none">
@@ -70,22 +72,22 @@ body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg)}
           <input id="oversFile" type="file" accept="audio/*" style="display:none">
         </label>
       </div>
-
-      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+      <div class="row">
         <div class="small">Yangilash (s):</div>
         <input id="updateSec" class="input" type="number" min="1" value="1" style="width:100px">
-        <div class="small" style="margin-left:auto">Kod bilan kirish: <span class="badge">2768</span></div>
+        <div class="small" style="margin-left:auto">Kod: <span class="badge">2768</span></div>
       </div>
-
-      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+      <div class="row">
         <button id="exportBtn" class="btn ghost">Export radars</button>
         <button id="importBtn" class="btn ghost">Import radars</button>
         <input id="importFile" type="file" accept=".json" style="display:none">
       </div>
     </div>
-
   </div>
 </div>
+
+<!-- Interaction blocker until login -->
+<div id="blocker" class="disabled-cover"></div>
 
 <!-- Login Modal -->
 <div id="loginModal" class="modal" aria-hidden="false">
@@ -93,7 +95,7 @@ body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg)}
     <h3>Kirish</h3>
     <div class="small-muted">Kod bilan yoki Oddiy kirish tanlang</div>
     <div style="margin-top:12px">
-      <input id="codeInput" class="input" placeholder="Kod (admin)" />
+      <input id="codeInput" class="input" placeholder="Kod (admin: 2768)" />
       <div style="display:flex;gap:8px;margin-top:8px">
         <button id="codeEnter" class="btn">Kodni kiriting</button>
         <button id="noCode" class="btn ghost">Oddiy kirish</button>
@@ -103,317 +105,202 @@ body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg)}
   </div>
 </div>
 
-<!-- Leaflet -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
-  // ===== config =====
-  const ADMIN_CODE = '2768';
-  const STORAGE = 'radar_auth_v1';
-  let isAdmin = false;
-  let deleteMode = false;
-  let watchId = null;
-  let lastPos = null;
-  let lastSpeed = null;
-  let updateInterval = 1000; // ms default
-  let lastFired = {};
-  let alertFile = null;
-  let oversFile = null;
+  const ADMIN_CODE='2768', STORAGE='radar_auth_v2';
+  let isAdmin=false, deleteMode=false;
+  let watchId=null, lastPos=null, lastSpeed=null;
+  let fastPoll=null; // extra 1s currentPosition
+  let lastFired={};
+  let alertFile=null, oversFile=null;
 
   // DOM
-  const loginModal = document.getElementById('loginModal');
-  const codeInput = document.getElementById('codeInput');
-  const codeEnter = document.getElementById('codeEnter');
-  const noCode = document.getElementById('noCode');
-  const loginMsg = document.getElementById('loginMsg');
-  const adminPanel = document.getElementById('adminPanel');
-  const startBtn = document.getElementById('startBtn');
-  const guestBtn = document.getElementById('guestBtn');
-  const addBtn = document.getElementById('addBtn');
-  const delModeBtn = document.getElementById('delModeBtn');
-  const centerBtn = document.getElementById('centerBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const overlay = document.getElementById('overlay');
-  const curSpeed = document.getElementById('curSpeed');
-  const curLimit = document.getElementById('curLimit');
-  const alertInput = document.getElementById('alertFile');
-  const oversInput = document.getElementById('oversFile');
-  const updateSecInput = document.getElementById('updateSec');
-  const exportBtn = document.getElementById('exportBtn');
-  const importBtn = document.getElementById('importBtn');
-  const importFile = document.getElementById('importFile');
+  const loginModal=$('#loginModal'), blocker=$('#blocker');
+  const codeInput=$('#codeInput'), codeEnter=$('#codeEnter'), noCode=$('#noCode'), loginMsg=$('#loginMsg');
+  const startBtn=$('#startBtn'), guestBtn=$('#guestBtn'), centerBtn=$('#centerBtn'), clearBtn=$('#clearBtn');
+  const addBtn=$('#addBtn'), delModeBtn=$('#delModeBtn'), adminPanel=$('#adminPanel');
+  const alertInput=$('#alertFile'), oversInput=$('#oversFile');
+  const updateSecInput=$('#updateSec'), exportBtn=$('#exportBtn'), importBtn=$('#importBtn'), importFile=$('#importFile');
+  const overlay=$('#overlay'), curSpeed=$('#curSpeed'), curLimit=$('#curLimit');
 
-  // map state
+  // Map
   let map, userMarker, userCircle;
-  const layers = {};
+  const layers={};
 
-  function uid(){ return 'r'+Date.now()+Math.random().toString(36).slice(2,8); }
+  function $(sel){ return document.querySelector(sel); }
+  function toRad(v){return v*Math.PI/180;}
+  function haversine(aLat,aLon,bLat,bLon){const R=6371000,dLat=toRad(bLat-aLat),dLon=toRad(bLon-aLon);const A=Math.sin(dLat/2)**2+Math.cos(toRad(aLat))*Math.cos(toRad(bLat))*Math.sin(dLon/2)**2;return R*(2*Math.atan2(Math.sqrt(A),Math.sqrt(1-A)));}
+  function uid(){return 'r'+Date.now()+Math.random().toString(36).slice(2,8);}
+  function load(){try{return JSON.parse(localStorage.getItem(STORAGE))||[]}catch(e){return []}}
+  function save(a){localStorage.setItem(STORAGE, JSON.stringify(a));}
 
-  // storage helpers
-  function load(){ try { return JSON.parse(localStorage.getItem(STORAGE)) || []; } catch(e){ return []; } }
-  function save(arr){ localStorage.setItem(STORAGE, JSON.stringify(arr)); }
-
-  // map init
   function initMap(){
-    map = L.map('map',{zoomControl:false, attributionControl:false}).setView([41.311081,69.240562],13);
+    map=L.map('map',{zoomControl:false, attributionControl:false}).setView([41.311081,69.240562],13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
     renderRadars();
-    map.on('contextmenu', e => {
-      if(isAdmin && !deleteMode){
-        const lim = prompt('Radar limit (km/h)','70'); if(lim) addRadar(e.latlng.lat, e.latlng.lng, lim);
-      }
-    });
-    map.on('click', e => {
-      if(isAdmin && deleteMode){
-        // find nearest radar within 30m and delete
-        const arr = load();
-        let nearest = null;
-        arr.forEach(r=>{
-          const d = haversine(e.latlng.lat,e.latlng.lng,r.lat,r.lon);
-          if(d<30 && (!nearest || d<nearest.d)){ nearest={r,d}; }
-        });
-        if(nearest){
-          if(confirm('Ushbu radarni oʻchirish?')) {
-            const arr2 = load().filter(x=>x.id!==nearest.r.id);
-            save(arr2); renderRadars();
-            alert('Radar oʻchirildi');
-          }
-        }
-      }
-    });
+    map.on('contextmenu',e=>{ if(isAdmin && !deleteMode){ const lim=prompt('Limit (km/h)','70'); if(lim) addRadar(e.latlng.lat,e.latlng.lng,lim); } });
+    map.on('click',e=>{ if(isAdmin && deleteMode){ tryDeleteNearest(e.latlng.lat,e.latlng.lng); } });
   }
 
   function renderRadars(){
-    // clear
-    Object.values(layers).forEach(Ly=>{
-      if(Ly.marker) map.removeLayer(Ly.marker);
-      if(Ly.c100) map.removeLayer(Ly.c100);
-      if(Ly.c300) map.removeLayer(Ly.c300);
-      if(Ly.c500) map.removeLayer(Ly.c500);
-    });
+    Object.values(layers).forEach(Ly=>{ if(Ly.marker) map.removeLayer(Ly.marker); if(Ly.c100) map.removeLayer(Ly.c100); if(Ly.c300) map.removeLayer(Ly.c300); if(Ly.c500) map.removeLayer(Ly.c500); });
     for(const k in layers) delete layers[k];
-
-    const arr = load();
+    const arr=load();
     arr.forEach((r,idx)=>{
-      const m = L.marker([r.lat,r.lon]).addTo(map).bindPopup(`<b>Radar #${idx+1}</b><div>Limit: ${r.limit} km/h</div>`);
-      const c500 = L.circle([r.lat,r.lon],{radius:500,color:'#0ea5e9',fill:false}).addTo(map);
-      const c300 = L.circle([r.lat,r.lon],{radius:300,color:'#f59e0b',fill:false}).addTo(map);
-      const c100 = L.circle([r.lat,r.lon],{radius:100,color:'#ef4444',fill:false}).addTo(map);
-      layers[r.id] = {marker:m,c100,c300,c500,meta:r};
+      const m=L.marker([r.lat,r.lon]).addTo(map).bindPopup(`<b>Radar #${idx+1}</b><div>Limit: ${r.limit} km/h</div>`);
+      const c500=L.circle([r.lat,r.lon],{radius:500,color:'#0ea5e9',fill:false}).addTo(map);
+      const c300=L.circle([r.lat,r.lon],{radius:300,color:'#f59e0b',fill:false}).addTo(map);
+      const c100=L.circle([r.lat,r.lon],{radius:100,color:'#ef4444',fill:false}).addTo(map);
+      layers[r.id]={marker:m,c100,c300,c500,meta:r};
     });
   }
 
-  // haversine
-  function toRad(v){ return v*Math.PI/180; }
-  function haversine(aLat,aLon,bLat,bLon){
-    const R=6371000; const dLat=toRad(bLat-aLat); const dLon=toRad(bLon-aLon);
-    const A = Math.sin(dLat/2)**2 + Math.cos(toRad(aLat))*Math.cos(toRad(bLat))*Math.sin(dLon/2)**2;
-    return R * (2 * Math.atan2(Math.sqrt(A), Math.sqrt(1-A)));
-  }
-
-  // add/delete radars
   function addRadar(lat,lon,limit){
-    const Lm = parseInt(limit);
-    if(isNaN(Lm) || Lm<=0){ alert('Limit not valid'); return; }
-    const arr = load(); arr.push({id:uid(), lat:lat, lon:lon, limit:Lm}); save(arr); renderRadars();
+    const Lm=parseInt(limit); if(isNaN(Lm)||Lm<=0){alert('Limit noto‘g‘ri'); return;}
+    const arr=load(); arr.push({id:uid(),lat,lon,limit:Lm}); save(arr); renderRadars();
   }
 
-  // watch
-  function start(){
+  function tryDeleteNearest(lat,lon){
+    const arr=load(); let nearest=null;
+    arr.forEach(r=>{const d=haversine(lat,lon,r.lat,r.lon); if(d<30 && (!nearest||d<nearest.d)) nearest={r,d};});
+    if(nearest && confirm('Ushbu radarni o‘chirasizmi?')){ save(arr.filter(x=>x.id!==nearest.r.id)); renderRadars(); alert('O‘chirildi'); }
+  }
+
+  // ===== Fast-start geolocation =====
+  function startGeo(){
     if(watchId) return;
-    if(!navigator.geolocation){ alert('Geolocation mavjud emas'); return; }
-    const sec = Math.max(1, Number(updateSecInput.value) || 1);
-    updateInterval = sec*1000;
-    // initial get to prompt permission
-    navigator.geolocation.getCurrentPosition(p=>{
-      watchId = navigator.geolocation.watchPosition(onPos, onErr, {enableHighAccuracy:true, maximumAge:0, timeout:5000});
-      // ensure frequent updates: optional extra pings every updateInterval (if browser caches)
-      // but we'll rely on watchPosition
-    }, onErr, {enableHighAccuracy:true, timeout:8000});
+    // 1) Start watchPosition immediately (prompts quickly)
+    watchId=navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true, maximumAge:0, timeout:4000});
+    // 2) Also ask one immediate fix (so marker ko‘rinsin darhol)
+    navigator.geolocation.getCurrentPosition(onPos, onErr, {enableHighAccuracy:true, maximumAge:0, timeout:3000});
+    // 3) Extra fast poll each second to force fresh coords on some browsers
+    stopFastPoll();
+    fastPoll=setInterval(()=>{
+      navigator.geolocation.getCurrentPosition(onPos, ()=>{}, {enableHighAccuracy:true, maximumAge:0, timeout:2000});
+    }, 1000);
   }
-  function stop(){
-    if(watchId){ navigator.geolocation.clearWatch(watchId); watchId = null; }
+  function stopGeo(){
+    if(watchId){ navigator.geolocation.clearWatch(watchId); watchId=null; }
+    stopFastPoll();
   }
+  function stopFastPoll(){ if(fastPoll){ clearInterval(fastPoll); fastPoll=null; } }
 
-  function onErr(e){ console.warn('geo err', e); alert('GPS xatoligi: ' + (e.message||e.code)); }
+  function onErr(e){ alert('GPS xatoligi: ' + (e.message||e.code)); }
 
   function onPos(p){
-    const lat = p.coords.latitude, lon = p.coords.longitude, ts = p.timestamp || Date.now();
+    const lat=p.coords.latitude, lon=p.coords.longitude, ts=p.timestamp||Date.now();
     if(!userMarker){
-      userMarker = L.circleMarker([lat,lon],{radius:7,color:'#0284c7',fillColor:'#06b6d4',fillOpacity:.9}).addTo(map);
-      userCircle = L.circle([lat,lon],{radius:12,color:'#93c5fd',fillColor:'#dbeafe',fillOpacity:.25}).addTo(map);
+      userMarker=L.circleMarker([lat,lon],{radius:7,color:'#0284c7',fillColor:'#06b6d4',fillOpacity:.9}).addTo(map);
+      userCircle=L.circle([lat,lon],{radius:12,color:'#93c5fd',fillColor:'#dbeafe',fillOpacity:.25}).addTo(map);
       map.setView([lat,lon],15);
-    } else {
-      userMarker.setLatLng([lat,lon]);
-      userCircle.setLatLng([lat,lon]);
-    }
+    } else { userMarker.setLatLng([lat,lon]); userCircle.setLatLng([lat,lon]); }
 
-    // compute speed m/s
-    let s = null;
-    if(p.coords.speed != null && !isNaN(p.coords.speed)) s = p.coords.speed;
-    else if(lastPos){
-      const d = haversine(lastPos.lat, lastPos.lon, lat, lon);
-      const dt = (ts - lastPos.ts)/1000;
-      if(dt>0) s = d/dt;
-    }
-    if(s != null) lastSpeed = s;
+    // speed
+    let s=null;
+    if(p.coords.speed!=null && !isNaN(p.coords.speed)) s=p.coords.speed;
+    else if(lastPos){ const d=haversine(lastPos.lat,lastPos.lon,lat,lon); const dt=(ts-lastPos.ts)/1000; if(dt>0) s=d/dt; }
+    if(s!=null) lastSpeed=s;
     const kmh = lastSpeed ? Math.round(lastSpeed*3.6*10)/10 : null;
-    document.getElementById('curSpeed').textContent = kmh ? kmh : '—';
+    curSpeed.textContent = kmh ? kmh : '—';
 
-    // nearest radar within 500m
-    const arr = load();
-    let nearest = null;
-    arr.forEach(r=>{
-      const d = haversine(lat,lon,r.lat,r.lon);
-      if(d <= 500){
-        if(!nearest || d < nearest.d || (Math.abs(d-nearest.d)<0.5 && r.limit < nearest.limit)){
-          nearest = {id:r.id, d, limit:r.limit};
-        }
-      }
+    // nearest limit (<=500 m)
+    const arr=load(); let nearest=null;
+    arr.forEach(r=>{ const d=haversine(lat,lon,r.lat,r.lon);
+      if(d<=500 && (!nearest || d<nearest.d || (Math.abs(d-nearest.d)<0.5 && r.limit<nearest.limit)) ) nearest={id:r.id,d,limit:r.limit};
     });
     curLimit.textContent = nearest ? nearest.limit : '—';
 
-    // overspeed check (when speed > limit)
-    if(kmh != null && nearest && kmh > nearest.limit + 0.5){
+    // overspeed (play oversFile each 10s)
+    if(kmh!=null && nearest && kmh > nearest.limit + 0.5){
       showOverlay(nearest.limit + ' km/h');
-      // oversFile plays once every 10s max
-      const key = nearest.id + '-overs';
-      if((Date.now() - (lastFired[key]||0)) > 10000){
-        lastFired[key] = Date.now();
-        if(oversFile) playFile(oversFile);
-      }
+      const key=nearest.id+'-overs';
+      if(Date.now()-(lastFired[key]||0) > 10000){ lastFired[key]=Date.now(); if(oversFile) playFile(oversFile); }
     }
 
-    // proximity alerts for 500/300/100
+    // proximity 500/300/100
     arr.forEach(r=>{
       const d = Math.round(haversine(lat,lon,r.lat,r.lon));
-      let level = null;
-      if(d <= 100) level = '100';
-      else if(d <= 300) level = '300';
-      else if(d <= 500) level = '500';
-      if(level){
-        const key = r.id + '-' + level;
-        if((Date.now() - (lastFired[key]||0)) > 6000){
-          lastFired[key] = Date.now();
-          // show big overlay
-          showOverlay(r.limit + ' km/h');
-          // 3s beep via WebAudio (unless silent)
-          playBeep( level === '100' ? 520 : (level === '300' ? 440 : 360), 3.0 );
-          if(alertFile) playFile(alertFile);
-        }
-      }
+      let level=null; if(d<=100) level='100'; else if(d<=300) level='300'; else if(d<=500) level='500';
+      if(level){ const key=r.id+'-'+level; if(Date.now()-(lastFired[key]||0) > 6000){ lastFired[key]=Date.now(); showOverlay(r.limit+' km/h'); if(alertFile) playFile(alertFile); } }
     });
 
-    lastPos = {lat, lon, ts};
+    lastPos={lat,lon,ts};
   }
 
   // UI helpers
-  function showOverlay(text){
-    overlay.textContent = text;
-    overlay.style.display = 'block';
-    setTimeout(()=>{ overlay.style.display = 'none'; }, 3000);
+  function showOverlay(text){ overlay.textContent=text; overlay.style.display='block'; setTimeout(()=> overlay.style.display='none', 3000); }
+  function playFile(file){ const url=URL.createObjectURL(file); const a=new Audio(url); a.play().finally(()=>URL.revokeObjectURL(url)); }
+
+  // ===== Login flow (blocker prevents accidental "kodsiz kirish") =====
+  codeEnter.addEventListener('click', ()=>{
+    const v=codeInput.value.trim();
+    if(v===ADMIN_CODE){
+      isAdmin=true; loginSuccess();
+      adminPanel.classList.remove('hidden');
+      enableAdmin(true);
+    } else {
+      loginMsg.textContent='Kod noto‘g‘ri';
+    }
+  });
+  noCode.addEventListener('click', ()=>{
+    isAdmin=false; loginSuccess();
+    adminPanel.classList.add('hidden');
+    enableGuest(true);
+  });
+
+  function loginSuccess(){
+    loginModal.style.display='none';
+    blocker.classList.add('hidden'); // now UI clickable
+    // Enable Start + Guest buttons
+    startBtn.disabled=false; guestBtn.disabled=false;
+    // Guest core controls enabled (center & clear) will activate after Start
+    centerBtn.disabled=false; clearBtn.disabled=false;
   }
 
-  function playBeep(freq, duration){
-    try{
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sine'; o.frequency.value = freq;
-      g.gain.value = 0.06;
-      o.connect(g); g.connect(ctx.destination);
-      o.start(0);
-      setTimeout(()=>{ o.stop(); ctx.close(); }, duration*1000);
-    }catch(e){}
+  function enableAdmin(on){
+    addBtn.disabled=!on; delModeBtn.disabled=!on;
+  }
+  function enableGuest(on){
+    // guest has no extra toggles here
   }
 
-  function playFile(file){
-    try{
-      const url = URL.createObjectURL(file);
-      const a = new Audio(url);
-      a.play().finally(()=> URL.revokeObjectURL(url));
-    }catch(e){}
-  }
+  // Buttons
+  startBtn.addEventListener('click', ()=> startGeo());
+  guestBtn.addEventListener('click', ()=> startGeo());
+  centerBtn.addEventListener('click', ()=> { if(lastPos) map.setView([lastPos.lat,lastPos.lon],15); });
+  clearBtn.addEventListener('click', ()=> { if(confirm('Hamma radarlarni o‘chirilsinmi?')){ localStorage.removeItem(STORAGE); renderRadars(); }});
+  addBtn.addEventListener('click', ()=> { if(!lastPos){ alert('Avval GPSni ishga tushiring'); return; } const lim=prompt('Limit (km/h)','70'); if(lim) addRadar(lastPos.lat,lastPos.lon,lim); });
+  delModeBtn.addEventListener('click', ()=> { deleteMode=!deleteMode; delModeBtn.textContent = "O'chirish rejimi: " + (deleteMode?'ON':'OFF'); });
 
-  // Export / Import
+  alertInput.addEventListener('change', e=> alertFile = e.target.files[0] || null);
+  oversInput.addEventListener('change', e=> oversFile = e.target.files[0] || null);
+
   exportBtn.addEventListener('click', ()=> {
-    const data = load();
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href=url; a.download='radars.json'; a.click(); URL.revokeObjectURL(url);
+    const data=load(); const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='radars.json'; a.click(); URL.revokeObjectURL(url);
   });
   importBtn.addEventListener('click', ()=> importFile.click());
   importFile.addEventListener('change', e=>{
-    const f = e.target.files[0]; if(!f) return;
-    const r = new FileReader(); r.onload = ()=> {
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader(); r.onload=()=>{
       try{
-        const data = JSON.parse(r.result);
-        if(!Array.isArray(data)) throw new Error('JSON array kutilmoqda');
-        const normalized = data.map(d => ({ id: d.id || uid(), lat: Number(d.lat), lon: Number(d.lon), limit: Number(d.limit||70) })).filter(x=>!isNaN(x.lat)&&!isNaN(x.lon));
-        const base = load();
-        // merge (avoid duplicates by id)
-        const ids = new Set(base.map(x=>x.id));
-        normalized.forEach(n=>{ if(!ids.has(n.id)) base.push(n); });
-        save(base); renderRadars(); alert('Import amalga oshdi');
-      }catch(err){ alert('Import xato: ' + err.message); }
+        const data=JSON.parse(r.result); if(!Array.isArray(data)) throw new Error('JSON array kutilmoqda');
+        const normalized=data.map(d=>({id:d.id||uid(), lat:Number(d.lat), lon:Number(d.lon), limit:Number(d.limit||70)})).filter(x=>!isNaN(x.lat)&&!isNaN(x.lon)&&!isNaN(x.limit));
+        const base=load(); const ids=new Set(base.map(x=>x.id)); normalized.forEach(n=>{ if(!ids.has(n.id)) base.push(n); });
+        save(base); renderRadars(); alert('Import ok');
+      }catch(err){ alert('Import xato: '+err.message); }
     }; r.readAsText(f);
   });
 
-  // file inputs
-  alertInput.addEventListener('change', e => { alertFile = e.target.files[0] || null; alert('Alert ovozi saqlandi'); });
-  oversInput.addEventListener('change', e => { oversFile = e.target.files[0] || null; alert('Overspeed ovozi saqlandi'); });
-
-  // admin toggles
-  delModeBtn.addEventListener('click', ()=> {
-    deleteMode = !deleteMode;
-    delModeBtn.textContent = 'O\'chirish rejimi: ' + (deleteMode ? 'ON' : 'OFF');
-  });
-
-  // basic controls
-  startBtn.addEventListener('click', ()=> start());
-  centerBtn.addEventListener('click', ()=> { if(lastPos) map.setView([lastPos.lat,lastPos.lon],15); });
-  clearBtn.addEventListener('click', ()=> { if(confirm('Hamma radarlarni oʻchirilsinmi?')){ localStorage.removeItem(STORAGE); renderRadars(); }});
-  addBtn.addEventListener('click', ()=> { if(!lastPos){ alert('Avval GPSni ishga tushiring'); return; } const lim = prompt('Limit (km/h)','70'); if(lim) addRadar(lastPos.lat,lastPos.lon,lim); });
-
-  // login flow
-  codeEnter.addEventListener('click', ()=> {
-    const v = codeInput.value.trim();
-    if(v === ADMIN_CODE){
-      isAdmin = true;
-      loginModal.style.display = 'none';
-      adminPanel.style.display = 'block';
-      loginMsg.textContent = 'Admin rejim yoqildi';
-      // show admin-only elements
-      document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-    } else {
-      loginMsg.textContent = 'Kod noto\'g\'ri';
-    }
-  });
-
-  noCode.addEventListener('click', ()=> {
-    isAdmin = false;
-    loginModal.style.display = 'none';
-    // guest: only basic controls
-    adminPanel.style.display = 'none';
-  });
-
-  // init map and sample data if none
+  // Init
   function init(){
     initMap();
-    if(load().length === 0){
-      // sample radars
-      const sample = [
-        {id: uid(), lat:41.32678, lon:69.28153, limit:70},
-        {id: uid(), lat:41.31115, lon:69.27973, limit:60}
-      ];
-      save(sample);
+    if(load().length===0){
+      save([{id:uid(),lat:41.32678,lon:69.28153,limit:70},{id:uid(),lat:41.31115,lon:69.27973,limit:60}]);
       renderRadars();
     }
-    // react to updateSec change
-    updateSecInput.addEventListener('change', ()=> {
-      // will be used next start
-    });
   }
-
   init();
 })();
 </script>
