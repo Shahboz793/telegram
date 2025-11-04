@@ -3,8 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Radar Mobile + Voice — Ogohlantirish va Hushyorlik</title>
+  <title>Radar Mobile PWA — Server + Overspeed</title>
   <meta name="theme-color" content="#0ea5e9">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon-192.png" sizes="192x192">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
   <style>
     :root{
       --bg:#f8fbff;--card:#fff;--accent:#0ea5e9;--accent-700:#0284c7;
@@ -23,28 +28,30 @@
     .btn{background:var(--accent);color:#fff;border:0;padding:12px 14px;border-radius:12px;font-weight:700}
     .btn.ghost{background:transparent;color:var(--accent);border:2px solid rgba(14,165,233,.15)}
     .small{font-size:12px;color:var(--muted)}
+    .badge{display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;background:#fff;border:3px solid #e6f2fb;box-shadow:0 10px 24px rgba(2,6,23,.08);font-weight:900;font-size:18px}
+    .badgerow{display:flex;gap:12px;margin-left:auto}
     .alert{padding:10px;border-radius:10px;margin-top:8px}
     .a500{background:#f0f9ff;border-left:6px solid #0ea5e9;color:#0369a1}
     .a300{background:#fff7ed;border-left:6px solid #f59e0b;color:#b45309}
     .a100{background:#fff1f2;border-left:6px solid #ef4444;color:#991b1b}
+    .overspeed{background:#fee2e2;border-left:8px solid #ef4444;color:#991b1b;font-weight:800}
     .list{max-height:180px;overflow:auto;margin-top:8px;display:flex;flex-direction:column;gap:6px}
     .item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid #eaf2f9;border-radius:10px}
     input[type="file"]{display:none}
     input[type="number"]{padding:8px;border:1px solid #e6eef9;border-radius:10px;width:90px}
   </style>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 </head>
 <body>
   <div class="app">
     <header>
       <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(180deg,#06b6d4,#0284c7);display:flex;align-items:center;justify-content:center;color:white;font-weight:800">R</div>
       <div class="brand">
-        <div class="title">Radar Mobile + Voice</div>
-        <div class="sub">500m / 300m / 100m + hushyorlik ovozlari</div>
+        <div class="title">Radar Mobile PWA</div>
+        <div class="sub">Serverdan radar + Offline + Overspeed</div>
       </div>
-      <div style="margin-left:auto;text-align:right">
-        <div class="small">Tezlik: <span id="sp">—</span> km/h</div>
-        <div class="small" id="gps">GPS: kutilyapti…</div>
+      <div class="badgerow">
+        <div class="badge"><div><div class="small">TEZLIK</div><div id="curSpeed">—</div></div></div>
+        <div class="badge"><div><div class="small">LIMIT</div><div id="curLimit">—</div></div></div>
       </div>
     </header>
 
@@ -59,46 +66,64 @@
       </div>
 
       <div class="row" style="margin-top:8px">
-        <label for="alert-voice" class="btn ghost">Ogohlantirish ovozi (1x)</label>
+        <button id="fetch" class="btn">Serverdan yuklash</button>
+        <input id="api" style="flex:1;padding:10px;border:1px solid #e6eef9;border-radius:10px" placeholder="API URL (JSON) — masalan: https://domain/radars.json">
+      </div>
+
+      <div class="row" style="margin-top:8px">
+        <label for="overs-voice" class="btn ghost">tezlik_oshirdingiz.mp3</label>
+        <input id="overs-voice" type="file" accept="audio/*">
+        <label for="alert-voice" class="btn ghost">Alert ovozi (1x)</label>
         <input id="alert-voice" type="file" accept="audio/*">
-        <label for="drowsy-voices" class="btn ghost">Hushyorlik MP3 (navbat bilan)</label>
+        <label for="drowsy-voices" class="btn ghost">Hushyorlik MP3</label>
         <input id="drowsy-voices" type="file" accept="audio/*" multiple>
         <span class="small">Interval (daq):</span>
         <input id="drowsy-min" type="number" min="1" value="5">
         <button id="drowsy-toggle" class="btn ghost">Hushyorlik: OFF</button>
       </div>
 
+      <div id="overs" style="margin-top:8px"></div>
       <div id="alerts"></div>
-
       <div class="list" id="list"></div>
     </div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
+  // ====== Service Worker Registration ======
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('./sw.js').catch(console.warn);
+    });
+  }
+
   (function(){
     // ===== Config =====
-    const TH = { A500:500, A300:300, A100:100 }; // meters
-    const STORAGE = 'radars_voice_v1';
+    const TH = { A500:500, A300:300, A100:100 };
+    const STORAGE = 'radars_server_v1';
 
     // ===== State =====
     let map, userMarker, userCircle, watchId=null, lastPos=null, lastSpeed=null;
     let audioReady=false;
-    let alertVoice=null; // one-shot alert file
-    let drowsyFiles=[];  // playlist
-    let drowsyIndex=0, drowsyTimer=null;
+    let alertVoice=null, oversVoice=null;
+    let drowsyFiles=[], drowsyIndex=0, drowsyTimer=null;
+    let currentLimit=null, oversLastFire=0; // rate-limit
 
-    const sp = document.getElementById('sp');
-    const gps = document.getElementById('gps');
+    const curSpeedEl = document.getElementById('curSpeed');
+    const curLimitEl = document.getElementById('curLimit');
     const list = document.getElementById('list');
     const alerts = document.getElementById('alerts');
+    const overs = document.getElementById('overs');
 
     // Buttons / inputs
     const btnStart = document.getElementById('start');
     const btnAdd = document.getElementById('add');
     const btnCenter = document.getElementById('center');
     const btnClear = document.getElementById('clear');
+    const btnFetch = document.getElementById('fetch');
+    const apiInput = document.getElementById('api');
     const inpAlert = document.getElementById('alert-voice');
+    const inpOvers = document.getElementById('overs-voice');
     const inpDrowsy = document.getElementById('drowsy-voices');
     const inpDMin = document.getElementById('drowsy-min');
     const btnDToggle = document.getElementById('drowsy-toggle');
@@ -118,14 +143,13 @@
     function save(a){localStorage.setItem(STORAGE, JSON.stringify(a));}
 
     // ===== Map =====
+    const layers={}; // id -> {marker,c500,c300,c100,meta}
     function initMap(){
       map = L.map('map',{zoomControl:false, attributionControl:false}).setView([41.311081,69.240562],13);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
       map.on('contextmenu', e=>quickAdd(e.latlng.lat, e.latlng.lng));
       renderRadars();
     }
-
-    const layers={}; // id -> {marker,c500,c300,c100,meta}
     function clearLayers(){
       Object.values(layers).forEach(Ly=>{
         if(Ly.marker) map.removeLayer(Ly.marker);
@@ -155,6 +179,7 @@
       });
     }
 
+    // ===== Add / Quick Add =====
     function addRadar(lat,lon,limit){
       const Lm=parseInt(limit); if(isNaN(Lm)||Lm<=0){alert('Limit notoʻgʻri'); return;}
       const arr=load(); arr.push({id:uid(),lat,lon,limit:Lm,created:Date.now()}); save(arr); renderRadars();
@@ -163,85 +188,127 @@
       const lim=prompt('Radar maksimal tezligi (km/h)','70'); if(lim===null) return; addRadar(lat,lon,lim);
     }
 
+    // ===== Fetch from Server =====
+    async function fetchFromServer(){
+      const url = apiInput.value.trim();
+      if(!url){ alert('API URL kiriting'); return; }
+      try{
+        const res = await fetch(url, {cache:'no-store'});
+        const data = await res.json();
+        if(!Array.isArray(data)) throw new Error('JSON array bo\'lishi kerak');
+        // expected fields: [{lat, lon, limit}]
+        const normalized = data.map(d=>({id: d.id || uid(), lat: Number(d.lat), lon: Number(d.lon), limit: Number(d.limit||70)}))
+                               .filter(x=>!isNaN(x.lat)&&!isNaN(x.lon)&&!isNaN(x.limit));
+        // merge (by id if exists, else append)
+        const base = load();
+        const ids = new Set(base.map(b=>b.id));
+        normalized.forEach(n=>{ if(!ids.has(n.id)) base.push(n); });
+        save(base);
+        renderRadars();
+        alert('Serverdan yuklandi: ' + normalized.length + ' ta radar');
+      }catch(e){
+        alert('Yuklash xatoligi: ' + e.message);
+      }
+    }
+
     // ===== Geolocation =====
     function startWatch(){
       if(watchId!==null) return;
-      if(!navigator.geolocation){alert('Brauzer geolocation ni qoʻllamaydi'); return;}
-      gps.textContent='GPS: izlanmoqda…';
+      if(!navigator.geolocation){alert('Geolocation yo‘q'); return;}
       watchId = navigator.geolocation.watchPosition(onPos, onGeoErr, {enableHighAccuracy:true, maximumAge:500, timeout:10000});
     }
-    function onGeoErr(err){ gps.textContent='GPS xatoligi: ' + (err.message||err.code); }
+    function onGeoErr(err){ console.warn('GPS xatoligi', err); }
     function onPos(p){
       const lat=p.coords.latitude, lon=p.coords.longitude, ts=p.timestamp||Date.now();
-      if(!userMarker){ userMarker=L.circleMarker([lat,lon],{radius:8,color:'#0284c7',fillColor:'#06b6d4',fillOpacity:.9}).addTo(map);
-                       userCircle=L.circle([lat,lon],{radius:10,color:'#93c5fd',fillColor:'#dbeafe',fillOpacity:.25}).addTo(map); }
-      else { userMarker.setLatLng([lat,lon]); userCircle.setLatLng([lat,lon]); }
+      if(!userMarker){
+        userMarker=L.circleMarker([lat,lon],{radius:8,color:'#0284c7',fillColor:'#06b6d4',fillOpacity:.9}).addTo(map);
+        userCircle=L.circle([lat,lon],{radius:10,color:'#93c5fd',fillColor:'#dbeafe',fillOpacity:.25}).addTo(map);
+        map.setView([lat,lon],15);
+      } else { userMarker.setLatLng([lat,lon]); userCircle.setLatLng([lat,lon]); }
       // speed
       let s=null;
       if(p.coords.speed!=null && !isNaN(p.coords.speed)) s=p.coords.speed;
       else if(lastPos){ const d=dist(lastPos.lat,lastPos.lon,lat,lon); const dt=(ts-lastPos.ts)/1000; if(dt>0) s=d/dt; }
       if(s!=null) lastSpeed=s;
-      const kmh = lastSpeed? mps2kmh(lastSpeed):null; sp.textContent = kmh? kmh : '—';
+      const kmh = lastSpeed? mps2kmh(lastSpeed):null;
+      curSpeedEl.textContent = kmh? kmh : '—';
 
-      gps.textContent='GPS: ok';
-      // check
-      handleAlerts({lat,lon,kmh});
-      // after-pass check
-      handlePassed({lat,lon});
+      // compute applicable limit: take nearest radar within 500 m (lowest limit if tie)
+      const arr = load();
+      let nearest = null;
+      arr.forEach(r=>{
+        const d = dist(lat,lon,r.lat,r.lon);
+        if(d<=TH.A500){
+          if(!nearest || d<nearest.d || (Math.abs(d-nearest.d)<1 && r.limit<nearest.limit)){
+            nearest = {id:r.id, d, limit:r.limit};
+          }
+        }
+      });
+      currentLimit = nearest ? nearest.limit : null;
+      curLimitEl.textContent = currentLimit != null ? currentLimit : '—';
+
+      // overspeed check
+      overs.innerHTML='';
+      if(kmh!=null && currentLimit!=null && kmh > currentLimit + 1){
+        const div = document.createElement('div');
+        div.className='alert overspeed';
+        const diff = Math.round(kmh - currentLimit);
+        div.innerHTML = `<b>Tezlik oshdi!</b> — ${kmh} km/h (limit ${currentLimit}) — kamaytiring ${diff} km/h`;
+        overs.appendChild(div);
+        // audio once per 10s
+        if(audioReady && Date.now() - oversLastFire > 10000){
+          oversLastFire = Date.now();
+          if(oversVoice) playOnce(oversVoice);
+        }
+      }
+
+      // Proximity alerts
+      handleAlerts({lat,lon});
+
       lastPos={lat,lon,ts};
     }
 
-    // ===== Alerts =====
-    const lastFired = {}; // id+level -> timestamp (to rate-limit)
-    const crossed = {};   // id -> {minDist: number, passed: boolean}
-    function handleAlerts({lat,lon,kmh}){
-      const arr = load(); alerts.innerHTML='';
+    // ===== Alerts (500/300/100 + optional voice) =====
+    const lastFired = {}; // id+level -> ts
+    function handleAlerts({lat,lon}){
+      alerts.innerHTML='';
+      const arr = load();
       const msgs=[];
       arr.forEach(r=>{
         const d = Math.round(dist(lat,lon,r.lat,r.lon));
-        if(!crossed[r.id]) crossed[r.id]={minDist:Infinity,passed:false};
-        // update min distance (to detect passing)
-        if(d < crossed[r.id].minDist) crossed[r.id].minDist = d;
-        // pick level
         let level=null;
         if(d<=TH.A100) level='A100';
         else if(d<=TH.A300) level='A300';
         else if(d<=TH.A500) level='A500';
         if(level){
-          msgs.push({id:r.id,d,limit:r.limit,level});
-          renderAlertCard({d,limit:r.limit,level});
-          maybeSound({id:r.id,level});
-          // if wants 200m optional intermediate beep, you can duplicate for 200m here
+          msgs.push({id:r.id, d, limit:r.limit, level});
         }
       });
+      msgs.sort((a,b)=>a.d - b.d);
+      msgs.forEach(m=>{
+        const div = document.createElement('div');
+        if(m.level==='A100') div.className='alert a100';
+        else if(m.level==='A300') div.className='alert a300';
+        else div.className='alert a500';
+        const title = m.level==='A100' ? '100 m: Xavf! Radar juda yaqin' :
+                       m.level==='A300' ? '300 m: Tezlikni pasaytiring' :
+                                          '500 m: Radar yaqin';
+        div.innerHTML = `<b>${title}</b><div class="small">${m.d} m qoldi — max ${m.limit} km/h</div>`;
+        alerts.appendChild(div);
+        maybeSound({id:m.id, level:m.level});
+      });
     }
-
-    function renderAlertCard({d,limit,level}){
-      const div=document.createElement('div');
-      if(level==='A100') div.className='alert a100';
-      else if(level==='A300') div.className='alert a300';
-      else div.className='alert a500';
-      const title = level==='A100' ? '100 m: Xavf! Radar juda yaqin' :
-                     level==='A300' ? '300 m: Tezlikni pasaytiring' :
-                                       '500 m: Radar yaqin';
-      div.innerHTML = `<b>${title}</b><div class="small">${d} m qoldi — max ${limit} km/h</div>`;
-      alerts.appendChild(div);
-    }
-
     function maybeSound({id,level}){
       if(!audioReady) return;
       const key = id+'-'+level;
       const now = Date.now();
-      if((now - (lastFired[key]||0)) < 6000) return; // rate-limit 6s
+      if((now - (lastFired[key]||0)) < 6000) return;
       lastFired[key]=now;
-      // 3 soniya ogohlantirish signali (beep)
+      // 3s tone + 1x alertVoice
       tone(level);
-      // 1 marta yuklangan ogohlantirish ovozi
-      if(alertVoice){ playOnce(alertVoice); }
+      if(alertVoice) playOnce(alertVoice);
     }
-
     function tone(level){
-      // 3 sekundlik beep (chastota levelga qarab)
       const freq = level==='A100' ? 520 : (level==='A300' ? 440 : 360);
       const dur = 3.0;
       try{
@@ -259,32 +326,11 @@
       a.play().finally(()=> URL.revokeObjectURL(url));
     }
 
-    // ===== After passing radar: 100 m keyin ovoz =====
-    function handlePassed({lat,lon}){
-      const arr = load();
-      arr.forEach(r=>{
-        const d = Math.round(dist(lat,lon,r.lat,r.lon));
-        const c = crossed[r.id];
-        if(!c) return;
-        // passed if we were closer before and now moving away (> c.minDist + 100)
-        if(!c.passed && c.minDist<=30 && d>=100){
-          c.passed=true;
-          // play short voice/beep to say "radardan o'tdingiz, 100 m"
-          if(audioReady){
-            tone('A500'); // short neutral tone
-            if(alertVoice) playOnce(alertVoice);
-          }
-        }
-        // reset if far away to allow next pass in future
-        if(c.passed && d>TH.A500+200){ crossed[r.id]={minDist:Infinity,passed:false}; }
-      });
-    }
-
-    // ===== Drowsiness playlist (hushyorlik) =====
+    // ===== Drowsy (playlist) =====
     function startDrowsy(){
       stopDrowsy();
       const mins = Math.max(1, parseInt(inpDMin.value)||5);
-      if(drowsyFiles.length===0){ alert('Hushyorlik uchun MP3 fayllarni tanlang'); return; }
+      if(drowsyFiles.length===0){ alert('Hushyorlik uchun MP3 tanlang'); return; }
       btnDToggle.textContent='Hushyorlik: ON';
       drowsyTimer = setInterval(()=>{
         if(!audioReady) return;
@@ -307,31 +353,12 @@
     });
     btnCenter.addEventListener('click',()=>{ if(lastPos) map.setView([lastPos.lat,lastPos.lon],15); });
     btnClear.addEventListener('click',()=>{ if(confirm('Hamma radarlarni o‘chirilsinmi?')){ localStorage.removeItem(STORAGE); renderRadars(); } });
+    btnFetch.addEventListener('click', fetchFromServer);
 
     inpAlert.addEventListener('change',e=>{ alertVoice = e.target.files[0]||null; });
+    inpOvers.addEventListener('change',e=>{ oversVoice = e.target.files[0]||null; });
     inpDrowsy.addEventListener('change',e=>{ drowsyFiles = Array.from(e.target.files||[]); drowsyIndex=0; });
     btnDToggle.addEventListener('click',()=>{ if(drowsyTimer) stopDrowsy(); else startDrowsy(); });
-
-    function startWatch(){
-      if(watchId!==null) return;
-      if(!navigator.geolocation){ alert('Geolocation yo‘q'); return; }
-      watchId = navigator.geolocation.watchPosition(p=>{
-        const lat=p.coords.latitude, lon=p.coords.longitude, ts=p.timestamp||Date.now();
-        if(!userMarker){
-          userMarker=L.circleMarker([lat,lon],{radius:8,color:'#0284c7',fillColor:'#06b6d4',fillOpacity:.9}).addTo(map);
-          userCircle=L.circle([lat,lon],{radius:10,color:'#93c5fd',fillColor:'#dbeafe',fillOpacity:.25}).addTo(map);
-          map.setView([lat,lon],15);
-        } else { userMarker.setLatLng([lat,lon]); userCircle.setLatLng([lat,lon]); }
-        let s=null;
-        if(p.coords.speed!=null && !isNaN(p.coords.speed)) s=p.coords.speed;
-        else if(lastPos){ const d=dist(lastPos.lat,lastPos.lon,lat,lon); const dt=(ts-lastPos.ts)/1000; if(dt>0) s=d/dt; }
-        if(s!=null) lastSpeed=s; sp.textContent = lastSpeed? mps2kmh(lastSpeed):'—';
-        gps.textContent='GPS: ok';
-        handleAlerts({lat,lon,kmh:lastSpeed?mps2kmh(lastSpeed):null});
-        handlePassed({lat,lon});
-        lastPos={lat,lon,ts};
-      }, onGeoErr, {enableHighAccuracy:true,maximumAge:500,timeout:10000});
-    }
 
     initMap();
   })();
