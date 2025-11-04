@@ -1,307 +1,714 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Radar — Admin (2768) / Guest (Fast Fix)</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kim Millioner Bo'lishni Xohlaydi — Web (Offline, 4 yordam, Pro)</title>
 <style>
-:root{ --bg:#f7fbff; --card:#fff; --accent:#0ea5e9; --danger:#ef4444; --muted:#475569; --radius:12px; }
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg)}
-.app{display:flex;flex-direction:column;height:100vh}
-.top{display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);box-shadow:0 8px 24px rgba(2,6,23,.06)}
-.brand{font-weight:800}
-.small{font-size:13px;color:var(--muted)}
-.mapwrap{flex:1;position:relative}
-#map{height:100%}
-.panel{position:fixed;left:10px;right:10px;bottom:12px;background:var(--card);padding:10px;border-radius:12px;box-shadow:0 12px 36px rgba(2,6,23,.12);display:flex;flex-direction:column;gap:8px}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.btn{padding:10px 12px;border-radius:10px;border:0;background:var(--accent);color:#fff;font-weight:700}
-.btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(14,165,233,.12)}
-.centerOverlay{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);z-index:1200;background:rgba(0,0,0,.8);color:#fff;padding:16px 20px;border-radius:12px;display:none;font-weight:800;font-size:20px}
-.badge{padding:6px 10px;border-radius:10px;background:#fff;border:1px solid #eef6fb;font-weight:800}
+  /* ===== THEME TOKENS ===== */
+  :root{
+    --bg:#0b122b; --panel:#0f172a; --card:#0f172a; --muted:#94a3b8; --text:#e5e7eb; 
+    --accent:#fbbf24; --ok:#22c55e; --danger:#ef4444; --primary:#2563eb; --border:#1f2937;
+    --shadow: 0 20px 50px rgba(0,0,0,.35); --radius:20px;
+    --glow:0 0 0px rgba(255,255,255,.0);
+  }
+  /* Neon theme */
+  .theme-neon{ --bg:#050510; --panel:#0a0b1a; --card:#0a0b1a; --border:#1b1c31; --accent:#22d3ee; --primary:#8b5cf6; --text:#eaf2ff; --muted:#9fb0cf; --glow:0 0 18px rgba(139,92,246,.35) }
+  /* School (kid-friendly) */
+  .theme-school{ --bg:#0b122b; --panel:#0a1728; --card:#0a1728; --border:#1e3350; --accent:#f59e0b; --primary:#10b981; --text:#eaf7ff; --muted:#bcd7ff; --glow:0 0 14px rgba(245,158,11,.35) }
+  /* Classic */
+  .theme-classic{ --bg:#0b122b; }
 
-/* Modal (blocks interaction until choice) */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:2000}
-.card{background:#fff;padding:18px;border-radius:12px;max-width:420px;width:92%}
-.input{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef9;margin-top:8px}
-.small-muted{font-size:12px;color:var(--muted);margin-top:6px}
+  *{box-sizing:border-box}
+  html,body{height:100%;}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%, #112 0%, #0a0f22 40%, #060b18 100%), var(--bg); color:var(--text); font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif; overflow:hidden}
+  .container{height:100%;max-width:1250px;margin:0 auto;padding:16px;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:12px;flex-wrap:wrap}
+  .brand{font-weight:800;font-size:22px;letter-spacing:.3px}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .file{display:flex;align-items:center;gap:8px;background:#0f172a;border:1px solid var(--border);padding:8px 10px;border-radius:12px;color:#cbd5e1}
+  input[type=file]{color:#cbd5e1;max-width:220px}
+  .btn{background:linear-gradient(180deg,var(--primary),#1e40af); color:#fff; border:0; padding:10px 16px; border-radius:12px; font-weight:700; cursor:pointer; box-shadow:var(--shadow)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-secondary{background:#1f2937}
 
-/* Disable app until login */
-.disabled-cover{position:fixed;inset:0;z-index:1500;background:transparent;pointer-events:auto}
-.hidden{display:none}
+  .wrap{flex:1;display:grid;grid-template-columns:1.18fr .82fr;gap:16px;min-height:0}
+  .left,.right{background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; min-height:0}
+  .left{position:relative; display:flex; flex-direction:column}
+  .right{display:flex;flex-direction:column}
+  .topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01))}
+  .pill{background:#111827;border:1px solid var(--border);color:#cbd5e1;padding:6px 10px;border-radius:999px;font-size:12px}
+  .score{font-weight:800;color:#ffe08a; text-shadow:var(--glow)}
+  .helps{display:flex;gap:10px;align-items:center}
+  .help{background:#0f172a;border:1px solid var(--border);color:#e5e7eb;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:800}
+  .help:disabled{opacity:.5;cursor:not-allowed}
+
+  .stage-wrap{position:relative; flex:1; display:flex; flex-direction:column; min-height:0}
+  .q-top{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 14px; border-bottom:1px dashed var(--border)}
+  .q-timer-badge{font-weight:900; color:#1f2937; background:linear-gradient(180deg,#ffe08a,#facc15); padding:6px 12px; border-radius:10px; border:2px solid #a16207}
+
+  .question{padding:18px 18px 6px;font-size:32px;font-weight:900;text-align:center;line-height:1.22}
+  .qimg{max-width:85%;max-height:240px;border:2px dashed var(--border);border-radius:14px;box-shadow:var(--shadow)}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:12px 16px 16px;flex:1;align-content:start}
+  .opt{background:linear-gradient(180deg,#0b132b,#0b132b);border:2px solid #1e293b;color:#fff;border-radius:16px;padding:16px 16px;font-size:20px;font-weight:800;cursor:pointer;box-shadow:var(--shadow);text-align:center}
+  .opt:hover{outline:2px solid #334155}
+  .opt.correct{background:linear-gradient(180deg,#0f3e1e,#0b2c16); border-color:#14532d}
+  .opt.wrong{background:linear-gradient(180deg,#3b0b0b,#2b0b0b); border-color:#7f1d1d}
+
+  .bottom{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);background:rgba(0,0,0,.25);backdrop-filter: blur(6px)}
+  .timer{height:10px;background:#0b122b;border:1px solid var(--border);border-radius:999px;overflow:hidden;flex:1;margin:0 12px}
+  .timer > div{height:100%;width:0;background:linear-gradient(90deg,#66c2ff,#4ade80);transition:width .3s}
+
+  .board{padding:12px;display:grid;grid-template-columns:1fr;gap:8px;overflow:hidden; flex:1; min-height:0}
+  .board-inner{overflow:auto; height:100%;}
+  .ladder-head{padding:10px 12px; font-weight:800}
+  .row{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,#0b1120,#0a0f22);border:1px solid var(--border);padding:10px 12px;border-radius:12px}
+  .row.active{outline:2px solid var(--accent)}
+  .row.passed{color:#a7f3d0;border-color:#14532d;background:#0b2016}
+  .row .level{color:#cbd5e1;font-weight:700}
+  .row .sum{color:#ffe08a;font-weight:800}
+
+  .players-bar{padding:10px 12px; border-top:1px dashed var(--border); display:flex; gap:8px; align-items:center}
+  .players-btn{background:#0b122b; border:1px solid var(--border); color:#e5e7eb; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer}
+  .players-badge{margin-left:auto; font-size:12px; color:#cbd5e1}
+
+  /* Players Modal */
+  .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.55); z-index:50}
+  .modal .sheet{width:min(860px, 92vw); max-height:80vh; background:#0b1120; border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); display:flex; flex-direction:column}
+  .modal .head{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--border)}
+  .modal .list{padding:12px; overflow:auto; display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .p-card{background:#0f172a; border:1px solid var(--border); border-radius:12px; padding:10px}
+  .p-title{font-weight:900}
+  .p-sub{color:#cbd5e1; font-size:12px}
+
+  /* Toast center */
+  .toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#111827;border:1px solid #334155;padding:18px 22px;border-radius:16px;box-shadow:var(--shadow);font-weight:900;font-size:22px;text-align:center;z-index:40}
+  .hidden{display:none}
+
+  /* Audience panel */
+  .audience{display:none;grid-template-columns:repeat(4,1fr);gap:12px;padding:0 16px 10px}
+  .aud-col{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .aud-bar-wrap{height:110px;width:40px;border:1px solid var(--border);border-radius:10px;background:#0b122b;display:flex;align-items:flex-end;overflow:hidden}
+  .aud-bar{width:100%;height:0;background:linear-gradient(180deg,#22c55e,#16a34a);transition:height .5s}
+  .aud-label{font-weight:800}
+
+  /* Final Panel */
+  .final{position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:60}
+  .final .card{width:min(900px,95vw); max-height:85vh; overflow:auto; background:#0b1120; border:1px solid var(--border); border-radius:18px; padding:16px}
+  .final h2{margin:6px 0 10px 0}
+  .table{width:100%; border-collapse:collapse}
+  .table th,.table td{border:1px solid #243044; padding:8px 10px; text-align:left}
+  .table th{background:#0f172a}
+
+  @media (max-width: 980px){
+    .wrap{grid-template-columns:1fr}
+    .question{font-size:26px}
+    .opt{font-size:18px}
+    .modal .list{grid-template-columns:1fr}
+  }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="top">
-    <div class="brand">Radar — Mini</div>
-    <div style="margin-left:auto" class="small">Hozir: <span id="curSpeed">—</span> km/h</div>
-  </div>
-
-  <div class="mapwrap">
-    <div id="map"></div>
-    <div id="overlay" class="centerOverlay" role="status" aria-live="polite"></div>
-  </div>
-
-  <div class="panel">
-    <div class="row">
-      <button id="startBtn" class="btn" disabled>BOSHLASH</button>
-      <button id="guestBtn" class="btn ghost" disabled>Oddiy (guest)</button>
-      <div style="margin-left:auto" class="small">Limit: <span id="curLimit">—</span></div>
-    </div>
-
-    <!-- Guest controls -->
-    <div id="guestControls" class="row">
-      <button id="centerBtn" class="btn ghost" disabled>Markazga</button>
-      <button id="clearBtn" class="btn ghost" disabled>Hammasini o'chirish</button>
-    </div>
-
-    <!-- Admin controls -->
-    <div id="adminPanel" class="hidden">
-      <div class="row">
-        <button id="addBtn" class="btn ghost" disabled>Joylashuv qo'sh</button>
-        <button id="delModeBtn" class="btn ghost" disabled>O'chirish rejimi: OFF</button>
-        <label class="btn ghost" style="display:inline-block;padding:8px;">
-          Upload alert (1x)
-          <input id="alertFile" type="file" accept="audio/*" style="display:none">
-        </label>
-        <label class="btn ghost" style="display:inline-block;padding:8px;">
-          Upload overspeed
-          <input id="oversFile" type="file" accept="audio/*" style="display:none">
-        </label>
+  <div class="container">
+    <header>
+      <div class="brand">💡 Kim Millioner Bo‘lishni Xohlaydi — Web (Offline, 4 yordam)</div>
+      <div class="controls">
+        <label class="file">📄 Savollar fayli: <input id="qFile" type="file" accept=".txt"></label>
+        <label class="file">👥 O‘yinchilar fayli: <input id="pFile" type="file" accept=".txt"></label>
+        <button id="btnStart" class="btn">Boshlash</button>
+        <button id="btnPlayers" class="btn btn-secondary">👥 O‘yinchilar</button>
+        <button id="btnFull" class="btn btn-secondary">Fullscreen</button>
       </div>
-      <div class="row">
-        <div class="small">Yangilash (s):</div>
-        <input id="updateSec" class="input" type="number" min="1" value="1" style="width:100px">
-        <div class="small" style="margin-left:auto">Kod: <span class="badge">2768</span></div>
-      </div>
-      <div class="row">
-        <button id="exportBtn" class="btn ghost">Export radars</button>
-        <button id="importBtn" class="btn ghost">Import radars</button>
-        <input id="importFile" type="file" accept=".json" style="display:none">
-      </div>
-    </div>
-  </div>
-</div>
+    </header>
 
-<!-- Interaction blocker until login -->
-<div id="blocker" class="disabled-cover"></div>
+    <div class="wrap">
+      <!-- LEFT: Game area -->
+      <section class="left">
+        <div class="topbar">
+          <div>
+            <span class="pill" id="badgePlayer">O‘yinchi: -</span>
+            <span class="pill" id="badgeQ">Savol: 1</span>
+          </div>
+          <div class="helps">
+            <button id="btn5050" class="help">🧮 50/50</button>
+            <button id="btnAudience" class="help">📊 Audience</button>
+            <button id="btnPhone" class="help">📞 Phone</button>
+            <button id="btnSkip" class="help">⏭️ Skip</button>
+          </div>
+          <div class="score" id="score">💰 0 so‘m</div>
+        </div>
 
-<!-- Login Modal -->
-<div id="loginModal" class="modal" aria-hidden="false">
-  <div class="card">
-    <h3>Kirish</h3>
-    <div class="small-muted">Kod bilan yoki Oddiy kirish tanlang</div>
-    <div style="margin-top:12px">
-      <input id="codeInput" class="input" placeholder="Kod (admin: 2768)" />
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="codeEnter" class="btn">Kodni kiriting</button>
-        <button id="noCode" class="btn ghost">Oddiy kirish</button>
-      </div>
-      <div id="loginMsg" class="small-muted"></div>
+        <div class="stage-wrap">
+          <div class="q-top">
+            <div class="pill" id="status">Tayyor.</div>
+            <div class="q-timer-badge" id="badgeTopTimer">30s</div>
+          </div>
+          <div id="stage" style="flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; padding:14px">
+            <div class="question">Fayllarni tanlang va “Boshlash” tugmasini bosing</div>
+            <div class="muted">Savollar format: 6 qatorlik bloklar (Savol, A, B, C, D, To‘g‘ri javob MATNI)</div>
+          </div>
+
+          <!-- Audience panel -->
+          <div id="audience" class="audience">
+            <div class="aud-col"><div class="aud-bar-wrap"><div class="aud-bar" id="barA"></div></div><div class="aud-label">A</div><div id="pctA">0%</div></div>
+            <div class="aud-col"><div class="aud-bar-wrap"><div class="aud-bar" id="barB"></div></div><div class="aud-label">B</div><div id="pctB">0%</div></div>
+            <div class="aud-col"><div class="aud-bar-wrap"><div class="aud-bar" id="barC"></div></div><div class="aud-label">C</div><div id="pctC">0%</div></div>
+            <div class="aud-col"><div class="aud-bar-wrap"><div class="aud-bar" id="barD"></div></div><div class="aud-label">D</div><div id="pctD">0%</div></div>
+          </div>
+
+          <div class="bottom">
+            <div class="timer"><div id="timebar"></div></div>
+            <span id="timeleft">30s</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Ladder & Players -->
+      <aside class="right">
+        <div class="ladder-head">🏆 Yutuqlar pillapoyasi</div>
+        <div class="board"><div id="ladder" class="board-inner"></div></div>
+        <div class="players-bar">
+          <button id="btnPlayers2" class="players-btn">👥 O‘yinchilar ro‘yxati</button>
+          <span class="players-badge" id="playersBadge">0 ta</span>
+        </div>
+      </aside>
     </div>
   </div>
-</div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <div id="toast" class="toast hidden">🎉 A’lo! 100 000 so‘m yutdingiz!</div>
+
+  <!-- Players Modal -->
+  <div id="playersModal" class="modal">
+    <div class="sheet">
+      <div class="head">
+        <div style="font-weight:900">👥 O‘yinchilar ro‘yxati</div>
+        <div>
+          <button id="btnClosePlayers" class="btn btn-secondary">Yopish</button>
+        </div>
+      </div>
+      <div id="playersList" class="list"></div>
+    </div>
+  </div>
+
+  <!-- Final standings modal -->
+  <div id="final" class="final">
+    <div class="card">
+      <h2>🏁 Umumiy natijalar</h2>
+      <div id="winnersNote" class="muted" style="margin-bottom:8px"></div>
+      <table class="table">
+        <thead><tr><th>#</th><th>Ism</th><th>To‘g‘ri (0–15)</th><th>Yutug‘i (so‘m)</th></tr></thead>
+        <tbody id="finalBody"></tbody>
+      </table>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
+        <button id="btnExport" class="btn">📄 TXT ko‘chirish</button>
+        <button id="btnRestart" class="btn btn-secondary">🔄 Yangi sessiya</button>
+        <button id="btnCloseFinal" class="btn btn-secondary">Yopish</button>
+      </div>
+    </div>
+  </div>
+
 <script>
-(function(){
-  const ADMIN_CODE='2768', STORAGE='radar_auth_v2';
-  let isAdmin=false, deleteMode=false;
-  let watchId=null, lastPos=null, lastSpeed=null;
-  let fastPoll=null; // extra 1s currentPosition
-  let lastFired={};
-  let alertFile=null, oversFile=null;
+(() => {
+  // ======= Config =======
+  const TIME_LIMIT = 30; // <<< Har savol uchun vaqt (soniya). O'zgartirish uchun shu joyni tahrir qiling.
+  const PRIZES = [
+    100000, 200000, 300000, 500000, 1000000,
+    2000000, 4000000, 8000000, 16000000, 32000000,
+    64000000, 125000000, 250000000, 500000000, 1000000000
+  ];
 
-  // DOM
-  const loginModal=$('#loginModal'), blocker=$('#blocker');
-  const codeInput=$('#codeInput'), codeEnter=$('#codeEnter'), noCode=$('#noCode'), loginMsg=$('#loginMsg');
-  const startBtn=$('#startBtn'), guestBtn=$('#guestBtn'), centerBtn=$('#centerBtn'), clearBtn=$('#clearBtn');
-  const addBtn=$('#addBtn'), delModeBtn=$('#delModeBtn'), adminPanel=$('#adminPanel');
-  const alertInput=$('#alertFile'), oversInput=$('#oversFile');
-  const updateSecInput=$('#updateSec'), exportBtn=$('#exportBtn'), importBtn=$('#importBtn'), importFile=$('#importFile');
-  const overlay=$('#overlay'), curSpeed=$('#curSpeed'), curLimit=$('#curLimit');
+  // ======= State =======
+  let questions = []; // {q,A,B,C,D,R}
+  let questionOrder = []; // shuffled indexes
+  let qPtr = 0; // pointer for global order
+  let players = []; // names
+  let currentPlayerIdx = 0;
+  let currentMoney = 0;
+  let correctCount = 0;
+  let standings = []; // {name, correct, money}
 
-  // Map
-  let map, userMarker, userCircle;
-  const layers={};
+  let timerId = null;
+  let timeLeft = TIME_LIMIT;
+  let answering = false;
 
-  function $(sel){ return document.querySelector(sel); }
-  function toRad(v){return v*Math.PI/180;}
-  function haversine(aLat,aLon,bLat,bLon){const R=6371000,dLat=toRad(bLat-aLat),dLon=toRad(bLon-aLon);const A=Math.sin(dLat/2)**2+Math.cos(toRad(aLat))*Math.cos(toRad(bLat))*Math.sin(dLon/2)**2;return R*(2*Math.atan2(Math.sqrt(A),Math.sqrt(1-A)));}
-  function uid(){return 'r'+Date.now()+Math.random().toString(36).slice(2,8);}
-  function load(){try{return JSON.parse(localStorage.getItem(STORAGE))||[]}catch(e){return []}}
-  function save(a){localStorage.setItem(STORAGE, JSON.stringify(a));}
+  let lifelines = resetLifelines(); // per player
 
-  function initMap(){
-    map=L.map('map',{zoomControl:false, attributionControl:false}).setView([41.311081,69.240562],13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
-    renderRadars();
-    map.on('contextmenu',e=>{ if(isAdmin && !deleteMode){ const lim=prompt('Limit (km/h)','70'); if(lim) addRadar(e.latlng.lat,e.latlng.lng,lim); } });
-    map.on('click',e=>{ if(isAdmin && deleteMode){ tryDeleteNearest(e.latlng.lat,e.latlng.lng); } });
+  // ======= DOM =======
+  const btnStart = document.getElementById('btnStart');
+  const btnFull = document.getElementById('btnFull');
+  const btnPlayers = document.getElementById('btnPlayers');
+  const btnPlayers2 = document.getElementById('btnPlayers2');
+  const playersBadge = document.getElementById('playersBadge');
+  const qFile = document.getElementById('qFile');
+  const pFile = document.getElementById('pFile');
+
+  const stage = document.getElementById('stage');
+  const scoreEl = document.getElementById('score');
+  const badgePlayer = document.getElementById('badgePlayer');
+  const badgeQ = document.getElementById('badgeQ');
+  const statusEl = document.getElementById('status');
+  const badgeTopTimer = document.getElementById('badgeTopTimer');
+  const timebar = document.getElementById('timebar');
+  const timeleftEl = document.getElementById('timeleft');
+  const ladder = document.getElementById('ladder');
+  const toast = document.getElementById('toast');
+
+  // lifeline buttons
+  const btn5050 = document.getElementById('btn5050');
+  const btnAudience = document.getElementById('btnAudience');
+  const btnPhone = document.getElementById('btnPhone');
+  const btnSkip = document.getElementById('btnSkip');
+
+  // audience elements
+  const audienceBox = document.getElementById('audience');
+  const barA = document.getElementById('barA'), barB = document.getElementById('barB'),
+        barC = document.getElementById('barC'), barD = document.getElementById('barD');
+  const pctA = document.getElementById('pctA'), pctB = document.getElementById('pctB'),
+        pctC = document.getElementById('pctC'), pctD = document.getElementById('pctD');
+
+  // players modal
+  const playersModal = document.getElementById('playersModal');
+  const playersList = document.getElementById('playersList');
+  const btnClosePlayers = document.getElementById('btnClosePlayers');
+
+  // final
+  const final = document.getElementById('final');
+  const finalBody = document.getElementById('finalBody');
+  const winnersNote = document.getElementById('winnersNote');
+  const btnExport = document.getElementById('btnExport');
+  const btnRestart = document.getElementById('btnRestart');
+  const btnCloseFinal = document.getElementById('btnCloseFinal');
+
+  // ======= Utils =======
+  const fmt = n => (n|0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  function showToast(text, ms=2000){
+    toast.textContent = text;
+    toast.classList.remove('hidden');
+    setTimeout(()=>toast.classList.add('hidden'), ms);
   }
 
-  function renderRadars(){
-    Object.values(layers).forEach(Ly=>{ if(Ly.marker) map.removeLayer(Ly.marker); if(Ly.c100) map.removeLayer(Ly.c100); if(Ly.c300) map.removeLayer(Ly.c300); if(Ly.c500) map.removeLayer(Ly.c500); });
-    for(const k in layers) delete layers[k];
-    const arr=load();
-    arr.forEach((r,idx)=>{
-      const m=L.marker([r.lat,r.lon]).addTo(map).bindPopup(`<b>Radar #${idx+1}</b><div>Limit: ${r.limit} km/h</div>`);
-      const c500=L.circle([r.lat,r.lon],{radius:500,color:'#0ea5e9',fill:false}).addTo(map);
-      const c300=L.circle([r.lat,r.lon],{radius:300,color:'#f59e0b',fill:false}).addTo(map);
-      const c100=L.circle([r.lat,r.lon],{radius:100,color:'#ef4444',fill:false}).addTo(map);
-      layers[r.id]={marker:m,c100,c300,c500,meta:r};
+  function shuffle(arr){
+    const a = [...arr];
+    for (let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  function resetLifelines(){
+    return { fifty:false, audience:false, phone:false, skip:false };
+  }
+
+  function sortedStandings(){
+    const arr = standings.slice().sort((x,y)=>{
+      if(y.correct!==x.correct) return y.correct-x.correct;
+      return y.money-x.money;
+    });
+    return arr;
+  }
+
+  // ======= Audio (WebAudio) =======
+  const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  function tone(freq=440, dur=0.15, type='sine', vol=.15){
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq; o.connect(g); g.connect(audioCtx.destination);
+    g.gain.value = vol; o.start(); setTimeout(()=>{o.stop();}, dur*1000);
+  }
+  function tick(){ tone(700, .07, 'sine', .08); }
+  function correctSnd(){ tone(880,.12,'square',.12); setTimeout(()=>tone(660,.12,'square',.12),140); setTimeout(()=>tone(990,.16,'square',.12),300); }
+  function wrongSnd(){ tone(220,.25,'sawtooth',.12); setTimeout(()=>tone(180,.25,'sawtooth',.12),260); }
+  function startSnd(){ tone(523,.12,'triangle',.12); setTimeout(()=>tone(659,.12,'triangle',.12),140); setTimeout(()=>tone(784,.18,'triangle',.12),290); }
+
+  // ======= File readers (serverlarsiz) =======
+  function readTxtFile(file){
+    return new Promise((resolve, reject)=>{
+      if(!file) return reject(new Error("Fayl tanlanmadi"));
+      const fr = new FileReader();
+      fr.onload = () => resolve(fr.result);
+      fr.onerror = reject;
+      fr.readAsText(file, 'utf-8');
     });
   }
 
-  function addRadar(lat,lon,limit){
-    const Lm=parseInt(limit); if(isNaN(Lm)||Lm<=0){alert('Limit noto‘g‘ri'); return;}
-    const arr=load(); arr.push({id:uid(),lat,lon,limit:Lm}); save(arr); renderRadars();
+  async function loadQuestions(){
+    const f = qFile.files[0];
+    if(!f) throw new Error("Iltimos, questions.txt faylini tanlang");
+    const text = await readTxtFile(f);
+    const lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+    if(lines.length % 6 !== 0) throw new Error("questions.txt formati xato (6 qatorlik blok)");
+    const out = [];
+    for (let i=0;i<lines.length;i+=6){
+      out.push({ q:lines[i], A:lines[i+1], B:lines[i+2], C:lines[i+3], D:lines[i+4], R:lines[i+5] });
+    }
+    return out;
   }
 
-  function tryDeleteNearest(lat,lon){
-    const arr=load(); let nearest=null;
-    arr.forEach(r=>{const d=haversine(lat,lon,r.lat,r.lon); if(d<30 && (!nearest||d<nearest.d)) nearest={r,d};});
-    if(nearest && confirm('Ushbu radarni o‘chirasizmi?')){ save(arr.filter(x=>x.id!==nearest.r.id)); renderRadars(); alert('O‘chirildi'); }
+  async function loadPlayers(){
+    const f = pFile.files[0];
+    if(!f) return ['Player1'];
+    const text = await readTxtFile(f);
+    const names = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+    return names.length ? names.slice(0,50) : ['Player1'];
   }
 
-  // ===== Fast-start geolocation =====
-  function startGeo(){
-    if(watchId) return;
-    // 1) Start watchPosition immediately (prompts quickly)
-    watchId=navigator.geolocation.watchPosition(onPos,onErr,{enableHighAccuracy:true, maximumAge:0, timeout:4000});
-    // 2) Also ask one immediate fix (so marker ko‘rinsin darhol)
-    navigator.geolocation.getCurrentPosition(onPos, onErr, {enableHighAccuracy:true, maximumAge:0, timeout:3000});
-    // 3) Extra fast poll each second to force fresh coords on some browsers
-    stopFastPoll();
-    fastPoll=setInterval(()=>{
-      navigator.geolocation.getCurrentPosition(onPos, ()=>{}, {enableHighAccuracy:true, maximumAge:0, timeout:2000});
+  // ======= UI builders =======
+  function renderLadder(){
+    ladder.innerHTML = '';
+    const inner = document.createElement('div');
+    // 15 -> 1
+    for(let i=PRIZES.length; i>=1; i--){
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.dataset.level = i;
+      const lv = document.createElement('div');
+      lv.className = 'level';
+      lv.textContent = `${String(i).padStart(2,'0')}. bosqich`;
+      const sm = document.createElement('div');
+      sm.className = 'sum';
+      sm.textContent = `${fmt(PRIZES[i-1])}`;
+      row.append(lv, sm);
+      inner.append(row);
+    }
+    ladder.append(inner);
+    updateLadder(0);
+  }
+
+  function updateLadder(passed){ 
+    const rows = ladder.querySelectorAll('.row');
+    rows.forEach(row=>{
+      const level = parseInt(row.dataset.level,10);
+      row.classList.remove('active','passed');
+      if(level <= passed) row.classList.add('passed');
+      if(level === passed+1) row.classList.add('active');
+    });
+  }
+
+  function renderPlayersModal(){
+    playersList.innerHTML = '';
+    const order = sortedStandings();
+    players.forEach((name, idx)=>{
+      const p = document.createElement('div');
+      p.className = 'p-card';
+      const inx = order.findIndex(x=>x.name===name);
+      const pos = inx>=0? (inx+1) : '-';
+      const st = standings.find(x=>x.name===name) || {correct:0, money:0};
+      p.innerHTML = `<div class="p-title">${idx===currentPlayerIdx? '▶️ ':''}${name}</div>
+                     <div class="p-sub">O‘rin: <b>${pos}</b> · To‘g‘ri: <b>${st.correct}</b> · Yutuq: <b>${fmt(st.money)}</b></div>`;
+      playersList.appendChild(p);
+    });
+  }
+
+  function openPlayers(){ renderPlayersModal(); playersModal.style.display='flex'; }
+  function closePlayers(){ playersModal.style.display='none'; }
+
+  function renderQuestion(item, indexShown){
+    audienceBox.style.display = 'none';
+    // Variantlarni har safar aralashtiramiz
+    const variants = shuffle([
+      {key:'A', text:item.A},
+      {key:'B', text:item.B},
+      {key:'C', text:item.C},
+      {key:'D', text:item.D},
+    ]);
+
+    const optsHtml = variants.map(v=>`<button class=\"opt\" data-a=\"${v.key}\">${v.text}</button>`).join('');
+    stage.innerHTML = `
+      <div class="question">${item.q}</div>
+      <div class="options">${optsHtml}</div>
+    `;
+    badgeQ.textContent = `Savol: ${indexShown}`;
+
+    stage.querySelectorAll('.opt').forEach(btn=>{
+      btn.addEventListener('click', () => handleAnswer(btn.textContent, btn));
+    });
+  }
+
+  function setScore(money){ scoreEl.textContent = `💰 ${fmt(money)} so‘m`; }
+
+  // ======= Game flow =======
+  function ensureStandingFor(name){
+    if(!standings.find(x=>x.name===name)) standings.push({name, correct:0, money:0});
+  }
+
+  function nextGlobalQuestion(){
+    if(qPtr >= questionOrder.length){
+      questionOrder = shuffle([...Array(questions.length).keys()]);
+      qPtr = 0;
+    }
+    const idx = questionOrder[qPtr++];
+    return { ...questions[idx], idx };
+  }
+
+  function startTimer(){
+    stopTimer();
+    timeLeft = TIME_LIMIT;
+    timeleftEl.textContent = `${timeLeft}s`;
+    badgeTopTimer.textContent = `${timeLeft}s`;
+    timebar.style.width = '0%';
+    timerId = setInterval(()=>{
+      timeLeft--;
+      tick();
+      if(timeLeft < 0){
+        stopTimer();
+        statusEl.textContent = "⏱️ Vaqt tugadi. Navbat keyingi o‘yinchida!";
+        wrongSnd();
+        handleLose();
+        return;
+      }
+      timeleftEl.textContent = `${timeLeft}s`;
+      badgeTopTimer.textContent = `${timeLeft}s`;
+      const progress = ((TIME_LIMIT-timeLeft)/TIME_LIMIT)*100;
+      timebar.style.width = `${Math.min(100, progress)}%`;
     }, 1000);
   }
-  function stopGeo(){
-    if(watchId){ navigator.geolocation.clearWatch(watchId); watchId=null; }
-    stopFastPoll();
+  function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
+
+  async function handleAnswer(userText, btnEl){
+    if(answering) return;
+    answering = true;
+    stopTimer();
+
+    const item = currentItem;
+    const rightText = item.R.trim();
+    const opts = Array.from(stage.querySelectorAll('.opt'));
+
+    let correctBtn = null;
+    opts.forEach(b=>{ if(b.textContent.trim() === rightText) correctBtn = b; });
+
+    const playerName = players[currentPlayerIdx];
+    ensureStandingFor(playerName);
+    const st = standings.find(x=>x.name===playerName);
+
+    if(userText.trim() === rightText){
+      if(correctBtn){ correctBtn.classList.add('correct'); }
+      correctCount++;
+      currentMoney = PRIZES[Math.min(correctCount-1, PRIZES.length-1)];
+      setScore(currentMoney);
+      updateLadder(correctCount);
+      st.correct = Math.max(st.correct, correctCount);
+      st.money = Math.max(st.money, currentMoney);
+      statusEl.textContent = "✅ To‘g‘ri! Keyingi savol yuklanmoqda…";
+      correctSnd();
+      centerCongrats();
+      await sleep(4000);
+      if(correctCount>=15){ // g‘olib bo‘ldi – keyingi ishtirokchiga o‘tadi
+        statusEl.textContent = "🏁 15 ta savol! Keyingi o‘yinchi";
+        await sleep(800);
+        handleLose(true);
+      }else{
+        askNextForSamePlayer();
+      }
+    }else{
+      if(btnEl){ btnEl.classList.add('wrong'); }
+      if(correctBtn){ correctBtn.classList.add('correct'); }
+      statusEl.textContent = "❌ Noto‘g‘ri. Keyingi o‘yinchi navbatda!";
+      wrongSnd();
+      await sleep(1200);
+      handleLose();
+    }
+    answering = false;
   }
-  function stopFastPoll(){ if(fastPoll){ clearInterval(fastPoll); fastPoll=null; } }
 
-  function onErr(e){ alert('GPS xatoligi: ' + (e.message||e.code)); }
+  function centerCongrats(){
+    const order = sortedStandings();
+    const me = players[currentPlayerIdx];
+    const myPos = Math.max(1, order.findIndex(x=>x.name===me)+1);
+    const text = `🎉 ${me}! ${fmt(currentMoney)} so‘m · O‘rin: #${myPos}`;
+    showToast(text, 4000);
+  }
 
-  function onPos(p){
-    const lat=p.coords.latitude, lon=p.coords.longitude, ts=p.timestamp||Date.now();
-    if(!userMarker){
-      userMarker=L.circleMarker([lat,lon],{radius:7,color:'#0284c7',fillColor:'#06b6d4',fillOpacity:.9}).addTo(map);
-      userCircle=L.circle([lat,lon],{radius:12,color:'#93c5fd',fillColor:'#dbeafe',fillOpacity:.25}).addTo(map);
-      map.setView([lat,lon],15);
-    } else { userMarker.setLatLng([lat,lon]); userCircle.setLatLng([lat,lon]); }
+  function handleLose(byWin=false){
+    const playerName = players[currentPlayerIdx];
+    ensureStandingFor(playerName);
+    const st = standings.find(x=>x.name===playerName);
+    // yakuniy yozuvlar allaqachon st’da
 
-    // speed
-    let s=null;
-    if(p.coords.speed!=null && !isNaN(p.coords.speed)) s=p.coords.speed;
-    else if(lastPos){ const d=haversine(lastPos.lat,lastPos.lon,lat,lon); const dt=(ts-lastPos.ts)/1000; if(dt>0) s=d/dt; }
-    if(s!=null) lastSpeed=s;
-    const kmh = lastSpeed ? Math.round(lastSpeed*3.6*10)/10 : null;
-    curSpeed.textContent = kmh ? kmh : '—';
+    currentPlayerIdx++;
+    if(currentPlayerIdx >= players.length){
+      gameOver();
+      return;
+    }
+    // reset score & helps for next player
+    currentMoney = 0;
+    correctCount = 0;
+    lifelines = resetLifelines();
+    updateHelpsUI();
 
-    // nearest limit (<=500 m)
-    const arr=load(); let nearest=null;
-    arr.forEach(r=>{ const d=haversine(lat,lon,r.lat,r.lon);
-      if(d<=500 && (!nearest || d<nearest.d || (Math.abs(d-nearest.d)<0.5 && r.limit<nearest.limit)) ) nearest={id:r.id,d,limit:r.limit};
+    setScore(currentMoney);
+    updateLadder(0);
+    badgePlayer.textContent = `O‘yinchi: ${players[currentPlayerIdx]}`;
+    statusEl.textContent = byWin? "🏁 G‘olib! Keyingi o‘yinchi boshlandi." : "➡️ Keyingi o‘yinchi boshlandi.";
+    startSnd();
+    askNextForSamePlayer();
+  }
+
+  function gameOver(){
+    stopTimer();
+    fillFinal();
+    final.style.display = 'flex';
+    statusEl.textContent = "✅ Yakunlandi";
+  }
+
+  function askNextForSamePlayer(){
+    currentItem = nextGlobalQuestion();
+    renderQuestion(currentItem, qPtr);
+    startTimer();
+  }
+
+  // ======= Lifelines =======
+  function updateHelpsUI(){
+    btn5050.disabled = lifelines.fifty;
+    btnAudience.disabled = lifelines.audience;
+    btnPhone.disabled = lifelines.phone;
+    btnSkip.disabled = lifelines.skip;
+  }
+
+  btn5050.addEventListener('click', () => {
+    if(lifelines.fifty || answering) return;
+    lifelines.fifty = true; updateHelpsUI();
+
+    const item = currentItem;
+    const rightText = item.R.trim();
+    const buttons = Array.from(stage.querySelectorAll('.opt'));
+    const wrong = buttons.filter(b => b.textContent.trim() !== rightText);
+    const toHide = wrong.length >= 2 ? shuffle(wrong).slice(0,2) : wrong;
+    toHide.forEach(b => { b.style.visibility = 'hidden'; });
+    statusEl.textContent = "🧮 50/50 qo‘llandi (2 ta noto‘g‘ri yashirildi).";
+  });
+
+  btnAudience.addEventListener('click', () => {
+    if(lifelines.audience || answering) return;
+    lifelines.audience = true; updateHelpsUI();
+
+    const item = currentItem;
+    const rightText = item.R.trim();
+    const labels = Array.from(stage.querySelectorAll('.opt')).map(b => b.textContent.trim());
+    const letters = ['A','B','C','D'];
+    const rightLetter = letters[labels.findIndex(t => t === rightText)];
+
+    let rightPct = rand(65, 90);
+    let r1 = rand(0, 100-rightPct);
+    let r2 = rand(0, 100-rightPct-r1);
+    let r3 = 100 - rightPct - r1 - r2;
+    let base = {A:0,B:0,C:0,D:0};
+
+    let others = shuffle(['A','B','C','D'].filter(x=>x!==rightLetter));
+    base[rightLetter] = rightPct;
+    base[others[0]] = r1; base[others[1]] = r2; base[others[2]] = r3;
+
+    setBar(barA, pctA, base.A);
+    setBar(barB, pctB, base.B);
+    setBar(barC, pctC, base.C);
+    setBar(barD, pctD, base.D);
+
+    audienceBox.style.display = 'grid';
+    statusEl.textContent = "📊 Tomoshabinlar fikri ko‘rsatildi.";
+  });
+
+  btnPhone.addEventListener('click', async () => {
+    if(lifelines.phone || answering) return;
+    lifelines.phone = true; updateHelpsUI();
+    statusEl.textContent = "📞 Telefon: do‘stingiz to‘g‘ri variantni aytdi!";
+    const rightText = currentItem.R.trim();
+    await sleep(400);
+    const btn = Array.from(stage.querySelectorAll('.opt')).find(b => b.textContent.trim() === rightText);
+    if(btn){ btn.click(); }
+  });
+
+  btnSkip.addEventListener('click', () => {
+    if(lifelines.skip || answering) return;
+    lifelines.skip = true; updateHelpsUI();
+    statusEl.textContent = "⏭️ Savol almashtirildi.";
+    stopTimer();
+    currentItem = nextGlobalQuestion();
+    renderQuestion(currentItem, qPtr);
+    startTimer();
+  });
+
+  function rand(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function setBar(barEl, pctEl, val){ barEl.style.height = `${Math.max(0, Math.min(100, val))}%`; pctEl.textContent = `${val}%`; }
+
+  // ======= Start / Fullscreen / Players Modal =======
+  btnStart.addEventListener('click', async () => {
+    try{
+      statusEl.textContent = "⏳ Yuklanmoqda…";
+      questions = await loadQuestions();
+      players = await loadPlayers();
+      playersBadge.textContent = `${players.length} ta`;
+
+      questionOrder = shuffle([...Array(questions.length).keys()]);
+      qPtr = 0;
+
+      currentPlayerIdx = 0;
+      currentMoney = 0;
+      correctCount = 0;
+      standings = players.map(n=>({name:n, correct:0, money:0}));
+      lifelines = resetLifelines();
+      updateHelpsUI();
+
+      renderLadder();
+      badgePlayer.textContent = `O‘yinchi: ${players[currentPlayerIdx]}`;
+      setScore(0);
+      statusEl.textContent = "✅ Boshlanmoqda…";
+      startSnd();
+      askNextForSamePlayer();
+    }catch(e){
+      console.error(e);
+      stage.innerHTML = `<div class="question">❗ Xatolik</div><div class="muted">${e.message || e}</div>`;
+      statusEl.textContent = "Xatolik yuz berdi";
+    }
+  });
+
+  function toggleFull(){
+    const el = document.documentElement;
+    if(!document.fullscreenElement){ if(el.requestFullscreen) el.requestFullscreen(); }
+    else{ if(document.exitFullscreen) document.exitFullscreen(); }
+  }
+  btnFull.addEventListener('click', toggleFull);
+  btnPlayers.addEventListener('click', openPlayers);
+  btnPlayers2.addEventListener('click', openPlayers);
+  btnClosePlayers.addEventListener('click', closePlayers);
+  playersModal.addEventListener('click', (e)=>{ if(e.target===playersModal) closePlayers(); });
+
+  // ======= Final =======
+  function fillFinal(){
+    const arr = sortedStandings();
+    finalBody.innerHTML = '';
+    arr.forEach((x,i)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${i+1}</td><td>${x.name}</td><td>${x.correct}</td><td>${fmt(x.money)}</td>`;
+      finalBody.appendChild(tr);
     });
-    curLimit.textContent = nearest ? nearest.limit : '—';
-
-    // overspeed (play oversFile each 10s)
-    if(kmh!=null && nearest && kmh > nearest.limit + 0.5){
-      showOverlay(nearest.limit + ' km/h');
-      const key=nearest.id+'-overs';
-      if(Date.now()-(lastFired[key]||0) > 10000){ lastFired[key]=Date.now(); if(oversFile) playFile(oversFile); }
-    }
-
-    // proximity 500/300/100
-    arr.forEach(r=>{
-      const d = Math.round(haversine(lat,lon,r.lat,r.lon));
-      let level=null; if(d<=100) level='100'; else if(d<=300) level='300'; else if(d<=500) level='500';
-      if(level){ const key=r.id+'-'+level; if(Date.now()-(lastFired[key]||0) > 6000){ lastFired[key]=Date.now(); showOverlay(r.limit+' km/h'); if(alertFile) playFile(alertFile); } }
-    });
-
-    lastPos={lat,lon,ts};
+    const winners = arr.filter(x=>x.correct>=15);
+    winnersNote.textContent = winners.length ? `🥇 15 ta savolni to‘liq topganlar: ${winners.map(w=>w.name).join(', ')}` : 'Hech kim 15 ta savolni to‘liq topmadi.';
   }
 
-  // UI helpers
-  function showOverlay(text){ overlay.textContent=text; overlay.style.display='block'; setTimeout(()=> overlay.style.display='none', 3000); }
-  function playFile(file){ const url=URL.createObjectURL(file); const a=new Audio(url); a.play().finally(()=>URL.revokeObjectURL(url)); }
-
-  // ===== Login flow (blocker prevents accidental "kodsiz kirish") =====
-  codeEnter.addEventListener('click', ()=>{
-    const v=codeInput.value.trim();
-    if(v===ADMIN_CODE){
-      isAdmin=true; loginSuccess();
-      adminPanel.classList.remove('hidden');
-      enableAdmin(true);
-    } else {
-      loginMsg.textContent='Kod noto‘g‘ri';
-    }
-  });
-  noCode.addEventListener('click', ()=>{
-    isAdmin=false; loginSuccess();
-    adminPanel.classList.add('hidden');
-    enableGuest(true);
-  });
-
-  function loginSuccess(){
-    loginModal.style.display='none';
-    blocker.classList.add('hidden'); // now UI clickable
-    // Enable Start + Guest buttons
-    startBtn.disabled=false; guestBtn.disabled=false;
-    // Guest core controls enabled (center & clear) will activate after Start
-    centerBtn.disabled=false; clearBtn.disabled=false;
+  function exportTXT(){
+    const arr = sortedStandings();
+    let txt = 'Umumiy natijalar (Kim Millioner Bo\'lishni Xohlaydi)\n\n';
+    arr.forEach((x,i)=>{ txt += `${i+1}. ${x.name} — To\'g\'ri: ${x.correct} / 15 — Yutuq: ${x.money}\n`; });
+    const winners = arr.filter(x=>x.correct>=15).map(x=>x.name);
+    txt += `\nG\'oliblar (15/15): ${winners.length? winners.join(', '): '—'}\n`;
+    const blob = new Blob([txt], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'natijalar.txt';
+    document.body.appendChild(a); a.click(); a.remove();
   }
 
-  function enableAdmin(on){
-    addBtn.disabled=!on; delModeBtn.disabled=!on;
-  }
-  function enableGuest(on){
-    // guest has no extra toggles here
-  }
+  btnExport.addEventListener('click', exportTXT);
+  btnRestart.addEventListener('click', ()=>{ final.style.display='none'; location.reload(); });
+  btnCloseFinal.addEventListener('click', ()=>{ final.style.display='none'; });
 
-  // Buttons
-  startBtn.addEventListener('click', ()=> startGeo());
-  guestBtn.addEventListener('click', ()=> startGeo());
-  centerBtn.addEventListener('click', ()=> { if(lastPos) map.setView([lastPos.lat,lastPos.lon],15); });
-  clearBtn.addEventListener('click', ()=> { if(confirm('Hamma radarlarni o‘chirilsinmi?')){ localStorage.removeItem(STORAGE); renderRadars(); }});
-  addBtn.addEventListener('click', ()=> { if(!lastPos){ alert('Avval GPSni ishga tushiring'); return; } const lim=prompt('Limit (km/h)','70'); if(lim) addRadar(lastPos.lat,lastPos.lon,lim); });
-  delModeBtn.addEventListener('click', ()=> { deleteMode=!deleteMode; delModeBtn.textContent = "O'chirish rejimi: " + (deleteMode?'ON':'OFF'); });
+  // Current item holder
+  let currentItem = null;
 
-  alertInput.addEventListener('change', e=> alertFile = e.target.files[0] || null);
-  oversInput.addEventListener('change', e=> oversFile = e.target.files[0] || null);
-
-  exportBtn.addEventListener('click', ()=> {
-    const data=load(); const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='radars.json'; a.click(); URL.revokeObjectURL(url);
-  });
-  importBtn.addEventListener('click', ()=> importFile.click());
-  importFile.addEventListener('change', e=>{
-    const f=e.target.files[0]; if(!f) return;
-    const r=new FileReader(); r.onload=()=>{
-      try{
-        const data=JSON.parse(r.result); if(!Array.isArray(data)) throw new Error('JSON array kutilmoqda');
-        const normalized=data.map(d=>({id:d.id||uid(), lat:Number(d.lat), lon:Number(d.lon), limit:Number(d.limit||70)})).filter(x=>!isNaN(x.lat)&&!isNaN(x.lon)&&!isNaN(x.limit));
-        const base=load(); const ids=new Set(base.map(x=>x.id)); normalized.forEach(n=>{ if(!ids.has(n.id)) base.push(n); });
-        save(base); renderRadars(); alert('Import ok');
-      }catch(err){ alert('Import xato: '+err.message); }
-    }; r.readAsText(f);
-  });
-
-  // Init
-  function init(){
-    initMap();
-    if(load().length===0){
-      save([{id:uid(),lat:41.32678,lon:69.28153,limit:70},{id:uid(),lat:41.31115,lon:69.27973,limit:60}]);
-      renderRadars();
-    }
-  }
-  init();
+  // Dastlab UI’ni tayyorlab qo‘yamiz
+  renderLadder();
 })();
 </script>
 </body>
