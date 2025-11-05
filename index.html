@@ -4,21 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BrandNomi — Sayt (Login & Ro'yxatga olish)</title>
-  <meta name="description" content="Bir sahifali sayt — endi ro'yxatga olish va login funksiyalari bilan (localStorage)." />
-  <link rel="icon" href="favicon.ico" />
+  <meta name="description" content="Ro'yxatdan o'tish, login va F.I.SH orqali parolni tiklash tizimi (localStorage)." />
   <style>
     :root{--bg:#0b1220;--card:#0f172a;--text:#e2e8f0;--muted:#94a3b8;--primary:#38bdf8;--accent:#22d3ee;--border:#1e293b;--shadow:0 12px 30px rgba(8,15,40,.35);--radius:14px}
-    [data-theme="light"]{--bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#475569;--primary:#2563eb;--accent:#06b6d4;--border:#e2e8f0}
     *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--text)}
     .container{max-width:1100px;margin:0 auto;padding:20px}
     header{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
     .logo{display:flex;align-items:center;gap:10px;font-weight:700}
     .btn{background:var(--primary);color:white;padding:8px 12px;border-radius:10px;border:0;cursor:pointer}
     .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.08)}
-    main{padding:30px 0}
     .card{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);box-shadow:var(--shadow)}
-
-    /* Modal/login panel */
     .auth-panel{position:fixed;inset:0;display:grid;place-items:center;background:rgba(2,6,23,.6);z-index:60}
     .auth{width:360px;background:var(--card);padding:18px;border-radius:12px;border:1px solid var(--border)}
     .tabs{display:flex;gap:6px;margin-bottom:12px}
@@ -28,217 +23,128 @@
     .field label{font-size:13px;color:var(--muted);margin-bottom:6px}
     .field input{padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)}
     .hint{font-size:13px;color:var(--muted)}
-    .small{font-size:13px}
-    .profile{display:flex;gap:12px;align-items:center}
-    .avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));display:grid;place-items:center;font-weight:800}
-
-    /* responsive */
-    @media(max-width:420px){.auth{width:92%}}
   </style>
 </head>
 <body>
   <header class="container">
-    <div class="logo"> <div style="width:12px;height:12px;border-radius:4px;background:linear-gradient(90deg,var(--primary),var(--accent))"></div> <div>BrandNomi</div></div>
+    <div class="logo">BrandNomi</div>
     <div id="headerRight"></div>
   </header>
 
   <main class="container">
     <div id="welcome" class="card">
-      <h2>Salom! Saytimizga xush kelibsiz.</h2>
-      <p class="hint">Ro'yxatdan o'ting yoki mavjud login bilan kiring. Sayt brauzeringizda (localStorage) barcha ma'lumotlarni xavfsiz saqlaydi.</p>
+      <h2>Saytga xush kelibsiz</h2>
+      <p class="hint">Ro'yxatdan o'ting yoki tizimga kiring. Parolingizni unutdingizmi? — F.I.SH orqali tiklash mumkin.</p>
     </div>
-
-    <section style="margin-top:16px">
-      <div class="card">
-        <h3>Siz tizimda:</h3>
-        <div id="userArea" style="margin-top:10px"></div>
-      </div>
-    </section>
+    <div id="userArea" class="card" style="margin-top:20px"></div>
   </main>
 
-  <!-- Auth modal / panel -->
   <div id="authPanel" class="auth-panel">
-    <div class="auth card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="auth card">
       <div class="tabs">
-        <button id="tabLogin" class="active">Kirish</button>
-        <button id="tabRegister">Ro'yxatdan o'tish</button>
+        <button id="tabLogin" type="button" class="active">Kirish</button>
+        <button id="tabRegister" type="button">Ro'yxatdan o'tish</button>
+        <button id="tabReset" type="button">Parolni tiklash</button>
       </div>
 
-      <!-- LOGIN -->
       <form id="loginForm">
-        <div class="field"><label for="login_username">Login</label><input id="login_username" name="username" required autocomplete="username" /></div>
-        <div class="field"><label for="login_password">Parol</label><input id="login_password" name="password" type="password" required autocomplete="current-password" /></div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><input id="rememberMe" type="checkbox"/><label for="rememberMe" class="small">Meni eslab qol</label></div>
-        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center">
-          <button class="btn" type="submit">Kirish</button>
-          <button id="toRegister" type="button" class="btn ghost">Ro'yxatdan o'tish</button>
-        </div>
-        <p id="loginMsg" class="hint" style="margin-top:10px"></p>
+        <div class="field"><label>Login</label><input id="login_username" required></div>
+        <div class="field"><label>Parol</label><input id="login_password" type="password" required></div>
+        <button class="btn" type="submit">Kirish</button>
+        <p id="loginMsg" class="hint"></p>
       </form>
 
-      <!-- REGISTER -->
-      <form id="registerForm" style="display:none;margin-top:8px">
-        <div class="field"><label for="reg_fullname">F.I.O</label><input id="reg_fullname" name="fullname" required /></div>
-        <div class="field"><label for="reg_username">Login</label><input id="reg_username" name="username" required autocomplete="username" /></div>
-        <div class="field"><label for="reg_email">Email</label><input id="reg_email" type="email" name="email" /></div>
-        <div class="field"><label for="reg_password">Parol</label><input id="reg_password" type="password" name="password" required autocomplete="new-password" /></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" type="submit">Ro'yxatdan o'tish</button></div>
-        <p id="regMsg" class="hint" style="margin-top:8px"></p>
+      <form id="registerForm" style="display:none">
+        <div class="field"><label>F.I.SH</label><input id="reg_fullname" required></div>
+        <div class="field"><label>Login</label><input id="reg_username" required></div>
+        <div class="field"><label>Parol</label><input id="reg_password" type="password" required></div>
+        <button class="btn" type="submit">Ro'yxatdan o'tish</button>
+        <p id="regMsg" class="hint"></p>
       </form>
 
+      <form id="resetForm" style="display:none">
+        <div class="field"><label>F.I.SH</label><input id="reset_fullname" required></div>
+        <div class="field"><label>Yangi parol</label><input id="reset_newpass" type="password" required></div>
+        <button class="btn" type="submit">Tiklash</button>
+        <p id="resetMsg" class="hint"></p>
+      </form>
     </div>
   </div>
 
-  <footer class="container" style="margin-top:28px;color:var(--muted)">© <span id="yil"></span> BrandNomi</footer>
-
   <script>
-    // Yil
-    document.getElementById('yil').textContent = new Date().getFullYear();
+    const LS_USERS='bn_users_v1', LS_CUR='bn_current_v1';
+    const users=()=>JSON.parse(localStorage.getItem(LS_USERS)||'{}');
+    const save=u=>localStorage.setItem(LS_USERS,JSON.stringify(u));
+    const cur=()=>localStorage.getItem(LS_CUR);
+    const setCur=u=>localStorage.setItem(LS_CUR,u);
+    const clearCur=()=>localStorage.removeItem(LS_CUR);
 
-    // ——— LocalStorage user management
-    const LS_USERS = 'bn_users_v1'; // users store
-    const LS_CURRENT = 'bn_currentUser_v1';
-    const LS_REMEMBER = 'bn_remember_v1';
+    async function hashString(s){const data=new TextEncoder().encode(s);const h=await crypto.subtle.digest('SHA-256',data);return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');}
 
-    function loadUsers(){return JSON.parse(localStorage.getItem(LS_USERS) || '{}')}
-    function saveUsers(obj){localStorage.setItem(LS_USERS, JSON.stringify(obj))}
-    function setCurrentUser(username){localStorage.setItem(LS_CURRENT, username)}
-    function getCurrentUser(){return localStorage.getItem(LS_CURRENT)}
-    function clearCurrentUser(){localStorage.removeItem(LS_CURRENT)}
-    function setRemember(obj){localStorage.setItem(LS_REMEMBER, JSON.stringify(obj))}
-    function getRemember(){return JSON.parse(localStorage.getItem(LS_REMEMBER) || 'null')}
+    const tabLogin=document.getElementById('tabLogin');
+    const tabRegister=document.getElementById('tabRegister');
+    const tabReset=document.getElementById('tabReset');
+    const loginForm=document.getElementById('loginForm');
+    const regForm=document.getElementById('registerForm');
+    const resetForm=document.getElementById('resetForm');
 
-    // Hash qilish - SHA-256 (WebCrypto) -> hex
-    async function hashString(str){
-      const enc = new TextEncoder();
-      const data = enc.encode(str);
-      const hash = await crypto.subtle.digest('SHA-256', data);
-      const arr = Array.from(new Uint8Array(hash));
-      return arr.map(b=>b.toString(16).padStart(2,'0')).join('');
+    tabLogin.onclick=()=>{show('login')};
+    tabRegister.onclick=()=>{show('register')};
+    tabReset.onclick=()=>{show('reset')};
+    function show(x){
+      [tabLogin,tabRegister,tabReset].forEach(t=>t.classList.remove('active'));
+      loginForm.style.display=regForm.style.display=resetForm.style.display='none';
+      if(x==='login'){tabLogin.classList.add('active');loginForm.style.display='block';}
+      if(x==='register'){tabRegister.classList.add('active');regForm.style.display='block';}
+      if(x==='reset'){tabReset.classList.add('active');resetForm.style.display='block';}
     }
 
-    // Register
-    document.getElementById('registerForm').addEventListener('submit', async (e)=>{
+    regForm.onsubmit=async e=>{
       e.preventDefault();
-      const u = document.getElementById('reg_username').value.trim();
-      const p = document.getElementById('reg_password').value;
-      const fullname = document.getElementById('reg_fullname').value.trim();
-      const email = document.getElementById('reg_email').value.trim();
-      const msg = document.getElementById('regMsg');
-      if(!u || !p){msg.textContent='Login va parol kiritilishi shart.';return}
-      const users = loadUsers();
-      if(users[u]){msg.textContent='Bunday login mavjud, boshqa login tanlang.';return}
-      const passHash = await hashString(p);
-      users[u] = {username:u, passwordHash:passHash, fullname, email, created:new Date().toISOString()};
-      saveUsers(users);
-      msg.textContent='Ro'yxatga olindi! Endi tizimga kiring.';
-      // switch to login tab
-      showLogin();
-      document.getElementById('login_username').value = u;
-      document.getElementById('login_password').value = '';
-    });
+      const u=users();
+      const f=reg_fullname.value.trim();
+      const l=reg_username.value.trim();
+      const p=reg_password.value;
+      if(u[l])return regMsg.textContent='Bu login allaqachon mavjud.';
+      u[l]={fullname:f,username:l,passwordHash:await hashString(p)};
+      save(u);setCur(l);
+      document.getElementById('authPanel').style.display='none';
+      render();
+    }
 
-    // Login
-    document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+    loginForm.onsubmit=async e=>{
       e.preventDefault();
-      const u = document.getElementById('login_username').value.trim();
-      const p = document.getElementById('login_password').value;
-      const remember = document.getElementById('rememberMe').checked;
-      const msg = document.getElementById('loginMsg');
-      const users = loadUsers();
-      if(!users[u]){msg.textContent='Bunday login topilmadi.';return}
-      const passHash = await hashString(p);
-      if(passHash !== users[u].passwordHash){msg.textContent='Parol noto'g'ri.';return}
-      // muvaffaqiyat
-      setCurrentUser(u);
-      if(remember){setRemember({username:u, passwordHash:passHash})} else {localStorage.removeItem(LS_REMEMBER)}
-      msg.textContent='Muvaffaqiyatli kirdingiz.';
-      hideAuthPanel();
-      renderUserArea();
-    });
-
-    // UI controls for tabs
-    const tabLogin = document.getElementById('tabLogin');
-    const tabRegister = document.getElementById('tabRegister');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    tabLogin.addEventListener('click', showLogin);
-    tabRegister.addEventListener('click', showRegister);
-    document.getElementById('toRegister').addEventListener('click', ()=>{showRegister();document.getElementById('reg_username').focus()});
-
-    function showLogin(){tabLogin.classList.add('active');tabRegister.classList.remove('active');loginForm.style.display='block';registerForm.style.display='none';}
-    function showRegister(){tabRegister.classList.add('active');tabLogin.classList.remove('active');registerForm.style.display='block';loginForm.style.display='none';}
-
-    function hideAuthPanel(){document.getElementById('authPanel').style.display='none'}
-    function showAuthPanel(){document.getElementById('authPanel').style.display='grid'}
-
-    // Render header / user area
-    function renderUserArea(){
-      const headerRight = document.getElementById('headerRight');
-      const userArea = document.getElementById('userArea');
-      const cur = getCurrentUser();
-      headerRight.innerHTML = '';
-      userArea.innerHTML = '';
-      if(!cur){
-        // not logged
-        const btn = document.createElement('button'); btn.className='btn'; btn.textContent='Kirish / Ro\'yxatdan o\'tish';
-        btn.addEventListener('click', ()=>{showAuthPanel();});
-        headerRight.appendChild(btn);
-        userArea.innerHTML = '<p class="hint">Tizimga kirmagansiz.</p>';
-      } else {
-        const users = loadUsers();
-        const uobj = users[cur];
-        const prof = document.createElement('div'); prof.className='profile';
-        const av = document.createElement('div'); av.className='avatar'; av.textContent = (uobj.fullname || cur).slice(0,2).toUpperCase();
-        const info = document.createElement('div');
-        info.innerHTML = `<strong>${uobj.fullname || cur}</strong><div class="hint">@${uobj.username}</div><div class="hint">${uobj.email || ''}</div>`;
-        prof.appendChild(av); prof.appendChild(info);
-        userArea.appendChild(prof);
-
-        const logout = document.createElement('button'); logout.className='btn'; logout.style.marginTop='12px'; logout.textContent='Chiqish';
-        logout.addEventListener('click', ()=>{clearCurrentUser();renderUserArea();showAuthPanel();});
-        userArea.appendChild(logout);
-
-        const span = document.createElement('div'); span.style.display='inline-block'; span.style.alignSelf='center';
-        headerRight.appendChild(span);
-      }
+      const u=users();
+      const l=login_username.value.trim();
+      const p=login_password.value;
+      if(!u[l])return loginMsg.textContent='Login topilmadi';
+      if(u[l].passwordHash!==await hashString(p))return loginMsg.textContent='Parol xato';
+      setCur(l);
+      document.getElementById('authPanel').style.display='none';
+      render();
     }
 
-    // Auto-login if remembered
-    async function tryAutoLogin(){
-      const remember = getRemember();
-      if(remember && remember.username){
-        const users = loadUsers();
-        const u = remember.username;
-        if(users[u] && users[u].passwordHash === remember.passwordHash){
-          // auto login
-          setCurrentUser(u);
-          hideAuthPanel();
-          renderUserArea();
-          return true;
-        }
-      }
-      return false;
+    resetForm.onsubmit=async e=>{
+      e.preventDefault();
+      const u=users();
+      const f=reset_fullname.value.trim();
+      const newp=reset_newpass.value;
+      let found=null;
+      for(const k in u){if(u[k].fullname===f){found=k;break}}
+      if(!found)return resetMsg.textContent='Bunday ismli foydalanuvchi topilmadi.';
+      u[found].passwordHash=await hashString(newp);
+      save(u);
+      resetMsg.textContent='Parol tiklandi! Endi kirishingiz mumkin.';
     }
 
-    // On load
-    (async ()=>{
-      // if no users exist, create sample user for testing (optional)
-      const users = loadUsers();
-      if(Object.keys(users).length===0){
-        // create demo user: demo / demo123
-        const demoHash = await hashString('demo123');
-        users['demo'] = {username:'demo', passwordHash:demoHash, fullname:'Demo Foydalanuvchi', email:'demo@example.com', created:new Date().toISOString()};
-        saveUsers(users);
-      }
-      const authed = await tryAutoLogin();
-      if(!authed){ showAuthPanel(); }
-      renderUserArea();
-    })();
-
-    // Accessibility: close auth panel on Escape (will not remove login state)
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ document.getElementById('authPanel').style.display='none' } });
-
+    function render(){
+      const div=document.getElementById('userArea');
+      const u=users();
+      const c=cur();
+      if(!c){div.innerHTML='<button class="btn" onclick="document.getElementById(\'authPanel\').style.display=\'grid\'">Kirish / Ro\'yxatdan o\'tish</button>';return;}
+      div.innerHTML=`<p>Foydalanuvchi: <b>${u[c].fullname}</b> (@${c})</p><button class="btn" onclick="clearCur();render()">Chiqish</button>`;
+    }
+    render();
   </script>
 </body>
 </html>
