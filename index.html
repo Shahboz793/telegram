@@ -384,6 +384,8 @@ function finishTest(){
 }
 
 /* ===== Results & Leaderboard ===== */
+let __lastTgText = '';
+
 function viewResults(code, justMade=null){
   show('userCard', false); show('playCard', false); show('resultsCard', true);
   const t = LS.tests.find(x=>x.code===code); if(!t){ alert('Test topilmadi'); return; }
@@ -398,7 +400,13 @@ function viewResults(code, justMade=null){
   }
 
   const dw = document.getElementById('detailWrap');
-  if(justMade){ dw.innerHTML = renderDetail(justMade); } else { dw.innerHTML = '<div class="muted">Aynan urinishni ko‘rish uchun testni yakunlang.</div>'; }
+  if(justMade){
+    dw.innerHTML = renderDetail(justMade);
+    __lastTgText = makeTgText(t, justMade);
+  } else {
+    dw.innerHTML = '<div class="muted">Aynan urinishni ko‘rish uchun testni yakunlang.</div>';
+    __lastTgText = '';
+  }
 }
 
 function renderDetail(rec){
@@ -410,11 +418,31 @@ function renderDetail(rec){
   return html;
 }
 
+/* ===== Telegram format & copy ===== */
+function makeTgText(test, rec){
+  const lines = [];
+  lines.push(`🧪 Test: ${test.name}${test.code ? ' ('+test.code+')':''}`);
+  lines.push(`👤 Login: ${rec.login}`);
+  lines.push(`📊 Natija: ${rec.score}/${rec.total}`);
+  lines.push('---');
+  rec.details.forEach(d=>{
+    lines.push(`${d.q}) tanlandi: ${d.chosen} | to‘g‘ri: ${d.correct} ${d.ok?'✅':'❌'}`);
+  });
+  return lines.join('\n');
+}
+
+function copyTg(){
+  if(!__lastTgText){
+    alert('Avval testni yakunlang va natijani ko‘ring, so‘ng nusxalang.');
+    return;
+  }
+  navigator.clipboard.writeText(__lastTgText)
+    .then(()=> alert('✅ Natija nusxalandi! Telegramga yopishtiring.'))
+    .catch(()=> alert('❌ Nusxalashda xato. Brauzer ruxsatini tekshiring.'));
+}
+
 /* utils */
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])) }
-
-/* copy to clipboard (stub) */
-function copyTg(){ alert('Natijani nusxalash keyingi versiyada qoʻshiladi.'); }
 
 /* Demo filler */
 function fillDemo(){ document.getElementById('userLogin').value='demo'; document.getElementById('userPass').value=''; }
