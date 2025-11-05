@@ -12,7 +12,8 @@
     header{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
     .logo{display:flex;align-items:center;gap:10px;font-weight:700}
     .btn{background:var(--primary);color:white;padding:8px 12px;border-radius:10px;border:0;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.08)}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:var(--text)}
+    .btn.row{display:inline-flex;gap:10px;align-items:center}
     .card{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);box-shadow:var(--shadow)}
     .auth-panel{position:fixed;inset:0;display:grid;place-items:center;background:rgba(2,6,23,.6);z-index:60}
     .auth{width:360px;background:var(--card);padding:18px;border-radius:12px;border:1px solid var(--border)}
@@ -34,7 +35,7 @@
   <main class="container">
     <div id="welcome" class="card">
       <h2>Saytga xush kelibsiz</h2>
-      <p class="hint">Ro'yxatdan o'ting yoki tizimga kiring. Parolingizni unutdingizmi? — F.I.SH orqali tiklash mumkin.</p>
+      <p class="hint">Ro'yxatdan o'ting yoki tizimga kiring. Parolingizni unutdingizmi? — F.I.SH orqali tiklash va loginni eslatish mumkin.</p>
     </div>
     <div id="userArea" class="card" style="margin-top:20px"></div>
   </main>
@@ -63,9 +64,12 @@
       </form>
 
       <form id="resetForm" style="display:none">
-        <div class="field"><label>F.I.SH</label><input id="reset_fullname" required></div>
+        <div class="field"><label>F.I.SH</label><input id="reset_fullname" required placeholder="Masalan: Shahboz Obloqulov"></div>
         <div class="field"><label>Yangi parol</label><input id="reset_newpass" type="password" required></div>
-        <button class="btn" type="submit">Tiklash</button>
+        <div class="field" style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+          <button class="btn" type="submit">Tiklash</button>
+          <button class="btn ghost row" type="button" id="remindLoginBtn">Loginni eslatish</button>
+        </div>
         <p id="resetMsg" class="hint"></p>
       </form>
     </div>
@@ -135,6 +139,17 @@
       u[found].passwordHash=await hashString(newp);
       save(u);
       resetMsg.textContent='Parol tiklandi! Endi kirishingiz mumkin.';
+    }
+
+    // Loginni eslatish: F.I.SH orqali loginni topib ko'rsatish
+    document.getElementById('remindLoginBtn').onclick=()=>{
+      const u=users();
+      const f=reset_fullname.value.trim().toLowerCase();
+      if(!f){resetMsg.textContent='Avval F.I.SH kiriting.';return;}
+      const matches = Object.values(u).filter(x=>x.fullname===f);
+      if(matches.length===0){resetMsg.textContent='Bunday F.I.SH topilmadi.';return;}
+      if(matches.length===1){resetMsg.textContent='Sizning login: @'+matches[0].username;return;}
+      resetMsg.textContent='Bir nechta mos foydalanuvchi topildi: '+matches.map(m=>'@'+m.username).join(', ');
     }
 
     function render(){
