@@ -102,8 +102,8 @@
     regForm.onsubmit=async e=>{
       e.preventDefault();
       const u=users();
-      const f=reg_fullname.value.trim();
-      const l=reg_username.value.trim();
+      const f=reg_fullname.value.trim().toLowerCase();
+      const l=reg_username.value.trim().toLowerCase();
       const p=reg_password.value;
       if(u[l])return regMsg.textContent='Bu login allaqachon mavjud.';
       u[l]={fullname:f,username:l,passwordHash:await hashString(p)};
@@ -115,7 +115,7 @@
     loginForm.onsubmit=async e=>{
       e.preventDefault();
       const u=users();
-      const l=login_username.value.trim();
+      const l=login_username.value.trim().toLowerCase();
       const p=login_password.value;
       if(!u[l])return loginMsg.textContent='Login topilmadi';
       if(u[l].passwordHash!==await hashString(p))return loginMsg.textContent='Parol xato';
@@ -127,7 +127,7 @@
     resetForm.onsubmit=async e=>{
       e.preventDefault();
       const u=users();
-      const f=reset_fullname.value.trim();
+      const f=reset_fullname.value.trim().toLowerCase();
       const newp=reset_newpass.value;
       let found=null;
       for(const k in u){if(u[k].fullname===f){found=k;break}}
