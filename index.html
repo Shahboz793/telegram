@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>TestMaster — Register+Login (yangilangan)</title>
+  <title>TestMaster — Login Everywhere (no-pass enforcement)</title>
   <style>
     :root{
       --bg:#f6f7fb;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e5e7eb;
@@ -25,8 +25,10 @@
     .flex{display:flex;gap:8px;align-items:center}
     .space{flex:1}
     .hidden{display:none!important}
+
+    /* Big, colorful ABCD buttons */
     .answer-pad{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-    .opt{padding:14px 20px;border-radius:12px;border:1px solid var(--border);min-width:70px;text-align:center;font-weight:800;font-size:18px;cursor:pointer}
+    .opt{padding:16px 22px;border-radius:12px;border:1px solid var(--border);min-width:72px;text-align:center;font-weight:800;font-size:18px;cursor:pointer}
     .opt[data-v="A"]{background:#eff6ff;border-color:#c7d2fe} /* blue */
     .opt[data-v="B"]{background:#ecfdf5;border-color:#bbf7d0} /* green */
     .opt[data-v="C"]{background:#fffbeb;border-color:#fde68a} /* yellow */
@@ -42,50 +44,49 @@
   <div class="wrap">
     <div class="card">
       <h1>TestMaster</h1>
-      <div class="muted">Roʻyxatga olish sahifasi ichida roʻyxatdan oʻtadi — roʻyxatdan oʻtgach avtomatik kiradi va login+kod brauzerda saqlanadi.</div>
+      <div class="muted">Login “bir xil bo‘lsa” hamma qurilmada kiradi. Logoutdan keyin login eslab qoladi, ammo kirishda tugmani bosish kerak.</div>
     </div>
 
-    <!-- Login/Register unified panel -->
+    <!-- Unified user auth (login+optional pass) -->
     <div class="card" id="authCard">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong>Kirish / Roʻyxatdan oʻtish</strong>
-        <div class="muted">Agar roʻyxatdan oʻtgansiz, kirish qiling</div>
+        <strong>Kirish</strong>
+        <div class="muted">Ro‘yxatdan o‘tish shart emas: login yozib kirsangiz, shu login saqlanadi.</div>
       </div>
       <div style="margin-top:10px" class="row">
         <div>
-          <label>Login (ID yoki ism)</label>
+          <label>Login (majburiy)</label>
           <input id="userLogin" placeholder="Masalan: AliValiyev" />
         </div>
         <div>
-          <label>Kod (parol)</label>
-          <input id="userPass" type="password" placeholder="Masalan: 1234" />
+          <label>Kod (ixtiyoriy)</label>
+          <input id="userPass" type="password" placeholder="" />
         </div>
       </div>
 
       <div style="margin-top:10px" class="flex">
         <button class="btn primary" onclick="loginUser()">Kirish</button>
-        <button class="btn ghost" onclick="registerAndLogin()">Roʻyxatdan oʻtish va kirish</button>
-        <button class="btn small" onclick="fillDemo()">Demo maʼlumot</button>
+        <button class="btn ghost" onclick="fillDemo()">Demo</button>
         <div class="space"></div>
         <button class="btn small" onclick="runSelfTests()">Self-test</button>
       </div>
 
       <div style="margin-top:10px" class="muted">
-        Eslatma: roʻyxatdan oʻtgan login+kod brauzerda saqlanadi va keyingi ochishda maydonlarga avtomatik toʻldiriladi.
+        Eslatma: Login shu brauzerda saqlanadi. Boshqa qurilmada ham shu login bilan kirishingiz mumkin — parol tekshirilmaydi.
       </div>
     </div>
 
-    <!-- Admin login (separate) -->
+    <!-- Admin login (blank, no code shown) -->
     <div class="card" id="adminAuthCard">
       <strong>Admin kirish</strong>
       <div class="row" style="margin-top:8px">
-        <div><input id="adminLogin" placeholder="Admin login (QWERTY)"/></div>
-        <div><input id="adminCode" placeholder="Kod (2768)" type="password" /></div>
+        <div><input id="adminLogin" placeholder="" /></div>
+        <div><input id="adminCode" placeholder="" type="password" /></div>
       </div>
       <div style="margin-top:8px" class="flex">
         <button class="btn primary" onclick="loginAdmin()">Admin sifatida kirish</button>
         <div class="space"></div>
-        <div class="muted">Admin uchun alohida kirish (qurilmada koʻrinadi)</div>
+        <div class="muted">Admin qiymatlari ko‘rsatilmaydi.</div>
       </div>
     </div>
 
@@ -104,7 +105,7 @@
             <label style="margin-top:8px">Maxsus kod</label><input id="tCode" />
             <label style="margin-top:8px">Savollar soni</label><input id="tCount" type="number" value="5" min="1" />
             <div style="margin-top:8px" class="flex">
-              <button class="btn" onclick="buildAnswerGrid()">Javob panellari yaratish</button>
+              <button class="btn" onclick="buildAnswerGrid()">Javob panellari</button>
               <button class="btn primary" onclick="saveTest()">Saqlash</button>
             </div>
             <div id="answerGrid" style="margin-top:8px"></div>
@@ -150,16 +151,15 @@
         <div class="space"></div><button class="btn" onclick="copyTg()">Telegramga nusxa</button>
       </div>
     </div>
-
   </div>
 
 <script>
 /* ===== Storage helpers ===== */
 const LS = {
-  testsKey: 'tm_tests_v3',
-  usersKey: 'tm_users_v3', // stores {login, pass}
+  testsKey: 'tm_tests_v4',
+  usersKey: 'tm_users_v4', // stores {login, pass?}
   resultsKey: code=>`tm_results_${code}`,
-  lastUserKey: 'tm_last_user_v3',
+  lastUserKey: 'tm_last_user_v4',
   get tests(){ return JSON.parse(localStorage.getItem(this.testsKey)||'[]') },
   set tests(v){ localStorage.setItem(this.testsKey, JSON.stringify(v)) },
   get users(){ return JSON.parse(localStorage.getItem(this.usersKey)||'[]') },
@@ -179,45 +179,31 @@ function logout(){
   show('authCard',true); show('adminAuthCard',true);
 }
 
-/* ===== Auth functions ===== */
+/* ===== Auth: login works anywhere (no pass enforcement) ===== */
 function findUser(login){ return (LS.users||[]).find(u=>u.login.toLowerCase()===login.toLowerCase()); }
-
-function registerAndLogin(){
-  const login = document.getElementById('userLogin').value.trim();
-  const pass  = document.getElementById('userPass').value.trim();
-  if(!login || !pass){ alert('Login va kod kiriting'); return; }
-  if(findUser(login)){ alert('Bu login band. Iltimos boshqa login tanlang yoki shu login bilan kiring.'); return; }
-  // save
-  LS.users = [...LS.users, {login, pass}];
-  // store last user for auto-fill/autologin
-  localStorage.setItem(LS.lastUserKey, login);
-  // auto-login user immediately
-  SESSION = { role:'user', login };
-  document.getElementById('whoTag').textContent = login;
-  // hide auth, show user area
-  show('authCard', false); show('adminAuthCard', false);
-  show('userCard', true);
-  renderTestsList();
-  alert('Roʻyxatdan oʻtildi va tizimga kirdingiz.');
-}
 
 function loginUser(){
   const login = document.getElementById('userLogin').value.trim();
   const pass  = document.getElementById('userPass').value.trim();
-  if(!login || !pass){ alert('Login va kod kiriting'); return; }
-  const u = findUser(login);
-  if(!u || u.pass !== pass){ alert('Login yoki kod xato'); return; }
-  // success
+  if(!login){ alert('Login kiriting'); return; }
+
+  // If user exists: ignore password check (device-agnostic login)
+  // If not exists: create it right now (so this login works on this device from now on)
+  let u = findUser(login);
+  if(!u){
+    u = { login, pass }; // pass is optional
+    LS.users = [...LS.users, u];
+  }
   SESSION = { role:'user', login: u.login };
   localStorage.setItem(LS.lastUserKey, u.login);
+
   document.getElementById('whoTag').textContent = u.login;
-  // hide auth forms (user logged in) and admin auth
   show('authCard', false); show('adminAuthCard', false);
   show('userCard', true);
   renderTestsList();
 }
 
-/* Admin login */
+/* Admin login (fields are blank, code not shown) */
 function loginAdmin(){
   const login = document.getElementById('adminLogin').value.trim();
   const code  = document.getElementById('adminCode').value.trim();
@@ -267,7 +253,6 @@ function saveTest(){
   renderAdminLists();
 }
 
-/* Admin lists render */
 function renderAdminLists(){
   const tbox = document.getElementById('adminTests'); tbox.innerHTML='';
   if(!LS.tests.length){ tbox.innerHTML = '<div class="muted">Testlar yoʻq</div>'; }
@@ -288,13 +273,12 @@ function renderAdminLists(){
   const ubox = document.getElementById('adminUsers'); ubox.innerHTML='';
   if(!LS.users.length){ ubox.innerHTML='<div class="muted">Foydalanuvchilar yoʻq</div>'; }
   else {
-    const table = document.createElement('table'); let html = '<thead><tr><th>#</th><th>Login</th><th>Kod</th></tr></thead><tbody>';
-    LS.users.forEach((u,i)=> html += `<tr><td>${i+1}</td><td>${escapeHtml(u.login)}</td><td>${escapeHtml(u.pass)}</td></tr>`);
+    const table = document.createElement('table'); let html = '<thead><tr><th>#</th><th>Login</th><th>Kod (agar saqlangan bo‘lsa)</th></tr></thead><tbody>';
+    LS.users.forEach((u,i)=> html += `<tr><td>${i+1}</td><td>${escapeHtml(u.login)}</td><td>${escapeHtml(u.pass||'—')}</td></tr>`);
     html += '</tbody>'; table.innerHTML = html; ubox.appendChild(table);
   }
 }
 
-/* delete test */
 function deleteTest(code){
   if(!confirm('Testni oʻchirasizmi?')) return;
   LS.tests = LS.tests.filter(t=>t.code!==code);
@@ -401,22 +385,31 @@ function renderDetail(rec){
 /* utils */
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])) }
 
-/* copy to clipboard (simple) */
-function copyTg(){ alert('Natijani nusxalash uchun avval urinish yakunlanadi — bu funksiya keyingi versiyada qoʻshiladi.'); }
+/* copy to clipboard (stub) */
+function copyTg(){ alert('Natijani nusxalash keyingi versiyada qoʻshiladi.'); }
 
-/* Demo filler for quick testing */
-function fillDemo(){ document.getElementById('userLogin').value='demo'; document.getElementById('userPass').value='1234'; }
+/* Demo filler */
+function fillDemo(){ document.getElementById('userLogin').value='demo'; document.getElementById('userPass').value=''; }
 
-/* Self-tests basic */
+/* Self-tests */
 function runSelfTests(){
   const out=[];
-  try{ out.push(typeof registerAndLogin==='function'?'✅ registerAndLogin ok':'❌ registerAndLogin missing'); }catch(e){ out.push('❌ register test error'); }
-  try{ out.push(typeof loginUser==='function'?'✅ loginUser ok':'❌ loginUser missing'); }catch(e){ out.push('❌ login test error'); }
-  try{ out.push('✅ UI ready'); }catch(e){ out.push('❌ UI error'); }
-  alert(out.join('\\n'));
+  try{
+    // 1) Login should create user if missing (no pass needed)
+    const rnd = 'self_'+Math.random().toString(36).slice(2,6);
+    const before = LS.users.length;
+    document.getElementById('userLogin').value = rnd;
+    document.getElementById('userPass').value = '';
+    loginUser();
+    if(!findUser(rnd)) throw new Error('user not created on login');
+    out.push('✅ Login creates user if missing (no pass)');
+    // 2) Admin placeholders blank
+    out.push(document.getElementById('adminLogin').placeholder==='' && document.getElementById('adminCode').placeholder==='' ? '✅ Admin fields blank' : '❌ Admin placeholders not blank');
+  }catch(e){ out.push('❌ Self-test error: '+e.message); }
+  alert(out.join('\n'));
 }
 
-/* ===== Boot: auto-fill last user ===== */
+/* ===== Boot: prefill last login (no auto-login) ===== */
 (function boot(){
   try{
     const last = localStorage.getItem(LS.lastUserKey);
@@ -424,8 +417,7 @@ function runSelfTests(){
       const u = findUser(last);
       if(u){
         document.getElementById('userLogin').value = u.login;
-        document.getElementById('userPass').value = u.pass;
-        // do not auto-login automatically to avoid surprise — user can press Kirish
+        // do not auto-login; user must click Kirish (your preference)
       }
     }
   }catch(e){}
