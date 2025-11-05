@@ -68,7 +68,7 @@
     .answer-pad{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
     .opt{
       padding:18px 26px;border-radius:14px;border:1px solid var(--border);min-width:76px;
-      text-align:center;font-weight:800;font-size:24px;cursor:pointer;transition:.12s;
+      text-align:center;font-weight:800;font-size:20px;cursor:pointer;transition:.12s;
       background:rgba(255,255,255,.04)
     }
     .opt[data-v="A"]{background:linear-gradient(180deg, rgba(96,165,250,.10), rgba(96,165,250,.06))}
@@ -98,21 +98,6 @@
     .tabs{display:flex;gap:8px;margin-top:8px}
     .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:var(--glass)}
     .tab.active{background:linear-gradient(180deg, rgba(96,165,250,.35), rgba(96,165,250,.2));border-color:#3b82f6}
-
-    /* PDF + tanlash split */
-    .play-split{
-      display:grid; grid-template-columns:1.2fr 1fr; gap:12px;
-    }
-    @media (max-width:980px){
-      .play-split{ grid-template-columns:1fr; }
-    }
-    .pdf-box{
-      height:72vh; min-height:480px;
-      border:1px solid var(--border); border-radius:16px; overflow:hidden;
-      background:var(--glass)
-    }
-    .pdf-iframe{ width:100%; height:100%; border:0; }
-    .answers-box{ max-height:72vh; overflow:auto; padding:2px; }
   </style>
 </head>
 <body>
@@ -124,7 +109,7 @@
         <small>Bulutga saqlanadigan professional test tizimi (Firestore)</small>
       </div>
       <div class="space"></div>
-      <span class="pill">Cloud v1.2 (PDF Picker)</span>
+      <span class="pill">Cloud v1.0</span>
     </div>
 
     <div class="grid">
@@ -207,9 +192,6 @@
             <label>Test nomi</label><input id="tName" />
             <label style="margin-top:10px">Maxsus kod</label><input id="tCode" />
             <label style="margin-top:10px">Savollar soni</label><input id="tCount" type="number" value="5" min="1" />
-            <label style="margin-top:10px">PDF URL (ixtiyoriy)</label><input id="tPdf" placeholder="https://.../fayl.pdf" />
-            <label style="margin-top:10px">PDF fayl (ixtiyoriy)</label>
-            <input id="tPdfFile" type="file" accept="application/pdf" />
             <div style="margin-top:10px" class="flex">
               <button class="btn" onclick="buildAnswerGrid()">Javob panellari</button>
               <button class="btn primary" onclick="saveTest()">Saqlash</button>
@@ -266,10 +248,7 @@
         <div class="space"></div>
         <button class="btn small" onclick="backToList()">⬅️ Orqaga</button>
       </div>
-
-      <div id="playSplit" class="hidden" style="margin-top:12px"></div>
       <div id="playBody" style="margin-top:12px"></div>
-
       <div class="flex" style="margin-top:12px">
         <div class="space"></div>
         <button class="btn primary" onclick="finishTest()">Yakunlash</button>
@@ -295,7 +274,7 @@
     © 2025 TestMaster — Firestore Cloud
   </footer>
 
-<!-- ===== BULUT REJIM: FIREBASE + FIRESTORE + STORAGE ===== -->
+<!-- ===== BULUT REJIM: FIREBASE + FIRESTORE ===== -->
 <script type="module">
   /* Firebase modullari (CDN) */
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
@@ -303,9 +282,6 @@
     getFirestore, doc, getDoc, setDoc, deleteDoc,
     collection, getDocs, query, where
   } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-  import {
-    getStorage, ref, uploadBytes, getDownloadURL
-  } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
 
   /* ✅ Config */
   const firebaseConfig = {
@@ -320,7 +296,6 @@
 
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
-  const storage = getStorage(app);
 
   /* === Yordamchilar === */
   function show(id,on=true){ document.getElementById(id).classList.toggle('hidden', !on) }
@@ -338,16 +313,6 @@
     const buf = new TextEncoder().encode(text);
     const hash = await crypto.subtle.digest('SHA-256', buf);
     return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');
-  }
-
-  /* === Storage helper: PDF yuklash === */
-  async function uploadPdfFile(file, code){
-    if(!file) return '';
-    const safeName = file.name.replace(/[^\w.\-]+/g,'_');
-    const path = `tests/${code}/${Date.now()}_${safeName}`;
-    const storageRef = ref(storage, path);
-    await uploadBytes(storageRef, file);
-    return await getDownloadURL(storageRef);
   }
 
   /* === DB qatlam === */
@@ -368,8 +333,8 @@
       return arr.sort((a,b)=>a.login.localeCompare(b.login));
     },
 
-    async saveTest({name, code, count, key, pdf}){
-      await setDoc(doc(db,'tests', code), { name, code, count, key, pdf: (pdf||'').trim(), updatedAt: Date.now() });
+    async saveTest({name, code, count, key}){
+      await setDoc(doc(db,'tests', code), { name, code, count, key, updatedAt: Date.now() });
     },
     async deleteTest(code){ await deleteDoc(doc(db,'tests', code)); },
     async allTests(){
@@ -454,6 +419,7 @@
     if(u.passHash !== await sha256(pass)) return alert('Parol noto‘g‘ri.');
     SESSION = { role:'user', login: u.login };
     document.getElementById('whoTag').textContent = u.login;
+    // So'nggi loginni eslab qo'yamiz
     try{ localStorage.setItem('tm_last_login', u.login); }catch(e){}
     show('authCard',false); show('adminAuthCard',false); show('userCard',true);
     await renderTestsList();
@@ -537,7 +503,7 @@
         <div class="flex">
           <strong>${t.name}</strong>
           <div class="space"></div>
-          <span class="pill">kod: ${t.code} • ${t.count} savol${t.pdf?' • PDF':''}</span>
+          <span class="pill">kod: ${t.code} • ${t.count} savol</span>
         </div>
         <div class="flex" style="margin-top:8px">
           <button class="btn" onclick="viewResults('${t.code}')">Natijalar</button>
@@ -625,37 +591,15 @@
     const name = document.getElementById('tName').value.trim();
     const code = document.getElementById('tCode').value.trim();
     const count = parseInt(document.getElementById('tCount').value||'0');
-    const pdfUrlInput  = document.getElementById('tPdf').value.trim();
-    const pdfFileInput = document.getElementById('tPdfFile');
-    const pdfFile = pdfFileInput && pdfFileInput.files ? pdfFileInput.files[0] : null;
-
-    if(!name || !code || !count){ alert("Nomi, kod va savollar soni to'ldirilsin"); return; }
+    if(!name || !code || !count){ alert('Nomi, kod va savollar soni to\'ldirilsin'); return; }
     const rows = [...document.getElementById('answerGrid').querySelectorAll('div')];
     const qrows = rows.filter(d=>d.querySelector && d.querySelector('.answer-pad'));
     if(qrows.length !== count){ alert('Avval javob panellarini yarating'); return; }
-
     const key = qrows.map((r,i)=> r.dataset.answer || (alert((i+1)+'-savol uchun javob belgilansin'), null));
     if(key.some(x=>!x)) return;
-
-    let finalPdfUrl = pdfUrlInput;
-    if(pdfFile){
-      try{
-        finalPdfUrl = await uploadPdfFile(pdfFile, code);
-      }catch(e){
-        alert("PDF yuklashda xatolik: " + e.message);
-        return;
-      }
-    }
-
-    await DB.saveTest({ name, code, count, key, pdf: finalPdfUrl });
-
+    await DB.saveTest({ name, code, count, key });
     alert('Test saqlandi (bulut)');
-    document.getElementById('tName').value='';
-    document.getElementById('tCode').value='';
-    document.getElementById('tCount').value=5;
-    document.getElementById('tPdf').value='';
-    if(pdfFileInput) pdfFileInput.value='';
-    document.getElementById('answerGrid').innerHTML='';
+    document.getElementById('tName').value=''; document.getElementById('tCode').value=''; document.getElementById('tCount').value=5; document.getElementById('answerGrid').innerHTML='';
     await renderAdminLists();
   }
   window.saveTest = saveTest;
@@ -668,12 +612,12 @@
     for(const t of tests){
       const res   = await DB.getResults(t.code);
       const best  = res.length? Math.max(...res.map(r=>r.score)) : 0;
-      const used  = SESSION.login ? await DB.getAttempts(t.code, SESSION.login) : 0;
-      const mine  = SESSION.login ? await DB.bestOfUser(t.code, SESSION.login) : null;
+      const used  = await DB.getAttempts(t.code, SESSION.login);
+      const mine  = await DB.bestOfUser(t.code, SESSION.login);
       const have  = !!mine;
 
       const card = document.createElement('div'); card.className='card'; card.style.margin='6px 0';
-      card.innerHTML = `<div class="flex"><strong>${t.name}</strong><div class="space"></div><span class="pill">${t.count} savol${t.pdf?' • PDF':''}</span></div>`;
+      card.innerHTML = `<div class="flex"><strong>${t.name}</strong><div class="space"></div><span class="pill">${t.count} savol</span></div>`;
       const controls = document.createElement('div'); controls.className='flex'; controls.style.marginTop='10px';
       if(used>=3){
         const tag=document.createElement('span'); tag.className='tag'; tag.textContent='Urinishlar: 3/3'; controls.appendChild(tag);
@@ -693,7 +637,7 @@
   }
   window.renderTestsList = renderTestsList;
 
-  let PLAY = { code:null, key:[], count:0, chosen:[], pdf:'' };
+  let PLAY = { code:null, key:[], count:0, chosen:[] };
 
   async function startTest(code){
     if(!SESSION.login){ alert('Avval kirish qiling'); return; }
@@ -703,7 +647,7 @@
     const used = await DB.getAttempts(code, SESSION.login);
     if(used>=3){ alert('Bu testni 3 martadan ko‘p ishlay olmaysiz.'); return; }
 
-    PLAY = { code:code, key: t.key, count: t.count, chosen: new Array(t.count).fill(null), pdf: (t.pdf||'') };
+    PLAY = { code:code, key: t.key, count: t.count, chosen: new Array(t.count).fill(null) };
     document.getElementById('playTitle').textContent = `${t.name} — ${t.count} savol`;
     renderPlay();
     show('userCard', false); show('playCard', true);
@@ -711,12 +655,7 @@
   window.startTest = startTest;
 
   function renderPlay(){
-    const body = document.getElementById('playBody'); 
-    const split = document.getElementById('playSplit');
-    body.innerHTML=''; split.innerHTML='';
-
-    const answersPanel = document.createElement('div');
-    answersPanel.className = 'answers-box';
+    const body = document.getElementById('playBody'); body.innerHTML='';
     for(let i=0;i<PLAY.count;i++){
       const row = document.createElement('div'); row.className='card'; row.style.margin='6px 0';
       row.innerHTML = `<div class="flex"><strong>${i+1}.</strong><div class="space"></div><span class="pill">Variant tanlang</span></div>`;
@@ -730,31 +669,7 @@
         });
         pad.appendChild(b);
       });
-      row.appendChild(pad); answersPanel.appendChild(row);
-    }
-
-    if(PLAY.pdf){
-      split.className = 'play-split';
-      const left = document.createElement('div'); left.className='pdf-box';
-      const iframe = document.createElement('iframe');
-      const src = PLAY.pdf.includes('#') ? PLAY.pdf : (PLAY.pdf + '#toolbar=1&navpanes=0&scrollbar=1&view=fitH');
-      iframe.src = src;
-      iframe.className = 'pdf-iframe';
-      iframe.setAttribute('title','PDF');
-      left.appendChild(iframe);
-
-      const right = document.createElement('div'); 
-      right.appendChild(answersPanel);
-
-      split.appendChild(left);
-      split.appendChild(right);
-
-      show('playSplit', true);
-      show('playBody', false);
-    } else {
-      body.appendChild(answersPanel);
-      show('playSplit', false);
-      show('playBody', true);
+      row.appendChild(pad); body.appendChild(row);
     }
   }
   window.renderPlay = renderPlay;
@@ -769,7 +684,9 @@
       const ok = chosen === correct; if(ok) score++;
       details.push({ q:i+1, chosen: chosen||'-', correct, ok });
     }
+    // urinish +1
     await DB.incAttempt(PLAY.code, SESSION.login);
+    // eng yaxshi natijani saqlash
     const rec = { login: SESSION.login, code: PLAY.code, score, total: PLAY.count, details, date: Date.now() };
     await DB.upsertBestResult(rec);
 
