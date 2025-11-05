@@ -93,132 +93,148 @@
     </div>
   </div>
 
- <script>
-  const LS_USERS='bn_users_v1', LS_CUR='bn_current_v1';
-  const users=()=>JSON.parse(localStorage.getItem(LS_USERS)||'{}');
-  const save=u=>localStorage.setItem(LS_USERS,JSON.stringify(u));
-  const cur=()=>sessionStorage.getItem(LS_CUR); // 👉 endi faqat sessiya davomida
-  const setCur=u=>sessionStorage.setItem(LS_CUR,u); // sessiya tugasa o‘chadi
-  const clearCur=()=>sessionStorage.removeItem(LS_CUR);
+  <script>
+    const LS_USERS='bn_users_v1', LS_CUR='bn_current_v1';
+    const users=()=>JSON.parse(localStorage.getItem(LS_USERS)||'{}');
+    const save=u=>localStorage.setItem(LS_USERS,JSON.stringify(u));
+    const cur=()=>localStorage.getItem(LS_CUR);
+    const setCur=u=>localStorage.setItem(LS_CUR,u);
+    const clearCur=()=>localStorage.removeItem(LS_CUR);
 
-  async function hashString(s){
-    const data=new TextEncoder().encode(s);
-    const h=await crypto.subtle.digest('SHA-256',data);
-    return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }
+    async function hashString(s){const data=new TextEncoder().encode(s);const h=await crypto.subtle.digest('SHA-256',data);return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');}
 
-  function initialsFrom(fullname=''){
-    const parts=(fullname||'').trim().toUpperCase().split(/\s+/).filter(Boolean);
-    if(parts.length===0)return'??';
-    if(parts.length===1)return parts[0].slice(0,2);
-    return(parts[0][0]||'')+(parts[1][0]||'');
-  }
-  function pastelFromSeed(seed=''){
-    let h=0;for(let i=0;i<seed.length;i++){h=(h*31+seed.charCodeAt(i))>>>0}
-    h=h%360;return`hsl(${h} 70% 70%)`;
-  }
-
-  const tabLogin=document.getElementById('tabLogin');
-  const tabRegister=document.getElementById('tabRegister');
-  const tabReset=document.getElementById('tabReset');
-  const loginForm=document.getElementById('loginForm');
-  const regForm=document.getElementById('registerForm');
-  const resetForm=document.getElementById('resetForm');
-
-  tabLogin.onclick=()=>show('login');
-  tabRegister.onclick=()=>show('register');
-  tabReset.onclick=()=>show('reset');
-
-  function show(x){
-    [tabLogin,tabRegister,tabReset].forEach(t=>t.classList.remove('active'));
-    loginForm.style.display=regForm.style.display=resetForm.style.display='none';
-    if(x==='login'){tabLogin.classList.add('active');loginForm.style.display='block';}
-    if(x==='register'){tabRegister.classList.add('active');regForm.style.display='block';}
-    if(x==='reset'){tabReset.classList.add('active');resetForm.style.display='block';}
-  }
-
-  regForm.onsubmit=async e=>{
-    e.preventDefault();
-    const u=users();
-    const f=reg_fullname.value.trim().toLowerCase();
-    const l=reg_username.value.trim().toLowerCase();
-    const p=reg_password.value;
-    if(u[l]){regMsg.textContent='Bu login allaqachon mavjud.';return;}
-    const avatarColor=pastelFromSeed(l);
-    u[l]={fullname:f,username:l,passwordHash:await hashString(p),avatarColor};
-    save(u);setCur(l);
-    document.getElementById('authPanel').style.display='none';render();
-  }
-
-  loginForm.onsubmit=async e=>{
-    e.preventDefault();
-    const u=users();
-    const l=login_username.value.trim().toLowerCase();
-    const p=login_password.value;
-    if(!u[l]){loginMsg.textContent='Login topilmadi';return}
-    if(u[l].passwordHash!==await hashString(p)){loginMsg.textContent='Parol xato';return}
-    setCur(l);
-    document.getElementById('authPanel').style.display='none';render();
-  }
-
-  resetForm.onsubmit=async e=>{
-    e.preventDefault();
-    const u=users();
-    const f=reset_fullname.value.trim().toLowerCase();
-    const newp=reset_newpass.value;
-    let found=null;
-    for(const k in u){if(u[k].fullname===f){found=k;break}}
-    if(!found){resetMsg.textContent='Bunday ismli foydalanuvchi topilmadi.';return}
-    u[found].passwordHash=await hashString(newp);
-    save(u);
-    resetMsg.textContent='Parol tiklandi! Endi kirishingiz mumkin.';
-  }
-
-  document.getElementById('remindLoginBtn').onclick=()=>{
-    const u=users();
-    const f=reset_fullname.value.trim().toLowerCase();
-    if(!f){resetMsg.textContent='Avval F.I.SH kiriting.';return}
-    const matches=Object.values(u).filter(x=>x.fullname===f);
-    if(matches.length===0){resetMsg.textContent='Bunday F.I.SH topilmadi.';return}
-    if(matches.length===1){resetMsg.textContent='Sizning login: @'+matches[0].username;return}
-    resetMsg.textContent='Bir nechta mos foydalanuvchi: '+matches.map(m=>'@'+m.username).join(', ');
-  }
-
-  document.getElementById('editForm').onsubmit=async e=>{
-    e.preventDefault();
-    const u=users();
-    const c=cur();if(!c)return;
-    const newFull=edit_fullname.value.trim().toLowerCase();
-    const newUser=edit_username.value.trim().toLowerCase();
-    const newPass=edit_password.value;
-    if(newUser!==c&&u[newUser]){editMsg.textContent='Bu login allaqachon mavjud.';return}
-    const oldColor=(u[c]&&u[c].avatarColor)?u[c].avatarColor:pastelFromSeed(c);
-    const avatarColor=(newUser===c)?oldColor:pastelFromSeed(newUser);
-    const updated={fullname:newFull,username:newUser,passwordHash:await hashString(newPass),avatarColor};
-    delete u[c];u[newUser]=updated;save(u);setCur(newUser);
-    editMsg.textContent='Ma’lumotlar yangilandi!';
-    setTimeout(()=>{document.getElementById('editPanel').style.display='none';render();},800);
-  }
-
-  function render(){
-    const div=document.getElementById('userArea');
-    const u=users();
-    const c=cur();
-    if(!c){div.innerHTML='<button class="btn" onclick="document.getElementById(\\'authPanel\\').style.display=\\'grid\\'">Kirish / Ro\\'yxatdan o\\'tish</button>';return}
-    const rec=u[c];
-    const initials=initialsFrom(rec.fullname);
-    const color=rec.avatarColor||pastelFromSeed(c);
-    div.innerHTML=`<div class="row"><span class="avatar" style="background:${color}">${initials}</span><div><b>${rec.fullname}</b><br><span class="hint">@${rec.username}</span></div></div><div class="row" style="margin-top:12px"><button class='btn' id='editOpen'>Profilni tahrirlash</button><button class='btn ghost' onclick='clearCur();render()'>Chiqish</button></div>`;
-    document.getElementById('editOpen').onclick=()=>{
-      document.getElementById('edit_fullname').value=rec.fullname;
-      document.getElementById('edit_username').value=rec.username;
-      document.getElementById('edit_password').value='';
-      const ea=document.getElementById('editAvatar');
-      ea.textContent=initials;ea.style.background=color;
-      document.getElementById('editPanel').style.display='grid';
+    // ——— Avatar yordamchi funksiyalar
+    function initialsFrom(fullname=''){
+      const parts = (fullname||'').trim().toUpperCase().split(/\s+/).filter(Boolean);
+      if(parts.length===0) return '??';
+      if(parts.length===1) return parts[0].slice(0,2);
+      return (parts[0][0]||'') + (parts[1][0]||'');
     }
-  }
-  render();
-</script>
+    function pastelFromSeed(seed=''){
+      // deterministik HSL pastel: H(0-360) seed bo'yicha, S=70%, L=70%
+      let h=0; for(let i=0;i<seed.length;i++){h=(h*31 + seed.charCodeAt(i))>>>0}
+      h = h % 360; return `hsl(${h} 70% 70%)`;
+    }
+
+    // ——— UI elementlari
+    const tabLogin=document.getElementById('tabLogin');
+    const tabRegister=document.getElementById('tabRegister');
+    const tabReset=document.getElementById('tabReset');
+    const loginForm=document.getElementById('loginForm');
+    const regForm=document.getElementById('registerForm');
+    const resetForm=document.getElementById('resetForm');
+
+    tabLogin.onclick=()=>show('login');
+    tabRegister.onclick=()=>show('register');
+    tabReset.onclick=()=>show('reset');
+
+    function show(x){
+      [tabLogin,tabRegister,tabReset].forEach(t=>t.classList.remove('active'));
+      loginForm.style.display=regForm.style.display=resetForm.style.display='none';
+      if(x==='login'){tabLogin.classList.add('active');loginForm.style.display='block';}
+      if(x==='register'){tabRegister.classList.add('active');regForm.style.display='block';}
+      if(x==='reset'){tabReset.classList.add('active');resetForm.style.display='block';}
+    }
+
+    // ——— Ro'yxat, kirish, tiklash
+    regForm.onsubmit=async e=>{
+      e.preventDefault();
+      const u=users();
+      const f=reg_fullname.value.trim().toLowerCase();
+      const l=reg_username.value.trim().toLowerCase();
+      const p=reg_password.value;
+      if(u[l]){regMsg.textContent='Bu login allaqachon mavjud.';return;}
+      const avatarColor = pastelFromSeed(l);
+      u[l]={fullname:f,username:l,passwordHash:await hashString(p), avatarColor};
+      save(u);setCur(l);
+      document.getElementById('authPanel').style.display='none';render();
+    }
+
+    loginForm.onsubmit=async e=>{
+      e.preventDefault();
+      const u=users();
+      const l=login_username.value.trim().toLowerCase();
+      const p=login_password.value;
+      if(!u[l]){loginMsg.textContent='Login topilmadi';return}
+      if(u[l].passwordHash!==await hashString(p)){loginMsg.textContent='Parol xato';return}
+      setCur(l);
+      document.getElementById('authPanel').style.display='none';render();
+    }
+
+    resetForm.onsubmit=async e=>{
+      e.preventDefault();
+      const u=users();
+      const f=reset_fullname.value.trim().toLowerCase();
+      const newp=reset_newpass.value;
+      let found=null;
+      for(const k in u){if(u[k].fullname===f){found=k;break}}
+      if(!found){resetMsg.textContent='Bunday ismli foydalanuvchi topilmadi.';return}
+      u[found].passwordHash=await hashString(newp);
+      save(u);
+      resetMsg.textContent='Parol tiklandi! Endi kirishingiz mumkin.';
+    }
+
+    document.getElementById('remindLoginBtn').onclick=()=>{
+      const u=users();
+      const f=reset_fullname.value.trim().toLowerCase();
+      if(!f){resetMsg.textContent='Avval F.I.SH kiriting.';return}
+      const matches=Object.values(u).filter(x=>x.fullname===f);
+      if(matches.length===0){resetMsg.textContent='Bunday F.I.SH topilmadi.';return}
+      if(matches.length===1){resetMsg.textContent='Sizning login: @'+matches[0].username;return}
+      resetMsg.textContent='Bir nechta mos foydalanuvchi: '+matches.map(m=>'@'+m.username).join(', ');
+    }
+
+    // ——— Profilni tahrirlash (login unikal tekshiruv bilan)
+    document.getElementById('editForm').onsubmit=async e=>{
+      e.preventDefault();
+      const u=users();
+      const c=cur(); if(!c) return;
+      const newFull=edit_fullname.value.trim().toLowerCase();
+      const newUser=edit_username.value.trim().toLowerCase();
+      const newPass=edit_password.value;
+      if(newUser!==c && u[newUser]){editMsg.textContent='Bu login allaqachon mavjud.';return}
+      // rang avvalgidek qoladi yoki yangi login bo'lsa qayta hisoblaymiz
+      const oldColor = (u[c] && u[c].avatarColor) ? u[c].avatarColor : pastelFromSeed(c);
+      const avatarColor = (newUser===c) ? oldColor : pastelFromSeed(newUser);
+      const updated={fullname:newFull,username:newUser,passwordHash:await hashString(newPass), avatarColor};
+      delete u[c]; u[newUser]=updated; save(u); setCur(newUser);
+      editMsg.textContent='Ma’lumotlar yangilandi!';
+      setTimeout(()=>{document.getElementById('editPanel').style.display='none';render();},800);
+    }
+
+    function render(){
+      const div=document.getElementById('userArea');
+      const u=users();
+      const c=cur();
+      if(!c){div.innerHTML='<button class="btn" onclick="document.getElementById(\'authPanel\').style.display=\'grid\'">Kirish / Ro\'yxatdan o\'tish</button>';return}
+      const rec=u[c];
+      const initials = initialsFrom(rec.fullname);
+      const color = rec.avatarColor || pastelFromSeed(c);
+      div.innerHTML=`
+        <div class="row">
+          <span class="avatar" style="background:${color}">${initials}</span>
+          <div>
+            <div><b>${rec.fullname}</b></div>
+            <div class="hint">@${rec.username}</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class='btn' id='editOpen'>Profilni tahrirlash</button>
+          <button class='btn ghost' onclick='clearCur();render()'>Chiqish</button>
+        </div>`;
+
+      // Edit panelni to'ldirish va ochish
+      document.getElementById('editOpen').onclick=()=>{
+        document.getElementById('edit_fullname').value = rec.fullname;
+        document.getElementById('edit_username').value = rec.username;
+        document.getElementById('edit_password').value = '';
+        const ea = document.getElementById('editAvatar');
+        ea.textContent = initials;
+        ea.style.background = color;
+        document.getElementById('editPanel').style.display='grid';
+      }
+    }
+    render();
+  </script>
 </body>
 </html>
