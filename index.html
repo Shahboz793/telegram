@@ -6,7 +6,7 @@
   <title>TestMaster — BUXORO_EDU</title>
   <style>
     :root{
-      --bg1:#0f172a; --bg2:#1e293b; --grad1:#111827; --grad2:#0b1220;
+      --grad1:#111827; --grad2:#0b1220;
       --card:rgba(255,255,255,.08); --glass:rgba(255,255,255,.06);
       --text:#e5e7eb; --muted:#9ca3af; --border:rgba(255,255,255,.16);
       --primary:#60a5fa;--primary-2:#3b82f6;--accent:#a78bfa;
@@ -45,7 +45,7 @@
     .panel-title{display:flex;align-items:center;gap:10px}
     .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--glass);color:var(--muted);font-size:12px}
 
-    input, select{
+    input{
       width:100%; padding:12px 12px; border-radius:12px; border:1px solid var(--border);
       background:rgba(255,255,255,.04); color:var(--text); outline:none
     }
@@ -95,14 +95,21 @@
     .tag{display:inline-block;padding:6px 10px;border-radius:999px;
       background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);font-size:12px}
 
-    /* Footer */
-    footer{
-      margin:24px auto 30px; max-width:1100px; padding:14px 18px; border-radius:16px;
-      background:linear-gradient(90deg, rgba(96,165,250,.14), rgba(167,139,250,.14));
-      border:1px solid var(--border); color:#cbd5e1; display:flex;justify-content:space-between;align-items:center
+    /* Collapsible header styles */
+    .collapsible-head{
+      display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid var(--border); cursor:pointer
     }
-    footer a{color:#bfdbfe;text-decoration:none}
-    footer a:hover{text-decoration:underline}
+    .chev{display:inline-block;transition:.15s}
+    .chev.open{transform:rotate(90deg)}
+    .head-right{display:flex;gap:8px;align-items:center}
+    .search-row{display:flex;gap:8px;align-items:center;margin:10px 0}
+
+    /* Auth tabs */
+    .tabs{display:flex;gap:8px;margin-top:8px}
+    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:var(--glass)}
+    .tab.active{background:linear-gradient(180deg, rgba(96,165,250,.35), rgba(96,165,250,.2));border-color:#3b82f6}
   </style>
 </head>
 <body>
@@ -115,34 +122,63 @@
         <small>Professional test tizimi: admin uchun tez kiritish, foydalanuvchi uchun toza muhit, reyting va TG yuborish.</small>
       </div>
       <div class="space"></div>
-      <span class="pill">v1.1</span>
+      <span class="pill">v1.3 (kod majburiy + ro‘yxatdan o‘tish)</span>
     </div>
 
-    <!-- Auth panels -->
+    <!-- Auth panels (Login / Register) -->
     <div class="grid">
       <div class="card" id="authCard">
-        <div class="panel-title"><strong>Kirish</strong><span class="pill">Foydalanuvchi</span></div>
-        <div style="margin-top:10px" class="row">
-          <div>
-            <label>Login (majburiy)</label>
-            <input id="userLogin" placeholder="Masalan: AliValiyev" />
+        <div class="panel-title"><strong>Foydalanuvchi</strong><span class="pill">Kirish / Ro‘yxatdan o‘tish</span></div>
+
+        <div class="tabs">
+          <div id="tabLogin" class="tab active" onclick="switchAuth('login')">Kirish</div>
+          <div id="tabReg" class="tab" onclick="switchAuth('reg')">Ro‘yxatdan o‘tish</div>
+        </div>
+
+        <!-- Login form -->
+        <div id="loginPanel" style="margin-top:10px">
+          <div class="row">
+            <div>
+              <label>Login (majburiy)</label>
+              <input id="userLogin" placeholder="Masalan: AliValiyev" />
+            </div>
+            <div>
+              <label>Kod / Parol (majburiy)</label>
+              <input id="userPass" type="password" placeholder="" />
+            </div>
           </div>
-          <div>
-            <label>Kod (ixtiyoriy)</label>
-            <input id="userPass" type="password" placeholder="" />
+          <div style="margin-top:10px" class="flex">
+            <button class="btn primary" onclick="loginUser()">Kirish</button>
+            <button class="btn ghost" onclick="fillDemo()">Demo</button>
+            <div class="space"></div>
+            <button class="btn small" onclick="runSelfTests()">Self-test</button>
+          </div>
+          <div style="margin-top:10px;color:var(--muted);font-size:13px">
+            Login shu brauzerda saqlanadi. Boshqa qurilmada ham shu login bilan kirishingiz mumkin — <b>parol mos bo‘lishi shart</b>.
           </div>
         </div>
-        <div style="margin-top:10px" class="flex">
-          <button class="btn primary" onclick="loginUser()">Kirish</button>
-          <button class="btn ghost" onclick="fillDemo()">Demo</button>
-          <div class="space"></div>
-          <button class="btn small" onclick="runSelfTests()">Self-test</button>
-        </div>
-        <div style="margin-top:10px;color:var(--muted);font-size:13px">
-          Login shu brauzerda saqlanadi. Boshqa qurilmada ham shu login bilan kirishingiz mumkin — parol tekshirilmaydi.
+
+        <!-- Register form -->
+        <div id="regPanel" class="hidden" style="margin-top:10px">
+          <div class="row">
+            <div>
+              <label>Login (majburiy)</label>
+              <input id="regLogin" placeholder="Yangi login" />
+            </div>
+            <div>
+              <label>Kod / Parol (majburiy)</label>
+              <input id="regPass" type="password" placeholder="Kamida 1 belgi" />
+            </div>
+          </div>
+          <div style="margin-top:10px" class="flex">
+            <button class="btn primary" onclick="registerUser()">Ro‘yxatdan o‘tish</button>
+            <div class="space"></div>
+            <span class="pill">Ro‘yxatdan so‘ng “Kirish” orqali login-parol bilan kiring</span>
+          </div>
         </div>
       </div>
 
+      <!-- Admin login -->
       <div class="card" id="adminAuthCard">
         <div class="panel-title"><strong>Admin kirish</strong><span class="pill">Maxfiy</span></div>
         <div class="row" style="margin-top:8px">
@@ -182,8 +218,32 @@
 
         <div class="card" style="margin:0">
           <strong>Saqlangan testlar & foydalanuvchilar</strong>
-          <div id="adminTests" style="margin-top:10px"></div>
-          <div id="adminUsers" style="margin-top:10px"></div>
+
+          <!-- TESTS COLLAPSIBLE -->
+          <div class="collapsible-head" id="testsHead" style="margin-top:10px">
+            <span class="chev" id="testsChev">▶</span>
+            <span><strong>Saqlangan testlar</strong></span>
+            <div class="space"></div>
+            <span class="pill" id="testsCount">0 ta</span>
+            <button class="btn small" id="toggleTestsBtn">Ko‘rsatish</button>
+          </div>
+          <div id="adminTests" class="hidden" style="margin-top:10px"></div>
+
+          <!-- USERS COLLAPSIBLE -->
+          <div class="collapsible-head" id="usersHead" style="margin-top:14px">
+            <span class="chev" id="usersChev">▶</span>
+            <span><strong>Foydalanuvchilar</strong></span>
+            <div class="space"></div>
+            <span class="pill" id="usersCount">0 ta</span>
+            <button class="btn small" id="toggleUsersBtn">Ko‘rsatish</button>
+          </div>
+          <div id="usersBox" class="hidden" style="margin-top:10px">
+            <div class="search-row">
+              <input id="usersSearch" placeholder="Login bo‘yicha qidirish..." />
+              <button class="btn small" onclick="clearUsersSearch()">Tozalash</button>
+            </div>
+            <div id="adminUsers"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -239,7 +299,7 @@ const LS = {
   testsKey: 'tm_tests_v4',
   usersKey: 'tm_users_v4',
   resultsKey: code=>`tm_results_${code}`,
-  attemptsKey: code=>`tm_attempts_${code}`,              // NEW: attempts per test
+  attemptsKey: code=>`tm_attempts_${code}`,
   lastUserKey: 'tm_last_user_v4',
   get tests(){ return JSON.parse(localStorage.getItem(this.testsKey)||'[]') },
   set tests(v){ localStorage.setItem(this.testsKey, JSON.stringify(v)) },
@@ -273,21 +333,54 @@ function backToList(){
     show('userCard', false); show('adminCard', false); show('playCard', false); show('resultsCard', false);
   }
 }
+function switchAuth(mode){
+  const isLogin = mode==='login';
+  document.getElementById('loginPanel').classList.toggle('hidden', !isLogin);
+  document.getElementById('regPanel').classList.toggle('hidden', isLogin);
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabReg').classList.toggle('active', !isLogin);
+}
 
-/* ===== Auth (login anywhere; pass optional) ===== */
+/* ===== Auth (parol majburiy) ===== */
 function findUser(login){ return (LS.users||[]).find(u=>u.login.toLowerCase()===login.toLowerCase()); }
+
+function registerUser(){
+  const login = document.getElementById('regLogin').value.trim();
+  const pass  = document.getElementById('regPass').value.trim();
+  if(!login){ alert('Login kiriting'); return; }
+  if(!pass){ alert('Parol kiriting'); return; }
+
+  const exists = findUser(login);
+  if(exists){ alert('Bu login band. Boshqa login tanlang.'); return; }
+
+  const u = { login, pass };
+  LS.users = [...LS.users, u];
+
+  // Login panelga o‘tamiz va loginni to‘ldirib qo‘yamiz
+  document.getElementById('userLogin').value = login;
+  document.getElementById('userPass').value = '';
+  switchAuth('login');
+  alert('Ro‘yxatdan o‘tildi! Endi login va parol bilan kirishingiz mumkin.');
+}
+
 function loginUser(){
   const login = document.getElementById('userLogin').value.trim();
   const pass  = document.getElementById('userPass').value.trim();
   if(!login){ alert('Login kiriting'); return; }
-  let u = findUser(login);
-  if(!u){ u = { login, pass }; LS.users = [...LS.users, u]; }
+  if(!pass){ alert('Parol kiriting'); return; }
+
+  const u = findUser(login);
+  if(!u){ alert('Bunday login topilmadi. Avval ro‘yxatdan o‘ting.'); return; }
+  if(u.pass !== pass){ alert('Parol noto‘g‘ri. Yana urinib ko‘ring.'); return; }
+
   SESSION = { role:'user', login: u.login };
   localStorage.setItem(LS.lastUserKey, u.login);
   document.getElementById('whoTag').textContent = u.login;
   show('authCard', false); show('adminAuthCard', false); show('userCard', true);
   renderTestsList();
 }
+
+/* ===== Admin login ===== */
 function loginAdmin(){
   const login = document.getElementById('adminLogin').value.trim();
   const code  = document.getElementById('adminCode').value.trim();
@@ -336,36 +429,140 @@ function saveTest(){
   document.getElementById('tName').value=''; document.getElementById('tCode').value=''; document.getElementById('tCount').value=5; document.getElementById('answerGrid').innerHTML='';
   renderAdminLists();
 }
+
+/* ===== Collapsible state ===== */
+let TESTS_OPEN=false, USERS_OPEN=false;
+let USERS_PAGE=1, USERS_PAGE_SIZE=20, USERS_QUERY='';
+
+function clearUsersSearch(){
+  USERS_QUERY=''; const inp=document.getElementById('usersSearch'); if(inp) inp.value='';
+  renderUsersPage();
+}
+
+/* ===== Admin lists (tests & users) ===== */
 function renderAdminLists(){
-  const tbox = document.getElementById('adminTests'); tbox.innerHTML='';
-  if(!LS.tests.length){ tbox.innerHTML = '<div class="muted">Testlar yoʻq</div>'; }
-  else {
-    LS.tests.forEach(t=>{
-      const div = document.createElement('div'); div.className='card'; div.style.margin='6px 0';
-      const res = LS.getResults(t.code); const best = res.length? Math.max(...res.map(r=>r.score)) : 0;
-      div.innerHTML = `<div class="flex"><strong>${t.name}</strong><div class="space"></div><span class="pill">kod: ${t.code} • ${t.count} savol</span></div>
+  /* counts */
+  const testsCountEl = document.getElementById('testsCount');
+  const usersCountEl = document.getElementById('usersCount');
+  if(testsCountEl) testsCountEl.textContent = `${LS.tests.length} ta`;
+  if(usersCountEl) usersCountEl.textContent = `${LS.users.length} ta`;
+
+  /* bind toggles (one-time safe) */
+  const tBtn=document.getElementById('toggleTestsBtn');
+  const uBtn=document.getElementById('toggleUsersBtn');
+  if(tBtn && !tBtn._bound){
+    tBtn._bound=true;
+    tBtn.addEventListener('click', ()=>{
+      TESTS_OPEN=!TESTS_OPEN;
+      tBtn.textContent = TESTS_OPEN?'Yopish':'Ko‘rsatish';
+      document.getElementById('testsChev').classList.toggle('open', TESTS_OPEN);
+      show('adminTests', TESTS_OPEN);
+      if(TESTS_OPEN) drawTestsListForAdmin();
+    });
+  }
+  if(uBtn && !uBtn._bound){
+    uBtn._bound=true;
+    uBtn.addEventListener('click', ()=>{
+      USERS_OPEN=!USERS_OPEN;
+      uBtn.textContent = USERS_OPEN?'Yopish':'Ko‘rsatish';
+      document.getElementById('usersChev').classList.toggle('open', USERS_OPEN);
+      show('usersBox', USERS_OPEN);
+      if(USERS_OPEN){ USERS_PAGE=1; renderUsersPage(); }
+    });
+  }
+
+  /* if already open, keep content fresh */
+  if(TESTS_OPEN) drawTestsListForAdmin();
+  if(USERS_OPEN) renderUsersPage();
+
+  /* wire search */
+  const s = document.getElementById('usersSearch');
+  if(s && !s._bound){
+    s._bound=true;
+    s.addEventListener('input', ()=>{
+      USERS_QUERY = s.value.trim().toLowerCase();
+      USERS_PAGE = 1;
+      renderUsersPage();
+    });
+  }
+}
+
+function drawTestsListForAdmin(){
+  const tbox = document.getElementById('adminTests'); 
+  if(!tbox) return;
+  tbox.innerHTML='';
+  if(!LS.tests.length){ tbox.innerHTML = '<div class="muted">Testlar yoʻq</div>'; return; }
+  LS.tests.forEach(t=>{
+    const div = document.createElement('div'); div.className='card'; div.style.margin='6px 0';
+    const res = LS.getResults(t.code); const best = res.length? Math.max(...res.map(r=>r.score)) : 0;
+    div.innerHTML = `
+      <div class="flex">
+        <strong>${t.name}</strong>
+        <div class="space"></div>
+        <span class="pill">kod: ${t.code} • ${t.count} savol</span>
+      </div>
       <div class="flex" style="margin-top:8px">
         <button class="btn" onclick="viewResults('${t.code}')">Natijalar</button>
         <button class="btn" onclick="deleteTest('${t.code}')">O'chirish</button>
         <div class="space"></div><span class="tag">Eng yaxshi: ${best}/${t.count}</span>
       </div>`;
-      tbox.appendChild(div);
-    });
-  }
-  const ubox = document.getElementById('adminUsers'); ubox.innerHTML='';
-  if(!LS.users.length){ ubox.innerHTML='<div class="muted">Foydalanuvchilar yoʻq</div>'; }
-  else {
-    const table = document.createElement('table'); let html = '<thead><tr><th>#</th><th>Login</th><th>Kod (agar saqlangan bo‘lsa)</th></tr></thead><tbody>';
-    LS.users.forEach((u,i)=> html += `<tr><td>${i+1}</td><td>${escapeHtml(u.login)}</td><td>${escapeHtml(u.pass||'—')}</td></tr>`);
-    html += '</tbody>'; table.innerHTML = html; ubox.appendChild(table);
-  }
+    tbox.appendChild(div);
+  });
 }
-function deleteTest(code){
-  if(!confirm('Testni oʻchirasizmi?')) return;
-  LS.tests = LS.tests.filter(t=>t.code!==code);
-  localStorage.removeItem(LS.resultsKey(code));
-  renderAdminLists();
-  alert('Oʻchirildi');
+
+/* Users with query + pagination */
+function renderUsersPage(){
+  const box = document.getElementById('adminUsers');
+  if(!box) return;
+  const list = LS.users || [];
+  const filtered = USERS_QUERY ? list.filter(u=> (u.login||'').toLowerCase().includes(USERS_QUERY)) : list.slice();
+  const total = filtered.length;
+  const start = (USERS_PAGE-1)*USERS_PAGE_SIZE;
+  const end = Math.min(start + USERS_PAGE_SIZE, total);
+  const slice = filtered.slice(start, end);
+
+  const usersCountEl = document.getElementById('usersCount');
+  if(usersCountEl) usersCountEl.textContent = `${total} ta`;
+
+  let html = '';
+  if(!slice.length){
+    html = '<div class="muted" style="margin-top:8px">Natija topilmadi</div>';
+    box.innerHTML = html;
+    return;
+  }
+
+  html += `
+    <div class="flex" style="margin:8px 0">
+      <span class="pill">Ko‘rinmoqda: ${start+1}–${end} / ${total}</span>
+      <div class="space"></div>
+      <div class="flex" style="gap:6px">
+        <button class="btn small" ${USERS_PAGE<=1?'disabled':''} onclick="USERS_PAGE=Math.max(1,USERS_PAGE-1);renderUsersPage()">⬅️ Oldingi</button>
+        <button class="btn small" ${end>=total?'disabled':''} onclick="USERS_PAGE=Math.min(Math.ceil(${total}/USERS_PAGE_SIZE),USERS_PAGE+1);renderUsersPage()">Keyingi ➡️</button>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Login</th><th>Kod (agar saqlangan bo‘lsa)</th></tr>
+      </thead>
+      <tbody>
+  `;
+  slice.forEach((u, i)=>{
+    html += `<tr>
+      <td>${start + i + 1}</td>
+      <td>${escapeHtml(u.login)}</td>
+      <td>${escapeHtml(u.pass || '—')}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>
+    <div class="flex" style="margin:10px 0 2px">
+      <div class="space"></div>
+      <div class="flex" style="gap:6px">
+        <button class="btn small" ${USERS_PAGE<=1?'disabled':''} onclick="USERS_PAGE=Math.max(1,USERS_PAGE-1);renderUsersPage()">⬅️ Oldingi</button>
+        <button class="btn small" ${end>=total?'disabled':''} onclick="USERS_PAGE=Math.min(Math.ceil(${total}/USERS_PAGE_SIZE),USERS_PAGE+1);renderUsersPage()">Keyingi ➡️</button>
+      </div>
+    </div>
+  `;
+  box.innerHTML = html;
 }
 
 /* ===== User: list tests (attempts & retake) ===== */
@@ -407,8 +604,6 @@ function startTest(code){
   if(!SESSION.login){ alert('Avval kirish qiling'); return; }
   const t = LS.tests.find(x=>x.code===code);
   if(!t){ alert('Test topilmadi'); return; }
-
-  // attempts check (max 3)
   const attempts = LS.getAttempts(code);
   const used = attempts[SESSION.login]||0;
   if(used>=3){ alert('Bu testni 3 martadan ko‘p ishlay olmaysiz.'); return; }
@@ -436,12 +631,10 @@ function renderPlay(){
     row.appendChild(pad); body.appendChild(row);
   }
 }
-
 function finishTest(){
   if(!SESSION.login){ alert('Kirish talab qilinadi'); return; }
   if(PLAY.chosen.some(x=>x===null)){ if(!confirm('Baʼzi savollar belgilanmagan. Baribir yakunlaysizmi?')) return; }
 
-  // score
   const details=[]; let score=0;
   for(let i=0;i<PLAY.count;i++){
     const correct = PLAY.key[i]; const chosen = PLAY.chosen[i];
@@ -450,22 +643,14 @@ function finishTest(){
   }
   const newRec = { login: SESSION.login, score, total: PLAY.count, details, date: new Date().toISOString() };
 
-  // attempts ++
   const attempts = LS.getAttempts(PLAY.code);
   attempts[SESSION.login] = (attempts[SESSION.login]||0)+1;
   LS.setAttempts(PLAY.code, attempts);
 
-  // keep only ONE result per login (use BEST)
   const arr = LS.getResults(PLAY.code);
   const idx = arr.findIndex(r=>r.login===SESSION.login);
-  if(idx<0){
-    arr.push(newRec);
-  }else{
-    const old = arr[idx];
-    if(newRec.score > old.score){
-      arr[idx] = newRec; // replace with better result
-    } // else keep old best
-  }
+  if(idx<0){ arr.push(newRec); }
+  else { if(newRec.score > arr[idx].score){ arr[idx] = newRec; } }
   LS.setResults(PLAY.code, arr);
 
   viewResults(PLAY.code, newRec);
@@ -493,7 +678,6 @@ function viewResults(code, justMade=null){
     dw.innerHTML = renderDetail(justMade);
     __lastTgText = makeTgText(t, justMade);
   } else {
-    // Agar hozirgina ishlanmagan bo‘lsa ham — SESSION.login uchun yozuv topib beramiz
     const mine = SESSION.login ? arr.find(r=>r.login===SESSION.login) : null;
     if(mine){
       dw.innerHTML = renderDetail(mine);
@@ -527,10 +711,8 @@ function makeTgText(test, rec){
 }
 function copyTg(){
   if(!__lastTgText){ alert('Avval o‘zingizning natijangizni oching (yoki testni tugating).'); return; }
-  // Avval Web Share API orqali bevosita “ulashish” (Telegram tanlasa bo‘ladi)
   if(navigator.share){
-    navigator.share({ text: __lastTgText })
-      .catch(()=>fallbackClipboard());
+    navigator.share({ text: __lastTgText }).catch(()=>fallbackClipboard());
   }else{
     fallbackClipboard();
   }
@@ -545,19 +727,27 @@ function fallbackClipboard(){
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])) }
 
 /* Demo filler */
-function fillDemo(){ document.getElementById('userLogin').value='demo'; document.getElementById('userPass').value=''; }
+function fillDemo(){ 
+  // Demo uchun: login regga emas, faqat namuna uchun to'ldiradi
+  document.getElementById('userLogin').value='demo'; 
+  document.getElementById('userPass').value='demo';
+}
 
-/* Self-tests */
+/* Self-tests (yangilangan: parol majburiy) */
 function runSelfTests(){
   const out=[];
   try{
     const rnd = 'self_'+Math.random().toString(36).slice(2,6);
+    // 1) Avval ro'yxatdan o'tamiz
+    document.getElementById('regLogin').value = rnd;
+    document.getElementById('regPass').value = 'p';
+    switchAuth('reg'); registerUser();
+    // 2) Endi login qilib kiramiz
     document.getElementById('userLogin').value = rnd;
-    document.getElementById('userPass').value = '';
-    loginUser();
-    if(!findUser(rnd)) throw new Error('user not created on login');
-    out.push('✅ Login creates user if missing (no pass)');
-    out.push(document.getElementById('adminLogin').placeholder==='' && document.getElementById('adminCode').placeholder==='' ? '✅ Admin fields blank' : '❌ Admin placeholders not blank');
+    document.getElementById('userPass').value = 'p';
+    switchAuth('login'); loginUser();
+    if(!findUser(rnd)) throw new Error('user not stored');
+    out.push('✅ Register + Login (password required) OK');
   }catch(e){ out.push('❌ Self-test error: '+e.message); }
   alert(out.join('\n'));
 }
@@ -568,7 +758,10 @@ function runSelfTests(){
     const last = localStorage.getItem(LS.lastUserKey);
     if(last){
       const u = findUser(last);
-      if(u){ document.getElementById('userLogin').value = u.login; }
+      if(u){ 
+        document.getElementById('userLogin').value = u.login; 
+        switchAuth('login');
+      }
     }
   }catch(e){}
 })();
