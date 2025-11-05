@@ -3,325 +3,242 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BrandNomi — Oddiy va zamonaviy sayt</title>
-  <meta name="description" content="Bir sahifali, tez va moslashuvchan HTML sayt shabloni. Navbar, Qorong'u rejim, bo'limlar va aloqa formasi tayyor." />
+  <title>BrandNomi — Sayt (Login & Ro'yxatga olish)</title>
+  <meta name="description" content="Bir sahifali sayt — endi ro'yxatga olish va login funksiyalari bilan (localStorage)." />
   <link rel="icon" href="favicon.ico" />
   <style>
-    :root{
-      --bg:#0b1220;        /* dark bg */
-      --card:#0f172a;
-      --text:#e2e8f0;
-      --muted:#94a3b8;
-      --primary:#38bdf8;   /* sky */
-      --accent:#22d3ee;    /* cyan */
-      --ring:rgba(56,189,248,.4);
-      --border:#1e293b;
-      --shadow:0 12px 30px rgba(8,15,40,.35);
-      --radius:18px;
-    }
-    [data-theme="light"]{
-      --bg:#f8fafc;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#475569;
-      --primary:#2563eb;
-      --accent:#06b6d4;
-      --ring:rgba(37,99,235,.25);
-      --border:#e2e8f0;
-      --shadow:0 10px 24px rgba(2,6,23,.08);
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:radial-gradient(1200px 600px at 80% -10%,rgba(34,211,238,.15),transparent 60%),radial-gradient(1000px 500px at 10% 0,rgba(56,189,248,.12),transparent 60%),var(--bg);color:var(--text);}
+    :root{--bg:#0b1220;--card:#0f172a;--text:#e2e8f0;--muted:#94a3b8;--primary:#38bdf8;--accent:#22d3ee;--border:#1e293b;--shadow:0 12px 30px rgba(8,15,40,.35);--radius:14px}
+    [data-theme="light"]{--bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#475569;--primary:#2563eb;--accent:#06b6d4;--border:#e2e8f0}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--text)}
+    .container{max-width:1100px;margin:0 auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:700}
+    .btn{background:var(--primary);color:white;padding:8px 12px;border-radius:10px;border:0;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.08)}
+    main{padding:30px 0}
+    .card{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);box-shadow:var(--shadow)}
 
-    /* Layout */
-    .container{max-width:1100px;margin:0 auto;padding:0 20px}
-    header{position:sticky;top:0;z-index:50;background:linear-gradient(to bottom,rgba(0,0,0,.45),transparent),var(--bg);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid color-mix(in oklab, var(--border) 70%, transparent)}
-    nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0}
-    .logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px}
-    .logo .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(120deg,var(--primary),var(--accent));box-shadow:0 0 0 6px color-mix(in oklab, var(--primary) 20%, transparent)}
-    .nav-links{display:flex;gap:18px}
-    .nav-links a{color:var(--muted);text-decoration:none;font-weight:600;border-radius:10px;padding:8px 10px}
-    .nav-links a:hover{color:var(--text);background:color-mix(in oklab, var(--primary) 12%, transparent)}
+    /* Modal/login panel */
+    .auth-panel{position:fixed;inset:0;display:grid;place-items:center;background:rgba(2,6,23,.6);z-index:60}
+    .auth{width:360px;background:var(--card);padding:18px;border-radius:12px;border:1px solid var(--border)}
+    .tabs{display:flex;gap:6px;margin-bottom:12px}
+    .tabs button{flex:1;padding:8px;border-radius:8px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+    .tabs button.active{background:linear-gradient(90deg,var(--primary),var(--accent));color:#022}
+    .field{display:grid;margin-bottom:10px}
+    .field label{font-size:13px;color:var(--muted);margin-bottom:6px}
+    .field input{padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)}
+    .hint{font-size:13px;color:var(--muted)}
+    .small{font-size:13px}
+    .profile{display:flex;gap:12px;align-items:center}
+    .avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));display:grid;place-items:center;font-weight:800}
 
-    .right{display:flex;align-items:center;gap:8px}
-    .btn,button{appearance:none;border:0;background:var(--primary);color:white;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
-    .btn.ghost{background:transparent;color:var(--text);border:1px solid color-mix(in oklab, var(--primary) 35%, var(--border));box-shadow:none}
-    .btn.ghost:hover{background:color-mix(in oklab, var(--primary) 12%, transparent)}
-    .toggle{display:inline-grid;place-items:center;width:42px;height:38px;border-radius:12px;background:color-mix(in oklab, var(--card) 80%, transparent);border:1px solid color-mix(in oklab, var(--border) 80%, transparent)}
-
-    /* Mobile */
-    .menu{display:none}
-    .mobile{display:none}
-    @media (max-width:860px){
-      .nav-links{display:none}
-      .menu{display:inline-flex}
-      .mobile{display:block;position:fixed;inset:70px 16px auto 16px;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:14px}
-      .mobile a{display:block;padding:12px;border-radius:10px;color:var(--text);text-decoration:none}
-      .mobile a:hover{background:color-mix(in oklab, var(--primary) 12%, transparent)}
-    }
-
-    /* Hero */
-    .hero{padding:80px 0}
-    .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:26px}
-    .headline{font-size:clamp(32px,4.5vw,52px);line-height:1.08;margin:0 0 14px}
-    .sub{color:var(--muted);font-size:clamp(15px,2.2vw,18px);max-width:52ch}
-    .cta{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}
-    .card{background:color-mix(in oklab, var(--card) 88%, transparent);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
-    .hero-visual{aspect-ratio:4/3;border-radius:22px;background:conic-gradient(from 200deg at 50% 50%,rgba(56,189,248,.18),rgba(34,211,238,.12),transparent 60%),radial-gradient(600px 300px at 80% 0,rgba(34,211,238,.12),transparent 60%),linear-gradient(135deg,color-mix(in oklab, var(--card) 80%, transparent),transparent);border:1px solid var(--border);display:grid;place-items:center}
-    .hero-visual h4{margin:0;color:var(--muted)}
-
-    /* Sections */
-    section{padding:64px 0;border-top:1px solid color-mix(in oklab, var(--border) 60%, transparent)}
-    .grid{display:grid;gap:16px}
-    .grid.cols-3{grid-template-columns:repeat(3,1fr)}
-    .grid.cols-2{grid-template-columns:repeat(2,1fr)}
-    @media (max-width:860px){.grid.cols-3,.grid.cols-2{grid-template-columns:1fr}}
-
-    .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:color-mix(in oklab, var(--primary) 12%, transparent);border:1px solid color-mix(in oklab, var(--primary) 30%, var(--border));color:var(--text);font-size:12px;font-weight:700;letter-spacing:.3px}
-    h2.section-title{margin:8px 0 14px;font-size:clamp(24px,3.8vw,36px)}
-    p.lead{color:var(--muted);max-width:62ch}
-
-    .feature{display:grid;gap:10px}
-    .feature h3{margin:0;font-size:18px}
-    .feature p{margin:0;color:var(--muted)}
-
-    /* Portfolio */
-    .tile{position:relative;overflow:hidden;border-radius:16px;border:1px solid var(--border);background:linear-gradient(180deg,color-mix(in oklab, var(--card) 84%, transparent),transparent)}
-    .tile .thumb{aspect-ratio:4/3;display:block;background:linear-gradient(135deg,rgba(56,189,248,.25),rgba(34,211,238,.15));}
-    .tile .meta{position:absolute;inset:auto 12px 12px 12px;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:8px 10px}
-
-    /* Pricing */
-    .pricing .plan{display:grid;gap:12px;padding:18px}
-    .price{font-weight:800;font-size:28px}
-
-    /* Contact */
-    form{display:grid;gap:12px}
-    .field{display:grid;gap:8px}
-    .field input,.field textarea{padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:color-mix(in oklab, var(--card) 92%, transparent);color:var(--text);outline:none}
-    .field input:focus,.field textarea:focus{box-shadow:0 0 0 6px var(--ring)}
-    .hint{color:var(--muted);font-size:13px}
-
-    footer{padding:40px 0;color:var(--muted)}
-    footer .row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between;border-top:1px solid color-mix(in oklab, var(--border) 70%, transparent);padding-top:16px}
+    /* responsive */
+    @media(max-width:420px){.auth{width:92%}}
   </style>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <nav>
-        <div class="logo"><span class="dot" aria-hidden="true"></span><span>BrandNomi</span></div>
-        <div class="nav-links" role="navigation" aria-label="Asosiy bo'limlar">
-          <a href="#boshi">Boshi</a>
-          <a href="#xizmatlar">Xizmatlar</a>
-          <a href="#portfolio">Portfolio</a>
-          <a href="#narxlar">Narxlar</a>
-          <a href="#aloqa">Aloqa</a>
-        </div>
-        <div class="right">
-          <button class="toggle" id="themeToggle" title="Qorong'u/Yorug' rejim">
-            <span id="themeIcon" aria-hidden="true">🌙</span>
-          </button>
-          <button class="menu btn ghost" id="menuBtn" aria-expanded="false" aria-controls="mobileMenu">Menyu</button>
-          <a class="btn" href="#aloqa">Boshlash</a>
-        </div>
-      </nav>
-    </div>
-    <div class="container mobile" id="mobileMenu" hidden>
-      <a href="#boshi" onclick="closeMenu()">Boshi</a>
-      <a href="#xizmatlar" onclick="closeMenu()">Xizmatlar</a>
-      <a href="#portfolio" onclick="closeMenu()">Portfolio</a>
-      <a href="#narxlar" onclick="closeMenu()">Narxlar</a>
-      <a href="#aloqa" onclick="closeMenu()">Aloqa</a>
-    </div>
+  <header class="container">
+    <div class="logo"> <div style="width:12px;height:12px;border-radius:4px;background:linear-gradient(90deg,var(--primary),var(--accent))"></div> <div>BrandNomi</div></div>
+    <div id="headerRight"></div>
   </header>
 
-  <main id="boshi" class="hero">
-    <div class="container wrap">
-      <div>
-        <span class="tag">Tez, moslashuvchan, tayyor</span>
-        <h1 class="headline">Sizga mos <span style="background:linear-gradient(90deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent">zamonaviy sayt</span> shabloni</h1>
-        <p class="sub">Ushbu shablon yordamida 10–15 daqiqada tanishtiruv saytingizni ishga tushiring: sarlavha, xizmatlar, portfolio, narxlar va aloqa formasi tayyor. Yorug' va qorong'u rejim, mobil menyu va silliq skroll bor.</p>
-        <div class="cta">
-          <a class="btn" href="#xizmatlar">Xizmatlarni ko'rish</a>
-          <a class="btn ghost" href="#portfolio">Namunalarga o'tish</a>
-        </div>
-        <div class="card" style="margin-top:16px">
-          <strong>Qanday sozlash kerak?</strong>
-          <p class="hint">Matnlarni o'zgartiring, <em>BrandNomi</em>ni o'zingizning nomingizga almashtiring, rasmlar joylang, kerak bo'limlarni olib tashlang yoki ko'paytiring.</p>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <h4>📦 index.html tayyor</h4>
-      </div>
+  <main class="container">
+    <div id="welcome" class="card">
+      <h2>Salom! Saytimizga xush kelibsiz.</h2>
+      <p class="hint">Ro'yxatdan o'ting yoki mavjud login bilan kiring. Sayt brauzeringizda (localStorage) barcha ma'lumotlarni xavfsiz saqlaydi.</p>
     </div>
+
+    <section style="margin-top:16px">
+      <div class="card">
+        <h3>Siz tizimda:</h3>
+        <div id="userArea" style="margin-top:10px"></div>
+      </div>
+    </section>
   </main>
 
-  <section id="xizmatlar">
-    <div class="container">
-      <span class="tag">Xizmatlar</span>
-      <h2 class="section-title">Biz taklif qilamiz</h2>
-      <p class="lead">Quyidagi yo'nalishlar bo'yicha mijozlarga yordam beramiz. Matnlarni o'zingizga moslab o'zgartiring.</p>
-      <div class="grid cols-3" style="margin-top:18px">
-        <div class="card feature">
-          <h3>Veb-dizayn</h3>
-          <p>Brendingizga mos, mobilga qulay va tezkor sayt maketlari.</p>
-        </div>
-        <div class="card feature">
-          <h3>Front-end ishlab chiqish</h3>
-          <p>Toza HTML/CSS/JS, optimallashtirilgan kod va SEO asoslari.</p>
-        </div>
-        <div class="card feature">
-          <h3>Qo'llab-quvvatlash</h3>
-          <p>Saytni yangilash, kontentni yuritish va monitoring.</p>
-        </div>
+  <!-- Auth modal / panel -->
+  <div id="authPanel" class="auth-panel">
+    <div class="auth card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <div class="tabs">
+        <button id="tabLogin" class="active">Kirish</button>
+        <button id="tabRegister">Ro'yxatdan o'tish</button>
       </div>
-    </div>
-  </section>
 
-  <section id="portfolio">
-    <div class="container">
-      <span class="tag">Portfolio</span>
-      <h2 class="section-title">Ishlardan namunalar</h2>
-      <p class="lead">Rasmlarni o'zingiznikiga almashtiring (jpg/png/webp). Har bir karta ostiga qisqa ta'rif yozing.</p>
-      <div class="grid cols-3" style="margin-top:18px">
-        <article class="tile">
-          <a class="thumb" aria-label="Loyiha 1 skrinshot"></a>
-          <div class="meta">Loyiha 1 — Landing sahifa</div>
-        </article>
-        <article class="tile">
-          <a class="thumb" aria-label="Loyiha 2 skrinshot"></a>
-          <div class="meta">Loyiha 2 — Portfolio sayti</div>
-        </article>
-        <article class="tile">
-          <a class="thumb" aria-label="Loyiha 3 skrinshot"></a>
-          <div class="meta">Loyiha 3 — Onlayn katalog</div>
-        </article>
-      </div>
-    </div>
-  </section>
+      <!-- LOGIN -->
+      <form id="loginForm">
+        <div class="field"><label for="login_username">Login</label><input id="login_username" name="username" required autocomplete="username" /></div>
+        <div class="field"><label for="login_password">Parol</label><input id="login_password" name="password" type="password" required autocomplete="current-password" /></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><input id="rememberMe" type="checkbox"/><label for="rememberMe" class="small">Meni eslab qol</label></div>
+        <div style="display:flex;gap:8px;justify-content:space-between;align-items:center">
+          <button class="btn" type="submit">Kirish</button>
+          <button id="toRegister" type="button" class="btn ghost">Ro'yxatdan o'tish</button>
+        </div>
+        <p id="loginMsg" class="hint" style="margin-top:10px"></p>
+      </form>
 
-  <section id="narxlar" class="pricing">
-    <div class="container">
-      <span class="tag">Narxlar</span>
-      <h2 class="section-title">Mos paketni tanlang</h2>
-      <div class="grid cols-3" style="margin-top:18px">
-        <div class="card plan">
-          <div class="price">0 so'm</div>
-          <div class="muted">Starter</div>
-          <ul class="hint" style="margin:0 0 8px 16px">
-            <li>Bitta sahifa</li>
-            <li>Oddiy dizayn</li>
-            <li>Qo'llanma</li>
-          </ul>
-          <button>Tanlash</button>
-        </div>
-        <div class="card plan" style="outline:2px solid color-mix(in oklab, var(--primary) 60%, transparent)">
-          <div class="price">299 000 so'm</div>
-          <div class="muted">Professional</div>
-          <ul class="hint" style="margin:0 0 8px 16px">
-            <li>Bir sahifali sayt</li>
-            <li>Qorong'u/Yorug' rejim</li>
-            <li>Tez sozlash</li>
-          </ul>
-          <button>Tanlash</button>
-        </div>
-        <div class="card plan">
-          <div class="price">So'rov bo'yicha</div>
-          <div class="muted">Maxsus</div>
-          <ul class="hint" style="margin:0 0 8px 16px">
-            <li>Ko'p sahifa</li>
-            <li>Qo'shimcha skriptlar</li>
-            <li>Texnik yordam</li>
-          </ul>
-          <button>Tanlash</button>
-        </div>
-      </div>
-    </div>
-  </section>
+      <!-- REGISTER -->
+      <form id="registerForm" style="display:none;margin-top:8px">
+        <div class="field"><label for="reg_fullname">F.I.O</label><input id="reg_fullname" name="fullname" required /></div>
+        <div class="field"><label for="reg_username">Login</label><input id="reg_username" name="username" required autocomplete="username" /></div>
+        <div class="field"><label for="reg_email">Email</label><input id="reg_email" type="email" name="email" /></div>
+        <div class="field"><label for="reg_password">Parol</label><input id="reg_password" type="password" name="password" required autocomplete="new-password" /></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" type="submit">Ro'yxatdan o'tish</button></div>
+        <p id="regMsg" class="hint" style="margin-top:8px"></p>
+      </form>
 
-  <section id="aloqa">
-    <div class="container">
-      <span class="tag">Aloqa</span>
-      <h2 class="section-title">Biz bilan bog'laning</h2>
-      <div class="grid cols-2" style="margin-top:18px;align-items:start">
-        <form id="contactForm" class="card" onsubmit="return sendForm(event)">
-          <div class="field">
-            <label for="ism">Ismingiz</label>
-            <input id="ism" name="ism" placeholder="Masalan: Shahboz" required />
-          </div>
-          <div class="field">
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" placeholder="siz@pochta.com" required />
-          </div>
-          <div class="field">
-            <label for="xabar">Xabar</label>
-            <textarea id="xabar" name="xabar" rows="5" placeholder="Qanday yordam beraylik?" required></textarea>
-          </div>
-          <button type="submit">Yuborish</button>
-          <p class="hint">Mazkur forma demo rejimida. Xabar brauzerda saqlanadi (backend yo'q).</p>
-        </form>
-        <div class="card">
-          <h3 style="margin-top:0">Kontakt ma'lumotlari</h3>
-          <p class="hint">Manzil, telefon, ijtimoiy tarmoqlar havolalarini bu yerga yozing.</p>
-          <ul>
-            <li>📍 Jizzax, O'zbekiston</li>
-            <li>📞 +998 (90) 123-45-67</li>
-            <li>✉️ hello@example.com</li>
-          </ul>
-        </div>
-      </div>
     </div>
-  </section>
+  </div>
 
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div>© <span id="yil"></span> <strong>BrandNomi</strong>. Barcha huquqlar himoyalangan.</div>
-        <div class="hint">HTML • CSS • JavaScript</div>
-      </div>
-    </div>
-  </footer>
+  <footer class="container" style="margin-top:28px;color:var(--muted)">© <span id="yil"></span> BrandNomi</footer>
 
   <script>
-    // ——— Dark/Light theme (localStorage bilan)
-    const root = document.documentElement;
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
-    const saved = localStorage.getItem('theme') || 'dark';
-    if(saved==='light'){root.setAttribute('data-theme','light');themeIcon.textContent='☀️'}
-    themeToggle.addEventListener('click',()=>{
-      const cur = root.getAttribute('data-theme')==='light'?'dark':'light';
-      if(cur==='light'){root.setAttribute('data-theme','light');themeIcon.textContent='☀️'}
-      else{root.removeAttribute('data-theme');themeIcon.textContent='🌙'}
-      localStorage.setItem('theme',cur);
-    });
+    // Yil
+    document.getElementById('yil').textContent = new Date().getFullYear();
 
-    // ——— Mobile menyu
-    const menuBtn = document.getElementById('menuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    menuBtn?.addEventListener('click',()=>{
-      const open = mobileMenu.hasAttribute('hidden');
-      mobileMenu.toggleAttribute('hidden');
-      menuBtn.setAttribute('aria-expanded', String(open));
-    });
-    function closeMenu(){ if(window.innerWidth<861){mobileMenu.setAttribute('hidden','')} }
+    // ——— LocalStorage user management
+    const LS_USERS = 'bn_users_v1'; // users store
+    const LS_CURRENT = 'bn_currentUser_v1';
+    const LS_REMEMBER = 'bn_remember_v1';
 
-    // ——— Aloqa formasi (demo): localStorage ga yozish
-    function sendForm(e){
+    function loadUsers(){return JSON.parse(localStorage.getItem(LS_USERS) || '{}')}
+    function saveUsers(obj){localStorage.setItem(LS_USERS, JSON.stringify(obj))}
+    function setCurrentUser(username){localStorage.setItem(LS_CURRENT, username)}
+    function getCurrentUser(){return localStorage.getItem(LS_CURRENT)}
+    function clearCurrentUser(){localStorage.removeItem(LS_CURRENT)}
+    function setRemember(obj){localStorage.setItem(LS_REMEMBER, JSON.stringify(obj))}
+    function getRemember(){return JSON.parse(localStorage.getItem(LS_REMEMBER) || 'null')}
+
+    // Hash qilish - SHA-256 (WebCrypto) -> hex
+    async function hashString(str){
+      const enc = new TextEncoder();
+      const data = enc.encode(str);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      const arr = Array.from(new Uint8Array(hash));
+      return arr.map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+
+    // Register
+    document.getElementById('registerForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
-      const data = Object.fromEntries(new FormData(e.target).entries());
-      const key = 'contact_messages';
-      const all = JSON.parse(localStorage.getItem(key) || '[]');
-      all.push({ ...data, date:new Date().toISOString() });
-      localStorage.setItem(key, JSON.stringify(all));
-      alert('Rahmat! Xabaringiz saqlandi (demo).');
-      e.target.reset();
+      const u = document.getElementById('reg_username').value.trim();
+      const p = document.getElementById('reg_password').value;
+      const fullname = document.getElementById('reg_fullname').value.trim();
+      const email = document.getElementById('reg_email').value.trim();
+      const msg = document.getElementById('regMsg');
+      if(!u || !p){msg.textContent='Login va parol kiritilishi shart.';return}
+      const users = loadUsers();
+      if(users[u]){msg.textContent='Bunday login mavjud, boshqa login tanlang.';return}
+      const passHash = await hashString(p);
+      users[u] = {username:u, passwordHash:passHash, fullname, email, created:new Date().toISOString()};
+      saveUsers(users);
+      msg.textContent='Ro'yxatga olindi! Endi tizimga kiring.';
+      // switch to login tab
+      showLogin();
+      document.getElementById('login_username').value = u;
+      document.getElementById('login_password').value = '';
+    });
+
+    // Login
+    document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const u = document.getElementById('login_username').value.trim();
+      const p = document.getElementById('login_password').value;
+      const remember = document.getElementById('rememberMe').checked;
+      const msg = document.getElementById('loginMsg');
+      const users = loadUsers();
+      if(!users[u]){msg.textContent='Bunday login topilmadi.';return}
+      const passHash = await hashString(p);
+      if(passHash !== users[u].passwordHash){msg.textContent='Parol noto'g'ri.';return}
+      // muvaffaqiyat
+      setCurrentUser(u);
+      if(remember){setRemember({username:u, passwordHash:passHash})} else {localStorage.removeItem(LS_REMEMBER)}
+      msg.textContent='Muvaffaqiyatli kirdingiz.';
+      hideAuthPanel();
+      renderUserArea();
+    });
+
+    // UI controls for tabs
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    tabLogin.addEventListener('click', showLogin);
+    tabRegister.addEventListener('click', showRegister);
+    document.getElementById('toRegister').addEventListener('click', ()=>{showRegister();document.getElementById('reg_username').focus()});
+
+    function showLogin(){tabLogin.classList.add('active');tabRegister.classList.remove('active');loginForm.style.display='block';registerForm.style.display='none';}
+    function showRegister(){tabRegister.classList.add('active');tabLogin.classList.remove('active');registerForm.style.display='block';loginForm.style.display='none';}
+
+    function hideAuthPanel(){document.getElementById('authPanel').style.display='none'}
+    function showAuthPanel(){document.getElementById('authPanel').style.display='grid'}
+
+    // Render header / user area
+    function renderUserArea(){
+      const headerRight = document.getElementById('headerRight');
+      const userArea = document.getElementById('userArea');
+      const cur = getCurrentUser();
+      headerRight.innerHTML = '';
+      userArea.innerHTML = '';
+      if(!cur){
+        // not logged
+        const btn = document.createElement('button'); btn.className='btn'; btn.textContent='Kirish / Ro\'yxatdan o\'tish';
+        btn.addEventListener('click', ()=>{showAuthPanel();});
+        headerRight.appendChild(btn);
+        userArea.innerHTML = '<p class="hint">Tizimga kirmagansiz.</p>';
+      } else {
+        const users = loadUsers();
+        const uobj = users[cur];
+        const prof = document.createElement('div'); prof.className='profile';
+        const av = document.createElement('div'); av.className='avatar'; av.textContent = (uobj.fullname || cur).slice(0,2).toUpperCase();
+        const info = document.createElement('div');
+        info.innerHTML = `<strong>${uobj.fullname || cur}</strong><div class="hint">@${uobj.username}</div><div class="hint">${uobj.email || ''}</div>`;
+        prof.appendChild(av); prof.appendChild(info);
+        userArea.appendChild(prof);
+
+        const logout = document.createElement('button'); logout.className='btn'; logout.style.marginTop='12px'; logout.textContent='Chiqish';
+        logout.addEventListener('click', ()=>{clearCurrentUser();renderUserArea();showAuthPanel();});
+        userArea.appendChild(logout);
+
+        const span = document.createElement('div'); span.style.display='inline-block'; span.style.alignSelf='center';
+        headerRight.appendChild(span);
+      }
+    }
+
+    // Auto-login if remembered
+    async function tryAutoLogin(){
+      const remember = getRemember();
+      if(remember && remember.username){
+        const users = loadUsers();
+        const u = remember.username;
+        if(users[u] && users[u].passwordHash === remember.passwordHash){
+          // auto login
+          setCurrentUser(u);
+          hideAuthPanel();
+          renderUserArea();
+          return true;
+        }
+      }
       return false;
     }
 
-    // ——— Yil
-    document.getElementById('yil').textContent = new Date().getFullYear();
+    // On load
+    (async ()=>{
+      // if no users exist, create sample user for testing (optional)
+      const users = loadUsers();
+      if(Object.keys(users).length===0){
+        // create demo user: demo / demo123
+        const demoHash = await hashString('demo123');
+        users['demo'] = {username:'demo', passwordHash:demoHash, fullname:'Demo Foydalanuvchi', email:'demo@example.com', created:new Date().toISOString()};
+        saveUsers(users);
+      }
+      const authed = await tryAutoLogin();
+      if(!authed){ showAuthPanel(); }
+      renderUserArea();
+    })();
+
+    // Accessibility: close auth panel on Escape (will not remove login state)
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ document.getElementById('authPanel').style.display='none' } });
+
   </script>
 </body>
 </html>
