@@ -1,177 +1,236 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BrandNomi — Firebase Login tizimi</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>BrandNomi — Firebase test (ro'yxat + tiklash)</title>
   <style>
-    :root{--bg:#0b1220;--card:#0f172a;--text:#e2e8f0;--muted:#94a3b8;--primary:#38bdf8;--accent:#22d3ee;--border:#1e293b;--shadow:0 12px 30px rgba(8,15,40,.35);--radius:14px}
-    *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--text)}
-    .container{max-width:1100px;margin:0 auto;padding:20px}
-    header{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
-    .logo{font-weight:700;font-size:20px}
-    .btn{background:var(--primary);color:white;padding:8px 12px;border-radius:10px;border:0;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:var(--text)}
-    .card{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);box-shadow:var(--shadow)}
-    .auth-panel{position:fixed;inset:0;display:grid;place-items:center;background:rgba(2,6,23,.6);z-index:60}
-    .auth{width:420px;background:var(--card);padding:18px;border-radius:12px;border:1px solid var(--border)}
-    .tabs{display:flex;gap:6px;margin-bottom:12px}
-    .tabs button{flex:1;padding:8px;border-radius:8px;border:0;background:transparent;color:var(--muted);cursor:pointer}
-    .tabs button.active{background:linear-gradient(90deg,var(--primary),var(--accent));color:#022}
-    .field{display:grid;margin-bottom:10px}
-    .field label{font-size:13px;color:var(--muted);margin-bottom:6px}
-    .field input{padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)}
-    .hint{font-size:13px;color:var(--muted)}
-    .row{display:flex;gap:12px;align-items:center}
-    .avatar{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;letter-spacing:.5px;color:#0b1220;user-select:none}
-    .avatar.lg{width:72px;height:72px;font-size:20px}
+    :root{--bg:#0b1220;--card:#0f172a;--text:#e2e8f0;--muted:#94a3b8;--primary:#38bdf8}
+    body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial;margin:0;padding:18px}
+    .card{background:var(--card);padding:16px;border-radius:10px;max-width:640px;margin:12px auto;border:1px solid rgba(255,255,255,0.04)}
+    .field{margin-bottom:10px}
+    input{width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)}
+    button{background:var(--primary);color:#022;padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+    .hint{color:var(--muted);font-size:13px;margin-top:6px}
+    .err{color:#fca5a5;margin-top:8px}
+    .ok{color:#86efac;margin-top:8px}
+    .row{display:flex;gap:8px;align-items:center}
   </style>
 </head>
 <body>
-  <header class="container"><div class="logo">BrandNomi</div></header>
-  <main class="container">
-    <div id="welcome" class="card">
-      <h2>Firebase asosidagi umumiy login tizimi</h2>
-      <p class="hint">Ro‘yxatdan o‘tish, kirish, parolni tiklash, profilni tahrirlash. Ma’lumotlar Firestore bazasida saqlanadi — istalgan qurilmadan kirish mumkin.</p>
+  <div class="card">
+    <h2>BrandNomi — test (Ro'yxat + Kirish + Tiklash)</h2>
+    <p class="hint">Firebase konfiguratsiyasini kiritib, Firestore yoqilganligini tekshiring.</p>
+
+    <!-- auth panel (tabs) -->
+    <div id="tabs" class="row" style="margin-bottom:12px">
+      <button id="btnLogin">Kirish</button>
+      <button id="btnReg">Ro'yxatdan o'tish</button>
+      <button id="btnReset">Parol tiklash</button>
     </div>
-    <div id="userArea" class="card" style="margin-top:20px"></div>
-  </main>
 
-  <div id="authPanel" class="auth-panel">
-    <div class="auth card">
-      <div class="tabs">
-        <button id="tabLogin" type="button" class="active">Kirish</button>
-        <button id="tabRegister" type="button">Ro'yxatdan o'tish</button>
-        <button id="tabReset" type="button">Parolni tiklash</button>
-      </div>
+    <!-- login -->
+    <form id="formLogin" style="display:block" class="card" onsubmit="return false;">
+      <div class="field"><label>Login</label><input id="login_username" placeholder="login (masalan: shahboz)" required></div>
+      <div class="field"><label>Parol</label><input id="login_password" type="password" placeholder="parol" required></div>
+      <div class="row"><button id="loginBtn">Kirish</button></div>
+      <div id="loginMsg" class="err"></div>
+    </form>
 
-      <form id="loginForm">
-        <div class="field"><label>Login</label><input id="login_username" required></div>
-        <div class="field"><label>Parol</label><input id="login_password" type="password" required></div>
-        <button class="btn" type="submit">Kirish</button><p id="loginMsg" class="hint"></p>
-      </form>
+    <!-- register -->
+    <form id="formReg" style="display:none" class="card" onsubmit="return false;">
+      <div class="field"><label>F.I.SH</label><input id="reg_fullname" placeholder="to'liq ism" required></div>
+      <div class="field"><label>Login</label><input id="reg_username" placeholder="login (unique, kichik harflar)" required></div>
+      <div class="field"><label>Parol</label><input id="reg_password" type="password" placeholder="parol" required></div>
+      <div class="row"><button id="regBtn">Ro'yxatdan o'tish</button></div>
+      <div id="regMsg" class="err"></div>
+    </form>
 
-      <form id="registerForm" style="display:none">
-        <div class="field"><label>F.I.SH</label><input id="reg_fullname" required></div>
-        <div class="field"><label>Login</label><input id="reg_username" required></div>
-        <div class="field"><label>Parol</label><input id="reg_password" type="password" required></div>
-        <button class="btn" type="submit">Ro'yxatdan o'tish</button><p id="regMsg" class="hint"></p>
-      </form>
+    <!-- reset -->
+    <form id="formReset" style="display:none" class="card" onsubmit="return false;">
+      <div class="field"><label>F.I.SH (parolni tiklash uchun)</label><input id="reset_fullname" placeholder="to'liq ism (F.I.SH)" required></div>
+      <div class="field"><label>Yangi parol</label><input id="reset_newpass" type="password" placeholder="yangi parol" required></div>
+      <div class="row"><button id="resetBtn">Tiklash</button></div>
+      <div id="resetMsg" class="err"></div>
+    </form>
 
-      <form id="resetForm" style="display:none">
-        <div class="field"><label>F.I.SH</label><input id="reset_fullname" required></div>
-        <div class="field"><label>Yangi parol</label><input id="reset_newpass" type="password" required></div>
-        <div class="row" style="justify-content:space-between">
-          <button class="btn" type="submit">Tiklash</button>
-          <button class="btn ghost" type="button" id="remindLoginBtn">Loginni eslatish</button>
-        </div>
-        <p id="resetMsg" class="hint"></p>
-      </form>
-    </div>
-  </div>
-
-  <div id="editPanel" class="auth-panel" style="display:none">
-    <div class="auth card">
-      <h3 class="row"><span class="avatar lg" id="editAvatar">AA</span> Profilni tahrirlash</h3>
-      <form id="editForm">
-        <div class="field"><label>Yangi F.I.SH</label><input id="edit_fullname" required></div>
-        <div class="field"><label>Yangi login</label><input id="edit_username" required></div>
-        <div class="field"><label>Yangi parol</label><input id="edit_password" type="password" required></div>
-        <div class="row" style="justify-content:space-between">
-          <button class="btn" type="submit">Saqlash</button>
-          <button class="btn ghost" type="button" onclick="document.getElementById('editPanel').style.display='none'">Bekor qilish</button>
-        </div>
-        <p id="editMsg" class="hint"></p>
-      </form>
+    <div style="margin-top:12px">
+      <p class="hint">Kodni ishlatishdan oldin konsolni (F12 → Console) oching — kerakli xabarlar/hatoliklar shu yerda chiqadi.</p>
     </div>
   </div>
 
-  <!-- Firebase kutubxonalar -->
+  <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
   <script>
-    // 🔹 SHU JOYGA O‘ZINGNING FIREBASE CONFIGINGNI QO‘Y!
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT",
-    };
+  (async()=>{
 
+  // ========== 1) BU YERNI O'ZGARTIRING: o'zingizning Firebase project configini qo'ying ==========
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT",
+    // storageBucket, messagingSenderId, appId — agar bo'lsa kiriting
+  };
+  // ================================================================================================
+
+  // init
+  try {
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    console.log('Firebase initialized');
+  } catch(err){
+    console.error('Firebase init error', err);
+    alert('Firebase initialize bo‘lmadi. Konfiguratsiyani tekshiring va Console’da xatoni ko‘ring.');
+    return;
+  }
 
-    // --- Foydali funksiyalar
-    async function hashString(s){const data=new TextEncoder().encode(s);const h=await crypto.subtle.digest('SHA-256',data);return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');}
-    function initialsFrom(n){const p=(n||'').trim().toUpperCase().split(/\\s+/);if(p.length==1)return p[0].slice(0,2);return(p[0][0]||'')+(p[1][0]||'');}
-    function pastelFromSeed(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return`hsl(${h%360} 70% 70%)`;}
-    const LS_CUR='bn_cur';const cur=()=>sessionStorage.getItem(LS_CUR);const setCur=u=>sessionStorage.setItem(LS_CUR,u);const clearCur=()=>sessionStorage.removeItem(LS_CUR);
-    function userRef(u){return db.collection('users').doc(u)}
+  const db = firebase.firestore();
 
-    // --- UI
-    const tabLogin=document.getElementById('tabLogin'),tabRegister=document.getElementById('tabRegister'),tabReset=document.getElementById('tabReset');
-    const loginForm=document.getElementById('loginForm'),regForm=document.getElementById('registerForm'),resetForm=document.getElementById('resetForm');
-    tabLogin.onclick=()=>show('login');tabRegister.onclick=()=>show('register');tabReset.onclick=()=>show('reset');
-    function show(x){[tabLogin,tabRegister,tabReset].forEach(t=>t.classList.remove('active'));loginForm.style.display=regForm.style.display=resetForm.style.display='none';if(x==='login'){tabLogin.classList.add('active');loginForm.style.display='block'}if(x==='register'){tabRegister.classList.add('active');regForm.style.display='block'}if(x==='reset'){tabReset.classList.add('active');resetForm.style.display='block'}}
+  // check connection — oddiy test: Firestorega so'rov yuborib ko'ramiz
+  try {
+    await db.collection('_test').doc('_ping').set({ts: Date.now()});
+    console.log('Firestore write OK');
+  } catch(e){
+    console.error('Firestore write failed — check rules and network', e);
+    alert('Firestore bilan ulanishda muammo. Console’ni tekshiring.');
+    // continue — foydali xatolik xabari konsolda bor
+  }
 
-    // --- Ro‘yxatdan o‘tish
-    regForm.onsubmit=async e=>{
-      e.preventDefault();
-      const f=reg_fullname.value.trim().toLowerCase(),l=reg_username.value.trim().toLowerCase(),p=reg_password.value;
-      const exist=await userRef(l).get();if(exist.exists){regMsg.textContent='Bu login allaqachon mavjud.';return;}
-      await userRef(l).set({fullname:f,fullnameLower:f,username:l,passwordHash:await hashString(p),avatarColor:pastelFromSeed(l),createdAt:Date.now()});
-      setCur(l);document.getElementById('authPanel').style.display='none';render();
-    };
+  // helper funksiyalar
+  async function hashString(s){ const d=new TextEncoder().encode(s); const h=await crypto.subtle.digest('SHA-256',d); return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+  function normalize(s){ return (s||'').trim().toLowerCase(); }
+  function initialsFrom(n){ const p=(n||'').trim().toUpperCase().split(/\s+/).filter(Boolean); if(p.length===0) return '??'; if(p.length===1) return p[0].slice(0,2); return (p[0][0]||'')+(p[1][0]||''); }
+  function pastelFromSeed(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))>>>0 } return `hsl(${h%360} 70% 70%)` }
 
-    // --- Kirish
-    loginForm.onsubmit=async e=>{
-      e.preventDefault();
-      const l=login_username.value.trim().toLowerCase(),p=login_password.value;
-      const rec=await userRef(l).get();if(!rec.exists){loginMsg.textContent='Login topilmadi';return;}
-      const d=rec.data();if(d.passwordHash!==await hashString(p)){loginMsg.textContent='Parol xato';return;}
-      await userRef(l).update({lastLoginAt:Date.now()});setCur(l);document.getElementById('authPanel').style.display='none';render();
-    };
+  // UI elements
+  const $ = id => document.getElementById(id);
+  const formLogin = $('formLogin'), formReg = $('formReg'), formReset = $('formReset');
+  const btnLoginTab = $('btnLogin'), btnRegTab = $('btnReg'), btnResetTab = $('btnReset');
 
-    // --- Parolni tiklash
-    resetForm.onsubmit=async e=>{
-      e.preventDefault();
-      const f=reset_fullname.value.trim().toLowerCase(),newp=reset_newpass.value;
-      const q=await db.collection('users').where('fullnameLower','==',f).limit(1).get();
-      if(q.empty){resetMsg.textContent='Foydalanuvchi topilmadi';return;}
-      const doc=q.docs[0];await userRef(doc.id).update({passwordHash:await hashString(newp)});
-      resetMsg.textContent='Parol tiklandi! Login: @'+doc.id;setTimeout(()=>show('login'),1500);
-    };
+  btnLoginTab.onclick = ()=>{ formLogin.style.display='block'; formReg.style.display='none'; formReset.style.display='none'; $('loginMsg').textContent=''; }
+  btnRegTab.onclick   = ()=>{ formLogin.style.display='none'; formReg.style.display='block'; formReset.style.display='none'; $('regMsg').textContent=''; }
+  btnResetTab.onclick = ()=>{ formLogin.style.display='none'; formReg.style.display='none'; formReset.style.display='block'; $('resetMsg').textContent=''; }
 
-    // --- Loginni eslatish
-    document.getElementById('remindLoginBtn').onclick=async()=>{
-      const f=reset_fullname.value.trim().toLowerCase();if(!f){resetMsg.textContent='Avval F.I.SH kiriting';return;}
-      const q=await db.collection('users').where('fullnameLower','==',f).get();if(q.empty){resetMsg.textContent='Topilmadi';return;}
-      resetMsg.textContent='Sizning login: '+q.docs.map(d=>'@'+d.id).join(', ');
-    };
+  // Firestore ref helpers
+  const userRef = username => db.collection('users').doc(username);
 
-    // --- Profil tahriri
-    document.getElementById('editForm').onsubmit=async e=>{
-      e.preventDefault();const c=cur();if(!c)return;
-      const r=await userRef(c).get();if(!r.exists)return;
-      const nf=edit_fullname.value.trim().toLowerCase(),nu=edit_username.value.trim().toLowerCase(),np=edit_password.value;
-      if(nu!==c){const ex=await userRef(nu).get();if(ex.exists){editMsg.textContent='Bu login band.';return;}
-        const data=r.data();await userRef(nu).set({...data,fullname:nf,fullnameLower:nf,username:nu,passwordHash:await hashString(np),avatarColor:pastelFromSeed(nu)});
-        await userRef(c).delete();setCur(nu);
-      }else await userRef(c).update({fullname:nf,fullnameLower:nf,passwordHash:await hashString(np)});
-      editMsg.textContent='Yangilandi';setTimeout(()=>{document.getElementById('editPanel').style.display='none';render();},800);
-    };
-
-    // --- Ko‘rsatish
-    async function render(){
-      const div=document.getElementById('userArea'),c=cur();if(!c){div.innerHTML='<button class=\"btn\" onclick=\"document.getElementById(\\'authPanel\\').style.display=\\'grid\\'\">Kirish / Ro\\'yxatdan o\\'tish</button>';return;}
-      const rec=await userRef(c).get();if(!rec.exists){clearCur();return render();}
-      const r=rec.data(),initials=initialsFrom(r.fullname),color=r.avatarColor||pastelFromSeed(r.username);
-      const last=r.lastLoginAt?new Date(r.lastLoginAt).toLocaleString():'—';
-      div.innerHTML=`<div class=\"row\"><span class=\"avatar\" style=\"background:${color}\">${initials}</span><div><b>${r.fullname}</b><br><span class=\"hint\">@${r.username}</span><br><span class=\"hint\">Oxirgi kirish: ${last}</span></div></div><div class=\"row\" style=\"margin-top:12px\"><button class='btn' id='editOpen'>Profilni tahrirlash</button><button class='btn ghost' id='logoutBtn'>Chiqish</button></div>`;
-      document.getElementById('logoutBtn').onclick=()=>{clearCur();render()};
-      document.getElementById('editOpen').onclick=()=>{edit_fullname.value=r.fullname;edit_username.value=r.username;edit_password.value='';editAvatar.textContent=initials;editAvatar.style.background=color;document.getElementById('editPanel').style.display='grid';};
+  // ========== Registration ==========
+  $('regBtn').onclick = async (ev)=>{
+    ev.preventDefault();
+    $('regMsg').textContent = '';
+    const fullname = normalize($('reg_fullname').value);
+    const username = normalize($('reg_username').value);
+    const password = $('reg_password').value;
+    if(!fullname || !username || !password){ $('regMsg').textContent='Barcha maydonlar to‘ldirilsin.'; return; }
+    try{
+      console.log('Reg: checking exist', username);
+      const snap = await userRef(username).get();
+      if(snap.exists){ $('regMsg').textContent='Bu login allaqachon mavjud.'; return; }
+      const hashed = await hashString(password);
+      const doc = {
+        username,
+        fullname,
+        fullnameLower: fullname,
+        passwordHash: hashed,
+        avatarColor: pastelFromSeed(username),
+        createdAt: Date.now(),
+        lastLoginAt: null
+      };
+      await userRef(username).set(doc);
+      console.log('Reg: user created', username);
+      $('regMsg').className = 'ok'; $('regMsg').textContent = 'Ro‘yxatdan o‘tish muvaffaqiyatli. Kirishingiz mumkin.';
+      // clear form
+      $('reg_fullname').value=''; $('reg_username').value=''; $('reg_password').value='';
+      // go to login tab
+      setTimeout(()=>{ btnLoginTab.click(); }, 900);
+    }catch(err){
+      console.error('Registration error', err);
+      $('regMsg').className='err'; $('regMsg').textContent = 'Ro‘yxatdan o‘tishda xato. Console’ga qarang.';
     }
-    render();
+  };
+
+  // ========== Login ==========
+  $('loginBtn').onclick = async (ev)=>{
+    ev.preventDefault();
+    $('loginMsg').textContent = '';
+    const username = normalize($('login_username').value);
+    const password = $('login_password').value;
+    if(!username || !password){ $('loginMsg').textContent='Login va parol kiriting.'; return; }
+    try{
+      const snap = await userRef(username).get();
+      if(!snap.exists){ $('loginMsg').textContent='Login topilmadi (yoki noto‘g‘ri).'; return; }
+      const data = snap.data();
+      const hashed = await hashString(password);
+      if(data.passwordHash !== hashed){ $('loginMsg').textContent='Parol xato.'; return; }
+      // muvaffaqiyatli kirish — yangilash
+      await userRef(username).update({ lastLoginAt: Date.now() });
+      // session (sahifa sessiyasi)
+      sessionStorage.setItem('bn_current', username);
+      $('loginMsg').className='ok'; $('loginMsg').textContent='Kirish muvaffaqiyatli!';
+      console.log('Login success', username);
+      // show simple profile area (yoki qayta render qiling)
+      setTimeout(()=>{ window.location.reload(); }, 600);
+    }catch(err){
+      console.error('Login error', err);
+      $('loginMsg').textContent='Kirishda texnik xato. Console’ni tekshiring.';
+    }
+  };
+
+  // ========== Password reset via F.I.SH ==========
+  $('resetBtn').onclick = async (ev)=>{
+    ev.preventDefault();
+    $('resetMsg').textContent = '';
+    const fullname = normalize($('reset_fullname').value);
+    const newp = $('reset_newpass').value;
+    if(!fullname || !newp){ $('resetMsg').textContent='F.I.SH va yangi parol kerak.'; return; }
+    try{
+      const q = await db.collection('users').where('fullnameLower','==',fullname).limit(1).get();
+      if(q.empty){ $('resetMsg').textContent='Bunday ismli foydalanuvchi topilmadi.'; return; }
+      const doc = q.docs[0];
+      const username = doc.id;
+      const hashed = await hashString(newp);
+      await userRef(username).update({ passwordHash: hashed });
+      $('resetMsg').className='ok'; $('resetMsg').textContent = `Parol tiklandi! Sizning login: @${username}`;
+      console.log('Password reset for', username);
+      // avtomatik login oynasiga qaytish
+      setTimeout(()=>{ btnLoginTab.click(); }, 1200);
+    }catch(err){
+      console.error('Reset error', err);
+      $('resetMsg').textContent = 'Tiklashda xatolik. Console’ni tekshiring.';
+    }
+  };
+
+  // ========== Remind login (F.I.SH orqali) ==========
+  $('remindLoginBtn').onclick = async ()=>{
+    $('resetMsg').textContent=''; const fullname = normalize($('reset_fullname').value);
+    if(!fullname){ $('resetMsg').textContent='Avval F.I.SH kiriting.'; return; }
+    try{
+      const q = await db.collection('users').where('fullnameLower','==',fullname).get();
+      if(q.empty){ $('resetMsg').textContent='Topilmadi.'; return; }
+      const list = q.docs.map(d=>'@'+d.id).join(', ');
+      $('resetMsg').className='ok'; $('resetMsg').textContent = (q.size===1)? `Sizning login: ${list}` : `Mos loginlar: ${list}`;
+    }catch(e){ console.error(e); $('resetMsg').textContent='Xato. Console ko‘rilsin.'; }
+  };
+
+  // ========== Simple page render: if session exist show welcome ==========
+  function showWelcome(){
+    const cur = sessionStorage.getItem('bn_current');
+    if(!cur) return;
+    // fetch user and show small alert
+    userRef(cur).get().then(snap=>{
+      if(!snap.exists) { sessionStorage.removeItem('bn_current'); return; }
+      const d = snap.data();
+      alert(`Siz tizimga kirdingiz: @${d.username}\nOxirgi kirish: ${d.lastLoginAt? new Date(d.lastLoginAt).toLocaleString() : '—'}`);
+      // clear session if you want auto-logout on refresh: sessionStorage.removeItem('bn_current');
+    }).catch(e=>console.error('Render welcome error',e));
+  }
+
+  // call showWelcome on load
+  showWelcome();
+
+  // end async IIFE
+  })();
   </script>
 </body>
 </html>
