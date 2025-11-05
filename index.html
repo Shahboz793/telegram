@@ -1,236 +1,543 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>BrandNomi — Firebase test (ro'yxat + tiklash)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TestMaster — Admin/User (Login+Kod, Bir martalik urinish)</title>
   <style>
-    :root{--bg:#0b1220;--card:#0f172a;--text:#e2e8f0;--muted:#94a3b8;--primary:#38bdf8}
-    body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial;margin:0;padding:18px}
-    .card{background:var(--card);padding:16px;border-radius:10px;max-width:640px;margin:12px auto;border:1px solid rgba(255,255,255,0.04)}
-    .field{margin-bottom:10px}
-    input{width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text)}
-    button{background:var(--primary);color:#022;padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
-    .hint{color:var(--muted);font-size:13px;margin-top:6px}
-    .err{color:#fca5a5;margin-top:8px}
-    .ok{color:#86efac;margin-top:8px}
-    .row{display:flex;gap:8px;align-items:center}
+    :root{
+      --bg:#f6f7fb;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e5e7eb;
+      --primary:#2563eb;--good:#16a34a;--bad:#ef4444;--amber:#f59e0b;--pink:#ec4899;--teal:#14b8a6;
+      --radius:18px;--shadow:0 14px 32px rgba(15,23,42,.10)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
+    .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+    h1{margin:0 0 8px}
+    .muted{color:var(--muted)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .input{display:flex;flex-direction:column;gap:6px}
+    input,select,textarea{padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff;outline:none}
+    .btn{padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;cursor:pointer}
+    .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .btn.ghost{background:#f8fafc}
+    .btn.small{padding:6px 10px;border-radius:10px}
+    .btn.warn{background:var(--amber);color:#111;border-color:var(--amber)}
+    .grid{display:grid;gap:12px}
+    @media (min-width: 900px){.grid.cols-3{grid-template-columns:repeat(3,1fr)}.grid.cols-2{grid-template-columns:repeat(2,1fr)}}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left}
+    th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .answer-pad{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .opt{padding:16px 22px;border:1px solid var(--border);border-radius:14px;background:#fff;cursor:pointer;min-width:64px;text-align:center;font-weight:700;font-size:18px;transition:.15s}
+    .opt.active{box-shadow:0 0 0 3px rgba(37,99,235,.25)}
+    /* Ranglar: A (ko'k), B (yashil), C (sariq), D (pushti) */
+    .opt[data-v="A"]{background:#eff6ff;border-color:#dbeafe}
+    .opt[data-v="B"]{background:#ecfdf5;border-color:#bbf7d0}
+    .opt[data-v="C"]{background:#fffbeb;border-color:#fde68a}
+    .opt[data-v="D"]{background:#fdf2f8;border-color:#fbcfe8}
+    .opt:hover{transform:translateY(-1px)}
+    .tag{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#f8fafc;font-size:12px}
+    .good{color:var(--good)}.bad{color:var(--bad)}
+    .hidden{display:none!important}
+    .section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .flex{display:flex;gap:8px;align-items:center}
+    .space{flex:1}
+    .copy{white-space:pre-wrap;background:#0f172a;color:#fff;padding:12px;border-radius:12px}
+    .note{font-size:12px;color:var(--muted)}
+    .pill{font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;border:1px solid #e0e7ff}
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>BrandNomi — test (Ro'yxat + Kirish + Tiklash)</h2>
-    <p class="hint">Firebase konfiguratsiyasini kiritib, Firestore yoqilganligini tekshiring.</p>
-
-    <!-- auth panel (tabs) -->
-    <div id="tabs" class="row" style="margin-bottom:12px">
-      <button id="btnLogin">Kirish</button>
-      <button id="btnReg">Ro'yxatdan o'tish</button>
-      <button id="btnReset">Parol tiklash</button>
+  <div class="wrap">
+    <div class="card">
+      <h1>TestMaster</h1>
+      <div class="muted">Login+Kod bilan kirish, Admin test yaratadi, foydalanuvchilar 1 marta ishlaydi, natijalar reyting bo‘yicha tartiblanadi.</div>
     </div>
 
-    <!-- login -->
-    <form id="formLogin" style="display:block" class="card" onsubmit="return false;">
-      <div class="field"><label>Login</label><input id="login_username" placeholder="login (masalan: shahboz)" required></div>
-      <div class="field"><label>Parol</label><input id="login_password" type="password" placeholder="parol" required></div>
-      <div class="row"><button id="loginBtn">Kirish</button></div>
-      <div id="loginMsg" class="err"></div>
-    </form>
+    <!-- Login Panel -->
+    <div class="card" id="loginCard">
+      <div class="section-title"><strong>Kirish</strong><span class="muted">Admin yoki foydalanuvchi</span></div>
+      <div class="row">
+        <div class="card" style="margin:0">
+          <strong>Foydalanuvchi kirishi</strong>
+          <div class="input"><label>Login (ism yoki ID)</label><input id="userLogin" placeholder="Masalan: AliValiyev"/></div>
+          <div class="input"><label>Kod (parol)</label><input id="userPass" type="password" placeholder="Masalan: 1234"/></div>
+          <div class="flex">
+            <button class="btn primary" onclick="loginUser()">Kirish</button>
+            <button class="btn ghost" onclick="registerUser()">Ro‘yxatdan o‘tish</button>
+            <button class="btn small ghost" onclick="runSelfTests()">Self-test</button>
+          </div>
+          <div class="note">Bir marta ro‘yxatdan o‘tgach, keyin shu login+kod bilan har qanday qurilmada kira olasiz (ma’lumot sinxroni uchun server kerak — hozircha JSON Export/Import bor).</div>
+        </div>
+        <div class="card" style="margin:0">
+          <strong>Admin kirish</strong>
+          <div class="input"><label>Login</label><input id="adminLogin" placeholder="QWERTY"/></div>
+          <div class="input"><label>Kod</label><input id="adminCode" type="password" placeholder="2768"/></div>
+          <button class="btn primary" onclick="loginAdmin()">Admin bo'lib kirish</button>
+          <div class="note">Admin panelida testlar, foydalanuvchilar va natijalarni ko‘rish, export/import qilish mumkin.</div>
+        </div>
+      </div>
+    </div>
 
-    <!-- register -->
-    <form id="formReg" style="display:none" class="card" onsubmit="return false;">
-      <div class="field"><label>F.I.SH</label><input id="reg_fullname" placeholder="to'liq ism" required></div>
-      <div class="field"><label>Login</label><input id="reg_username" placeholder="login (unique, kichik harflar)" required></div>
-      <div class="field"><label>Parol</label><input id="reg_password" type="password" placeholder="parol" required></div>
-      <div class="row"><button id="regBtn">Ro'yxatdan o'tish</button></div>
-      <div id="regMsg" class="err"></div>
-    </form>
+    <!-- Admin Panel -->
+    <div class="card hidden" id="adminCard">
+      <div class="section-title">
+        <strong>Admin — Boshqaruv</strong>
+        <div class="flex">
+          <span class="tag">Admin</span>
+          <button class="btn small" onclick="logout()">Chiqish</button>
+        </div>
+      </div>
 
-    <!-- reset -->
-    <form id="formReset" style="display:none" class="card" onsubmit="return false;">
-      <div class="field"><label>F.I.SH (parolni tiklash uchun)</label><input id="reset_fullname" placeholder="to'liq ism (F.I.SH)" required></div>
-      <div class="field"><label>Yangi parol</label><input id="reset_newpass" type="password" placeholder="yangi parol" required></div>
-      <div class="row"><button id="resetBtn">Tiklash</button></div>
-      <div id="resetMsg" class="err"></div>
-    </form>
+      <div class="grid cols-2">
+        <div class="card" style="margin:0">
+          <strong>1) Test yaratish</strong>
+          <div class="input"><label>Test nomi</label><input id="tName" placeholder="Masalan: Matematika 10 savol"/></div>
+          <div class="input"><label>Maxsus raqamli kod</label><input id="tCode" type="number" placeholder="Masalan: 12001"/></div>
+          <div class="input"><label>Savollar soni</label><input id="tCount" type="number" min="1" max="100" value="10"/></div>
+          <button class="btn" onclick="buildAnswerGrid()">Javob panellari yaratish</button>
 
-    <div style="margin-top:12px">
-      <p class="hint">Kodni ishlatishdan oldin konsolni (F12 → Console) oching — kerakli xabarlar/hatoliklar shu yerda chiqadi.</p>
+          <div class="card" style="margin:12px 0 0 0">
+            <strong>Javob kaliti (A/B/C/D)</strong>
+            <div id="answerGrid" class="grid"></div>
+            <div class="flex" style="margin-top:8px;">
+              <button class="btn ghost" onclick="fillAll('A')">Hammasi A</button>
+              <button class="btn ghost" onclick="fillAll('B')">Hammasi B</button>
+              <button class="btn ghost" onclick="fillAll('C')">Hammasi C</button>
+              <button class="btn ghost" onclick="fillAll('D')">Hammasi D</button>
+              <div class="space"></div>
+              <button class="btn primary" onclick="saveTest()">Testni saqlash</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin:0">
+          <strong>2) Saqlangan testlar</strong>
+          <div id="adminTests"></div>
+          <div class="flex" style="margin-top:8px">
+            <button class="btn ghost" onclick="exportAll()">Export (JSON)</button>
+            <label class="btn ghost" style="cursor:pointer">Import (JSON)
+              <input type="file" accept="application/json" hidden onchange="importAll(event)"/>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin:12px 0 0 0">
+        <strong>Foydalanuvchilar</strong>
+        <div id="adminUsers" style="margin-top:8px"></div>
+        <div class="note">Loginlar va kodlar shu brauzerda saqlanadi. (Server qo‘shilganda markazlashgan ko‘rish/sinxronlash mumkin.)</div>
+      </div>
+    </div>
+
+    <!-- User Panel: Choose & Play -->
+    <div class="card hidden" id="userCard">
+      <div class="section-title">
+        <strong>Saqlangan testlar</strong>
+        <div class="flex"><span class="tag" id="whoTag"></span><button class="btn small" onclick="logout()">Chiqish</button></div>
+      </div>
+      <div id="testsList"></div>
+    </div>
+
+    <!-- Play Panel -->
+    <div class="card hidden" id="playCard">
+      <div class="section-title">
+        <strong id="playTitle">Test</strong>
+        <div class="flex"><button class="btn small" onclick="backToList()">⬅️ Orqaga</button></div>
+      </div>
+      <div id="playBody"></div>
+      <div class="flex" style="margin-top:12px"><div class="space"></div><button class="btn primary" onclick="finishTest()">Yakunlash</button></div>
+    </div>
+
+    <!-- Results/Leaderboard -->
+    <div class="card hidden" id="resultsCard">
+      <div class="section-title">
+        <strong id="resTitle">Natijalar</strong>
+        <div class="flex"><button class="btn small" onclick="backToList()">⬅️ Testlar ro'yxati</button></div>
+      </div>
+      <div id="leaderboardWrap" class="card" style="margin:0 0 12px 0"></div>
+      <div id="detailWrap"></div>
+      <div class="card" style="margin-top:12px">
+        <strong>Telegram uchun matn</strong>
+        <div class="copy" id="tgText"></div>
+        <div class="flex" style="margin-top:8px"><button class="btn" onclick="copyTg()">Copy</button><span class="muted" id="copyState"></span></div>
+      </div>
     </div>
   </div>
 
-  <!-- Firebase (compat) -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-
   <script>
-  (async()=>{
+    // ===== Storage helpers =====
+    const LS = {
+      testsKey: 'tm_tests',
+      usersKey: 'tm_users_v2',
+      resultsKey: code => `tm_results_${code}`,
+      lastRoleKey: 'tm_lastRole',
+      lastUserKey: 'tm_userLogin',
+      get tests(){return JSON.parse(localStorage.getItem(this.testsKey)||'[]')},
+      set tests(v){localStorage.setItem(this.testsKey, JSON.stringify(v))},
+      get users(){return JSON.parse(localStorage.getItem(this.usersKey)||'[]')},
+      set users(v){localStorage.setItem(this.usersKey, JSON.stringify(v))},
+      getResults(code){return JSON.parse(localStorage.getItem(this.resultsKey(code))||'[]')},
+      setResults(code, arr){localStorage.setItem(this.resultsKey(code), JSON.stringify(arr))},
+    };
 
-  // ========== 1) BU YERNI O'ZGARTIRING: o'zingizning Firebase project configini qo'ying ==========
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT",
-    // storageBucket, messagingSenderId, appId — agar bo'lsa kiriting
-  };
-  // ================================================================================================
+    // ===== Session =====
+    let SESSION = { role:null, login:null };
 
-  // init
-  try {
-    firebase.initializeApp(firebaseConfig);
-    console.log('Firebase initialized');
-  } catch(err){
-    console.error('Firebase init error', err);
-    alert('Firebase initialize bo‘lmadi. Konfiguratsiyani tekshiring va Console’da xatoni ko‘ring.');
-    return;
-  }
+    function show(id, on=true){document.getElementById(id).classList.toggle('hidden', !on)}
+    function logout(){SESSION={role:null,login:null};show('adminCard',false);show('userCard',false);show('playCard',false);show('resultsCard',false);show('loginCard',true)}
 
-  const db = firebase.firestore();
+    // ===== Users (login + pass) =====
+    function findUser(login){ return (LS.users||[]).find(u=>u.login.toLowerCase()===login.toLowerCase()); }
+    function registerUser(){
+      const login = document.getElementById('userLogin').value.trim();
+      const pass  = document.getElementById('userPass').value.trim();
+      if(!login || !pass){alert('Login va kod (parol) kiriting');return}
+      if(findUser(login)){alert('Bu login band. Boshqa login tanlang yoki mavjud loginingiz bilan kiring.');return}
+      const u = { login, pass };
+      LS.users = [...LS.users, u];
+      alert('Ro‘yxatdan o‘tildi! Endi shu login+kod bilan kira olasiz.');
+    }
 
-  // check connection — oddiy test: Firestorega so'rov yuborib ko'ramiz
-  try {
-    await db.collection('_test').doc('_ping').set({ts: Date.now()});
-    console.log('Firestore write OK');
-  } catch(e){
-    console.error('Firestore write failed — check rules and network', e);
-    alert('Firestore bilan ulanishda muammo. Console’ni tekshiring.');
-    // continue — foydali xatolik xabari konsolda bor
-  }
+    function loginUser(){
+      const login = document.getElementById('userLogin').value.trim();
+      const pass  = document.getElementById('userPass').value.trim();
+      if(!login || !pass){alert('Login va kod (parol) kiriting');return}
+      const u = findUser(login);
+      if(!u || u.pass!==pass){alert('Login yoki kod xato');return}
+      SESSION={role:'user', login: u.login};
+      localStorage.setItem(LS.lastRoleKey,'user');
+      localStorage.setItem(LS.lastUserKey, u.login);
+      document.getElementById('whoTag').textContent = `Foydalanuvchi: ${u.login}`;
+      show('loginCard',false);show('userCard',true);renderTestsList();
+    }
 
-  // helper funksiyalar
-  async function hashString(s){ const d=new TextEncoder().encode(s); const h=await crypto.subtle.digest('SHA-256',d); return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
-  function normalize(s){ return (s||'').trim().toLowerCase(); }
-  function initialsFrom(n){ const p=(n||'').trim().toUpperCase().split(/\s+/).filter(Boolean); if(p.length===0) return '??'; if(p.length===1) return p[0].slice(0,2); return (p[0][0]||'')+(p[1][0]||''); }
-  function pastelFromSeed(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))>>>0 } return `hsl(${h%360} 70% 70%)` }
+    // ===== Admin =====
+    function loginAdmin(){
+      const login = document.getElementById('adminLogin').value.trim();
+      const code  = document.getElementById('adminCode').value.trim();
+      if(login.toLowerCase()==='qwerty' && code==='2768'){
+        SESSION={role:'admin', login:'ADMIN'};
+        show('loginCard',false);show('adminCard',true);
+        renderAdminLists();
+      }else{
+        alert('Login yoki kod xato');
+      }
+    }
 
-  // UI elements
-  const $ = id => document.getElementById(id);
-  const formLogin = $('formLogin'), formReg = $('formReg'), formReset = $('formReset');
-  const btnLoginTab = $('btnLogin'), btnRegTab = $('btnReg'), btnResetTab = $('btnReset');
+    function renderAdminLists(){
+      // tests
+      const box=document.getElementById('adminTests');
+      const tests=[...LS.tests].sort((a,b)=>a.name.localeCompare(b.name));
+      if(!tests.length){box.innerHTML='<div class="muted">Hozircha testlar yo‘q.</div>'}
+      else{
+        let html='';
+        tests.forEach(t=>{
+          const res=LS.getResults(t.code);
+          const best=res.length? Math.max(...res.map(r=>r.score)) : 0;
+          html += `<div class="card" style="margin:0 0 10px 0">
+            <div class="section-title"><strong>${t.name}</strong><span class="muted">Kod: ${t.code} • ${t.count} savol</span></div>
+            <div class="flex">
+              <span class="tag">Eng yuqori ball: ${best}/${t.count}</span>
+              <div class="space"></div>
+              <button class="btn" onclick="viewResults('${t.code}')">Natijalar</button>
+              <button class="btn warn" onclick="deleteTest('${t.code}')">O‘chirish</button>
+            </div>
+          </div>`;
+        });
+        box.innerHTML=html;
+      }
+      // users
+      const ub=document.getElementById('adminUsers');
+      const users=[...LS.users].sort((a,b)=>a.login.localeCompare(b.login));
+      if(!users.length){ub.innerHTML='<div class="muted">Foydalanuvchilar yo‘q.</div>'}
+      else{
+        let uhtml='<table><thead><tr><th>#</th><th>Login</th><th>Kod (parol)</th></tr></thead><tbody>';
+        users.forEach((u,i)=>{ uhtml+=`<tr><td>${i+1}</td><td>${u.login}</td><td>${u.pass}</td></tr>`; });
+        uhtml+='</tbody></table>';
+        ub.innerHTML=uhtml;
+      }
+    }
+    function deleteTest(code){
+      if(!confirm('Testni o‘chirishni tasdiqlang')) return;
+      LS.tests = LS.tests.filter(t=>t.code!=code);
+      localStorage.removeItem(LS.resultsKey(code));
+      renderAdminLists();
+      alert('O‘chirildi');
+    }
 
-  btnLoginTab.onclick = ()=>{ formLogin.style.display='block'; formReg.style.display='none'; formReset.style.display='none'; $('loginMsg').textContent=''; }
-  btnRegTab.onclick   = ()=>{ formLogin.style.display='none'; formReg.style.display='block'; formReset.style.display='none'; $('regMsg').textContent=''; }
-  btnResetTab.onclick = ()=>{ formLogin.style.display='none'; formReg.style.display='none'; formReset.style.display='block'; $('resetMsg').textContent=''; }
+    // ===== Admin: Build Answer Grid =====
+    function buildAnswerGrid(){
+      const count = parseInt(document.getElementById('tCount').value||'0');
+      const grid = document.getElementById('answerGrid');
+      grid.innerHTML='';
+      for(let i=1;i<=count;i++){
+        const row = document.createElement('div');
+        row.className='flex';
+        row.innerHTML = `<strong style="width:40px">${i}.</strong>`;
+        const pad = document.createElement('div');
+        pad.className='answer-pad';
+        ['A','B','C','D'].forEach(ch=>{
+          const b = document.createElement('button');
+          b.type='button'; b.className='opt'; b.textContent=ch; b.dataset.v=ch;
+          b.addEventListener('click',()=>{
+            [...pad.children].forEach(x=>x.classList.remove('active'));
+            b.classList.add('active'); row.dataset.answer = ch;
+          });
+          pad.appendChild(b);
+        })
+        row.appendChild(pad);
+        grid.appendChild(row);
+      }
+    }
+    function fillAll(ch){
+      const grid = document.getElementById('answerGrid');
+      [...grid.querySelectorAll('.flex')].forEach(row=>{
+        row.dataset.answer = ch;
+        const pad=row.querySelector('.answer-pad');
+        [...pad.children].forEach(x=>x.classList.toggle('active', x.textContent===ch));
+      })
+    }
 
-  // Firestore ref helpers
-  const userRef = username => db.collection('users').doc(username);
+    function saveTest(){
+      const name=document.getElementById('tName').value.trim();
+      const code=document.getElementById('tCode').value.trim();
+      const count=parseInt(document.getElementById('tCount').value||'0');
+      if(!name||!code||!count){alert("Nomi, kod va savollar soni to'ldirilsin");return}
+      const rows=[...document.getElementById('answerGrid').querySelectorAll('.flex')];
+      if(rows.length!==count){alert('Avval "Javob panellari" ni yarating');return}
+      const answers = rows.map((r,i)=> r.dataset.answer || (alert(`${i+1}-savol uchun javob tanlanmadi`), null));
+      if(answers.some(x=>!x)) return;
+      const tests=LS.tests;
+      if(tests.find(t=>t.code==code)){ if(!confirm('Bu kod bilan test bor. Ustiga yozilsinmi?'))return }
+      const test={name, code, count, key:answers};
+      const others=tests.filter(t=>t.code!=code);
+      LS.tests=[...others, test];
+      alert('Test saqlandi');
+      document.getElementById('tName').value='';document.getElementById('tCode').value='';document.getElementById('tCount').value=10;document.getElementById('answerGrid').innerHTML='';
+      renderAdminLists();
+    }
 
-  // ========== Registration ==========
-  $('regBtn').onclick = async (ev)=>{
-    ev.preventDefault();
-    $('regMsg').textContent = '';
-    const fullname = normalize($('reg_fullname').value);
-    const username = normalize($('reg_username').value);
-    const password = $('reg_password').value;
-    if(!fullname || !username || !password){ $('regMsg').textContent='Barcha maydonlar to‘ldirilsin.'; return; }
-    try{
-      console.log('Reg: checking exist', username);
-      const snap = await userRef(username).get();
-      if(snap.exists){ $('regMsg').textContent='Bu login allaqachon mavjud.'; return; }
-      const hashed = await hashString(password);
-      const doc = {
-        username,
-        fullname,
-        fullnameLower: fullname,
-        passwordHash: hashed,
-        avatarColor: pastelFromSeed(username),
-        createdAt: Date.now(),
-        lastLoginAt: null
+    // ===== User: list tests =====
+    function renderTestsList(){
+      const box=document.getElementById('testsList');
+      const tests=[...LS.tests].sort((a,b)=>a.name.localeCompare(b.name));
+      if(!tests.length){box.innerHTML='<div class="muted">Hozircha testlar yo‘q.</div>';return}
+      box.innerHTML='';
+      tests.forEach(t=>{
+        const res=LS.getResults(t.code);
+        const best=res.length? Math.max(...res.map(r=>r.score)) : 0;
+        const div=document.createElement('div');
+        div.className='card';
+        div.style.margin='0 0 12px 0';
+        // 1 marta urinish cheklovi:
+        const already = res.some(r=>r.login===SESSION.login);
+        div.innerHTML=`<div class="section-title"><strong>${t.name}</strong><span class="muted">${t.count} savol</span></div>
+          <div class="flex">
+            ${already?`<span class="pill">Siz bu testni ishlagansiz</span>`:`<button class="btn primary" onclick="startTest('${t.code}')">Testni ishlash</button>`}
+            <button class="btn" onclick="viewResults('${t.code}')">Natijalar</button>
+            <div class="space"></div>
+            <span class="tag">Eng yuqori ball: ${best}/${t.count}</span>
+          </div>`;
+        box.appendChild(div);
+      })
+    }
+
+    // ===== Play test =====
+    let PLAY={ code:null, key:[], count:0, chosen:[] };
+
+    function startTest(code){
+      const t = LS.tests.find(x=>x.code==code);
+      if(!t){alert('Test topilmadi');return}
+      const res=LS.getResults(code);
+      if(res.some(r=>r.login===SESSION.login)){ alert('Bu testni allaqachon yakunlagansiz. Faqat 1 marta ruxsat.'); return; }
+      PLAY={code:code, key:t.key, count:t.count, chosen:new Array(t.count).fill(null)};
+      document.getElementById('playTitle').textContent = `${t.name} — ${t.count} savol`;
+      renderPlay();
+      show('userCard',false);show('resultsCard',false);show('playCard',true);
+    }
+
+    function renderPlay(){
+      const body=document.getElementById('playBody');
+      body.innerHTML='';
+      for(let i=0;i<PLAY.count;i++){
+        const row=document.createElement('div');row.className='card';row.style.margin='0 0 12px 0';
+        const pad=document.createElement('div');pad.className='answer-pad';
+        ['A','B','C','D'].forEach(ch=>{
+          const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=ch;b.dataset.v=ch;
+          if(PLAY.chosen[i]===ch) b.classList.add('active');
+          b.addEventListener('click',()=>{
+            PLAY.chosen[i]=ch;[...pad.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');
+          });
+          pad.appendChild(b);
+        });
+        row.innerHTML=`<div class="flex"><strong style="width:50px">${i+1}.</strong><div class="space"></div><span class="muted">Variantni tanlang</span></div>`;
+        row.appendChild(pad);
+        body.appendChild(row);
+      }
+    }
+
+    function finishTest(){
+      if(!SESSION.login){alert('Login bilan kirish talab qilinadi');return}
+      if(PLAY.chosen.some(x=>x===null)){
+        if(!confirm('Ba\'zi savollar belgilanmagan. Baribir yakunlaysizmi?')) return;
+      }
+      const details=[]; let score=0;
+      for(let i=0;i<PLAY.count;i++){
+        const correct=PLAY.key[i]; const chosen=PLAY.chosen[i];
+        const ok = chosen===correct; if(ok) score++;
+        details.push({q:i+1, chosen: chosen||'-', correct, ok});
+      }
+      const rec={
+        login:SESSION.login,
+        score, total:PLAY.count,
+        details,
+        date:new Date().toISOString()
       };
-      await userRef(username).set(doc);
-      console.log('Reg: user created', username);
-      $('regMsg').className = 'ok'; $('regMsg').textContent = 'Ro‘yxatdan o‘tish muvaffaqiyatli. Kirishingiz mumkin.';
-      // clear form
-      $('reg_fullname').value=''; $('reg_username').value=''; $('reg_password').value='';
-      // go to login tab
-      setTimeout(()=>{ btnLoginTab.click(); }, 900);
-    }catch(err){
-      console.error('Registration error', err);
-      $('regMsg').className='err'; $('regMsg').textContent = 'Ro‘yxatdan o‘tishda xato. Console’ga qarang.';
+      const arr=LS.getResults(PLAY.code);
+      // enforce 1 attempt by login:
+      if(arr.some(r=>r.login===SESSION.login)){ alert('Bu testni allaqachon yakunlagansiz.'); backToList(); return; }
+      arr.push(rec); LS.setResults(PLAY.code, arr);
+      viewResults(PLAY.code, rec);
     }
-  };
 
-  // ========== Login ==========
-  $('loginBtn').onclick = async (ev)=>{
-    ev.preventDefault();
-    $('loginMsg').textContent = '';
-    const username = normalize($('login_username').value);
-    const password = $('login_password').value;
-    if(!username || !password){ $('loginMsg').textContent='Login va parol kiriting.'; return; }
-    try{
-      const snap = await userRef(username).get();
-      if(!snap.exists){ $('loginMsg').textContent='Login topilmadi (yoki noto‘g‘ri).'; return; }
-      const data = snap.data();
-      const hashed = await hashString(password);
-      if(data.passwordHash !== hashed){ $('loginMsg').textContent='Parol xato.'; return; }
-      // muvaffaqiyatli kirish — yangilash
-      await userRef(username).update({ lastLoginAt: Date.now() });
-      // session (sahifa sessiyasi)
-      sessionStorage.setItem('bn_current', username);
-      $('loginMsg').className='ok'; $('loginMsg').textContent='Kirish muvaffaqiyatli!';
-      console.log('Login success', username);
-      // show simple profile area (yoki qayta render qiling)
-      setTimeout(()=>{ window.location.reload(); }, 600);
-    }catch(err){
-      console.error('Login error', err);
-      $('loginMsg').textContent='Kirishda texnik xato. Console’ni tekshiring.';
+    // ===== Results & Leaderboard =====
+    function viewResults(code, justMade=null){
+      show('userCard',false);show('playCard',false);show('resultsCard',true);
+      const t = LS.tests.find(x=>x.code==code); if(!t){alert('Test topilmadi');backToList();return}
+      document.getElementById('resTitle').textContent = `${t.name} — Natijalar (${t.code})`;
+
+      const arr=LS.getResults(code).slice().sort((a,b)=> b.score-a.score || new Date(a.date)-new Date(b.date));
+      const lb=document.getElementById('leaderboardWrap');
+      if(!arr.length){lb.innerHTML='<div class="muted">Natijalar yo‘q.</div>'}
+      else{
+        let html='<table><thead><tr><th>#</th><th>Login</th><th>Ball</th><th>Sana</th></tr></thead><tbody>';
+        arr.forEach((r,i)=>{
+          const d=new Date(r.date); const when=d.toLocaleString();
+          html += `<tr><td>${i+1}</td><td>${escapeHtml(r.login)}</td><td><strong>${r.score}/${r.total}</strong></td><td>${when}</td></tr>`;
+        });
+        html+='</tbody></table>';
+        lb.innerHTML=html;
+      }
+
+      const dw=document.getElementById('detailWrap');
+      if(justMade){
+        dw.innerHTML = renderDetail(justMade);
+        document.getElementById('tgText').textContent = makeTgText(t, justMade);
+      }else{
+        dw.innerHTML = '<div class="muted">Konkret urinishni ko‘rish uchun testni ishga tushirib yakunlang.</div>';
+        document.getElementById('tgText').textContent='';
+      }
     }
-  };
 
-  // ========== Password reset via F.I.SH ==========
-  $('resetBtn').onclick = async (ev)=>{
-    ev.preventDefault();
-    $('resetMsg').textContent = '';
-    const fullname = normalize($('reset_fullname').value);
-    const newp = $('reset_newpass').value;
-    if(!fullname || !newp){ $('resetMsg').textContent='F.I.SH va yangi parol kerak.'; return; }
-    try{
-      const q = await db.collection('users').where('fullnameLower','==',fullname).limit(1).get();
-      if(q.empty){ $('resetMsg').textContent='Bunday ismli foydalanuvchi topilmadi.'; return; }
-      const doc = q.docs[0];
-      const username = doc.id;
-      const hashed = await hashString(newp);
-      await userRef(username).update({ passwordHash: hashed });
-      $('resetMsg').className='ok'; $('resetMsg').textContent = `Parol tiklandi! Sizning login: @${username}`;
-      console.log('Password reset for', username);
-      // avtomatik login oynasiga qaytish
-      setTimeout(()=>{ btnLoginTab.click(); }, 1200);
-    }catch(err){
-      console.error('Reset error', err);
-      $('resetMsg').textContent = 'Tiklashda xatolik. Console’ni tekshiring.';
+    function renderDetail(rec){
+      let html = '<div class="card" style="margin:0">';
+      html += `<strong>${escapeHtml(rec.login)}</strong> — <span class="tag">${rec.score}/${rec.total}</span>`;
+      html += '<div style="margin-top:8px">';
+      html += '<table><thead><tr><th>#</th><th>Tanlangan</th><th>To‘g‘ri</th><th>Holat</th></tr></thead><tbody>';
+      rec.details.forEach(d=>{
+        const ok=d.ok; html += `<tr><td>${d.q}</td><td>${d.chosen}</td><td>${d.correct}</td><td>${ok?'<span class="good">to‘g‘ri</span>':'<span class="bad">xato</span>'}</td></tr>`;
+      })
+      html+='</tbody></table></div></div>';
+      return html;
     }
-  };
 
-  // ========== Remind login (F.I.SH orqali) ==========
-  $('remindLoginBtn').onclick = async ()=>{
-    $('resetMsg').textContent=''; const fullname = normalize($('reset_fullname').value);
-    if(!fullname){ $('resetMsg').textContent='Avval F.I.SH kiriting.'; return; }
-    try{
-      const q = await db.collection('users').where('fullnameLower','==',fullname).get();
-      if(q.empty){ $('resetMsg').textContent='Topilmadi.'; return; }
-      const list = q.docs.map(d=>'@'+d.id).join(', ');
-      $('resetMsg').className='ok'; $('resetMsg').textContent = (q.size===1)? `Sizning login: ${list}` : `Mos loginlar: ${list}`;
-    }catch(e){ console.error(e); $('resetMsg').textContent='Xato. Console ko‘rilsin.'; }
-  };
+    function makeTgText(test, rec){
+      const lines=[];
+      lines.push(`🧪 Test: ${test.name} (kod: ${test.code})`);
+      lines.push(`👤 Login: ${rec.login}`);
+      lines.push(`📊 Natija: ${rec.score}/${rec.total}`);
+      lines.push('---');
+      rec.details.forEach(d=>{lines.push(`${d.q}) tanlandi: ${d.chosen} | to‘g‘ri: ${d.correct} ${d.ok?'✅':'❌'}`)});
+      return lines.join('\n');
+    }
 
-  // ========== Simple page render: if session exist show welcome ==========
-  function showWelcome(){
-    const cur = sessionStorage.getItem('bn_current');
-    if(!cur) return;
-    // fetch user and show small alert
-    userRef(cur).get().then(snap=>{
-      if(!snap.exists) { sessionStorage.removeItem('bn_current'); return; }
-      const d = snap.data();
-      alert(`Siz tizimga kirdingiz: @${d.username}\nOxirgi kirish: ${d.lastLoginAt? new Date(d.lastLoginAt).toLocaleString() : '—'}`);
-      // clear session if you want auto-logout on refresh: sessionStorage.removeItem('bn_current');
-    }).catch(e=>console.error('Render welcome error',e));
-  }
+    function copyTg(){
+      const txt=document.getElementById('tgText').textContent.trim();
+      if(!txt){document.getElementById('copyState').textContent='Hech narsa yo‘q';return}
+      navigator.clipboard.writeText(txt).then(()=>{
+        document.getElementById('copyState').textContent='Nusxa olindi ✅';
+        setTimeout(()=>document.getElementById('copyState').textContent='',1500);
+      })
+    }
 
-  // call showWelcome on load
-  showWelcome();
+    function backToList(){
+      show('resultsCard',false);show('playCard',false);show('userCard',true);renderTestsList();
+    }
 
-  // end async IIFE
-  })();
+    // ===== Export / Import (admin uchun) =====
+    function exportAll(){
+      const data = { users:LS.users, tests:LS.tests, results:{} };
+      LS.tests.forEach(t=>{ data.results[t.code] = LS.getResults(t.code); });
+      const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='testmaster-backup.json'; a.click(); URL.revokeObjectURL(url);
+    }
+    function importAll(ev){
+      const f=ev.target.files[0]; if(!f)return;
+      const reader = new FileReader();
+      reader.onload = e=>{
+        try{
+          const data = JSON.parse(e.target.result);
+          if(data.users) LS.users = data.users;
+          if(data.tests) LS.tests = data.tests;
+          if(data.results){
+            Object.keys(data.results).forEach(code=>{
+              localStorage.setItem(LS.resultsKey(code), JSON.stringify(data.results[code]||[]));
+            });
+          }
+          alert('Import OK'); renderAdminLists();
+        }catch(err){alert('Import xato: '+err.message)}
+      };
+      reader.readAsText(f);
+    }
+
+    // ===== Utils =====
+    function escapeHtml(s){return s.replace(/[&<>\"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
+
+    // ===== Self tests (basic) =====
+    function runSelfTests(){
+      const out=[];
+      try{ out.push(typeof loginUser==='function' ? '✅ loginUser mavjud' : '❌ loginUser topilmadi'); }catch(e){ out.push('❌ loginUser xato'); }
+      try{ out.push(typeof loginAdmin==='function' ? '✅ loginAdmin mavjud' : '❌ loginAdmin topilmadi'); }catch(e){ out.push('❌ loginAdmin xato'); }
+      try{
+        const ulogin='self_tester'; const upass='0000';
+        LS.users = LS.users.filter(u=>u.login!==ulogin);
+        // register
+        const beforeU=LS.users.length; LS.users=[...LS.users,{login:ulogin,pass:upass}];
+        if(LS.users.length!==beforeU+1) throw new Error('user add fail');
+        // test create
+        const t={name:'_SelfTest', code:'99999', count:3, key:['A','B','C']};
+        LS.tests=[...LS.tests.filter(x=>x.code!=='99999'), t];
+        // attempt once
+        const rk=LS.resultsKey('99999'); localStorage.removeItem(rk);
+        const arr=[]; localStorage.setItem(rk, JSON.stringify(arr));
+        const rec={login:ulogin, score:2, total:3, details:[], date:new Date().toISOString()};
+        arr.push(rec); localStorage.setItem(rk, JSON.stringify(arr));
+        const again = JSON.parse(localStorage.getItem(rk));
+        if(!again.find(x=>x.login===ulogin)) throw new Error('result save fail');
+        out.push('✅ Self-test OK');
+      }catch(e){ out.push('❌ Self-test xato: '+e.message); }
+      alert(out.join('\n'));
+    }
+
+    // ===== Boot & Auto-login =====
+    (function boot(){
+      try{
+        const role=localStorage.getItem(LS.lastRoleKey);
+        const login=localStorage.getItem(LS.lastUserKey);
+        if(role==='user' && login){
+          const u=findUser(login);
+          if(u){
+            SESSION={role:'user', login};
+            document.getElementById('whoTag').textContent = `Foydalanuvchi: ${login}`;
+            show('loginCard',false);show('userCard',true);renderTestsList();
+          }
+        }
+      }catch(e){/* ignore */}
+    })();
   </script>
 </body>
 </html>
