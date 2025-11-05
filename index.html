@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>TestMaster — BUXORO_EDU (Cloud, Auth)</title>
+  <title>TestMaster — BUXORO_EDU (Cloud)</title>
   <style>
     :root{
       --grad1:#111827; --grad2:#0b1220;
@@ -27,23 +27,38 @@
       background:linear-gradient(90deg, rgba(96,165,250,.12), rgba(167,139,250,.12));
       border:1px solid var(--border); box-shadow:var(--shadow)
     }
-    .logo{width:46px;height:46px;border-radius:12px;background:conic-gradient(from 0deg,#60a5fa,#a78bfa,#60a5fa);filter:brightness(1.05) saturate(1.2);box-shadow:0 10px 30px rgba(96,165,250,.35)}
+    .logo{
+      width:46px;height:46px;border-radius:12px;
+      background:conic-gradient(from 0deg, #60a5fa, #a78bfa, #60a5fa);
+      filter:brightness(1.05) saturate(1.2); box-shadow:0 10px 30px rgba(96,165,250,.35);
+    }
     h1{margin:0;font-size:22px;letter-spacing:.3px}
     .brand small{color:var(--muted)}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
     @media (max-width:860px){ .grid{grid-template-columns:1fr} }
 
-    .card{background:var(--card);backdrop-filter: blur(10px);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+    .card{
+      background:var(--card); backdrop-filter: blur(10px);
+      border:1px solid var(--border); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:16px; margin-bottom:16px
+    }
     .panel-title{display:flex;align-items:center;gap:10px}
     .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--glass);color:var(--muted);font-size:12px}
 
-    input{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);outline:none}
+    input{
+      width:100%; padding:12px 12px; border-radius:12px; border:1px solid var(--border);
+      background:rgba(255,255,255,.04); color:var(--text); outline:none
+    }
     input::placeholder{color:#94a3b8}
     label{display:block;margin:10px 0 6px;font-size:13px;color:var(--muted)}
 
-    .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer;transition:.15s}
+    .btn{
+      padding:10px 14px;border-radius:12px;border:1px solid var(--border);
+      background:rgba(255,255,255,.06); color:var(--text); cursor:pointer; transition:.15s
+    }
     .btn:hover{transform:translateY(-1px); box-shadow:0 10px 24px rgba(0,0,0,.25)}
     .btn.primary{background:linear-gradient(180deg, rgba(96,165,250,.35), rgba(96,165,250,.25)); border-color:#3b82f6}
+    .btn.ghost{background:rgba(255,255,255,.04)}
     .btn.small{padding:7px 10px;font-size:13px}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .flex{display:flex;gap:10px;align-items:center}
@@ -51,20 +66,38 @@
     .hidden{display:none!important}
 
     .answer-pad{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
-    .opt{padding:18px 26px;border-radius:14px;border:1px solid var(--border);min-width:76px;text-align:center;font-weight:800;font-size:20px;cursor:pointer;transition:.12s;background:rgba(255,255,255,.04)}
+    .opt{
+      padding:18px 26px;border-radius:14px;border:1px solid var(--border);min-width:76px;
+      text-align:center;font-weight:800;font-size:20px;cursor:pointer;transition:.12s;
+      background:rgba(255,255,255,.04)
+    }
     .opt[data-v="A"]{background:linear-gradient(180deg, rgba(96,165,250,.10), rgba(96,165,250,.06))}
     .opt[data-v="B"]{background:linear-gradient(180deg, rgba(34,197,94,.10), rgba(34,197,94,.06))}
     .opt[data-v="C"]{background:linear-gradient(180deg, rgba(245,158,11,.12), rgba(245,158,11,.06))}
     .opt[data-v="D"]{background:linear-gradient(180deg, rgba(244,114,182,.12), rgba(244,114,182,.06))}
     .opt:hover{transform:translateY(-2px)}
-    .opt.active-admin{background:#fee2e2!important;border-color:#fca5a5!important;box-shadow:0 0 0 3px rgba(239,68,68,.25);transform:translateY(-2px)}
-    .opt.active-user{background:#dbeafe!important;border-color:#60a5fa!important;box-shadow:0 0 0 3px rgba(59,130,246,.25);transform:translateY(-2px)}
+    .opt.active-admin{background:#fee2e2!important; border-color:#fca5a5!important; box-shadow:0 0 0 3px rgba(239,68,68,.25); transform:translateY(-2px)}
+    .opt.active-user{background:#dbeafe!important; border-color:#60a5fa!important; box-shadow:0 0 0 3px rgba(59,130,246,.25); transform:translateY(-2px)}
 
     table{width:100%;border-collapse:collapse}
     th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
     th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 
-    .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);font-size:12px}
+    .tag{display:inline-block;padding:6px 10px;border-radius:999px;
+      background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);font-size:12px}
+
+    .collapsible-head{
+      display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid var(--border); cursor:pointer
+    }
+    .chev{display:inline-block;transition:.15s}
+    .chev.open{transform:rotate(90deg)}
+    .head-right{display:flex;gap:8px;align-items:center}
+    .search-row{display:flex;gap:8px;align-items:center;margin:10px 0}
+    .tabs{display:flex;gap:8px;margin-top:8px}
+    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:var(--glass)}
+    .tab.active{background:linear-gradient(180deg, rgba(96,165,250,.35), rgba(96,165,250,.2));border-color:#3b82f6}
   </style>
 </head>
 <body>
@@ -73,124 +106,184 @@
       <div class="logo"></div>
       <div>
         <h1>TestMaster — BUXORO_EDU</h1>
-        <small>Bulutga saqlanadigan professional test tizimi (Auth + Firestore)</small>
+        <small>Bulutga saqlanadigan professional test tizimi (Firestore)</small>
       </div>
       <div class="space"></div>
-      <span class="pill">Cloud v2.0 (Auth)</span>
+      <span class="pill">Cloud v1.0</span>
     </div>
 
     <div class="grid">
-      <!-- AUTH -->
+      <!-- Foydalanuvchi auth -->
       <div class="card" id="authCard">
         <div class="panel-title"><strong>Foydalanuvchi</strong><span class="pill">Kirish / Ro‘yxatdan o‘tish</span></div>
 
-        <div class="row" style="margin-top:10px">
-          <div>
-            <label>Email</label>
-            <input id="userEmail" type="email" placeholder="email@example.com" />
+        <div class="tabs">
+          <div id="tabLogin" class="tab active" onclick="switchAuth('login')">Kirish</div>
+          <div id="tabReg" class="tab" onclick="switchAuth('reg')">Ro‘yxatdan o‘tish</div>
+        </div>
+
+        <div id="loginPanel" style="margin-top:10px">
+          <div class="row">
+            <div>
+              <label>Login (majburiy)</label>
+              <input id="userLogin" placeholder="Masalan: AliValiyev" />
+            </div>
+            <div>
+              <label>Kod / Parol (majburiy)</label>
+              <input id="userPass" type="password" />
+            </div>
           </div>
-          <div>
-            <label>Parol</label>
-            <input id="userPass" type="password" placeholder="••••••••" />
+          <div style="margin-top:10px" class="flex">
+            <button class="btn primary" onclick="loginUser()">Kirish</button>
+            <button class="btn ghost" onclick="fillDemo()">Demo</button>
+            <div class="space"></div>
+          </div>
+          <div style="margin-top:10px;color:var(--muted);font-size:13px">
+            Login bulutda saqlanadi. Istalgan qurilmadan kiring — <b>parol mos</b> bo‘lishi shart.
           </div>
         </div>
-        <div class="flex" style="margin-top:10px">
-          <button class="btn primary" id="btnLogin">Kirish</button>
-          <button class="btn" id="btnRegister">Ro‘yxatdan o‘tish</button>
-          <div class="space"></div>
-          <button class="btn small" id="btnLogout" disabled>Chiqish</button>
-        </div>
-        <div style="margin-top:8px;color:var(--muted);font-size:13px">
-          Kirgandan keyin sahifa sizning holatingizni avtomatik yangilaydi. Admin bo‘lsangiz, admin panel ochiladi.
+
+        <div id="regPanel" class="hidden" style="margin-top:10px">
+          <div class="row">
+            <div>
+              <label>Login (majburiy)</label>
+              <input id="regLogin" placeholder="Yangi login" />
+            </div>
+            <div>
+              <label>Kod / Parol (majburiy)</label>
+              <input id="regPass" type="password" placeholder="Kamida 1 belgi" />
+            </div>
+          </div>
+          <div style="margin-top:10px" class="flex">
+            <button class="btn primary" onclick="registerUser()">Ro‘yxatdan o‘tish</button>
+            <div class="space"></div>
+            <span class="pill">Ro‘yxatdan so‘ng “Kirish” orqali kiring</span>
+          </div>
         </div>
       </div>
 
-      <!-- ADMIN PANEL -->
-      <div class="card hidden" id="adminCard">
-        <div class="flex">
-          <div class="panel-title"><strong>Admin — boshqaruv</strong><span class="pill">Test yaratish</span></div>
+      <!-- Admin auth -->
+      <div class="card" id="adminAuthCard">
+        <div class="panel-title"><strong>Admin kirish</strong><span class="pill">Maxfiy</span></div>
+        <div class="row" style="margin-top:8px">
+          <div><input id="adminLogin" placeholder="admin login" /></div>
+          <div><input id="adminCode" placeholder="kod" type="password" /></div>
+        </div>
+        <div style="margin-top:8px" class="flex">
+          <button class="btn primary" onclick="loginAdmin()">Admin sifatida kirish</button>
           <div class="space"></div>
-          <span id="adminTag" class="tag"></span>
+          <span style="color:var(--muted);font-size:13px">Admin qiymatlari ko‘rsatilmaydi.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin panel -->
+    <div class="card hidden" id="adminCard">
+      <div class="flex">
+        <div class="panel-title"><strong>Admin — boshqaruv</strong><span class="pill">Test yaratish</span></div>
+        <div class="space"></div>
+        <button class="btn small" onclick="logout()">Chiqish</button>
+      </div>
+
+      <div class="grid" style="margin-top:10px">
+        <div class="card" style="margin:0">
+          <strong>Test yaratish</strong>
+          <div style="margin-top:10px">
+            <label>Test nomi</label><input id="tName" />
+            <label style="margin-top:10px">Maxsus kod</label><input id="tCode" />
+            <label style="margin-top:10px">Savollar soni</label><input id="tCount" type="number" value="5" min="1" />
+            <div style="margin-top:10px" class="flex">
+              <button class="btn" onclick="buildAnswerGrid()">Javob panellari</button>
+              <button class="btn primary" onclick="saveTest()">Saqlash</button>
+            </div>
+            <div id="answerGrid" style="margin-top:10px"></div>
+          </div>
         </div>
 
-        <div class="grid" style="margin-top:10px">
-          <div class="card" style="margin:0">
-            <strong>Test yaratish</strong>
-            <div style="margin-top:10px">
-              <label>Test nomi</label><input id="tName" />
-              <label style="margin-top:10px">Maxsus kod</label><input id="tCode" />
-              <label style="margin-top:10px">Savollar soni</label><input id="tCount" type="number" value="5" min="1" />
-              <div class="flex" style="margin-top:10px">
-                <button class="btn" id="btnBuildGrid">Javob panellari</button>
-                <button class="btn primary" id="btnSaveTest">Saqlash</button>
-              </div>
-              <div id="answerGrid" style="margin-top:10px"></div>
-            </div>
-          </div>
+        <div class="card" style="margin:0">
+          <strong>Saqlangan testlar & foydalanuvchilar</strong>
 
-          <div class="card" style="margin:0">
-            <strong>Saqlangan testlar</strong>
-            <div id="adminTests" style="margin-top:10px"></div>
+          <div class="collapsible-head" id="testsHead" style="margin-top:10px">
+            <span class="chev" id="testsChev">▶</span>
+            <span><strong>Saqlangan testlar</strong></span>
+            <div class="space"></div>
+            <span class="pill" id="testsCount">0 ta</span>
+            <button class="btn small" id="toggleTestsBtn">Ko‘rsatish</button>
+          </div>
+          <div id="adminTests" class="hidden" style="margin-top:10px"></div>
+
+          <div class="collapsible-head" id="usersHead" style="margin-top:14px">
+            <span class="chev" id="usersChev">▶</span>
+            <span><strong>Foydalanuvchilar</strong></span>
+            <div class="space"></div>
+            <span class="pill" id="usersCount">0 ta</span>
+            <button class="btn small" id="toggleUsersBtn">Ko‘rsatish</button>
+          </div>
+          <div id="usersBox" class="hidden" style="margin-top:10px">
+            <div class="search-row">
+              <input id="usersSearch" placeholder="Login bo‘yicha qidirish..." />
+              <button class="btn small" onclick="clearUsersSearch()">Tozalash</button>
+            </div>
+            <div id="adminUsers"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- USER LIST -->
+    <!-- User test ro‘yxati -->
     <div class="card hidden" id="userCard">
       <div class="flex">
         <div class="panel-title"><strong>Saqlangan testlar</strong><span class="pill">Ro‘yxat</span></div>
         <div class="space"></div>
         <span id="whoTag" class="tag"></span>
+        <button class="btn small" onclick="logout()">Chiqish</button>
       </div>
       <div id="testsList" style="margin-top:12px"></div>
     </div>
 
-    <!-- PLAY -->
+    <!-- Test o‘ynash -->
     <div class="card hidden" id="playCard">
       <div class="flex">
         <div class="panel-title"><strong id="playTitle">Test</strong><span class="pill">Ishlash</span></div>
         <div class="space"></div>
-        <button class="btn small" id="btnBack1">⬅️ Orqaga</button>
+        <button class="btn small" onclick="backToList()">⬅️ Orqaga</button>
       </div>
       <div id="playBody" style="margin-top:12px"></div>
       <div class="flex" style="margin-top:12px">
         <div class="space"></div>
-        <button class="btn primary" id="btnFinish">Yakunlash</button>
+        <button class="btn primary" onclick="finishTest()">Yakunlash</button>
       </div>
     </div>
 
-    <!-- RESULTS -->
+    <!-- Natijalar -->
     <div class="card hidden" id="resultsCard">
       <div class="flex">
         <div class="panel-title"><strong id="resTitle">Natijalar</strong><span class="pill">Reyting</span></div>
         <div class="space"></div>
-        <button class="btn small" id="btnBack2">⬅️ Orqaga</button>
+        <button class="btn small" onclick="backToList()">⬅️ Orqaga</button>
       </div>
       <div id="leaderboardWrap" style="margin-top:12px"></div>
       <div id="detailWrap" style="margin-top:12px"></div>
       <div class="flex" style="margin-top:12px">
-        <div class="space"></div><button class="btn" id="btnTg">Telegramga yuborish</button>
+        <div class="space"></div><button class="btn" onclick="copyTg()">Telegramga yuborish</button>
       </div>
     </div>
   </div>
 
-  <footer style="opacity:.8;text-align:center;margin:18px 0">© 2025 TestMaster — Firestore Cloud</footer>
+  <footer style="opacity:.8;text-align:center;margin:18px 0">
+    © 2025 TestMaster — Firestore Cloud
+  </footer>
 
-<!-- ===== APP SCRIPT ===== -->
+<!-- ===== BULUT REJIM: FIREBASE + FIRESTORE ===== -->
 <script type="module">
-  // Firebase
+  /* Firebase modullari (CDN) */
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
   import {
     getFirestore, doc, getDoc, setDoc, deleteDoc,
     collection, getDocs, query, where
   } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-  import {
-    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
-  // --- Config (sizniki)
+  /* ✅ Config */
   const firebaseConfig = {
     apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
     authDomain: "shahboz-5d0a3.firebaseapp.com",
@@ -201,326 +294,498 @@
     measurementId: "G-YS5RGZ00EB"
   };
 
-  const app  = initializeApp(firebaseConfig);
-  const db   = getFirestore(app);
-  const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
 
-  // --- Helpers
-  const $ = id => document.getElementById(id);
-  const show = (id, on=true) => $(id).classList.toggle('hidden', !on);
-  const escapeHtml = s => (s||'').toString().replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
-  const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  /* === Yordamchilar === */
+  function show(id,on=true){ document.getElementById(id).classList.toggle('hidden', !on) }
+  function escapeHtml(s){ return (s||'').toString().replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])) }
+  function switchAuth(mode){
+    const isLogin = mode==='login';
+    document.getElementById('loginPanel').classList.toggle('hidden', !isLogin);
+    document.getElementById('regPanel').classList.toggle('hidden', isLogin);
+    document.getElementById('tabLogin').classList.toggle('active', isLogin);
+    document.getElementById('tabReg').classList.toggle('active', !isLogin);
+  }
+  window.switchAuth = switchAuth;
 
-  // --- Admin check (admins/{uid} mavjudmi?)
-  async function isAdmin(uid){
-    if(!uid) return false;
-    const snap = await getDoc(doc(db,'admins', uid));
-    return snap.exists();
+  async function sha256(text){
+    const buf = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest('SHA-256', buf);
+    return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');
   }
 
-  // --- DB Layer
+  /* === DB qatlam === */
   const DB = {
-    // tests
+    async findUser(login){
+      const id = login.toLowerCase();
+      const snap = await getDoc(doc(db,'users', id));
+      return snap.exists()? snap.data() : null;
+    },
+    async registerUser(login, pass){
+      const id = login.toLowerCase();
+      if(await this.findUser(login)) throw new Error('exists');
+      await setDoc(doc(db,'users', id), { login, passHash: await sha256(pass), createdAt: Date.now() });
+    },
+    async allUsers(){
+      const qs = await getDocs(collection(db,'users')); const arr=[];
+      qs.forEach(d=>arr.push(d.data()));
+      return arr.sort((a,b)=>a.login.localeCompare(b.login));
+    },
+
     async saveTest({name, code, count, key}){
       await setDoc(doc(db,'tests', code), { name, code, count, key, updatedAt: Date.now() });
     },
     async deleteTest(code){ await deleteDoc(doc(db,'tests', code)); },
     async allTests(){
-      const qs = await getDocs(collection(db,'tests')); const arr=[]; qs.forEach(d=>arr.push(d.data()));
+      const qs = await getDocs(collection(db,'tests')); const arr=[];
+      qs.forEach(d=>arr.push(d.data()));
       return arr.sort((a,b)=>a.name.localeCompare(b.name));
     },
-    // attempts
-    async getAttempts(code, uid){
-      const id = `${code}__${uid}`;
+
+    async getAttempts(code, login){
+      const id = `${code}__${login.toLowerCase()}`;
       const snap = await getDoc(doc(db,'attempts', id));
-      return snap.exists()? (snap.data().count||0) : 0;
+      return snap.exists() ? (snap.data().count||0) : 0;
     },
-    async incAttempt(code, uid, login){
-      const id = `${code}__${uid}`;
-      const n = await this.getAttempts(code, uid)+1;
-      await setDoc(doc(db,'attempts', id), { code, uid, login, count:n, updatedAt: Date.now() });
+    async incAttempt(code, login){
+      const id = `${code}__${login.toLowerCase()}`;
+      const n = await this.getAttempts(code, login)+1;
+      await setDoc(doc(db,'attempts', id), { code, login, count:n, updatedAt: Date.now() });
       return n;
     },
-    // results
+
     async getResults(code){
       const qs = await getDocs(query(collection(db,'results'), where('code','==',code)));
       const arr=[]; qs.forEach(d=>arr.push(d.data()));
       return arr.sort((a,b)=> b.score-a.score || a.date-b.date);
     },
     async upsertBestResult(rec){
-      const id = `${rec.code}__${rec.uid}`;
+      const id = `${rec.code}__${rec.login.toLowerCase()}`;
       const ref = doc(db,'results', id);
       const cur = await getDoc(ref);
       if(!cur.exists() || (rec.score > (cur.data().score||0))){
         await setDoc(ref, rec);
       }
     },
-    async bestOfUser(code, uid){
-      const id = `${code}__${uid}`;
+    async bestOfUser(code, login){
+      const id = `${code}__${login.toLowerCase()}`;
       const snap = await getDoc(doc(db,'results', id));
-      return snap.exists()? snap.data() : null;
+      return snap.exists()? snap.data(): null;
     }
   };
 
-  // --- Session
-  let SESSION = { uid:null, email:null, admin:false };
-  function resetUI(){
-    show('adminCard', false); show('userCard', false); show('playCard', false); show('resultsCard', false);
-    // authCard doim ko‘rinadi (kirish/chiqish)
-    $('whoTag').textContent = SESSION.email || '';
-    $('adminTag').textContent = SESSION.admin ? 'ADMIN' : '';
-    $('btnLogout').disabled = !SESSION.uid;
+  /* === Session va umumiy UI === */
+  let SESSION = { role:null, login:null };
+  function logout(){
+    SESSION={role:null,login:null};
+    show('adminCard',false); show('userCard',false); show('playCard',false); show('resultsCard',false);
+    show('authCard',true); show('adminAuthCard',true);
   }
+  window.logout = logout;
 
-  // --- Auth handlers
-  $('btnRegister').addEventListener('click', async ()=>{
-    const email = $('userEmail').value.trim();
-    const pass  = $('userPass').value.trim();
-    if(!isEmail(email)) return alert('Email kiriting (to‘g‘ri formatda).');
-    if(!pass) return alert('Parol kiriting.');
+  async function backToList(){
+    if(SESSION.role==='user'){ show('playCard',false); show('resultsCard',false); show('userCard',true); await renderTestsList(); }
+    else if(SESSION.role==='admin'){ show('resultsCard',false); show('playCard',false); show('adminCard',true); await renderAdminLists(); }
+    else { show('authCard',true); show('adminAuthCard',true); show('userCard',false); show('adminCard',false); show('playCard',false); show('resultsCard',false); }
+  }
+  window.backToList = backToList;
+
+  /* === Auth === */
+  async function registerUser(){
+    const login = document.getElementById('regLogin').value.trim();
+    const pass  = document.getElementById('regPass').value.trim();
+    if(!login) return alert('Login kiriting');
+    if(!pass)  return alert('Parol kiriting');
     try{
-      const cred = await createUserWithEmailAndPassword(auth, email, pass);
-      // optional: users/{uid} profilini saqlab qo‘yamiz
-      await setDoc(doc(db,'users', cred.user.uid), { uid: cred.user.uid, email, createdAt: Date.now() });
-      alert('Ro‘yxatdan o‘tildi! Endi kirishingiz mumkin.');
-    }catch(e){ alert('Xatolik: '+e.message); }
-  });
-
-  $('btnLogin').addEventListener('click', async ()=>{
-    const email = $('userEmail').value.trim();
-    const pass  = $('userPass').value.trim();
-    if(!isEmail(email) || !pass) return alert('Email va parol kiriting.');
-    try{
-      await signInWithEmailAndPassword(auth, email, pass);
-    }catch(e){ alert('Kirish xatosi: '+e.message); }
-  });
-
-  $('btnLogout').addEventListener('click', async ()=>{
-    try{ await signOut(auth); }catch(e){ alert('Chiqishda xato: '+e.message); }
-  });
-
-  // --- Auth state listener
-  onAuthStateChanged(auth, async (user)=>{
-    if(user){
-      SESSION.uid = user.uid;
-      SESSION.email = user.email || '(email yo‘q)';
-      try{ localStorage.setItem('tm_last_login', SESSION.email); }catch(_){}
-      SESSION.admin = await isAdmin(SESSION.uid);
-      $('whoTag').textContent = SESSION.email;
-      $('adminTag').textContent = SESSION.admin ? 'ADMIN' : '';
-      show('userCard', true);
-      if(SESSION.admin) show('adminCard', true);
-      await renderTestsList();
-      if(SESSION.admin) await drawTestsListForAdmin();
-    }else{
-      SESSION = { uid:null, email:null, admin:false };
-      resetUI();
+      await DB.registerUser(login, pass);
+      document.getElementById('userLogin').value = login;
+      document.getElementById('userPass').value = '';
+      switchAuth('login');
+      alert('Ro‘yxatdan o‘tildi! Endi login-parol bilan kiring.');
+    }catch(e){
+      if(e.message==='exists') alert('Bu login band. Boshqa login tanlang.');
+      else alert('Xatolik: '+e.message);
     }
-  });
+  }
+  window.registerUser = registerUser;
 
-  // --- Admin UI
-  $('btnBuildGrid').addEventListener('click', buildAnswerGrid);
-  $('btnSaveTest').addEventListener('click', saveTest);
+  async function loginUser(){
+    const login = document.getElementById('userLogin').value.trim();
+    const pass  = document.getElementById('userPass').value.trim();
+    if(!login || !pass) return alert('Login va parol kiriting');
+    const u = await DB.findUser(login);
+    if(!u) return alert('Bunday login topilmadi. Avval ro‘yxatdan o‘ting.');
+    if(u.passHash !== await sha256(pass)) return alert('Parol noto‘g‘ri.');
+    SESSION = { role:'user', login: u.login };
+    document.getElementById('whoTag').textContent = u.login;
+    // So'nggi loginni eslab qo'yamiz
+    try{ localStorage.setItem('tm_last_login', u.login); }catch(e){}
+    show('authCard',false); show('adminAuthCard',false); show('userCard',true);
+    await renderTestsList();
+  }
+  window.loginUser = loginUser;
 
-  function buildAnswerGrid(){
-    const count = parseInt($('tCount').value||'0');
-    const grid = $('answerGrid'); grid.innerHTML='';
-    for(let i=1;i<=count;i++){
-      const row = document.createElement('div');
-      row.style.margin='6px 0';
-      row.innerHTML = `<strong style="display:inline-block;width:28px">${i}.</strong>`;
-      const pad = document.createElement('div'); pad.className='answer-pad';
-      ['A','B','C','D'].forEach(ch=>{
-        const b=document.createElement('button'); b.className='opt'; b.dataset.v=ch; b.textContent=ch;
-        b.addEventListener('click',()=>{
-          for(const x of pad.children) x.classList.remove('active-admin');
-          b.classList.add('active-admin'); row.dataset.answer=ch;
-        });
-        pad.appendChild(b);
+  async function loginAdmin(){
+    const login = document.getElementById('adminLogin').value.trim();
+    const code  = document.getElementById('adminCode').value.trim();
+    if(login.toLowerCase()==='qwerty' && code==='2768'){
+      SESSION = { role:'admin', login:'ADMIN' };
+      show('authCard',false); show('adminAuthCard',false); show('adminCard',true);
+      await renderAdminLists();
+    } else alert('Admin login yoki kod xato');
+  }
+  window.loginAdmin = loginAdmin;
+
+  /* === Admin: UI === */
+  let TESTS_OPEN=false, USERS_OPEN=false, USERS_PAGE=1, USERS_PAGE_SIZE=20, USERS_QUERY='';
+  function clearUsersSearch(){
+    USERS_QUERY=''; const inp=document.getElementById('usersSearch'); if(inp) inp.value='';
+    renderUsersPage();
+  }
+  window.clearUsersSearch = clearUsersSearch;
+
+  async function renderAdminLists(){
+    const tests = await DB.allTests();
+    const users = await DB.allUsers();
+    const testsCountEl = document.getElementById('testsCount');
+    const usersCountEl = document.getElementById('usersCount');
+    if(testsCountEl) testsCountEl.textContent = `${tests.length} ta`;
+    if(usersCountEl) usersCountEl.textContent = `${users.length} ta`;
+
+    const tBtn=document.getElementById('toggleTestsBtn');
+    const uBtn=document.getElementById('toggleUsersBtn');
+    if(tBtn && !tBtn._bound){
+      tBtn._bound=true;
+      tBtn.addEventListener('click', async ()=>{
+        TESTS_OPEN=!TESTS_OPEN;
+        tBtn.textContent = TESTS_OPEN?'Yopish':'Ko‘rsatish';
+        document.getElementById('testsChev').classList.toggle('open', TESTS_OPEN);
+        show('adminTests', TESTS_OPEN);
+        if(TESTS_OPEN) await drawTestsListForAdmin();
       });
-      row.appendChild(pad); grid.appendChild(row);
+    }
+    if(uBtn && !uBtn._bound){
+      uBtn._bound=true;
+      uBtn.addEventListener('click', async ()=>{
+        USERS_OPEN=!USERS_OPEN;
+        uBtn.textContent = USERS_OPEN?'Yopish':'Ko‘rsatish';
+        document.getElementById('usersChev').classList.toggle('open', USERS_OPEN);
+        show('usersBox', USERS_OPEN);
+        if(USERS_OPEN){ USERS_PAGE=1; await renderUsersPage(); }
+      });
+    }
+
+    if(TESTS_OPEN) await drawTestsListForAdmin();
+    if(USERS_OPEN)  await renderUsersPage();
+
+    const s = document.getElementById('usersSearch');
+    if(s && !s._bound){
+      s._bound=true;
+      s.addEventListener('input', ()=>{
+        USERS_QUERY = s.value.trim().toLowerCase();
+        USERS_PAGE = 1;
+        renderUsersPage();
+      });
     }
   }
-
-  async function saveTest(){
-    try{
-      if(!SESSION.admin) return alert('Faqat admin yozishi mumkin.');
-      const name = $('tName').value.trim();
-      const code = $('tCode').value.trim();
-      const count= parseInt($('tCount').value||'0');
-      if(!name || !code || !count) return alert('Nomi, kod, savollar soni to‘ldirilsin.');
-      const rows=[...$('answerGrid').querySelectorAll('div')].filter(x=>x.querySelector&&x.querySelector('.answer-pad'));
-      if(rows.length!==count) return alert('Avval javob panellarini yarating.');
-      const key = rows.map((r,i)=> r.dataset.answer || (alert(`${i+1}-savol uchun javob belgilang`), null));
-      if(key.some(x=>!x)) return;
-      await DB.saveTest({name,code,count,key});
-      alert('Test saqlandi.');
-      $('tName').value=''; $('tCode').value=''; $('tCount').value=5; $('answerGrid').innerHTML='';
-      await drawTestsListForAdmin();
-      await renderTestsList();
-    }catch(e){ alert('Saqlash xatosi: '+e.message); }
-  }
+  window.renderAdminLists = renderAdminLists;
 
   async function drawTestsListForAdmin(){
-    const box = $('adminTests'); box.innerHTML='';
-    const tests = await DB.allTests();
-    if(!tests.length){ box.innerHTML='<div class="muted">Testlar yo‘q</div>'; return; }
+    const tbox = document.getElementById('adminTests'); if(!tbox) return;
+    const tests = await DB.allTests(); tbox.innerHTML='';
+    if(!tests.length){ tbox.innerHTML = '<div class="muted">Testlar yo‘q</div>'; return; }
     for(const t of tests){
       const res = await DB.getResults(t.code);
       const best = res.length ? Math.max(...res.map(r=>r.score)) : 0;
       const div = document.createElement('div'); div.className='card'; div.style.margin='6px 0';
       div.innerHTML = `
         <div class="flex">
-          <strong>${escapeHtml(t.name)}</strong>
+          <strong>${t.name}</strong>
           <div class="space"></div>
-          <span class="pill">kod: ${escapeHtml(t.code)} • ${t.count} savol</span>
+          <span class="pill">kod: ${t.code} • ${t.count} savol</span>
         </div>
         <div class="flex" style="margin-top:8px">
-          <button class="btn small" onclick="viewResults('${t.code}')">Natijalar</button>
-          <button class="btn small" onclick="(async()=>{await DB.deleteTest('${t.code}'); await drawTestsListForAdmin(); await renderTestsList();})();">O'chirish</button>
+          <button class="btn" onclick="viewResults('${t.code}')">Natijalar</button>
+          <button class="btn" onclick="(async()=>{await DB.deleteTest('${t.code}'); await drawTestsListForAdmin();})();">O'chirish</button>
           <div class="space"></div><span class="tag">Eng yaxshi: ${best}/${t.count}</span>
         </div>`;
-      box.appendChild(div);
+      tbox.appendChild(div);
     }
   }
-  window.viewResults = viewResults; // global
+  window.drawTestsListForAdmin = drawTestsListForAdmin;
 
-  // --- User list & play
+  async function renderUsersPage(){
+    const box = document.getElementById('adminUsers');
+    if(!box) return;
+    const list = await DB.allUsers();
+    const filtered = USERS_QUERY ? list.filter(u=> (u.login||'').toLowerCase().includes(USERS_QUERY)) : list.slice();
+    const total = filtered.length;
+    const start = (USERS_PAGE-1)*USERS_PAGE_SIZE;
+    const end = Math.min(start + USERS_PAGE_SIZE, total);
+    const slice = filtered.slice(start, end);
+
+    const usersCountEl = document.getElementById('usersCount');
+    if(usersCountEl) usersCountEl.textContent = `${total} ta`;
+
+    if(!slice.length){
+      box.innerHTML = '<div class="muted" style="margin-top:8px">Natija topilmadi</div>';
+      return;
+    }
+
+    let html = `
+      <div class="flex" style="margin:8px 0">
+        <span class="pill">Ko‘rinmoqda: ${start+1}–${end} / ${total}</span>
+        <div class="space"></div>
+        <div class="flex" style="gap:6px">
+          <button class="btn small" ${USERS_PAGE<=1?'disabled':''} onclick="USERS_PAGE=Math.max(1,USERS_PAGE-1);renderUsersPage()">⬅️ Oldingi</button>
+          <button class="btn small" ${end>=total?'disabled':''} onclick="USERS_PAGE=Math.min(Math.ceil(${total}/USERS_PAGE_SIZE),USERS_PAGE+1);renderUsersPage()">Keyingi ➡️</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>#</th><th>Login</th><th>Parol xeshi</th></tr></thead><tbody>
+    `;
+    slice.forEach((u,i)=>{
+      html += `<tr>
+        <td>${start + i + 1}</td>
+        <td>${escapeHtml(u.login)}</td>
+        <td>${(u.passHash||'—').slice(0,10)}…</td>
+      </tr>`;
+    });
+    html += `</tbody></table>
+      <div class="flex" style="margin:10px 0 2px">
+        <div class="space"></div>
+        <div class="flex" style="gap:6px">
+          <button class="btn small" ${USERS_PAGE<=1?'disabled':''} onclick="USERS_PAGE=Math.max(1,USERS_PAGE-1);renderUsersPage()">⬅️ Oldingi</button>
+          <button class="btn small" ${end>=total?'disabled':''} onclick="USERS_PAGE=Math.min(Math.ceil(${total}/USERS_PAGE_SIZE),USERS_PAGE+1);renderUsersPage()">Keyingi ➡️</button>
+        </div>
+      </div>`;
+    box.innerHTML = html;
+  }
+  window.renderUsersPage = renderUsersPage;
+
+  /* === Test yaratish (UI) === */
+  function buildAnswerGrid(){
+    const count = parseInt(document.getElementById('tCount').value||'0');
+    const grid = document.getElementById('answerGrid'); grid.innerHTML = '';
+    for(let i=1;i<=count;i++){
+      const row = document.createElement('div');
+      row.style.margin = '6px 0';
+      row.innerHTML = `<strong style="display:inline-block;width:28px">${i}.</strong>`;
+      const pad = document.createElement('div'); pad.className='answer-pad';
+      ['A','B','C','D'].forEach(ch=>{
+        const b = document.createElement('button'); b.className='opt'; b.dataset.v=ch; b.textContent=ch;
+        b.addEventListener('click', ()=>{
+          for(const x of pad.children){ x.classList.remove('active-admin'); }
+          b.classList.add('active-admin');
+          row.dataset.answer = ch;
+        });
+        pad.appendChild(b);
+      });
+      row.appendChild(pad); grid.appendChild(row);
+    }
+  }
+  window.buildAnswerGrid = buildAnswerGrid;
+
+  async function saveTest(){
+    const name = document.getElementById('tName').value.trim();
+    const code = document.getElementById('tCode').value.trim();
+    const count = parseInt(document.getElementById('tCount').value||'0');
+    if(!name || !code || !count){ alert('Nomi, kod va savollar soni to\'ldirilsin'); return; }
+    const rows = [...document.getElementById('answerGrid').querySelectorAll('div')];
+    const qrows = rows.filter(d=>d.querySelector && d.querySelector('.answer-pad'));
+    if(qrows.length !== count){ alert('Avval javob panellarini yarating'); return; }
+    const key = qrows.map((r,i)=> r.dataset.answer || (alert((i+1)+'-savol uchun javob belgilansin'), null));
+    if(key.some(x=>!x)) return;
+    await DB.saveTest({ name, code, count, key });
+    alert('Test saqlandi (bulut)');
+    document.getElementById('tName').value=''; document.getElementById('tCode').value=''; document.getElementById('tCount').value=5; document.getElementById('answerGrid').innerHTML='';
+    await renderAdminLists();
+  }
+  window.saveTest = saveTest;
+
+  /* === User: test ro‘yxati, o‘ynash === */
   async function renderTestsList(){
-    const box = $('testsList'); box.innerHTML='';
+    const box = document.getElementById('testsList'); box.innerHTML='';
     const tests = await DB.allTests();
     if(!tests.length){ box.innerHTML = '<div class="muted">Testlar yoʻq</div>'; return; }
     for(const t of tests){
-      const res  = await DB.getResults(t.code);
-      const best = res.length? Math.max(...res.map(r=>r.score)) : 0;
-      const used = SESSION.uid ? await DB.getAttempts(t.code, SESSION.uid) : 0;
-      const mine = SESSION.uid ? await DB.bestOfUser(t.code, SESSION.uid) : null;
+      const res   = await DB.getResults(t.code);
+      const best  = res.length? Math.max(...res.map(r=>r.score)) : 0;
+      const used  = await DB.getAttempts(t.code, SESSION.login);
+      const mine  = await DB.bestOfUser(t.code, SESSION.login);
+      const have  = !!mine;
 
       const card = document.createElement('div'); card.className='card'; card.style.margin='6px 0';
-      card.innerHTML = `<div class="flex"><strong>${escapeHtml(t.name)}</strong><div class="space"></div><span class="pill">${t.count} savol</span></div>`;
+      card.innerHTML = `<div class="flex"><strong>${t.name}</strong><div class="space"></div><span class="pill">${t.count} savol</span></div>`;
       const controls = document.createElement('div'); controls.className='flex'; controls.style.marginTop='10px';
       if(used>=3){
         const tag=document.createElement('span'); tag.className='tag'; tag.textContent='Urinishlar: 3/3'; controls.appendChild(tag);
       }else{
-        const btn=document.createElement('button'); btn.className='btn primary'; btn.textContent = mine ? 'Qayta ishlash' : 'Testni ishlash';
-        btn.onclick=()=> startTest(t.code); controls.appendChild(btn);
-        const left=document.createElement('span'); left.className='pill'; left.textContent=`Urinish: ${used}/3`; controls.appendChild(left);
+        const btn = document.createElement('button'); btn.className='btn primary';
+        btn.textContent = have ? 'Qayta ishlash' : 'Testni ishlash';
+        btn.onclick=()=> startTest(t.code);
+        controls.appendChild(btn);
+        const left=document.createElement('span'); left.className='pill'; left.textContent = `Urinish: ${used}/3`;
+        controls.appendChild(left);
       }
-      const btnRes=document.createElement('button'); btnRes.className='btn'; btnRes.textContent='Natijalar'; btnRes.onclick=()=>viewResults(t.code); controls.appendChild(btnRes);
-      const spacer=document.createElement('div'); spacer.className='space'; controls.appendChild(spacer);
-      const tag2=document.createElement('span'); tag2.className='tag'; tag2.textContent=`Eng: ${best}/${t.count}`; controls.appendChild(tag2);
+      const btnRes = document.createElement('button'); btnRes.className='btn'; btnRes.textContent='Natijalar'; btnRes.onclick=()=>viewResults(t.code); controls.appendChild(btnRes);
+      const spacer = document.createElement('div'); spacer.className='space'; controls.appendChild(spacer);
+      const tag2 = document.createElement('span'); tag2.className='tag'; tag2.textContent = `Eng: ${best}/${t.count}`; controls.appendChild(tag2);
       card.appendChild(controls); box.appendChild(card);
     }
   }
-  window.startTest = startTest;
+  window.renderTestsList = renderTestsList;
 
   let PLAY = { code:null, key:[], count:0, chosen:[] };
 
   async function startTest(code){
-    if(!SESSION.uid) return alert('Avval kiring.');
+    if(!SESSION.login){ alert('Avval kirish qiling'); return; }
     const tests = await DB.allTests();
     const t = tests.find(x=>x.code===code);
-    if(!t) return alert('Test topilmadi');
-    const used = await DB.getAttempts(code, SESSION.uid);
-    if(used>=3) return alert('Bu testni 3 martadan ko‘p ishlay olmaysiz.');
-    PLAY = { code:code, key:t.key, count:t.count, chosen:new Array(t.count).fill(null) };
-    $('playTitle').textContent = `${t.name} — ${t.count} savol`;
+    if(!t){ alert('Test topilmadi'); return; }
+    const used = await DB.getAttempts(code, SESSION.login);
+    if(used>=3){ alert('Bu testni 3 martadan ko‘p ishlay olmaysiz.'); return; }
+
+    PLAY = { code:code, key: t.key, count: t.count, chosen: new Array(t.count).fill(null) };
+    document.getElementById('playTitle').textContent = `${t.name} — ${t.count} savol`;
     renderPlay();
     show('userCard', false); show('playCard', true);
   }
+  window.startTest = startTest;
 
   function renderPlay(){
-    const body = $('playBody'); body.innerHTML='';
+    const body = document.getElementById('playBody'); body.innerHTML='';
     for(let i=0;i<PLAY.count;i++){
-      const row=document.createElement('div'); row.className='card'; row.style.margin='6px 0';
+      const row = document.createElement('div'); row.className='card'; row.style.margin='6px 0';
       row.innerHTML = `<div class="flex"><strong>${i+1}.</strong><div class="space"></div><span class="pill">Variant tanlang</span></div>`;
-      const pad=document.createElement('div'); pad.className='answer-pad';
+      const pad = document.createElement('div'); pad.className='answer-pad';
       ['A','B','C','D'].forEach(ch=>{
-        const b=document.createElement('button'); b.className='opt'; b.dataset.v=ch; b.textContent=ch;
-        b.addEventListener('click',()=>{ for(const x of pad.children) x.classList.remove('active-user'); b.classList.add('active-user'); PLAY.chosen[i]=ch; });
+        const b = document.createElement('button'); b.className='opt'; b.dataset.v=ch; b.textContent=ch;
+        b.addEventListener('click', ()=>{
+          for(const x of pad.children){ x.classList.remove('active-user'); }
+          b.classList.add('active-user');
+          PLAY.chosen[i]=ch;
+        });
         pad.appendChild(b);
       });
       row.appendChild(pad); body.appendChild(row);
     }
   }
+  window.renderPlay = renderPlay;
 
   async function finishTest(){
-    if(!SESSION.uid) return alert('Kirish talab qilinadi.');
-    if(PLAY.chosen.some(x=>x===null) && !confirm('Baʼzi savollar belgilanmagan. Baribir yakunlaysizmi?')) return;
+    if(!SESSION.login){ alert('Kirish talab qilinadi'); return; }
+    if(PLAY.chosen.some(x=>x===null)){ if(!confirm('Baʼzi savollar belgilanmagan. Baribir yakunlaysizmi?')) return; }
 
     const details=[]; let score=0;
     for(let i=0;i<PLAY.count;i++){
-      const correct=PLAY.key[i]; const chosen=PLAY.chosen[i]; const ok=(chosen===correct); if(ok) score++;
+      const correct = PLAY.key[i]; const chosen = PLAY.chosen[i];
+      const ok = chosen === correct; if(ok) score++;
       details.push({ q:i+1, chosen: chosen||'-', correct, ok });
     }
-    await DB.incAttempt(PLAY.code, SESSION.uid, SESSION.email);
-    const rec = { uid:SESSION.uid, login:SESSION.email, code:PLAY.code, score, total:PLAY.count, details, date:Date.now() };
+    // urinish +1
+    await DB.incAttempt(PLAY.code, SESSION.login);
+    // eng yaxshi natijani saqlash
+    const rec = { login: SESSION.login, code: PLAY.code, score, total: PLAY.count, details, date: Date.now() };
     await DB.upsertBestResult(rec);
+
     await viewResults(PLAY.code, rec);
   }
-  $('btnFinish').addEventListener('click', finishTest);
-  $('btnBack1').addEventListener('click', ()=>{ show('playCard',false); show('userCard',true); });
+  window.finishTest = finishTest;
 
-  // --- Results + share
+  /* === Natijalar + TG === */
   let __lastTgText = '';
   function makeTgText(test, rec){
-    const lines=[];
-    lines.push(`🧪 Test: ${test.name}${test.code?' ('+test.code+')':''}`);
+    const lines = [];
+    lines.push(`🧪 Test: ${test.name}${test.code ? ' ('+test.code+')':''}`);
     lines.push(`👤 Login: ${rec.login}`);
     lines.push(`📊 Natija: ${rec.score}/${rec.total}`);
     lines.push('---');
-    rec.details.forEach(d=> lines.push(`${d.q}) tanlandi: ${d.chosen} | to‘g‘ri: ${d.correct} ${d.ok?'✅':'❌'}`));
+    rec.details.forEach(d=>{
+      lines.push(`${d.q}) tanlandi: ${d.chosen} | to‘g‘ri: ${d.correct} ${d.ok?'✅':'❌'}`);
+    });
     return lines.join('\n');
   }
+
   function renderDetail(rec){
     let html = '<div class="card" style="margin:0">';
     html += `<strong>${escapeHtml(rec.login)}</strong> — <span class="tag">${rec.score}/${rec.total}</span>`;
     html += '<div style="margin-top:10px"><table><thead><tr><th>#</th><th>Tanlangan</th><th>Toʻgʻri</th><th>Holat</th></tr></thead><tbody>';
     rec.details.forEach(d=> html += `<tr><td>${d.q}</td><td>${d.chosen}</td><td>${d.correct}</td><td>${d.ok?'<span style="color:#22c55e">to‘g‘ri</span>':'<span style="color:#ef4444">xato</span>'}</td></tr>`);
-    html += '</tbody></table></div></div>'; return html;
+    html += '</tbody></table></div></div>';
+    return html;
   }
 
   async function viewResults(code, justMade=null){
     show('userCard', false); show('playCard', false); show('resultsCard', true);
     const tests = await DB.allTests(); const t = tests.find(x=>x.code===code); if(!t){ alert('Test topilmadi'); return; }
-    $('resTitle').textContent = `${t.name} — Natijalar`;
+    document.getElementById('resTitle').textContent = `${t.name} — Natijalar`;
 
     const arr = await DB.getResults(code);
-    const lb = $('leaderboardWrap'); lb.innerHTML='';
+    const lb = document.getElementById('leaderboardWrap'); lb.innerHTML='';
     if(!arr.length){ lb.innerHTML = '<div class="muted">Natijalar yoʻq</div>'; }
-    else{
+    else {
       let h = '<table><thead><tr><th>#</th><th>Login</th><th>Ball</th><th>Sana</th></tr></thead><tbody>';
       arr.forEach((r,i)=> h += `<tr><td>${i+1}</td><td>${escapeHtml(r.login)}</td><td><strong>${r.score}/${r.total}</strong></td><td>${new Date(r.date).toLocaleString()}</td></tr>`);
       h += '</tbody></table>'; lb.innerHTML = h;
     }
 
-    const dw = $('detailWrap');
-    const mine = justMade || (SESSION.uid ? await DB.bestOfUser(code, SESSION.uid) : null);
-    if(mine){ dw.innerHTML = renderDetail(mine); __lastTgText = makeTgText(t, mine); }
-    else { dw.innerHTML = '<div class="muted">O‘zingizning urinishni ko‘rish uchun testni yakunlang.</div>'; __lastTgText=''; }
+    const dw = document.getElementById('detailWrap');
+    const mine = justMade || (SESSION.login ? await DB.bestOfUser(code, SESSION.login) : null);
+    if(mine){
+      dw.innerHTML = renderDetail(mine);
+      __lastTgText = makeTgText(t, mine);
+    } else {
+      dw.innerHTML = '<div class="muted">Aynan bir urinishni ko‘rish uchun testni yakunlang yoki o‘z natijangiz yo‘q.</div>';
+      __lastTgText = '';
+    }
   }
-  $('btnBack2').addEventListener('click', ()=>{ show('resultsCard',false); show('userCard',true); });
+  window.viewResults = viewResults;
 
+  /* === Telegramga nusxalash === */
+  function copyTg(){
+    if(!__lastTgText){
+      alert('Avval o‘zingizning natijangizni oching (yoki testni tugating).');
+      return;
+    }
+    if(navigator.share){
+      navigator.share({ text: __lastTgText }).catch(()=>fallbackClipboard());
+    } else {
+      fallbackClipboard();
+    }
+  }
   function fallbackClipboard(){
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(__lastTgText)
-        .then(()=> alert('✅ Matn nusxalandi! Telegramga yuborishingiz mumkin.'))
+        .then(()=> alert('✅ Matn nusxalandi! Endi Telegramga yuboring (yopishtiring).'))
         .catch(()=> prompt('Matnni qo‘lda nusxalang (Ctrl+C):', __lastTgText));
     } else {
       prompt('Matnni qo‘lda nusxalang (Ctrl+C):', __lastTgText);
     }
   }
-  function copyTg(){
-    if(!__lastTgText) return alert('Avval o‘zingizning natijangizni oching (yoki testni tugating).');
-    if(navigator.share){ navigator.share({ text: __lastTgText }).catch(()=>fallbackClipboard()); }
-    else fallbackClipboard();
-  }
-  $('btnTg').addEventListener('click', copyTg);
+  window.copyTg = copyTg;
 
-  // Start (UI reset)
-  resetUI();
-  // Avvalgi emailni to‘ldirib qo‘yish
-  try{ const last = localStorage.getItem('tm_last_login'); if(last) $('userEmail').value = last; }catch(_){}
+  /* Demo filler */
+  function fillDemo(){
+    document.getElementById('userLogin').value='demo';
+    document.getElementById('userPass').value='demo';
+  }
+  window.fillDemo = fillDemo;
+
+  /* ===== Boot: so‘nggi loginni to‘ldirish ===== */
+  (function boot(){
+    try{
+      const last = localStorage.getItem('tm_last_login');
+      if(last){
+        document.getElementById('userLogin').value = last;
+        switchAuth('login');
+      }
+    }catch(e){}
+  })();
+
+  // Start holat
+  logout();
 </script>
 </body>
 </html>
