@@ -705,7 +705,7 @@
   function clipboardOrPrompt(text){
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text)
-        .then(()=> alert('✅ Nusxa olindi. Istalgan joyga yopishtiring.'))
+        .then(()=> alert('✅ Nusxa olindi. Istalgan joyga ulashing . Telegramga vstavit qiling'))
         .catch(()=> prompt('Matnni qo‘lda nusxalang (Ctrl+C):', text));
     } else {
       prompt('Matnni qo‘lda nusxalang (Ctrl+C):', text);
