@@ -241,14 +241,16 @@
 
   /* ——— Config ——— */
   const firebaseConfig = {
-    apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
-    authDomain: "shahboz-5d0a3.firebaseapp.com",
-    projectId: "shahboz-5d0a3",
-    storageBucket: "shahboz-5d0a3.firebasestorage.app",
-    messagingSenderId: "352024095535",
-    appId: "1:352024095535:web:6ca630de2c199a33c54fda",
-    measurementId: "G-YS5RGZ00EB"
-  };
+	  apiKey: "AIzaSyBJNZlgnfh_UI96SLYX_RLLpElbYEozazA",
+	  authDomain: "buxoroedu-87f52.firebaseapp.com",
+	  projectId: "buxoroedu-87f52",
+	  storageBucket: "buxoroedu-87f52.appspot.com", // ← to‘g‘ri domen (appspot.com)
+	  messagingSenderId: "444519456395",
+	  appId: "1:444519456395:web:d8ca35794b173b9e78be8e",
+	  measurementId: "G-6T2K290W9Y"
+	};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
