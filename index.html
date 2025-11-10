@@ -67,9 +67,14 @@
 
     .answer-pad{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
     .opt{
-      padding:18px 26px;border-radius:14px;border:1px solid var(--border);min-width:76px;
-      text-align:center;font-weight:800;font-size:20px;cursor:pointer;transition:.12s;
-      background:rgba(255,255,255,.04)
+      padding:16px 22px;border-radius:14px;border:1px solid var(--border);min-width:76px;
+      text-align:center;font-weight:800;font-size:18px;cursor:pointer;transition:.12s;
+      background:rgba(255,255,255,.04); display:flex; align-items:center; justify-content:center; gap:10px;
+    }
+    .opt .hk{
+      font-size:11px; padding:2px 7px; border-radius:999px;
+      border:1px solid var(--border); background:var(--glass); color:var(--muted);
+      line-height:1; letter-spacing:.3px;
     }
     .opt[data-v="A"]{background:linear-gradient(180deg, rgba(96,165,250,.10), rgba(96,165,250,.06))}
     .opt[data-v="B"]{background:linear-gradient(180deg, rgba(34,197,94,.10), rgba(34,197,94,.06))}
@@ -86,18 +91,10 @@
     .tag{display:inline-block;padding:6px 10px;border-radius:999px;
       background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);font-size:12px}
 
-    .collapsible-head{
-      display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border:1px solid var(--border); cursor:pointer
-    }
-    .chev{display:inline-block;transition:.15s}
-    .chev.open{transform:rotate(90deg)}
-    .head-right{display:flex;gap:8px;align-items:center}
-    .search-row{display:flex;gap:8px;align-items:center;margin:10px 0}
-    .tabs{display:flex;gap:8px;margin-top:8px}
-    .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:var(--glass)}
-    .tab.active{background:linear-gradient(180deg, rgba(96,165,250,.35), rgba(96,165,250,.2));border-color:#3b82f6}
+    .active-card{ outline:2px solid #60a5fa; border-color:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.25) }
+    .focus-q{ outline:2px solid #60a5fa; border-color:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.25) }
+    .my-row{ background: rgba(96,165,250,.15); }
+    .adm-qrow{ margin:8px 0; padding:12px; border:1px dashed var(--border); border-radius:14px; }
   </style>
 </head>
 <body>
@@ -109,55 +106,24 @@
         <small>Bulutga saqlanadigan professional test tizimi (Firestore)</small>
       </div>
       <div class="space"></div>
-      <span class="pill">Cloud v1.0</span>
+      <span class="pill">Cloud v1.7 — Copy Only</span>
     </div>
 
-    <div class="grid">
-      <!-- Foydalanuvchi auth -->
+    <div class="grid" id="authGrid">
+      <!-- Foydalanuvchi: faqat ism -->
       <div class="card" id="authCard">
-        <div class="panel-title"><strong>Foydalanuvchi</strong><span class="pill">Kirish / Ro‘yxatdan o‘tish</span></div>
-
-        <div class="tabs">
-          <div id="tabLogin" class="tab active" onclick="switchAuth('login')">Kirish</div>
-          <div id="tabReg" class="tab" onclick="switchAuth('reg')">Ro‘yxatdan o‘tish</div>
+        <div class="panel-title">
+          <strong>Foydalanuvchi</strong><span class="pill">Parolsiz (faqat ism)</span>
         </div>
-
         <div id="loginPanel" style="margin-top:10px">
-          <div class="row">
-            <div>
-              <label>Login (majburiy)</label>
-              <input id="userLogin" placeholder="Masalan: AliValiyev" />
-            </div>
-            <div>
-              <label>Kod / Parol (majburiy)</label>
-              <input id="userPass" type="password" />
-            </div>
-          </div>
-          <div style="margin-top:10px" class="flex">
-            <button class="btn primary" onclick="loginUser()">Kirish</button>
-            <button class="btn ghost" onclick="fillDemo()">Demo</button>
+          <label>Ismingizni yozing (istalgan ism, unikallik shart emas)</label>
+          <input id="userName" placeholder="Masalan: Ali yoki Dilnoza" />
+          <div class="flex" style="margin-top:10px">
+            <button class="btn primary" id="btnUserLogin">Kirish</button>
             <div class="space"></div>
           </div>
           <div style="margin-top:10px;color:var(--muted);font-size:13px">
-            Login bulutda saqlanadi. Istalgan qurilmadan kiring — <b>parol mos</b> bo‘lishi shart.
-          </div>
-        </div>
-
-        <div id="regPanel" class="hidden" style="margin-top:10px">
-          <div class="row">
-            <div>
-              <label>Login (majburiy)</label>
-              <input id="regLogin" placeholder="Yangi login" />
-            </div>
-            <div>
-              <label>Kod / Parol (majburiy)</label>
-              <input id="regPass" type="password" placeholder="Kamida 1 belgi" />
-            </div>
-          </div>
-          <div style="margin-top:10px" class="flex">
-            <button class="btn primary" onclick="registerUser()">Ro‘yxatdan o‘tish</button>
-            <div class="space"></div>
-            <span class="pill">Ro‘yxatdan so‘ng “Kirish” orqali kiring</span>
+            Parol kerak emas. Xohlagan ismingizni kiriting va testlarni ishga tushiring.
           </div>
         </div>
       </div>
@@ -169,8 +135,8 @@
           <div><input id="adminLogin" placeholder="admin login" /></div>
           <div><input id="adminCode" placeholder="kod" type="password" /></div>
         </div>
-        <div style="margin-top:8px" class="flex">
-          <button class="btn primary" onclick="loginAdmin()">Admin sifatida kirish</button>
+        <div class="flex" style="margin-top:8px">
+          <button class="btn primary" id="btnAdminLogin">Admin sifatida kirish</button>
           <div class="space"></div>
           <span style="color:var(--muted);font-size:13px">Admin qiymatlari ko‘rsatilmaydi.</span>
         </div>
@@ -180,9 +146,9 @@
     <!-- Admin panel -->
     <div class="card hidden" id="adminCard">
       <div class="flex">
-        <div class="panel-title"><strong>Admin — boshqaruv</strong><span class="pill">Test yaratish</span></div>
+        <div class="panel-title"><strong>Admin — boshqaruv</strong><span class="pill">Test yaratish / O‘chirish / Hisobot</span></div>
         <div class="space"></div>
-        <button class="btn small" onclick="logout()">Chiqish</button>
+        <button class="btn small" id="btnLogout1">Chiqish</button>
       </div>
 
       <div class="grid" style="margin-top:10px">
@@ -192,52 +158,41 @@
             <label>Test nomi</label><input id="tName" />
             <label style="margin-top:10px">Maxsus kod</label><input id="tCode" />
             <label style="margin-top:10px">Savollar soni</label><input id="tCount" type="number" value="5" min="1" />
-            <div style="margin-top:10px" class="flex">
-              <button class="btn" onclick="buildAnswerGrid()">Javob panellari</button>
-              <button class="btn primary" onclick="saveTest()">Saqlash</button>
+            <div class="flex" style="margin-top:10px">
+              <button class="btn" id="btnBuildGrid">Javob panellari</button>
+              <button class="btn primary" id="btnSaveTest">Saqlash</button>
             </div>
             <div id="answerGrid" style="margin-top:10px"></div>
           </div>
         </div>
 
         <div class="card" style="margin:0">
-          <strong>Saqlangan testlar & foydalanuvchilar</strong>
-
-          <div class="collapsible-head" id="testsHead" style="margin-top:10px">
-            <span class="chev" id="testsChev">▶</span>
-            <span><strong>Saqlangan testlar</strong></span>
-            <div class="space"></div>
-            <span class="pill" id="testsCount">0 ta</span>
-            <button class="btn small" id="toggleTestsBtn">Ko‘rsatish</button>
-          </div>
-          <div id="adminTests" class="hidden" style="margin-top:10px"></div>
-
-          <div class="collapsible-head" id="usersHead" style="margin-top:14px">
-            <span class="chev" id="usersChev">▶</span>
-            <span><strong>Foydalanuvchilar</strong></span>
-            <div class="space"></div>
-            <span class="pill" id="usersCount">0 ta</span>
-            <button class="btn small" id="toggleUsersBtn">Ko‘rsatish</button>
-          </div>
-          <div id="usersBox" class="hidden" style="margin-top:10px">
-            <div class="search-row">
-              <input id="usersSearch" placeholder="Login bo‘yicha qidirish..." />
-              <button class="btn small" onclick="clearUsersSearch()">Tozalash</button>
-            </div>
-            <div id="adminUsers"></div>
-          </div>
+          <strong>Saqlangan testlar</strong>
+          <div class="panel-title" style="margin-top:8px"><span class="pill" id="testsCount">0 ta</span></div>
+          <div id="adminTests" style="margin-top:10px"></div>
         </div>
       </div>
     </div>
 
-    <!-- User test ro‘yxati -->
+    <!-- User panel -->
     <div class="card hidden" id="userCard">
       <div class="flex">
-        <div class="panel-title"><strong>Saqlangan testlar</strong><span class="pill">Ro‘yxat</span></div>
+        <div class="panel-title"><strong>Testlar</strong><span class="pill">Tez kirish</span></div>
         <div class="space"></div>
         <span id="whoTag" class="tag"></span>
-        <button class="btn small" onclick="logout()">Chiqish</button>
+        <button class="btn small" id="btnLogout2">Chiqish</button>
       </div>
+
+      <div class="flex" style="gap:8px;flex-wrap:wrap;margin-top:8px">
+        <input id="codeInput" placeholder="Kod: masalan ENG101" style="max-width:260px">
+        <button class="btn primary" id="btnStartByCode">Kodni ishga tushirish</button>
+
+        <input id="nameSearch" placeholder="Nom bo‘yicha qidirish..." style="min-width:220px">
+        <button class="btn" id="btnClearSearch">Tozalash</button>
+
+        <button class="btn" id="btnShowAll">Barcha testlar</button>
+      </div>
+
       <div id="testsList" style="margin-top:12px"></div>
     </div>
 
@@ -246,12 +201,12 @@
       <div class="flex">
         <div class="panel-title"><strong id="playTitle">Test</strong><span class="pill">Ishlash</span></div>
         <div class="space"></div>
-        <button class="btn small" onclick="backToList()">⬅️ Orqaga</button>
+        <button class="btn small" id="btnBack1">⬅️ Orqaga</button>
       </div>
       <div id="playBody" style="margin-top:12px"></div>
       <div class="flex" style="margin-top:12px">
         <div class="space"></div>
-        <button class="btn primary" onclick="finishTest()">Yakunlash</button>
+        <button class="btn primary" id="finishBtn">Yakunlash (Ctrl+Enter)</button>
       </div>
     </div>
 
@@ -260,30 +215,31 @@
       <div class="flex">
         <div class="panel-title"><strong id="resTitle">Natijalar</strong><span class="pill">Reyting</span></div>
         <div class="space"></div>
-        <button class="btn small" onclick="backToList()">⬅️ Orqaga</button>
+        <button class="btn small" id="btnBack2">⬅️ Orqaga</button>
       </div>
       <div id="leaderboardWrap" style="margin-top:12px"></div>
       <div id="detailWrap" style="margin-top:12px"></div>
       <div class="flex" style="margin-top:12px">
-        <div class="space"></div><button class="btn" onclick="copyTg()">Telegramga yuborish</button>
+        <div class="space"></div>
+        <!-- faqat nusxa olish -->
+        <button class="btn" id="btnCopy">📋 Nusxa olish</button>
       </div>
     </div>
   </div>
 
   <footer style="opacity:.8;text-align:center;margin:18px 0">
-    © 2025 TestMaster — Firestore Cloud
+    © 2025 TestMaster — Firestore Cloud (Copy Only)
   </footer>
 
-<!-- ===== BULUT REJIM: FIREBASE + FIRESTORE ===== -->
+<!-- ===== FIREBASE / FIRESTORE ===== -->
 <script type="module">
-  /* Firebase modullari (CDN) */
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
   import {
     getFirestore, doc, getDoc, setDoc, deleteDoc,
-    collection, getDocs, query, where
+    collection, getDocs, query, where, writeBatch
   } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-  /* ✅ Config */
+  /* ——— Config ——— */
   const firebaseConfig = {
     apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
     authDomain: "shahboz-5d0a3.firebaseapp.com",
@@ -293,55 +249,50 @@
     appId: "1:352024095535:web:6ca630de2c199a33c54fda",
     measurementId: "G-YS5RGZ00EB"
   };
-
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
-  /* === Yordamchilar === */
-  function show(id,on=true){ document.getElementById(id).classList.toggle('hidden', !on) }
+  /* ——— Helpers ——— */
+  const $ = (id)=>document.getElementById(id);
+  function show(id,on=true){ const el=$(id); if(el) el.classList.toggle('hidden', !on) }
   function escapeHtml(s){ return (s||'').toString().replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])) }
-  function switchAuth(mode){
-    const isLogin = mode==='login';
-    document.getElementById('loginPanel').classList.toggle('hidden', !isLogin);
-    document.getElementById('regPanel').classList.toggle('hidden', isLogin);
-    document.getElementById('tabLogin').classList.toggle('active', isLogin);
-    document.getElementById('tabReg').classList.toggle('active', !isLogin);
-  }
-  window.switchAuth = switchAuth;
 
-  async function sha256(text){
-    const buf = new TextEncoder().encode(text);
-    const hash = await crypto.subtle.digest('SHA-256', buf);
-    return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');
+  /* ——— Qidiruv klaviatura holati ——— */
+  let __searchItems = [];
+  let __searchIndex = -1;
+  function setActiveCard(idx){
+    __searchIndex = idx;
+    document.querySelectorAll('#testsList .card').forEach(el=> el.classList.remove('active-card'));
+    const el = document.getElementById('srch_'+idx);
+    if(el){ el.classList.add('active-card'); el.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
   }
 
-  /* === DB qatlam === */
+  /* ——— Cache ——— */
+  const CACHE = { tests:null, lastTestsAt:0 };
+  async function cachedAllTests(force=false){
+    if(!force && CACHE.tests && (Date.now()-CACHE.lastTestsAt<15000)) return CACHE.tests;
+    const qs = await getDocs(collection(db,'tests')); const arr=[]; qs.forEach(d=>arr.push(d.data()));
+    arr.sort((a,b)=>a.name.localeCompare(b.name));
+    CACHE.tests=arr; CACHE.lastTestsAt=Date.now(); return arr;
+  }
+
+  /* ——— Batch delete helper ——— */
+  async function __batchDeleteSnap(db, snap){
+    const refs=[]; snap.forEach(d=>refs.push(d.ref));
+    for(let i=0;i<refs.length;i+=450){
+      const batch = writeBatch(db);
+      refs.slice(i,i+450).forEach(r=>batch.delete(r));
+      await batch.commit();
+    }
+  }
+
+  /* ——— DB qatlam (users yo‘q) ——— */
   const DB = {
-    async findUser(login){
-      const id = login.toLowerCase();
-      const snap = await getDoc(doc(db,'users', id));
-      return snap.exists()? snap.data() : null;
-    },
-    async registerUser(login, pass){
-      const id = login.toLowerCase();
-      if(await this.findUser(login)) throw new Error('exists');
-      await setDoc(doc(db,'users', id), { login, passHash: await sha256(pass), createdAt: Date.now() });
-    },
-    async allUsers(){
-      const qs = await getDocs(collection(db,'users')); const arr=[];
-      qs.forEach(d=>arr.push(d.data()));
-      return arr.sort((a,b)=>a.login.localeCompare(b.login));
-    },
-
     async saveTest({name, code, count, key}){
       await setDoc(doc(db,'tests', code), { name, code, count, key, updatedAt: Date.now() });
+      CACHE.tests=null;
     },
-    async deleteTest(code){ await deleteDoc(doc(db,'tests', code)); },
-    async allTests(){
-      const qs = await getDocs(collection(db,'tests')); const arr=[];
-      qs.forEach(d=>arr.push(d.data()));
-      return arr.sort((a,b)=>a.name.localeCompare(b.name));
-    },
+    async allTests(){ return cachedAllTests(); },
 
     async getAttempts(code, login){
       const id = `${code}__${login.toLowerCase()}`;
@@ -372,342 +323,345 @@
       const id = `${code}__${login.toLowerCase()}`;
       const snap = await getDoc(doc(db,'results', id));
       return snap.exists()? snap.data(): null;
+    },
+
+    async deleteTestDeep(code){
+      const resSnap = await getDocs(query(collection(db,'results'), where('code','==',code)));
+      await __batchDeleteSnap(db, resSnap);
+      const attSnap = await getDocs(query(collection(db,'attempts'), where('code','==',code)));
+      await __batchDeleteSnap(db, attSnap);
+      await deleteDoc(doc(db,'tests', code));
+      CACHE.tests=null;
     }
   };
 
-  /* === Session va umumiy UI === */
+  /* ——— Sessiya / UI ——— */
   let SESSION = { role:null, login:null };
   function logout(){
     SESSION={role:null,login:null};
     show('adminCard',false); show('userCard',false); show('playCard',false); show('resultsCard',false);
     show('authCard',true); show('adminAuthCard',true);
   }
-  window.logout = logout;
 
   async function backToList(){
-    if(SESSION.role==='user'){ show('playCard',false); show('resultsCard',false); show('userCard',true); await renderTestsList(); }
+    if(SESSION.role==='user'){ show('playCard',false); show('resultsCard',false); show('userCard',true); await showAllTests(); }
     else if(SESSION.role==='admin'){ show('resultsCard',false); show('playCard',false); show('adminCard',true); await renderAdminLists(); }
-    else { show('authCard',true); show('adminAuthCard',true); show('userCard',false); show('adminCard',false); show('playCard',false); show('resultsCard',false); }
+    else { logout(); }
   }
-  window.backToList = backToList;
 
-  /* === Auth === */
-  async function registerUser(){
-    const login = document.getElementById('regLogin').value.trim();
-    const pass  = document.getElementById('regPass').value.trim();
-    if(!login) return alert('Login kiriting');
-    if(!pass)  return alert('Parol kiriting');
-    try{
-      await DB.registerUser(login, pass);
-      document.getElementById('userLogin').value = login;
-      document.getElementById('userPass').value = '';
-      switchAuth('login');
-      alert('Ro‘yxatdan o‘tildi! Endi login-parol bilan kiring.');
-    }catch(e){
-      if(e.message==='exists') alert('Bu login band. Boshqa login tanlang.');
-      else alert('Xatolik: '+e.message);
-    }
-  }
-  window.registerUser = registerUser;
-
+  /* ——— Parolsiz kirish (faqat ism) ——— */
   async function loginUser(){
-    const login = document.getElementById('userLogin').value.trim();
-    const pass  = document.getElementById('userPass').value.trim();
-    if(!login || !pass) return alert('Login va parol kiriting');
-    const u = await DB.findUser(login);
-    if(!u) return alert('Bunday login topilmadi. Avval ro‘yxatdan o‘ting.');
-    if(u.passHash !== await sha256(pass)) return alert('Parol noto‘g‘ri.');
-    SESSION = { role:'user', login: u.login };
-    document.getElementById('whoTag').textContent = u.login;
-    // So'nggi loginni eslab qo'yamiz
-    try{ localStorage.setItem('tm_last_login', u.login); }catch(e){}
+    const name = ($('userName').value||'').trim();
+    if(!name) return alert('Ism kiriting');
+    SESSION = { role:'user', login: name };
+    const who = $('whoTag'); if(who) who.textContent = name;
+    try{ localStorage.setItem('tm_last_login_name', name); }catch(e){}
     show('authCard',false); show('adminAuthCard',false); show('userCard',true);
-    await renderTestsList();
+    await showAllTests();
   }
-  window.loginUser = loginUser;
 
+  $('userName').addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); loginUser(); } });
+  $('btnUserLogin').addEventListener('click', loginUser);
+
+  /* ——— Admin auth ——— */
   async function loginAdmin(){
-    const login = document.getElementById('adminLogin').value.trim();
-    const code  = document.getElementById('adminCode').value.trim();
-    if(login.toLowerCase()==='qwerty' && code==='2768'){
+    const login = $('adminLogin').value.trim();
+    const code  = $('adminCode').value.trim();
+    if(login.toLowerCase()==='UsmonovJAsur0102' && code==='2768'){
       SESSION = { role:'admin', login:'ADMIN' };
       show('authCard',false); show('adminAuthCard',false); show('adminCard',true);
       await renderAdminLists();
     } else alert('Admin login yoki kod xato');
   }
-  window.loginAdmin = loginAdmin;
+  $('btnAdminLogin').addEventListener('click', loginAdmin);
 
-  /* === Admin: UI === */
-  let TESTS_OPEN=false, USERS_OPEN=false, USERS_PAGE=1, USERS_PAGE_SIZE=20, USERS_QUERY='';
-  function clearUsersSearch(){
-    USERS_QUERY=''; const inp=document.getElementById('usersSearch'); if(inp) inp.value='';
-    renderUsersPage();
-  }
-  window.clearUsersSearch = clearUsersSearch;
+  /* ——— Admin: JAVOB PANEL ——— */
+  let ADMIN_KEY = []; // ["A","C","B",...]
 
-  async function renderAdminLists(){
-    const tests = await DB.allTests();
-    const users = await DB.allUsers();
-    const testsCountEl = document.getElementById('testsCount');
-    const usersCountEl = document.getElementById('usersCount');
-    if(testsCountEl) testsCountEl.textContent = `${tests.length} ta`;
-    if(usersCountEl) usersCountEl.textContent = `${users.length} ta`;
-
-    const tBtn=document.getElementById('toggleTestsBtn');
-    const uBtn=document.getElementById('toggleUsersBtn');
-    if(tBtn && !tBtn._bound){
-      tBtn._bound=true;
-      tBtn.addEventListener('click', async ()=>{
-        TESTS_OPEN=!TESTS_OPEN;
-        tBtn.textContent = TESTS_OPEN?'Yopish':'Ko‘rsatish';
-        document.getElementById('testsChev').classList.toggle('open', TESTS_OPEN);
-        show('adminTests', TESTS_OPEN);
-        if(TESTS_OPEN) await drawTestsListForAdmin();
-      });
-    }
-    if(uBtn && !uBtn._bound){
-      uBtn._bound=true;
-      uBtn.addEventListener('click', async ()=>{
-        USERS_OPEN=!USERS_OPEN;
-        uBtn.textContent = USERS_OPEN?'Yopish':'Ko‘rsatish';
-        document.getElementById('usersChev').classList.toggle('open', USERS_OPEN);
-        show('usersBox', USERS_OPEN);
-        if(USERS_OPEN){ USERS_PAGE=1; await renderUsersPage(); }
-      });
-    }
-
-    if(TESTS_OPEN) await drawTestsListForAdmin();
-    if(USERS_OPEN)  await renderUsersPage();
-
-    const s = document.getElementById('usersSearch');
-    if(s && !s._bound){
-      s._bound=true;
-      s.addEventListener('input', ()=>{
-        USERS_QUERY = s.value.trim().toLowerCase();
-        USERS_PAGE = 1;
-        renderUsersPage();
-      });
-    }
-  }
-  window.renderAdminLists = renderAdminLists;
-
-  async function drawTestsListForAdmin(){
-    const tbox = document.getElementById('adminTests'); if(!tbox) return;
-    const tests = await DB.allTests(); tbox.innerHTML='';
-    if(!tests.length){ tbox.innerHTML = '<div class="muted">Testlar yo‘q</div>'; return; }
-    for(const t of tests){
-      const res = await DB.getResults(t.code);
-      const best = res.length ? Math.max(...res.map(r=>r.score)) : 0;
-      const div = document.createElement('div'); div.className='card'; div.style.margin='6px 0';
-      div.innerHTML = `
-        <div class="flex">
-          <strong>${t.name}</strong>
-          <div class="space"></div>
-          <span class="pill">kod: ${t.code} • ${t.count} savol</span>
-        </div>
-        <div class="flex" style="margin-top:8px">
-          <button class="btn" onclick="viewResults('${t.code}')">Natijalar</button>
-          <button class="btn" onclick="(async()=>{await DB.deleteTest('${t.code}'); await drawTestsListForAdmin();})();">O'chirish</button>
-          <div class="space"></div><span class="tag">Eng yaxshi: ${best}/${t.count}</span>
-        </div>`;
-      tbox.appendChild(div);
-    }
-  }
-  window.drawTestsListForAdmin = drawTestsListForAdmin;
-
-  async function renderUsersPage(){
-    const box = document.getElementById('adminUsers');
-    if(!box) return;
-    const list = await DB.allUsers();
-    const filtered = USERS_QUERY ? list.filter(u=> (u.login||'').toLowerCase().includes(USERS_QUERY)) : list.slice();
-    const total = filtered.length;
-    const start = (USERS_PAGE-1)*USERS_PAGE_SIZE;
-    const end = Math.min(start + USERS_PAGE_SIZE, total);
-    const slice = filtered.slice(start, end);
-
-    const usersCountEl = document.getElementById('usersCount');
-    if(usersCountEl) usersCountEl.textContent = `${total} ta`;
-
-    if(!slice.length){
-      box.innerHTML = '<div class="muted" style="margin-top:8px">Natija topilmadi</div>';
-      return;
-    }
-
-    let html = `
-      <div class="flex" style="margin:8px 0">
-        <span class="pill">Ko‘rinmoqda: ${start+1}–${end} / ${total}</span>
-        <div class="space"></div>
-        <div class="flex" style="gap:6px">
-          <button class="btn small" ${USERS_PAGE<=1?'disabled':''} onclick="USERS_PAGE=Math.max(1,USERS_PAGE-1);renderUsersPage()">⬅️ Oldingi</button>
-          <button class="btn small" ${end>=total?'disabled':''} onclick="USERS_PAGE=Math.min(Math.ceil(${total}/USERS_PAGE_SIZE),USERS_PAGE+1);renderUsersPage()">Keyingi ➡️</button>
-        </div>
-      </div>
-      <table>
-        <thead><tr><th>#</th><th>Login</th><th>Parol xeshi</th></tr></thead><tbody>
-    `;
-    slice.forEach((u,i)=>{
-      html += `<tr>
-        <td>${start + i + 1}</td>
-        <td>${escapeHtml(u.login)}</td>
-        <td>${(u.passHash||'—').slice(0,10)}…</td>
-      </tr>`;
-    });
-    html += `</tbody></table>
-      <div class="flex" style="margin:10px 0 2px">
-        <div class="space"></div>
-        <div class="flex" style="gap:6px">
-          <button class="btn small" ${USERS_PAGE<=1?'disabled':''} onclick="USERS_PAGE=Math.max(1,USERS_PAGE-1);renderUsersPage()">⬅️ Oldingi</button>
-          <button class="btn small" ${end>=total?'disabled':''} onclick="USERS_PAGE=Math.min(Math.ceil(${total}/USERS_PAGE_SIZE),USERS_PAGE+1);renderUsersPage()">Keyingi ➡️</button>
-        </div>
-      </div>`;
-    box.innerHTML = html;
-  }
-  window.renderUsersPage = renderUsersPage;
-
-  /* === Test yaratish (UI) === */
   function buildAnswerGrid(){
-    const count = parseInt(document.getElementById('tCount').value||'0');
-    const grid = document.getElementById('answerGrid'); grid.innerHTML = '';
-    for(let i=1;i<=count;i++){
-      const row = document.createElement('div');
-      row.style.margin = '6px 0';
-      row.innerHTML = `<strong style="display:inline-block;width:28px">${i}.</strong>`;
+    const cnt = Math.max(1, parseInt(($('tCount').value||'1'),10));
+    const wrap = $('answerGrid'); wrap.innerHTML='';
+    ADMIN_KEY = new Array(cnt).fill(null);
+    for(let i=0;i<cnt;i++){
+      const row = document.createElement('div'); row.className='adm-qrow'; row.id = 'adm_q_'+i;
+      row.innerHTML = `<div class="flex"><strong>${i+1}.</strong><div class="space"></div><span class="pill">To‘g‘ri variantni tanlang</span></div>`;
       const pad = document.createElement('div'); pad.className='answer-pad';
       ['A','B','C','D'].forEach(ch=>{
-        const b = document.createElement('button'); b.className='opt'; b.dataset.v=ch; b.textContent=ch;
+        const b = document.createElement('button'); b.className='opt'; b.dataset.v=ch; b.innerHTML = `<span class="hk">${ch}</span> ${ch}`;
         b.addEventListener('click', ()=>{
-          for(const x of pad.children){ x.classList.remove('active-admin'); }
+          [...pad.children].forEach(x=> x.classList.remove('active-admin'));
           b.classList.add('active-admin');
-          row.dataset.answer = ch;
+          ADMIN_KEY[i] = ch;
         });
         pad.appendChild(b);
       });
-      row.appendChild(pad); grid.appendChild(row);
+      row.appendChild(pad); wrap.appendChild(row);
     }
   }
-  window.buildAnswerGrid = buildAnswerGrid;
+  $('btnBuildGrid').addEventListener('click', buildAnswerGrid);
+  let __cntTimer=null; $('tCount').addEventListener('input', ()=>{ clearTimeout(__cntTimer); __cntTimer=setTimeout(buildAnswerGrid, 200); });
 
   async function saveTest(){
-    const name = document.getElementById('tName').value.trim();
-    const code = document.getElementById('tCode').value.trim();
-    const count = parseInt(document.getElementById('tCount').value||'0');
-    if(!name || !code || !count){ alert('Nomi, kod va savollar soni to\'ldirilsin'); return; }
-    const rows = [...document.getElementById('answerGrid').querySelectorAll('div')];
-    const qrows = rows.filter(d=>d.querySelector && d.querySelector('.answer-pad'));
-    if(qrows.length !== count){ alert('Avval javob panellarini yarating'); return; }
-    const key = qrows.map((r,i)=> r.dataset.answer || (alert((i+1)+'-savol uchun javob belgilansin'), null));
-    if(key.some(x=>!x)) return;
-    await DB.saveTest({ name, code, count, key });
-    alert('Test saqlandi (bulut)');
-    document.getElementById('tName').value=''; document.getElementById('tCode').value=''; document.getElementById('tCount').value=5; document.getElementById('answerGrid').innerHTML='';
+    const name = ($('tName').value||'').trim();
+    const code = ($('tCode').value||'').trim();
+    const count = Math.max(1, parseInt(($('tCount').value||'1'),10));
+    if(!name || !code) return alert('Nom va kodni kiriting');
+    if(!ADMIN_KEY.length || ADMIN_KEY.length!==count || ADMIN_KEY.some(v=>!v)){
+      return alert('Har bir savol uchun A/B/C/D tanlang. Avval "Javob panellari" ni tuzing.');
+    }
+    await DB.saveTest({ name, code, count, key: ADMIN_KEY.slice() });
+    alert('✅ Test saqlandi');
+    $('tName').value=''; $('tCode').value=''; $('tCount').value=5; $('answerGrid').innerHTML=''; ADMIN_KEY=[];
     await renderAdminLists();
   }
-  window.saveTest = saveTest;
+  $('btnSaveTest').addEventListener('click', saveTest);
 
-  /* === User: test ro‘yxati, o‘ynash === */
-  async function renderTestsList(){
-    const box = document.getElementById('testsList'); box.innerHTML='';
+  /* ——— Admin ro‘yxatlari ——— */
+  async function renderAdminLists(){
     const tests = await DB.allTests();
-    if(!tests.length){ box.innerHTML = '<div class="muted">Testlar yoʻq</div>'; return; }
-    for(const t of tests){
-      const res   = await DB.getResults(t.code);
-      const best  = res.length? Math.max(...res.map(r=>r.score)) : 0;
-      const used  = await DB.getAttempts(t.code, SESSION.login);
-      const mine  = await DB.bestOfUser(t.code, SESSION.login);
-      const have  = !!mine;
+    $('testsCount').textContent = `${tests.length} ta`;
+    await drawTestsListForAdmin();
+  }
 
-      const card = document.createElement('div'); card.className='card'; card.style.margin='6px 0';
-      card.innerHTML = `<div class="flex"><strong>${t.name}</strong><div class="space"></div><span class="pill">${t.count} savol</span></div>`;
-      const controls = document.createElement('div'); controls.className='flex'; controls.style.marginTop='10px';
-      if(used>=3){
-        const tag=document.createElement('span'); tag.className='tag'; tag.textContent='Urinishlar: 3/3'; controls.appendChild(tag);
-      }else{
-        const btn = document.createElement('button'); btn.className='btn primary';
-        btn.textContent = have ? 'Qayta ishlash' : 'Testni ishlash';
-        btn.onclick=()=> startTest(t.code);
-        controls.appendChild(btn);
-        const left=document.createElement('span'); left.className='pill'; left.textContent = `Urinish: ${used}/3`;
-        controls.appendChild(left);
-      }
-      const btnRes = document.createElement('button'); btnRes.className='btn'; btnRes.textContent='Natijalar'; btnRes.onclick=()=>viewResults(t.code); controls.appendChild(btnRes);
-      const spacer = document.createElement('div'); spacer.className='space'; controls.appendChild(spacer);
-      const tag2 = document.createElement('span'); tag2.className='tag'; tag2.textContent = `Eng: ${best}/${t.count}`; controls.appendChild(tag2);
-      card.appendChild(controls); box.appendChild(card);
+  async function drawTestsListForAdmin(){
+    const tbox = $('adminTests'); tbox.innerHTML='';
+    const tests = await DB.allTests();
+    if(!tests.length){ tbox.innerHTML = '<div class="muted">Testlar yo‘q</div>'; return; }
+    for(const t of tests){
+      const res = await DB.getResults(t.code);
+      const participants = res.length;
+      const div = document.createElement('div'); div.className='card'; div.style.margin='6px 0';
+      div.innerHTML = `
+        <div class="flex">
+          <strong>${escapeHtml(t.name)}</strong>
+          <div class="space"></div>
+          <span class="pill">kod: ${escapeHtml(t.code)} • ${t.count} savol • 👥 ${participants} ta</span>
+        </div>
+        <div class="flex" style="margin-top:8px">
+          <button class="btn" data-act="view">Natijalar</button>
+          <button class="btn" data-act="del">O'chirish</button>
+          <button class="btn" data-act="tg">Hisobot nusxasi</button>
+          <div class="space"></div>
+        </div>`;
+      const [btnView, btnDel, btnTg] = div.querySelectorAll('button');
+      btnView.addEventListener('click', ()=> viewResults(t.code));
+      btnDel.addEventListener('click', ()=> adminDeleteTest(t.code, btnDel));
+      btnTg.addEventListener('click', ()=> adminTgReport(t.code));
+      tbox.appendChild(div);
     }
   }
-  window.renderTestsList = renderTestsList;
 
+  async function adminDeleteTest(code, el){
+    if(!confirm(`'${code}' kodli testni VA unga tegishli barcha natija/urinishlarni o‘chiraymi?`)) return;
+    const oldText = el.textContent; el.textContent = 'O‘chirilmoqda…'; el.disabled = true;
+    try{ await DB.deleteTestDeep(code); alert('✅ Test, results va attempts to‘liq o‘chirildi.'); await drawTestsListForAdmin(); }
+    catch(e){ alert('❌ O‘chirishda xatolik: '+e.message); }
+    finally{ el.textContent = oldText; el.disabled = false; }
+  }
+
+  /* ——— Admin: Hisobot (faqat nusxa olish) ——— */
+  async function adminTgReport(code){
+    const all = await DB.allTests();
+    const t = all.find(x=>x.code===code);
+    if(!t){ alert('Test topilmadi'); return; }
+    const res = await DB.getResults(code);
+
+    if(!res.length){
+      clipboardOrPrompt(`🧪 Test: ${t.name} (${t.code})\n👥 Ishtirokchilar: 0 ta\nHali natijalar yo‘q.`);
+      return;
+    }
+
+    let sumPct = 0; const lines = [];
+    res.forEach((r,i)=>{
+      const pct = Math.round((r.score/r.total)*100);
+      sumPct += pct; const wrong = r.total - r.score;
+      lines.push(`${i+1}) ${r.login} — ${pct}%  ✅ ${r.score} / ❌ ${wrong}`);
+    });
+    const avg = Math.round(sumPct / res.length);
+
+    const head = [
+      `🧪 Test: ${t.name} (${t.code})`,
+      `📝 Savollar: ${t.count} ta`,
+      `👥 Ishtirokchilar: ${res.length} ta`,
+      `📊 O‘rtacha: ${avg}%`,
+      `---`
+    ];
+    clipboardOrPrompt(head.concat(lines).join('\n'));
+  }
+
+  /* ——— User: QUICK ACCESS ——— */
+  $('codeInput').addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); startByCode(); } });
+  $('btnStartByCode').addEventListener('click', startByCode);
+  $('nameSearch').addEventListener('input', ()=>{ clearTimeout(__searchTimer); __searchTimer = setTimeout(searchByName, 200); });
+  $('nameSearch').addEventListener('keydown', (e)=>{
+    if(!__searchItems.length) return;
+    if(e.key === 'ArrowDown'){ e.preventDefault(); const next = (__searchIndex + 1) % __searchItems.length; setActiveCard(next); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); const prev = (__searchIndex - 1 + __searchItems.length) % __searchItems.length; setActiveCard(prev); }
+    else if(e.key === 'Enter'){ e.preventDefault(); const t = __searchItems[__searchIndex]; if(t) startTest(t.code); }
+  });
+  $('btnClearSearch').addEventListener('click', ()=>{ const i = $('nameSearch'); if(i){ i.value=''; } $('testsList').innerHTML = '<div class="muted">Qidiruv tozalandi. “Barcha testlar” ni bosing yoki kod orqali ishga tushiring.</div>'; });
+  $('btnShowAll').addEventListener('click', showAllTests);
+
+  async function startByCode(){
+    if(!SESSION.login) return alert('Avval ism bilan kiring');
+    const code = ($('codeInput').value||'').trim();
+    if(!code) return alert('Kod kiriting');
+    const tests = await DB.allTests();
+    const t = tests.find(x=> (x.code||'').toLowerCase() === code.toLowerCase());
+    if(!t) return alert('Bunday kod topilmadi');
+    await startTest(t.code);
+  }
+
+  async function searchByName(){
+    if(!SESSION.login) return alert('Avval ism bilan kiring');
+    const q = ($('nameSearch').value||'').trim().toLowerCase();
+    const box = $('testsList'); box.innerHTML='';
+    const tests = await DB.allTests();
+    const filtered = q ? tests.filter(t => (t.name||'').toLowerCase().includes(q)) : [];
+    __searchItems = filtered; __searchIndex = filtered.length ? 0 : -1;
+
+    if(!filtered.length){ box.innerHTML = q ? '<div class="muted">Mos test topilmadi</div>' : '<div class="muted">Qidiruv matnini kiriting yoki “Barcha testlar” ni bosing</div>'; return; }
+
+    const frag = document.createDocumentFragment();
+    filtered.forEach((t,i)=>{
+      const card = document.createElement('div'); card.className='card'; card.id = 'srch_'+i; card.style.margin='6px 0';
+      card.innerHTML = `
+        <div class="flex"><strong>${escapeHtml(t.name)}</strong><div class="space"></div><span class="pill">${t.count} savol</span></div>
+        <div class="flex" style="margin-top:10px">
+          <button class="btn primary">Testni ishlash</button>
+          <button class="btn">Natijalar</button>
+          <div class="space"></div>
+          <span class="tag">kod: ${escapeHtml(t.code)}</span>
+        </div>`;
+      const [btn1, btn2] = card.querySelectorAll('button');
+      btn1.addEventListener('click', ()=> startTest(t.code));
+      btn2.addEventListener('click', ()=> viewResults(t.code));
+      frag.appendChild(card);
+    });
+    box.appendChild(frag); setActiveCard(__searchIndex);
+  }
+
+  async function showAllTests(){
+    if(!SESSION.login) return alert('Avval ism bilan kiring');
+    const tests = await DB.allTests();
+    const box = $('testsList'); box.innerHTML='';
+    if(!tests.length){ box.innerHTML = '<div class="muted">Testlar yoʻq</div>'; return; }
+    __searchItems = tests.slice(); __searchIndex = -1; renderTestsCards(tests);
+  }
+  function renderTestsCards(list){
+    const box = $('testsList'); const frag = document.createDocumentFragment();
+    list.forEach((t,i)=>{
+      const card = document.createElement('div'); card.className='card'; card.id='srch_'+i; card.style.margin='6px 0';
+      card.innerHTML = `
+        <div class="flex"><strong>${escapeHtml(t.name)}</strong><div class="space"></div><span class="pill">${t.count} savol</span></div>
+        <div class="flex" style="margin-top:10px">
+          <button class="btn primary">Testni ishlash</button>
+          <button class="btn">Natijalar</button>
+          <div class="space"></div>
+          <span class="tag">kod: ${escapeHtml(t.code)}</span>
+        </div>`;
+      const [btn1, btn2] = card.querySelectorAll('button');
+      btn1.addEventListener('click', ()=> startTest(t.code));
+      btn2.addEventListener('click', ()=> viewResults(t.code));
+      frag.appendChild(card);
+    });
+    box.appendChild(frag);
+  }
+
+  /* ——— Test o‘ynash ——— */
   let PLAY = { code:null, key:[], count:0, chosen:[] };
+  let PLAY_FOCUS = 0;
 
   async function startTest(code){
-    if(!SESSION.login){ alert('Avval kirish qiling'); return; }
+    if(!SESSION.login){ alert('Avval ism bilan kiring'); return; }
     const tests = await DB.allTests();
     const t = tests.find(x=>x.code===code);
     if(!t){ alert('Test topilmadi'); return; }
     const used = await DB.getAttempts(code, SESSION.login);
     if(used>=3){ alert('Bu testni 3 martadan ko‘p ishlay olmaysiz.'); return; }
 
-    PLAY = { code:code, key: t.key, count: t.count, chosen: new Array(t.count).fill(null) };
-    document.getElementById('playTitle').textContent = `${t.name} — ${t.count} savol`;
+    PLAY = { code:code, key: t.key||[], count: t.count||0, chosen: new Array(t.count||0).fill(null) };
+    $('playTitle').textContent = `${t.name} — ${t.count} savol`;
     renderPlay();
     show('userCard', false); show('playCard', true);
   }
-  window.startTest = startTest;
+
+  function setFocus(i){
+    if(PLAY.count<=0) return;
+    if(i < 0) i = 0; if(i >= PLAY.count) i = PLAY.count - 1; PLAY_FOCUS = i;
+    document.querySelectorAll('#playBody .card').forEach(el=> el.classList.remove('focus-q'));
+    const row = document.getElementById('qrow_'+i);
+    if(row){ row.classList.add('focus-q'); row.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
+  }
+  function nextIndexFrom(i){ for(let k=i+1;k<PLAY.count;k++){ if(PLAY.chosen[k]==null) return k; } return Math.min(i+1, PLAY.count-1); }
+  function selectOption(i, ch){
+    const row = document.getElementById('qrow_'+i); if(!row) return;
+    const pad = row.querySelector('.answer-pad'); if(!pad) return;
+    [...pad.children].forEach(x=> x.classList.remove('active-user'));
+    const btn = [...pad.children].find(x => (x.dataset.v === ch));
+    if(btn) btn.classList.add('active-user');
+    PLAY.chosen[i] = ch;
+  }
 
   function renderPlay(){
-    const body = document.getElementById('playBody'); body.innerHTML='';
+    const body = $('playBody'); body.innerHTML='';
     for(let i=0;i<PLAY.count;i++){
-      const row = document.createElement('div'); row.className='card'; row.style.margin='6px 0';
+      const row = document.createElement('div'); row.className='card'; row.style.margin='6px 0'; row.id = 'qrow_'+i;
       row.innerHTML = `<div class="flex"><strong>${i+1}.</strong><div class="space"></div><span class="pill">Variant tanlang</span></div>`;
+      row.addEventListener('click', ()=> setFocus(i));
       const pad = document.createElement('div'); pad.className='answer-pad';
       ['A','B','C','D'].forEach(ch=>{
-        const b = document.createElement('button'); b.className='opt'; b.dataset.v=ch; b.textContent=ch;
-        b.addEventListener('click', ()=>{
-          for(const x of pad.children){ x.classList.remove('active-user'); }
-          b.classList.add('active-user');
-          PLAY.chosen[i]=ch;
-        });
+        const b = document.createElement('button'); b.className='opt'; b.dataset.v=ch; b.innerHTML = `<span class="hk">${ch}</span> ${ch}`;
+        b.addEventListener('click', ()=>{ [...pad.children].forEach(x=> x.classList.remove('active-user')); b.classList.add('active-user'); PLAY.chosen[i]=ch; setFocus(nextIndexFrom(i)); });
         pad.appendChild(b);
       });
       row.appendChild(pad); body.appendChild(row);
     }
+    setFocus(0);
   }
-  window.renderPlay = renderPlay;
+
+  // Global hotkeys
+  document.addEventListener('keydown', (e)=>{
+    const playOpen = !document.getElementById('playCard').classList.contains('hidden');
+    if(!playOpen) return;
+
+    if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); finishTest(); return; }
+    const key = e.key.toLowerCase();
+    if(key === 'arrowdown'){ e.preventDefault(); setFocus(Math.min(PLAY_FOCUS+1, PLAY.count-1)); return; }
+    if(key === 'arrowup'){ e.preventDefault(); setFocus(Math.max(PLAY_FOCUS-1, 0)); return; }
+    const map = { a:'A', b:'B', c:'C', d:'D' };
+    if(map[key]){ e.preventDefault(); selectOption(PLAY_FOCUS, map[key]); setFocus(nextIndexFrom(PLAY_FOCUS)); }
+  });
 
   async function finishTest(){
     if(!SESSION.login){ alert('Kirish talab qilinadi'); return; }
-    if(PLAY.chosen.some(x=>x===null)){ if(!confirm('Baʼzi savollar belgilanmagan. Baribir yakunlaysizmi?')) return; }
+    if(PLAY.chosen.some(x=>x===null)){
+      if(!confirm('Baʼzi savollar belgilanmagan. Baribir yakunlaysizmi?')) return;
+    }
 
     const details=[]; let score=0;
     for(let i=0;i<PLAY.count;i++){
-      const correct = PLAY.key[i]; const chosen = PLAY.chosen[i];
-      const ok = chosen === correct; if(ok) score++;
+      const correct = PLAY.key[i]; const chosen = PLAY.chosen[i]; const ok = chosen === correct; if(ok) score++;
       details.push({ q:i+1, chosen: chosen||'-', correct, ok });
     }
-    // urinish +1
     await DB.incAttempt(PLAY.code, SESSION.login);
-    // eng yaxshi natijani saqlash
     const rec = { login: SESSION.login, code: PLAY.code, score, total: PLAY.count, details, date: Date.now() };
     await DB.upsertBestResult(rec);
-
     await viewResults(PLAY.code, rec);
   }
-  window.finishTest = finishTest;
 
-  /* === Natijalar + TG === */
+  /* ——— Natijalar + matn tayyorlash ——— */
   let __lastTgText = '';
   function makeTgText(test, rec){
     const lines = [];
+    const pct = Math.round((rec.score/rec.total)*100);
     lines.push(`🧪 Test: ${test.name}${test.code ? ' ('+test.code+')':''}`);
-    lines.push(`👤 Login: ${rec.login}`);
-    lines.push(`📊 Natija: ${rec.score}/${rec.total}`);
+    lines.push(`👤 Ism: ${rec.login}`);
+    lines.push(`📊 Natija: ${rec.score}/${rec.total} — ${pct}%`);
     lines.push('---');
-    rec.details.forEach(d=>{
-      lines.push(`${d.q}) tanlandi: ${d.chosen} | to‘g‘ri: ${d.correct} ${d.ok?'✅':'❌'}`);
-    });
+    rec.details.forEach(d=>{ lines.push(`${d.q}) tanlandi: ${d.chosen} | to‘g‘ri: ${d.correct} ${d.ok?'✅':'❌'}`); });
     return lines.join('\n');
   }
-
   function renderDetail(rec){
     let html = '<div class="card" style="margin:0">';
     html += `<strong>${escapeHtml(rec.login)}</strong> — <span class="tag">${rec.score}/${rec.total}</span>`;
@@ -720,69 +674,65 @@
   async function viewResults(code, justMade=null){
     show('userCard', false); show('playCard', false); show('resultsCard', true);
     const tests = await DB.allTests(); const t = tests.find(x=>x.code===code); if(!t){ alert('Test topilmadi'); return; }
-    document.getElementById('resTitle').textContent = `${t.name} — Natijalar`;
+    $('resTitle').textContent = `${t.name} — Natijalar`;
 
     const arr = await DB.getResults(code);
-    const lb = document.getElementById('leaderboardWrap'); lb.innerHTML='';
+    const lb = $('leaderboardWrap'); lb.innerHTML='';
     if(!arr.length){ lb.innerHTML = '<div class="muted">Natijalar yoʻq</div>'; }
     else {
-      let h = '<table><thead><tr><th>#</th><th>Login</th><th>Ball</th><th>Sana</th></tr></thead><tbody>';
-      arr.forEach((r,i)=> h += `<tr><td>${i+1}</td><td>${escapeHtml(r.login)}</td><td><strong>${r.score}/${r.total}</strong></td><td>${new Date(r.date).toLocaleString()}</td></tr>`);
+      let h = '<table><thead><tr><th>#</th><th>Ism</th><th>Ball</th><th>Foiz</th><th>Sana</th></tr></thead><tbody>';
+      arr.forEach((r,i)=>{
+        const mine = (SESSION.login && r.login === SESSION.login);
+        const pct = Math.round((r.score/r.total)*100);
+        h += `<tr class="${mine ? 'my-row' : ''}">
+                <td>${i+1}</td>
+                <td>${escapeHtml(r.login)}</td>
+                <td><strong>${r.score}/${r.total}</strong></td>
+                <td>${pct}%</td>
+                <td>${new Date(r.date).toLocaleString()}</td>
+              </tr>`;
+      });
       h += '</tbody></table>'; lb.innerHTML = h;
     }
 
-    const dw = document.getElementById('detailWrap');
+    const dw = $('detailWrap');
     const mine = justMade || (SESSION.login ? await DB.bestOfUser(code, SESSION.login) : null);
-    if(mine){
-      dw.innerHTML = renderDetail(mine);
-      __lastTgText = makeTgText(t, mine);
+    if(mine){ dw.innerHTML = renderDetail(mine); __lastTgText = makeTgText(t, mine); }
+    else { dw.innerHTML = '<div class="muted">O‘zingizning oxirgi urinish tafsilotlari ko‘rinmadi.</div>'; __lastTgText = ''; }
+  }
+
+  /* ——— FAQAT NUSXA OLISH ——— */
+  function clipboardOrPrompt(text){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(()=> alert('✅ Nusxa olindi. Istalgan joyga yopishtiring.'))
+        .catch(()=> prompt('Matnni qo‘lda nusxalang (Ctrl+C):', text));
     } else {
-      dw.innerHTML = '<div class="muted">Aynan bir urinishni ko‘rish uchun testni yakunlang yoki o‘z natijangiz yo‘q.</div>';
-      __lastTgText = '';
+      prompt('Matnni qo‘lda nusxalang (Ctrl+C):', text);
     }
   }
-  window.viewResults = viewResults;
 
-  /* === Telegramga nusxalash === */
-  function copyTg(){
+  function copyResult(){
     if(!__lastTgText){
       alert('Avval o‘zingizning natijangizni oching (yoki testni tugating).');
       return;
     }
-    if(navigator.share){
-      navigator.share({ text: __lastTgText }).catch(()=>fallbackClipboard());
-    } else {
-      fallbackClipboard();
-    }
+    clipboardOrPrompt(__lastTgText);
   }
-  function fallbackClipboard(){
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(__lastTgText)
-        .then(()=> alert('✅ Matn nusxalandi! Endi Telegramga yuboring (yopishtiring).'))
-        .catch(()=> prompt('Matnni qo‘lda nusxalang (Ctrl+C):', __lastTgText));
-    } else {
-      prompt('Matnni qo‘lda nusxalang (Ctrl+C):', __lastTgText);
-    }
-  }
-  window.copyTg = copyTg;
 
-  /* Demo filler */
-  function fillDemo(){
-    document.getElementById('userLogin').value='demo';
-    document.getElementById('userPass').value='demo';
-  }
-  window.fillDemo = fillDemo;
+  // Qidiruv maydoni bo'sh bo'lganda yordamchi yozuv
+  $('testsList').innerHTML = '<div class="muted">Kodni kiriting yoki “Barcha testlar” ni bosing</div>';
 
-  /* ===== Boot: so‘nggi loginni to‘ldirish ===== */
-  (function boot(){
-    try{
-      const last = localStorage.getItem('tm_last_login');
-      if(last){
-        document.getElementById('userLogin').value = last;
-        switchAuth('login');
-      }
-    }catch(e){}
-  })();
+  // Tugma handlerlari
+  $('btnBack1').addEventListener('click', backToList);
+  $('btnBack2').addEventListener('click', backToList);
+  $('btnLogout1').addEventListener('click', logout);
+  $('btnLogout2').addEventListener('click', logout);
+  $('finishBtn').addEventListener('click', finishTest);
+  $('btnCopy').addEventListener('click', copyResult);
+
+  // Boot
+  (function boot(){ try{ const last = localStorage.getItem('tm_last_login_name'); if(last){ $('userName').value = last; } }catch(e){} })();
 
   // Start holat
   logout();
