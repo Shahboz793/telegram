@@ -270,7 +270,7 @@
       background:#f9fafb;
     }
     .lesson-title{font-size:13px;font-weight:500;}
-    .lesson-status{font-size:11px;text-align:right;}
+    .lesson-status{font-size:11px;text-align:right;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;}
 
     .video-wrapper{
       position:relative;
@@ -457,7 +457,7 @@
   <!-- FIREBASE (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <!-- YouTube Iframe API -->
+  <!-- YouTube Iframe API (asosiy skript) -->
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
@@ -690,7 +690,26 @@
 <script>
   /* YOUTUBE API HOLATI */
   let ytApiReady = false;
-  function onYouTubeIframeAPIReady() { ytApiReady = true; }
+  let ytApiLoading = false;
+  function onYouTubeIframeAPIReady() {
+    ytApiReady = true;
+    ytApiLoading = false;
+  }
+  // API har qanday paytda kerak bo‘lib qolsa, qayta yuklab qo‘yish
+  function ensureYouTubeApiLoaded() {
+    if (window.YT && typeof window.YT.Player === "function") {
+      ytApiReady = true;
+      return;
+    }
+    if (ytApiLoading) return;
+    ytApiLoading = true;
+    const existing = document.querySelector('script[src*="youtube.com/iframe_api"]');
+    if (existing) return;
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    tag.async = true;
+    document.head.appendChild(tag);
+  }
 
   /* FIREBASE INIT */
   const firebaseConfig = {
@@ -921,8 +940,18 @@
           <div class="lesson-list">
             ${lessons.map((l,i)=>`
               <div class="lesson-item">
-                <div class="lesson-title">${i+1}. ${l.title}</div>
-                <div class="lesson-status"><span class="muted">ID: ${l.id}</span></div>
+                <div>
+                  <div class="lesson-title">${i+1}. ${l.title}</div>
+                  <div class="muted" style="font-size:11px;">ID: ${l.id}</div>
+                </div>
+                <div class="lesson-status">
+                  <button type="button" class="btn-xs btn-lesson-up"
+                          data-course-id="${course.id}" data-lesson-id="${l.id}">↑</button>
+                  <button type="button" class="btn-xs btn-lesson-down"
+                          data-course-id="${course.id}" data-lesson-id="${l.id}">↓</button>
+                  <button type="button" class="btn-xs btn-lesson-delete"
+                          data-course-id="${course.id}" data-lesson-id="${l.id}">O‘chirish</button>
+                </div>
               </div>`).join("")}
           </div>`;
       }
@@ -985,20 +1014,57 @@
     }
   });
 
-  adminCourseList.addEventListener("click",async e=>{
-    const btn=e.target.closest(".btn-delete-course");
-    if(!btn) return;
-    const courseId=btn.dataset.courseId;
-    if(!confirm("Kursni o‘chirishni xohlaysizmi?")) return;
+  // Admin tarafda kursni o‘chirish, darsni o‘chirish va tartiblash
+  adminCourseList.addEventListener("click", async e=>{
+    const courseDel = e.target.closest(".btn-delete-course");
+    const lessonDel = e.target.closest(".btn-lesson-delete");
+    const lessonUp  = e.target.closest(".btn-lesson-up");
+    const lessonDown= e.target.closest(".btn-lesson-down");
+
+    if(courseDel){
+      const courseId=courseDel.dataset.courseId;
+      if(!confirm("Kursni o‘chirishni xohlaysizmi?")) return;
+      try{
+        await deleteCourseFromFirestore(courseId);
+        data.courses = data.courses.filter(c=>c.id!==courseId);
+        renderAdminCourses();
+        renderUserCourses();
+        renderCourseModalList();
+      }catch(err){
+        console.error("Delete error:",err);
+        alert("Kursni o‘chirishda xatolik yuz berdi.");
+      }
+      return;
+    }
+
+    if(!lessonDel && !lessonUp && !lessonDown) return;
+    if(!data.currentUser || data.currentUser.role!=="admin") return;
+
+    const btn = lessonDel || lessonUp || lessonDown;
+    const courseId = btn.dataset.courseId;
+    const lessonId = btn.dataset.lessonId;
+    const course = data.courses.find(c=>c.id===courseId);
+    if(!course) return;
+    const lessons = course.lessons || [];
+    const idx = lessons.findIndex(l=>l.id===lessonId);
+    if(idx===-1) return;
+
     try{
-      await deleteCourseFromFirestore(courseId);
-      data.courses = data.courses.filter(c=>c.id!==courseId);
-      renderAdminCourses();
-      renderUserCourses();
-      renderCourseModalList();
+      if(lessonDel){
+        if(!confirm("Bu darsni o‘chirishni xohlaysizmi?")) return;
+        lessons.splice(idx,1);
+      }else if(lessonUp){
+        if(idx===0) return;
+        [lessons[idx-1],lessons[idx]]=[lessons[idx],lessons[idx-1]];
+      }else if(lessonDown){
+        if(idx===lessons.length-1) return;
+        [lessons[idx],lessons[idx+1]]=[lessons[idx+1],lessons[idx]];
+      }
+      await updateCourseLessons(courseId,lessons);
+      await refreshCourses();
     }catch(err){
-      console.error("Delete error:",err);
-      alert("Kursni o‘chirishda xatolik yuz berdi.");
+      console.error(err);
+      alert("Darsni yangilashda xatolik yuz berdi.");
     }
   });
 
@@ -1077,7 +1143,7 @@
     await openUserCourseDetail(courseId);
   });
 
-  /* COURSE DETAIL + PROGRESS (barqaror, ko‘p martalik tomosha) */
+  /* COURSE DETAIL + PROGRESS */
   let currentCourseDetail = null;
   let currentCourseProgress = null;
   let currentPlayer = null;
@@ -1129,10 +1195,14 @@
       clearInterval(progressInterval);
       progressInterval = null;
     }
-    if (currentPlayer && typeof currentPlayer.pauseVideo === "function") {
-      try { currentPlayer.pauseVideo(); } catch (e) {}
-    }
+    // avval progressni saqlaymiz
     saveCurrentLessonProgressOnce();
+    // keyin playerni to‘liq tozalaymiz
+    if (currentPlayer) {
+      try { currentPlayer.stopVideo(); } catch(e){}
+      try { currentPlayer.destroy(); } catch(e){}
+      currentPlayer = null;
+    }
   }
 
   function renderCourseLessonsList() {
@@ -1158,7 +1228,7 @@
 
       let unlocked = (idx === 0);
       if (maxCompletedIndex >= 0 && idx <= maxCompletedIndex + 3) {
-        unlocked = true; // 1-dars tugasa, oldinda 3 ta dars ochiladi
+        unlocked = true;
       }
 
       const statusText = info.completed
@@ -1223,6 +1293,7 @@
   async function openLessonPlayer(lesson){
     if(!currentCourseDetail || !data.currentUser) return;
 
+    // avval eski playerni to‘liq tozalaymiz
     stopCurrentPlayer();
 
     currentLessonId = lesson.id;
@@ -1235,6 +1306,9 @@
     const info = (currentCourseProgress.lessons || {})[lesson.id] || { percent:0 };
     const resumePercent = info.percent && info.percent < 95 ? info.percent : 0;
     lastSavedPercent = resumePercent;
+
+    // YouTube API doim yuklangan bo‘lishi uchun
+    ensureYouTubeApiLoaded();
 
     if(!ytApiReady){
       lessonProgressText.textContent = "YouTube API yuklanmoqda...";
@@ -1252,39 +1326,29 @@
       return;
     }
 
-    if(!currentPlayer){
-      currentPlayer = new YT.Player("yt-player",{
-        videoId: lesson.videoId,
-        playerVars:{rel:0,modestbranding:1},
-        events:{
-          onReady:()=>{
-            if(resumePercent>0){
-              const dur=currentPlayer.getDuration();
-              const start=(resumePercent/100)*dur;
-              if(start && isFinite(start)) currentPlayer.seekTo(start,true);
-            }
-            currentPlayer.playVideo();
-            startProgressInterval();
+    // har safar yangi, toza player yaratamiz
+    currentPlayer = new YT.Player("yt-player",{
+      videoId: lesson.videoId,
+      playerVars:{rel:0,modestbranding:1},
+      events:{
+        onReady:(event)=>{
+          const player = event.target;
+          if(resumePercent>0){
+            const dur = player.getDuration();
+            const start = (resumePercent/100)*dur;
+            if(start && isFinite(start)) player.seekTo(start,true);
+          }
+          player.playVideo();
+          startProgressInterval();
+        },
+        onStateChange:(event)=>{
+          if(event.data === YT.PlayerState.ENDED){
+            // video tugaganda ham progressni saqlaymiz
+            saveCurrentLessonProgressOnce();
           }
         }
-      });
-    }else{
-      if(resumePercent>0){
-        currentPlayer.loadVideoById({
-          videoId: lesson.videoId,
-          startSeconds: 0
-        });
-        setTimeout(()=>{
-          const dur=currentPlayer.getDuration();
-          const start=(resumePercent/100)*dur;
-          if(start && isFinite(start)) currentPlayer.seekTo(start,true);
-        },1000);
-      }else{
-        currentPlayer.loadVideoById(lesson.videoId);
       }
-      currentPlayer.playVideo();
-      startProgressInterval();
-    }
+    });
   }
 
   async function openUserCourseDetail(courseId){
@@ -1496,8 +1560,19 @@
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
+
+      // YouTube API har doim tayyor bo‘lishi uchun
+      ensureYouTubeApiLoaded();
     }catch(err){ console.error("init error",err); }
   })();
+
+  // WATCHDOG: har 5 soniyada player / intervalni tekshirib, qotib qolgan bo‘lsa tozalaydi
+  setInterval(()=>{
+    if(!currentPlayer && progressInterval){
+      clearInterval(progressInterval);
+      progressInterval = null;
+    }
+  },5000);
 </script>
 </body>
 </html>
