@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <title>Ta'lim Edu — Kurs Platforma (HTML + JS)</title>
+  <title>Ta'lim Edu — Kurs Platforma (Firestore)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -12,7 +12,6 @@
       color:#111827;
     }
     a{text-decoration:none;color:inherit}
-
     .page{min-height:100vh;}
 
     /* HEADER */
@@ -24,9 +23,7 @@
       color:#e5e7eb;
       border-bottom:1px solid #1f2937;
     }
-    .logo{
-      font-weight:800;font-size:20px;
-    }
+    .logo{font-weight:800;font-size:20px;}
     .logo span{color:#f97316;}
     .nav{display:flex;align-items:center;gap:14px;font-size:14px;}
     .nav a{color:#e5e7eb;opacity:.85;}
@@ -48,10 +45,7 @@
       margin:0 auto;
       padding:18px 12px 32px;
     }
-
-    .section{
-      margin-bottom:18px;
-    }
+    .section{margin-bottom:18px;}
     .hidden{display:none;}
 
     .card{
@@ -61,25 +55,10 @@
       box-shadow:0 18px 45px rgba(15,23,42,0.08);
       border:1px solid #e5e7eb;
     }
-    .card h2{
-      font-size:18px;
-      margin-bottom:6px;
-    }
-    .card p.sub{
-      font-size:13px;
-      color:#6b7280;
-      margin-bottom:10px;
-    }
+    .card h2{font-size:18px;margin-bottom:6px;}
+    .card p.sub{font-size:13px;color:#6b7280;margin-bottom:10px;}
 
-    .hero-title{
-      font-size:24px;
-      font-weight:700;
-      margin-bottom:4px;
-    }
-    .hero-text{
-      font-size:14px;
-      color:#4b5563;
-    }
+    .hero-text{font-size:14px;color:#4b5563;}
 
     .grid-2{
       display:grid;
@@ -114,7 +93,6 @@
       box-shadow:0 2px 8px rgba(15,23,42,0.18);
       color:#111827;
     }
-
     .form{
       display:flex;
       flex-direction:column;
@@ -126,10 +104,7 @@
       flex-direction:column;
       gap:4px;
     }
-    label{
-      font-size:13px;
-      color:#4b5563;
-    }
+    label{font-size:13px;color:#4b5563;}
     input,textarea,select{
       border-radius:10px;
       border:1px solid #d1d5db;
@@ -165,15 +140,21 @@
       transform:translateY(0);
       box-shadow:0 6px 14px rgba(129,140,248,0.4);
     }
-    .hint{
-      font-size:11px;
-      color:#6b7280;
-    }
-    .error{
+    .btn-small{
+      padding:4px 10px;
       font-size:12px;
-      color:#b91c1c;
-      margin-top:2px;
+      border-radius:999px;
+      border:none;
+      cursor:pointer;
+      background:#e5e7eb;
+      color:#111827;
     }
+    .btn-small.danger{
+      background:#fee2e2;
+      color:#b91c1c;
+    }
+    .hint{font-size:11px;color:#6b7280;}
+    .error{font-size:12px;color:#b91c1c;margin-top:2px;}
     .pill{
       font-size:11px;
       padding:4px 10px;
@@ -208,17 +189,8 @@
       flex-direction:column;
       gap:6px;
     }
-    .course-title{
-      font-size:15px;
-      font-weight:600;
-      color:#111827;
-    }
-    .course-desc{
-      font-size:13px;
-      color:#4b5563;
-      max-height:60px;
-      overflow:hidden;
-    }
+    .course-title{font-size:15px;font-weight:600;color:#111827;}
+    .course-desc{font-size:13px;color:#4b5563;max-height:60px;overflow:hidden;}
     .course-meta{
       display:flex;
       flex-wrap:wrap;
@@ -231,12 +203,8 @@
       background:#e5e7eb;
       color:#374151;
     }
-    .badge.free{
-      background:#dcfce7;color:#166534;
-    }
-    .badge.price{
-      background:#fef9c3;color:#854d0e;
-    }
+    .badge.free{background:#dcfce7;color:#166534;}
+    .badge.price{background:#fef9c3;color:#854d0e;}
 
     .course-footer{
       display:flex;
@@ -247,6 +215,7 @@
       margin-top:4px;
     }
 
+    /* Player + playlist */
     .video-wrapper{
       position:relative;
       padding-bottom:56.25%;
@@ -254,58 +223,13 @@
       overflow:hidden;
       border-radius:8px;
       background:#000;
+      margin-top:6px;
     }
-    .video-wrapper iframe{
+    .video-wrapper > div{
       position:absolute;
       top:0;left:0;width:100%;height:100%;
-      border:0;
     }
 
-    .mini-form{
-      margin-top:6px;
-      border-top:1px dashed #e5e7eb;
-      padding-top:6px;
-    }
-
-    .empty{
-      font-size:13px;
-      color:#9ca3af;
-      margin-top:6px;
-    }
-
-    /* ADMIN LESSON LIST (delete) */
-    .admin-lessons{
-      margin-top:6px;
-      border-top:1px dashed #e5e7eb;
-      padding-top:6px;
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-    .admin-lesson-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:6px;
-      font-size:12px;
-      background:#f9fafb;
-      border-radius:8px;
-      padding:4px 6px;
-      border:1px solid #e5e7eb;
-    }
-    .admin-lesson-title{flex:1;}
-    .btn-xs{
-      border:none;
-      border-radius:999px;
-      padding:3px 8px;
-      font-size:11px;
-      cursor:pointer;
-      background:#fee2e2;
-      color:#b91c1c;
-    }
-    .btn-xs:hover{background:#fecaca;}
-
-    /* USER PLAYER + PLAYLIST */
     .course-player{
       margin-top:8px;
       display:flex;
@@ -316,7 +240,7 @@
       display:flex;
       flex-direction:column;
       gap:6px;
-      max-height:200px;
+      max-height:180px;
       overflow:auto;
     }
     .lesson-playlist-item{
@@ -368,25 +292,73 @@
       color:#e5e7eb;
     }
 
-    .course-actions{
+    .empty{font-size:13px;color:#9ca3af;margin-top:6px;}
+    .loading{font-size:13px;color:#6b7280;margin-top:6px;}
+
+    /* ADMIN: lessons list & users list */
+    .admin-lessons{
+      margin-top:6px;
+      border-top:1px dashed #e5e7eb;
+      padding-top:6px;
       display:flex;
-      gap:6px;
+      flex-direction:column;
+      gap:4px;
+    }
+    .admin-lesson-row{
+      display:flex;
+      justify-content:space-between;
       align-items:center;
-      margin-top:4px;
+      gap:6px;
+      font-size:12px;
+      background:#f9fafb;
+      border-radius:8px;
+      padding:4px 6px;
+      border:1px solid #e5e7eb;
+    }
+    .admin-lesson-title{flex:1;}
+
+    .admin-user-row{
+      font-size:12px;
+      padding:4px 6px;
+      border-radius:8px;
+      border:1px solid #e5e7eb;
+      background:#f9fafb;
+      margin-bottom:4px;
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
       flex-wrap:wrap;
     }
-    .link-btn{
+
+    /* Reviews */
+    .reviews-block{
+      margin-top:8px;
+      border-top:1px dashed #e5e7eb;
+      padding-top:6px;
+    }
+    .review-item{
+      font-size:12px;
+      border-radius:8px;
+      border:1px solid #e5e7eb;
+      padding:6px;
+      background:#ffffff;
+      margin-bottom:4px;
+    }
+    .review-meta{
       font-size:11px;
-      padding:3px 8px;
-      border-radius:999px;
-      border:1px solid #0ea5e9;
-      background:#e0f2fe;
-      color:#0369a1;
-      cursor:pointer;
+      color:#6b7280;
+      margin-bottom:2px;
     }
-    .link-btn:hover{
-      background:#bae6fd;
+    .review-form textarea{
+      font-size:12px;
     }
+    .review-form{
+      margin-top:6px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
   </style>
 </head>
 <body>
@@ -447,7 +419,9 @@
                 <label for="reg-password2">Parolni takrorlang</label>
                 <input id="reg-password2" type="password" required />
               </div>
-              <p class="hint">Ro‘yxatdan o‘tgan foydalanuvchilar <b>kurslarni ko‘rishi</b> mumkin, lekin admin panelga kira olmaydi.</p>
+              <p class="hint">
+                Ro‘yxatdan o‘tgan foydalanuvchilar <b>kurslarni ko‘rishi</b> mumkin, lekin admin panelga kira olmaydi.
+              </p>
               <button type="submit" class="btn">Ro‘yxatdan o‘tish</button>
               <div id="register-error" class="error"></div>
             </form>
@@ -458,14 +432,16 @@
           <div class="card">
             <h2>Platforma haqida</h2>
             <p class="sub">
-              Bu Ta'lim Edu uchun HTML + CSS + JS asosida yaratilgan demo kurs tizimi.
+              Bu Ta'lim Edu uchun HTML + CSS + JS + Firestore asosida yaratilgan kurs tizimi.
             </p>
             <p class="hero-text">
-              • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga 30 ta va undan ortiq
-              YouTube <b>yashirin (Unlisted)</b> videolarni qo‘shishi mumkin.<br>
-              • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va <b>kurslar ichidagi darslarni tomosha qiladi</b>.<br><br>
-              Videolar YouTube’da saqlanadi, sayt esa ularni o‘z ichiga o‘rnatib beradi.
+              • <b>Admin</b> — kurs yaratadi, darslar qo‘shadi, foydalanuvchilarni ko‘radi.<br>
+              • <b>Foydalanuvchi</b> — kiradi, kurslarni ko‘radi, darslarni tomosha qiladi,
+              kursga izoh va baho qoldiradi.<br><br>
+              Foydalanuvchi darslarni ko‘rib borgan sari kurs <b>% bo‘yicha</b> tugallanishi hisoblanadi.
+              100% bo‘lsa maxsus tabrik chiqadi.
             </p>
+            <p id="load-status" class="loading">Ma'lumotlar yuklanmoqda...</p>
           </div>
         </div>
       </div>
@@ -477,7 +453,7 @@
         <div class="section-header">
           <div>
             <h2>Admin panel</h2>
-            <p class="sub">Bu qismga faqat admin kirishi mumkin. Kurslar va darslar shu yerda boshqariladi.</p>
+            <p class="sub">Kurslar, darslar, foydalanuvchilar va izohlar shu yerda boshqariladi.</p>
           </div>
           <span class="pill">Rol: Admin</span>
         </div>
@@ -502,11 +478,6 @@
               <input id="course-price" type="number" min="0" placeholder="0 = bepul" />
             </div>
           </div>
-          <div class="form-row">
-            <label for="course-telegram">Kursning Telegram havolasi (ixtiyoriy)</label>
-            <input id="course-telegram" placeholder="https://t.me/kanal yoki guruh" />
-            <p class="hint">Talabalar uchun kursga tegishli Telegram kanal/guruh havolasini qo‘shish mumkin.</p>
-          </div>
           <button type="submit" class="btn">Kursni qo‘shish</button>
           <div id="course-error" class="error"></div>
         </form>
@@ -519,6 +490,14 @@
         </div>
         <div id="admin-course-list"></div>
         <div id="admin-empty" class="empty">Hozircha kurs yo‘q. Yuqoridan kurs qo‘shing.</div>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #e5e7eb;">
+
+        <div class="section-header">
+          <h3 style="font-size:15px;">Foydalanuvchilar</h3>
+          <span class="muted" id="admin-user-count">0 ta foydalanuvchi</span>
+        </div>
+        <div id="admin-user-list"></div>
       </div>
     </section>
 
@@ -546,38 +525,76 @@
   </main>
 </div>
 
-<script>
-  const LS_KEY = "talimEduAppData_v1";
+<!-- FIREBASE + APP JS -->
+<script type="module">
+  import {
+    initializeApp
+  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    collection,
+    getDocs,
+    addDoc,
+    deleteDoc,
+    query,
+    where
+  } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-  function loadData() {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) {
-      const initial = {
-        users: [
-          { username: "admin", password: "admin123", role: "admin" }
-        ],
-        currentUser: null,
-        courses: [] // {id,title,description,category,price,telegram,lessons:[{id,title,videoId}]}
-      };
-      localStorage.setItem(LS_KEY, JSON.stringify(initial));
-      return initial;
-    }
-    try {
-      return JSON.parse(raw);
-    } catch (e) {
-      console.error("JSON parse error, resetting storage", e);
-      localStorage.removeItem(LS_KEY);
-      return loadData();
+  // --- Sening FireBase config'ing ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
+    authDomain: "shahboz-5d0a3.firebaseapp.com",
+    projectId: "shahboz-5d0a3",
+    storageBucket: "shahboz-5d0a3.firebasestorage.app",
+    messagingSenderId: "352024095535",
+    appId: "1:352024095535:web:6ca630de2c199a33c54fda",
+    measurementId: "G-YS5RGZ00EB"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const USERS_COL = "users";
+  const COURSES_COL = "courses";
+  const PROGRESS_COL = "userCourseProgress";
+
+  const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
+
+  let currentUser = loadCurrentUserLocal();
+  let courses = []; // {id,title,description,category,price,lessons,reviews,avgRating}
+  let allUsers = [];
+  let userProgress = {}; // { courseId: {completedLessonIds:[],percent,finished} }
+  let isDataLoaded = false;
+  let ytApiReady = false;
+  const players = {}; // { courseId: {player, currentIndex} }
+
+  const loadStatus = document.getElementById("load-status");
+
+  function loadCurrentUserLocal() {
+    const raw = localStorage.getItem(CURRENT_USER_KEY);
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch { return null; }
+  }
+  function saveCurrentUserLocal() {
+    if (currentUser) {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem(CURRENT_USER_KEY);
     }
   }
 
-  function saveData() {
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
+  function ensureLoaded() {
+    if (!isDataLoaded) {
+      alert("Ma'lumotlar hali yuklanmoqda. Birozdan keyin urinib ko‘ring.");
+      return false;
+    }
+    return true;
   }
 
-  let data = loadData();
-
-  // DOM elements
+  // DOM
   const authSection = document.getElementById("auth-section");
   const adminSection = document.getElementById("admin-section");
   const userSection = document.getElementById("user-section");
@@ -586,13 +603,147 @@
   const currentUserLabel = document.getElementById("current-user-label");
   const userRolePill = document.getElementById("user-role-pill");
 
-  // Auth tabs
   const tabButtons = document.querySelectorAll(".tab-btn");
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
   const loginErrorEl = document.getElementById("login-error");
   const registerErrorEl = document.getElementById("register-error");
 
+  const courseForm = document.getElementById("course-form");
+  const courseError = document.getElementById("course-error");
+  const adminCourseList = document.getElementById("admin-course-list");
+  const adminCourseCount = document.getElementById("admin-course-count");
+  const adminEmpty = document.getElementById("admin-empty");
+
+  const adminUserList = document.getElementById("admin-user-list");
+  const adminUserCount = document.getElementById("admin-user-count");
+
+  const userCourseList = document.getElementById("user-course-list");
+  const userCourseCount = document.getElementById("user-course-count");
+  const userEmpty = document.getElementById("user-empty");
+
+  // helpers
+  function formatPrice(price) {
+    const n = Number(price);
+    if (!price || isNaN(n)) return "";
+    if (n === 0) return "Bepul";
+    return n.toLocaleString("uz-UZ") + " so'm";
+  }
+  function extractYouTubeId(input) {
+    if (!input) return "";
+    let url = input.trim();
+    let m = url.match(/youtu\.be\/([^?&]+)/); if (m) return m[1];
+    m = url.match(/v=([^&]+)/); if (m) return m[1];
+    m = url.match(/embed\/([^?&]+)/); if (m) return m[1];
+    return url;
+  }
+
+  // Admin user borligini ta'minlash
+  async function ensureAdminUser() {
+    const adminRef = doc(db, USERS_COL, "admin");
+    const snap = await getDoc(adminRef);
+    if (!snap.exists()) {
+      await setDoc(adminRef, {
+        username: "admin",
+        password: "admin123",
+        role: "admin",
+        createdAt: Date.now()
+      });
+    }
+  }
+
+  async function loadUsersFromFirestore() {
+    const snap = await getDocs(collection(db, USERS_COL));
+    const list = snap.docs.map(d => d.data());
+    list.sort((a,b) => a.username.localeCompare(b.username));
+    return list;
+  }
+
+  async function loadCoursesFromFirestore() {
+    const courseSnap = await getDocs(collection(db, COURSES_COL));
+    const list = [];
+    for (const cDoc of courseSnap.docs) {
+      const base = cDoc.data();
+      const courseId = cDoc.id;
+
+      const lessonsSnap = await getDocs(collection(db, COURSES_COL, courseId, "lessons"));
+      const lessons = lessonsSnap.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+      })).sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
+
+      const reviewsSnap = await getDocs(collection(db, COURSES_COL, courseId, "reviews"));
+      const reviews = reviewsSnap.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+      }));
+      let avgRating = 0;
+      if (reviews.length) {
+        const sum = reviews.reduce((s,r) => s + (Number(r.rating) || 0), 0);
+        avgRating = sum / reviews.length;
+      }
+
+      list.push({
+        id: courseId,
+        title: base.title || "",
+        description: base.description || "",
+        category: base.category || "",
+        price: base.price || 0,
+        lessons,
+        reviews,
+        avgRating
+      });
+    }
+    list.sort((a,b) => a.title.localeCompare(b.title));
+    courses = list;
+  }
+
+  async function loadUserProgress(username) {
+    if (!username) return {};
+    const qProg = query(collection(db, PROGRESS_COL), where("username","==",username));
+    const snap = await getDocs(qProg);
+    const res = {};
+    snap.forEach(d => {
+      const data = d.data();
+      res[data.courseId] = {
+        completedLessonIds: data.completedLessonIds || [],
+        percent: data.percent || 0,
+        finished: !!data.finished
+      };
+    });
+    return res;
+  }
+
+  async function markLessonCompleted(courseId, lessonId) {
+    if (!currentUser) return;
+    const course = courses.find(c => c.id === courseId);
+    if (!course || !lessonId) return;
+
+    let prog = userProgress[courseId] || {completedLessonIds: [], percent: 0, finished:false};
+    if (!prog.completedLessonIds.includes(lessonId)) {
+      prog.completedLessonIds.push(lessonId);
+    }
+    const total = course.lessons.length || 1;
+    const percent = Math.round(prog.completedLessonIds.length * 100 / total);
+    prog.percent = percent;
+    prog.finished = percent >= 100;
+    userProgress[courseId] = prog;
+
+    const progDocId = `${currentUser.username}__${courseId}`;
+    await setDoc(doc(db, PROGRESS_COL, progDocId), {
+      username: currentUser.username,
+      courseId,
+      completedLessonIds: prog.completedLessonIds,
+      percent,
+      finished: prog.finished,
+      updatedAt: Date.now()
+    });
+
+    // UI ni yangilaymiz
+    renderUserCourses();
+  }
+
+  // Tabs
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       tabButtons.forEach(b => b.classList.remove("active"));
@@ -611,27 +762,43 @@
   });
 
   // LOGIN
-  loginForm.addEventListener("submit", e => {
+  loginForm.addEventListener("submit", async e => {
     e.preventDefault();
+    if (!ensureLoaded()) return;
+
     loginErrorEl.textContent = "";
     const username = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value;
 
-    const user = data.users.find(u => u.username === username && u.password === password);
-    if (!user) {
-      loginErrorEl.textContent = "Login yoki parol noto‘g‘ri.";
+    if (!username || !password) {
+      loginErrorEl.textContent = "Login va parolni kiriting.";
       return;
     }
 
-    data.currentUser = { username: user.username, role: user.role };
-    saveData();
+    const userRef = doc(db, USERS_COL, username);
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) {
+      loginErrorEl.textContent = "Bunday foydalanuvchi topilmadi.";
+      return;
+    }
+    const u = snap.data();
+    if (u.password !== password) {
+      loginErrorEl.textContent = "Parol noto‘g‘ri.";
+      return;
+    }
+
+    currentUser = { username: u.username, role: u.role };
+    saveCurrentUserLocal();
+    userProgress = await loadUserProgress(currentUser.username);
     loginForm.reset();
     updateUI();
   });
 
   // REGISTER
-  registerForm.addEventListener("submit", e => {
+  registerForm.addEventListener("submit", async e => {
     e.preventDefault();
+    if (!ensureLoaded()) return;
+
     registerErrorEl.textContent = "";
     const username = document.getElementById("reg-username").value.trim();
     const password = document.getElementById("reg-password").value;
@@ -645,99 +812,82 @@
       registerErrorEl.textContent = "Parollar mos kelmadi.";
       return;
     }
-    if (data.users.some(u => u.username === username)) {
+
+    const userRef = doc(db, USERS_COL, username);
+    const snap = await getDoc(userRef);
+    if (snap.exists()) {
       registerErrorEl.textContent = "Bu login band. Boshqa login tanlang.";
       return;
     }
 
-    data.users.push({ username, password, role: "user" });
-    data.currentUser = { username, role: "user" };
-    saveData();
+    await setDoc(userRef, {
+      username,
+      password,
+      role: "user",
+      createdAt: Date.now()
+    });
+
+    currentUser = { username, role: "user" };
+    saveCurrentUserLocal();
+    userProgress = await loadUserProgress(currentUser.username);
     registerForm.reset();
+
+    allUsers = await loadUsersFromFirestore();
     updateUI();
   });
 
   // LOGOUT
   logoutBtn.addEventListener("click", () => {
-    data.currentUser = null;
-    saveData();
+    currentUser = null;
+    userProgress = {};
+    saveCurrentUserLocal();
     updateUI();
   });
 
-  // COURSE MANAGEMENT (ADMIN)
-  const courseForm = document.getElementById("course-form");
-  const courseError = document.getElementById("course-error");
-  const adminCourseList = document.getElementById("admin-course-list");
-  const adminCourseCount = document.getElementById("admin-course-count");
-  const adminEmpty = document.getElementById("admin-empty");
-
-  courseForm.addEventListener("submit", e => {
+  // COURSE CREATE (ADMIN)
+  courseForm.addEventListener("submit", async e => {
     e.preventDefault();
-    if (!data.currentUser || data.currentUser.role !== "admin") return;
+    if (!ensureLoaded()) return;
+    if (!currentUser || currentUser.role !== "admin") return;
 
     courseError.textContent = "";
     const title = document.getElementById("course-title").value.trim();
     const desc = document.getElementById("course-desc").value.trim();
     const cat = document.getElementById("course-cat").value.trim();
     const price = document.getElementById("course-price").value.trim();
-    const telegram = document.getElementById("course-telegram").value.trim();
 
     if (!title || !desc) {
       courseError.textContent = "Kurs nomi va tavsifi majburiy.";
       return;
     }
 
-    const newCourse = {
-      id: Date.now().toString(),
+    await addDoc(collection(db, COURSES_COL), {
       title,
       description: desc,
       category: cat,
-      price,
-      telegram,
-      lessons: []
-    };
-    data.courses.push(newCourse);
-    saveData();
+      price: Number(price) || 0,
+      createdAt: Date.now()
+    });
+
     courseForm.reset();
+    await loadCoursesFromFirestore();
     renderAdminCourses();
     renderUserCourses();
   });
 
-  function formatPrice(price) {
-    const n = Number(price);
-    if (!price || isNaN(n)) return "";
-    if (n === 0) return "Bepul";
-    return n.toLocaleString("uz-UZ") + " so'm";
-  }
-
-  function extractYouTubeId(input) {
-    if (!input) return "";
-    let url = input.trim();
-    // youtu.be/xxxx
-    let m = url.match(/youtu\.be\/([^?&]+)/);
-    if (m) return m[1];
-    // youtube.com/watch?v=xxxx
-    m = url.match(/v=([^&]+)/);
-    if (m) return m[1];
-    // youtube.com/embed/xxxx
-    m = url.match(/embed\/([^?&]+)/);
-    if (m) return m[1];
-    // faqat ID bo’lsa
-    return url;
-  }
-
+  // ADMIN: kurslar ro‘yxati
   function renderAdminCourses() {
-    const courses = data.courses;
+    const list = courses || [];
     adminCourseList.innerHTML = "";
-    adminCourseCount.textContent = courses.length + " ta kurs";
+    adminCourseCount.textContent = list.length + " ta kurs";
 
-    if (courses.length === 0) {
+    if (list.length === 0) {
       adminEmpty.style.display = "block";
       return;
     }
     adminEmpty.style.display = "none";
 
-    courses.forEach(course => {
+    list.forEach(course => {
       const div = document.createElement("div");
       div.className = "course-card";
 
@@ -749,11 +899,11 @@
               <div class="admin-lesson-row">
                 <span class="admin-lesson-title">${idx + 1}-dars: ${lesson.title}</span>
                 <button type="button"
-                        class="btn-xs"
+                        class="btn-small danger"
                         data-action="delete-lesson"
                         data-course-id="${course.id}"
                         data-lesson-id="${lesson.id}">
-                  O‘chirish
+                  Darsni o‘chirish
                 </button>
               </div>
             `).join("")}
@@ -761,13 +911,23 @@
         `;
       }
 
+      const priceText = formatPrice(course.price);
       div.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
           ${course.category ? `<span class="badge">${course.category}</span>` : ""}
-          ${formatPrice(course.price) ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${formatPrice(course.price)}</span>` : ""}
-          <span class="badge">Darslar: ${course.lessons.length}</span>
+          ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
+          <span class="badge">Darslar: ${course.lessons ? course.lessons.length : 0}</span>
+          ${course.avgRating ? `<span class="badge">⭐ ${course.avgRating.toFixed(1)}</span>` : ""}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button type="button"
+                  class="btn-small danger"
+                  data-action="delete-course"
+                  data-course-id="${course.id}">
+            Kursni o‘chirish
+          </button>
         </div>
         <div class="mini-form">
           <div class="muted" style="margin-bottom:4px;">Ushbu kursga yangi dars/video qo‘shish:</div>
@@ -790,11 +950,12 @@
     });
   }
 
-  // Dars qo‘shish (admin)
-  adminCourseList.addEventListener("submit", e => {
+  // ADMIN: dars qo‘shish
+  adminCourseList.addEventListener("submit", async e => {
     if (!e.target.classList.contains("lesson-form")) return;
     e.preventDefault();
-    if (!data.currentUser || data.currentUser.role !== "admin") return;
+    if (!ensureLoaded()) return;
+    if (!currentUser || currentUser.role !== "admin") return;
 
     const form = e.target;
     const courseId = form.dataset.courseId;
@@ -802,7 +963,7 @@
     const url = form.lessonUrl.value.trim();
     if (!title || !url) return;
 
-    const course = data.courses.find(c => c.id === courseId);
+    const course = courses.find(c => c.id === courseId);
     if (!course) return;
 
     const videoId = extractYouTubeId(url);
@@ -811,72 +972,103 @@
       return;
     }
 
-    course.lessons.push({
-      id: Date.now().toString(),
+    const order = course.lessons ? course.lessons.length : 0;
+    await addDoc(collection(db, COURSES_COL, courseId, "lessons"), {
       title,
-      videoId
+      videoId,
+      order
     });
-    saveData();
+
     form.reset();
+    await loadCoursesFromFirestore();
     renderAdminCourses();
     renderUserCourses();
   });
 
-  // Darsni o‘chirish (admin)
-  adminCourseList.addEventListener("click", e => {
-    const btn = e.target.closest(".btn-xs[data-action='delete-lesson']");
-    if (!btn) return;
-    if (!data.currentUser || data.currentUser.role !== "admin") return;
+  // ADMIN: dars / kurs o‘chirish
+  adminCourseList.addEventListener("click", async e => {
+    const btnLesson = e.target.closest(".btn-small.danger[data-action='delete-lesson']");
+    const btnCourse = e.target.closest(".btn-small.danger[data-action='delete-course']");
 
-    const courseId = btn.dataset.courseId;
-    const lessonId = btn.dataset.lessonId;
+    if (btnLesson) {
+      if (!ensureLoaded()) return;
+      if (!currentUser || currentUser.role !== "admin") return;
+      const courseId = btnLesson.dataset.courseId;
+      const lessonId = btnLesson.dataset.lessonId;
+      if (!confirm("Bu darsni o‘chirmoqchimisiz?")) return;
+      await deleteDoc(doc(db, COURSES_COL, courseId, "lessons", lessonId));
+      await loadCoursesFromFirestore();
+      renderAdminCourses();
+      renderUserCourses();
+    }
 
-    const course = data.courses.find(c => c.id === courseId);
-    if (!course) return;
+    if (btnCourse) {
+      if (!ensureLoaded()) return;
+      if (!currentUser || currentUser.role !== "admin") return;
+      const courseId = btnCourse.dataset.courseId;
+      if (!confirm("Butun kursni (hamma darslari va izohlari bilan) o‘chirmoqchimisiz?")) return;
 
-    const idx = course.lessons.findIndex(l => l.id === lessonId);
-    if (idx === -1) return;
+      // darslarni o‘chirish
+      const lessonsSnap = await getDocs(collection(db, COURSES_COL, courseId, "lessons"));
+      for (const d of lessonsSnap.docs) {
+        await deleteDoc(doc(db, COURSES_COL, courseId, "lessons", d.id));
+      }
+      // izohlarni o‘chirish
+      const revSnap = await getDocs(collection(db, COURSES_COL, courseId, "reviews"));
+      for (const d of revSnap.docs) {
+        await deleteDoc(doc(db, COURSES_COL, courseId, "reviews", d.id));
+      }
+      // kursni o‘chirish
+      await deleteDoc(doc(db, COURSES_COL, courseId));
 
-    if (!confirm("Bu darsni o‘chirmoqchimisiz?")) return;
-
-    course.lessons.splice(idx, 1);
-    saveData();
-    renderAdminCourses();
-    renderUserCourses();
+      await loadCoursesFromFirestore();
+      renderAdminCourses();
+      renderUserCourses();
+    }
   });
 
-  // USER VIEW
-  const userCourseList = document.getElementById("user-course-list");
-  const userCourseCount = document.getElementById("user-course-count");
-  const userEmpty = document.getElementById("user-empty");
+  // ADMIN: foydalanuvchilar ro‘yxati
+  function renderAdminUsers() {
+    const list = allUsers || [];
+    adminUserList.innerHTML = "";
+    adminUserCount.textContent = list.length + " ta foydalanuvchi";
+    if (!list.length) return;
 
-  // YouTube API / players
-  let ytApiReady = false;
-  const players = {}; // { [courseId]: { player: YT.Player, currentIndex:number } }
+    list.forEach(u => {
+      const div = document.createElement("div");
+      div.className = "admin-user-row";
+      div.innerHTML = `
+        <span><b>${u.username}</b> — rol: ${u.role}</span>
+        <span>Parol: <code>${u.password}</code></span>
+      `;
+      adminUserList.appendChild(div);
+    });
+  }
 
+  // USER VIEW + Player + playlist
   function renderUserCourses() {
-    const courses = data.courses;
+    const list = courses || [];
     userCourseList.innerHTML = "";
-    userCourseCount.textContent = courses.length + " ta kurs";
+    userCourseCount.textContent = list.length + " ta kurs";
 
-    if (courses.length === 0) {
+    if (list.length === 0) {
       userEmpty.style.display = "block";
       return;
     }
     userEmpty.style.display = "none";
 
-    courses.forEach(course => {
+    list.forEach(course => {
       const card = document.createElement("div");
       card.className = "course-card";
 
       const priceText = formatPrice(course.price);
       const hasLessons = course.lessons && course.lessons.length > 0;
 
-      let lessonsHtml = "";
-      if (!hasLessons) {
-        lessonsHtml = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
-      } else {
-        lessonsHtml = `
+      const prog = currentUser ? (userProgress[course.id] || {percent:0, finished:false}) : {percent:0, finished:false};
+
+      let playerBlock = "";
+      if (hasLessons) {
+        playerBlock = `
           <div class="course-player" data-course-id="${course.id}">
             <div class="video-wrapper">
               <div id="player-${course.id}"></div>
@@ -900,13 +1092,55 @@
             </div>
           </div>
         `;
+      } else {
+        playerBlock = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
       }
 
-      const actionsHtml = `
-        <div class="course-actions">
-          ${course.telegram ? `<a class="link-btn" href="${course.telegram}" target="_blank" rel="noopener noreferrer">Telegram havola</a>` : ""}
+      let reviewsBlock = "";
+      if (course.reviews && course.reviews.length) {
+        const firstReviews = course.reviews.slice(0,3);
+        reviewsBlock = `
+          <div class="reviews-block">
+            <div class="muted" style="margin-bottom:4px;">
+              Izohlar (${course.reviews.length} ta) ${course.avgRating ? `— ⭐ ${course.avgRating.toFixed(1)}` : ""}
+            </div>
+            ${firstReviews.map(r => `
+              <div class="review-item">
+                <div class="review-meta">
+                  ${r.username || "Anonim"} — ⭐ ${r.rating || 0}
+                </div>
+                <div>${(r.text || "").replace(/</g,"&lt;")}</div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      const finishedNote = prog.finished ? `
+        <div class="pill" style="margin-top:6px;background:#dcfce7;color:#166534;">
+          Kursni 100% muvaffaqiyatli tugatdingiz! Omad yor bo‘lsin. Boshqa kurslarimizdan ham foydalanishingiz mumkin.
         </div>
-      `;
+      ` : "";
+
+      const reviewForm = currentUser ? `
+        <form class="review-form" data-course-id="${course.id}">
+          <div class="form-row">
+            <label>Kurs yoqdimi? ⭐ baholang</label>
+            <select name="rating">
+              <option value="5">5 — juda zo‘r</option>
+              <option value="4">4</option>
+              <option value="3">3</option>
+              <option value="2">2</option>
+              <option value="1">1 — yoqmadi</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Izohingiz</label>
+            <textarea name="text" placeholder="Fikringizni qoldiring..."></textarea>
+          </div>
+          <button type="submit" class="btn-small">Izohni yuborish</button>
+        </form>
+      ` : `<div class="hint" style="margin-top:4px;">Izoh qoldirish uchun tizimga kiring.</div>`;
 
       card.innerHTML = `
         <div class="course-title">${course.title}</div>
@@ -914,30 +1148,33 @@
         <div class="course-meta">
           ${course.category ? `<span class="badge">${course.category}</span>` : ""}
           ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
-          <span class="badge">Darslar: ${course.lessons.length}</span>
+          <span class="badge">Darslar: ${course.lessons ? course.lessons.length : 0}</span>
+          ${currentUser ? `<span class="badge">${prog.percent || 0}% tugallangan</span>` : ""}
+          ${course.avgRating ? `<span class="badge">⭐ ${course.avgRating.toFixed(1)}</span>` : ""}
         </div>
         <div class="course-footer">
           <span class="muted">Kurs ID: ${course.id}</span>
         </div>
-        ${actionsHtml}
-        ${lessonsHtml}
+        ${playerBlock}
+        ${finishedNote}
+        ${reviewsBlock}
+        ${reviewForm}
       `;
       userCourseList.appendChild(card);
     });
 
-    // Playlist render bo‘lgandan keyin playerlarni yangilaymiz
     setupAllPlayers();
   }
 
-  // Playlistda darsni bosganda video almashtirish
+  // Dars ustiga bosganda o‘sha video yoqilsin
   userCourseList.addEventListener("click", e => {
     const btn = e.target.closest(".lesson-playlist-item");
     if (!btn) return;
 
     const courseId = btn.dataset.courseId;
     const index = Number(btn.dataset.index);
-    const course = data.courses.find(c => c.id === courseId);
-    if (!course || !course.lessons[index]) return;
+    const course = courses.find(c => c.id === courseId);
+    if (!course || !course.lessons || !course.lessons[index]) return;
 
     const lesson = course.lessons[index];
     const info = players[courseId];
@@ -948,30 +1185,54 @@
     updateActivePlaylistItem(courseId, index);
   });
 
+  // Izoh/baho yuborish
+  userCourseList.addEventListener("submit", async e => {
+    if (!e.target.classList.contains("review-form")) return;
+    e.preventDefault();
+    if (!ensureLoaded()) return;
+    if (!currentUser) {
+      alert("Izoh qoldirish uchun tizimga kiring.");
+      return;
+    }
+
+    const form = e.target;
+    const courseId = form.dataset.courseId;
+    const rating = Number(form.rating.value || 5);
+    const text = (form.text.value || "").trim();
+
+    await addDoc(collection(db, COURSES_COL, courseId, "reviews"), {
+      username: currentUser.username,
+      rating,
+      text,
+      createdAt: Date.now()
+    });
+
+    form.reset();
+    await loadCoursesFromFirestore();
+    renderAdminCourses();
+    renderUserCourses();
+  });
+
   function updateActivePlaylistItem(courseId, activeIndex) {
     const playlistItems = document.querySelectorAll(`.lesson-playlist-item[data-course-id="${courseId}"]`);
     playlistItems.forEach(btn => {
       const idx = Number(btn.dataset.index);
-      if (idx === activeIndex) {
-        btn.classList.add("active");
-      } else {
-        btn.classList.remove("active");
-      }
+      if (idx === activeIndex) btn.classList.add("active");
+      else btn.classList.remove("active");
     });
   }
 
   function setupAllPlayers() {
     if (!ytApiReady) return;
 
-    // eski playerlarni tozalash
+    // old playersni tozalash
     for (const cid in players) {
       if (players[cid].player && typeof players[cid].player.destroy === "function") {
-        try { players[cid].player.destroy(); } catch (e) {}
+        try { players[cid].player.destroy(); } catch(e){}
       }
     }
 
-    // yangidan yaratish
-    data.courses.forEach(course => {
+    (courses || []).forEach(course => {
       if (!course.lessons || course.lessons.length === 0) return;
       const containerId = "player-" + course.id;
       const container = document.getElementById(containerId);
@@ -980,6 +1241,8 @@
       const firstLesson = course.lessons[0];
       if (!firstLesson || !firstLesson.videoId) return;
 
+      const videoIds = course.lessons.map(l => l.videoId);
+
       players[course.id] = {
         player: new YT.Player(containerId, {
           videoId: firstLesson.videoId,
@@ -987,8 +1250,9 @@
             rel: 0,
             modestbranding: 1,
             controls: 1,
-            fs: 0,
-            iv_load_policy: 3
+            fs: 1,
+            iv_load_policy: 3,
+            playlist: videoIds.join(",")
           },
           events: {
             'onStateChange': (event) => handlePlayerStateChange(event, course.id)
@@ -999,39 +1263,62 @@
     });
   }
 
-  function handlePlayerStateChange(event, courseId) {
+  async function handlePlayerStateChange(event, courseId) {
     if (event.data !== YT.PlayerState.ENDED) return;
 
-    const course = data.courses.find(c => c.id === courseId);
+    const course = courses.find(c => c.id === courseId);
     if (!course || !course.lessons || course.lessons.length === 0) return;
 
     const info = players[courseId];
     if (!info) return;
 
     const currentIndex = info.currentIndex || 0;
-    const nextIndex = currentIndex + 1;
-    if (nextIndex >= course.lessons.length) return;
-
     const currentLesson = course.lessons[currentIndex];
-    const nextLesson = course.lessons[nextIndex];
+    if (!currentLesson) return;
 
-    const confirmText = `${currentLesson.title} tugadi. Keyingi dars "${nextLesson.title}" ga o'tasizmi?`;
-    if (confirm(confirmText)) {
-      info.currentIndex = nextIndex;
-      info.player.loadVideoById(nextLesson.videoId);
-      updateActivePlaylistItem(courseId, nextIndex);
+    // progressni yangilaymiz (shu darsni tugatdi deb hisoblaymiz)
+    await markLessonCompleted(courseId, currentLesson.id);
+
+    const nextIndex = currentIndex + 1;
+    const hasNext = nextIndex < course.lessons.length;
+
+    let confirmText = `${currentLesson.title} tugadi.\n\n`;
+    if (hasNext) {
+      const nextLesson = course.lessons[nextIndex];
+      confirmText += `Keyingi dars "${nextLesson.title}" ga o'tasizmi?\nOK — keyingi dars, Bekor qilish — shu darsni qayta ko‘rish.`;
+    } else {
+      confirmText += `Bu kursning oxirgi darsi. Qayta ko‘rishni xohlaysizmi?\nOK — ushbu darsni qayta ko‘rish, Bekor qilish — hech narsa qilmaslik.`;
+    }
+
+    const ok = confirm(confirmText);
+
+    if (hasNext) {
+      if (ok) {
+        const nextLesson = course.lessons[nextIndex];
+        info.currentIndex = nextIndex;
+        info.player.loadVideoById(nextLesson.videoId);
+        updateActivePlaylistItem(courseId, nextIndex);
+      } else {
+        info.player.seekTo(0);
+        info.player.playVideo();
+      }
+    } else {
+      if (ok) {
+        info.player.seekTo(0);
+        info.player.playVideo();
+      }
     }
   }
 
-  // YouTube API callback
-  function onYouTubeIframeAPIReady() {
+  // YouTube API callback global
+  window.onYouTubeIframeAPIReady = function() {
     ytApiReady = true;
     setupAllPlayers();
-  }
+  };
 
   // UI UPDATE
   function updateUI() {
-    const user = data.currentUser;
+    const user = currentUser;
     if (!user) {
       authSection.classList.remove("hidden");
       adminSection.classList.add("hidden");
@@ -1039,32 +1326,44 @@
       navAdmin.classList.add("hidden");
       logoutBtn.style.display = "none";
       currentUserLabel.textContent = "Mehmon";
-      return;
-    }
-
-    authSection.classList.add("hidden");
-    userSection.classList.remove("hidden");
-    logoutBtn.style.display = "inline-block";
-    currentUserLabel.textContent = user.username;
-
-    if (user.role === "admin") {
-      adminSection.classList.remove("hidden");
-      navAdmin.classList.remove("hidden");
-      userRolePill.textContent = "Rol: Admin (foydalanuvchi rejimi)";
     } else {
-      adminSection.classList.add("hidden");
-      navAdmin.classList.add("hidden");
-      userRolePill.textContent = "Rol: Foydalanuvchi";
+      authSection.classList.add("hidden");
+      userSection.classList.remove("hidden");
+      logoutBtn.style.display = "inline-block";
+      currentUserLabel.textContent = user.username;
+
+      if (user.role === "admin") {
+        adminSection.classList.remove("hidden");
+        navAdmin.classList.remove("hidden");
+        userRolePill.textContent = "Rol: Admin (foydalanuvchi rejimi)";
+      } else {
+        adminSection.classList.add("hidden");
+        navAdmin.classList.add("hidden");
+        userRolePill.textContent = "Rol: Foydalanuvchi";
+      }
     }
 
     renderAdminCourses();
+    renderAdminUsers();
     renderUserCourses();
   }
 
-  // Initial render
-  updateUI();
+  // INIT
+  (async function init() {
+    if (loadStatus) loadStatus.textContent = "Ma'lumotlar yuklanmoqda...";
+    await ensureAdminUser();
+    allUsers = await loadUsersFromFirestore();
+    await loadCoursesFromFirestore();
+    if (currentUser) {
+      userProgress = await loadUserProgress(currentUser.username);
+    }
+    isDataLoaded = true;
+    if (loadStatus) loadStatus.textContent = "Ma'lumotlar yuklandi.";
+    updateUI();
+  })();
 </script>
-<!-- YouTube IFrame API -->
+
+<!-- YouTube IFrame API (module emas, oddiy script) -->
 <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
