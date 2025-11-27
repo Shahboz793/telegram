@@ -8,45 +8,42 @@
     *{box-sizing:border-box;margin:0;padding:0}
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:linear-gradient(180deg,#0f172a 0%,#111827 25%,#f97316 25.1%,#fef3c7 60%,#f3f4f6 100%);
+      background:#fff7ed;
       color:#111827;
     }
     a{text-decoration:none;color:inherit}
+
     .page{min-height:100vh;display:flex;flex-direction:column;}
 
     /* HEADER */
     .header{
       position:sticky;top:0;z-index:10;
       display:flex;align-items:center;justify-content:space-between;
-      padding:10px 16px;
-      background:linear-gradient(90deg,#0f172a,#111827,#1e293b);
-      color:#e5e7eb;
-      border-bottom:1px solid rgba(148,163,184,0.4);
-      box-shadow:0 12px 30px rgba(15,23,42,0.7);
+      padding:10px 20px;
+      background:linear-gradient(90deg,#f97316,#facc15);
+      color:#111827;
+      border-bottom:1px solid rgba(0,0,0,0.05);
     }
     .logo{
-      font-weight:800;font-size:22px;letter-spacing:.03em;
+      font-weight:800;font-size:20px;
     }
-    .logo span{color:#f97316;}
-    .nav{display:flex;align-items:center;gap:12px;font-size:14px;}
-    .nav a{color:#e5e7eb;opacity:.85;cursor:pointer;}
+    .logo span{color:#1f2933;}
+    .nav{display:flex;align-items:center;gap:14px;font-size:14px;}
+    .nav a{color:#111827;opacity:.9;cursor:pointer;font-weight:500;}
     .nav a:hover{opacity:1;}
-    .nav .user-label{font-size:13px;opacity:.8;}
+    .nav .user-label{font-size:13px;opacity:.9;}
     .btn-outline{
-      border:1px solid rgba(248,250,252,0.7);
+      border:1px solid rgba(0,0,0,0.15);
       border-radius:999px;
-      padding:6px 14px;
+      padding:6px 12px;
       font-size:13px;
       cursor:pointer;
-      background:rgba(15,23,42,0.4);
-      color:#e5e7eb;
-      box-shadow:0 4px 10px rgba(15,23,42,0.6);
-      transition:transform .1s ease,box-shadow .1s ease,background .1s ease;
+      background:rgba(255,255,255,0.85);
+      color:#111827;
+      font-weight:500;
     }
     .btn-outline:hover{
-      transform:translateY(-1px);
-      background:rgba(15,23,42,0.8);
-      box-shadow:0 8px 18px rgba(15,23,42,0.8);
+      background:#fff;
     }
 
     /* LAYOUT */
@@ -56,32 +53,42 @@
       padding:18px 12px 32px;
       flex:1 0 auto;
     }
-    .section{margin-bottom:18px;}
+
+    .section{
+      margin-bottom:18px;
+    }
     .hidden{display:none;}
 
     .card{
-      background:rgba(255,255,255,0.96);
+      background:#ffffff;
       border-radius:18px;
-      padding:18px 16px 20px;
-      box-shadow:0 18px 45px rgba(15,23,42,0.18);
-      border:1px solid rgba(148,163,184,0.5);
-      backdrop-filter:blur(8px);
+      padding:16px 16px 18px;
+      box-shadow:0 18px 45px rgba(148,85,17,0.12);
+      border:1px solid #fed7aa;
     }
     .card h2{
       font-size:18px;
       margin-bottom:6px;
+      color:#78350f;
     }
     .card p.sub{
       font-size:13px;
       color:#6b7280;
       margin-bottom:10px;
     }
-    .hero-text{font-size:14px;color:#4b5563;}
+
+    .hero-text{
+      font-size:14px;
+      color:#4b5563;
+    }
 
     .grid-2{
       display:grid;
       grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);
       gap:16px;
+    }
+    @media(max-width:900px){
+      .grid-2{grid-template-columns:minmax(0,1fr);}
     }
 
     /* FORM */
@@ -89,7 +96,7 @@
       display:flex;
       gap:4px;
       margin-bottom:10px;
-      background:#e5e7eb;
+      background:#fef3c7;
       border-radius:999px;
       padding:4px;
       width:max-content;
@@ -101,11 +108,12 @@
       font-size:13px;
       cursor:pointer;
       background:transparent;
-      color:#374151;
+      color:#92400e;
+      font-weight:500;
     }
     .tab-btn.active{
       background:#ffffff;
-      box-shadow:0 3px 10px rgba(15,23,42,0.26);
+      box-shadow:0 2px 8px rgba(248,181,0,0.35);
       color:#111827;
     }
 
@@ -115,16 +123,29 @@
       gap:10px;
       margin-top:6px;
     }
-    .form-row{display:flex;flex-direction:column;gap:4px;}
-    label{font-size:13px;color:#4b5563;}
+    .form-row{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    label{
+      font-size:13px;
+      color:#4b5563;
+    }
     input,textarea,select{
       border-radius:12px;
-      border:1px solid #d1d5db;
-      padding:9px 11px;
-      background:#f9fafb;
-      font-size:15px;
+      border:1px solid #fed7aa;
+      padding:10px 12px;
+      background:#fffbeb;
+      font-size:14px;
       color:#111827;
-      box-shadow:0 2px 5px rgba(148,163,184,0.35) inset;
+      width:100%;
+    }
+    input:focus,textarea:focus,select:focus{
+      outline:none;
+      border-color:#fbbf24;
+      box-shadow:0 0 0 1px #fbbf24;
+      background:#fff7ed;
     }
     textarea{min-height:70px;resize:vertical;}
     .form-grid{
@@ -132,51 +153,58 @@
       grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
       gap:10px;
     }
-
     .btn{
-      align-self:flex-start;
-      padding:9px 18px;
+      align-self:stretch;
+      padding:10px 16px;
       border-radius:999px;
-      border:1px solid rgba(249,115,22,0.9);
+      border:none;
       cursor:pointer;
-      background:linear-gradient(135deg,#f97316,#ea580c,#facc15);
-      color:#ffffff;
+      background:linear-gradient(90deg,#facc15,#f97316);
+      color:#111827;
       font-weight:700;
-      font-size:15px;
-      letter-spacing:.02em;
-      box-shadow:0 8px 22px rgba(248,113,22,0.7);
-      transition:transform .1s ease,box-shadow .1s ease,filter .1s ease;
+      font-size:14px;
+      box-shadow:0 10px 22px rgba(248,181,0,0.55);
+      transition:transform .08s ease,box-shadow .08s ease;
+      text-align:center;
     }
     .btn:hover{
-      transform:translateY(-2px);
-      box-shadow:0 14px 30px rgba(248,113,22,0.85);
-      filter:brightness(1.02);
+      transform:translateY(-1px);
+      box-shadow:0 14px 30px rgba(248,181,0,0.75);
     }
     .btn:active{
       transform:translateY(0);
-      box-shadow:0 5px 15px rgba(248,113,22,0.75);
+      box-shadow:0 6px 14px rgba(248,181,0,0.5);
     }
     .btn-xs{
       border-radius:999px;
-      border:1px solid #d1d5db;
+      border:1px solid #fed7aa;
       padding:4px 8px;
       font-size:11px;
-      background:#ffffff;
+      background:#fff7ed;
       cursor:pointer;
-      box-shadow:0 2px 6px rgba(148,163,184,0.6);
+      font-weight:500;
+      white-space:nowrap;
     }
-    .btn-xs:hover{background:#f3f4f6;}
-
-    .hint{font-size:11px;color:#6b7280;}
-    .error{font-size:12px;color:#b91c1c;margin-top:2px;}
+    .btn-xs:hover{
+      background:#fef3c7;
+    }
+    .hint{
+      font-size:11px;
+      color:#6b7280;
+    }
+    .error{
+      font-size:12px;
+      color:#b91c1c;
+      margin-top:2px;
+    }
     .pill{
       font-size:11px;
       padding:4px 10px;
       border-radius:999px;
-      background:#eff6ff;
-      color:#1d4ed8;
+      background:#fef3c7;
+      color:#92400e;
       width:max-content;
-      box-shadow:0 2px 6px rgba(59,130,246,0.4);
+      font-weight:600;
     }
 
     /* COURSES */
@@ -186,6 +214,7 @@
       align-items:center;
       gap:8px;
       margin-bottom:8px;
+      flex-wrap:wrap;
     }
     .muted{font-size:13px;color:#6b7280;}
 
@@ -196,16 +225,19 @@
       margin-top:6px;
     }
     .course-card{
-      background:linear-gradient(135deg,#ffffff,#f9fafb);
+      background:#fffbeb;
       border-radius:14px;
-      border:1px solid rgba(209,213,219,0.8);
+      border:1px solid #fed7aa;
       padding:10px;
       display:flex;
       flex-direction:column;
       gap:6px;
-      box-shadow:0 8px 18px rgba(148,163,184,0.4);
     }
-    .course-title{font-size:15px;font-weight:600;color:#111827;}
+    .course-title{
+      font-size:15px;
+      font-weight:700;
+      color:#78350f;
+    }
     .course-desc{
       font-size:13px;
       color:#4b5563;
@@ -219,13 +251,18 @@
       font-size:11px;
     }
     .badge{
-      padding:3px 8px;
+      padding:2px 8px;
       border-radius:999px;
-      background:#e5e7eb;
-      color:#374151;
+      background:#fef3c7;
+      color:#92400e;
+      font-weight:500;
     }
-    .badge.free{background:#dcfce7;color:#166534;}
-    .badge.price{background:#fef9c3;color:#854d0e;}
+    .badge.free{
+      background:#dcfce7;color:#166534;
+    }
+    .badge.price{
+      background:#fef9c3;color:#854d0e;
+    }
 
     .course-footer{
       display:flex;
@@ -247,7 +284,7 @@
     .lesson-item{
       background:#ffffff;
       border-radius:12px;
-      border:1px solid #e5e7eb;
+      border:1px solid #fed7aa;
       padding:9px 10px;
       display:flex;
       justify-content:space-between;
@@ -255,22 +292,27 @@
       gap:8px;
       cursor:pointer;
       transition:background .1s ease,box-shadow .1s ease,transform .05s ease,border-color .1s ease;
-      box-shadow:0 4px 10px rgba(148,163,184,0.45);
     }
     .lesson-item:hover{
-      background:#eef2ff;
-      box-shadow:0 7px 16px rgba(79,70,229,0.5);
+      background:#fef9c3;
+      box-shadow:0 4px 10px rgba(248,181,0,0.25);
       transform:translateY(-1px);
-      border-color:#818cf8;
+      border-color:#fbbf24;
     }
     .lesson-item.locked{
-      opacity:.55;
+      opacity:.5;
       cursor:not-allowed;
       box-shadow:none;
-      background:#f9fafb;
+      background:#fffbeb;
     }
-    .lesson-title{font-size:13px;font-weight:500;}
-    .lesson-status{font-size:11px;text-align:right;}
+    .lesson-title{
+      font-size:13px;
+      font-weight:600;
+    }
+    .lesson-status{
+      font-size:11px;
+      text-align:right;
+    }
 
     .video-wrapper{
       position:relative;
@@ -280,7 +322,6 @@
       border-radius:12px;
       background:#000;
       margin-top:6px;
-      box-shadow:0 12px 28px rgba(15,23,42,0.8);
     }
     .video-wrapper iframe{
       position:absolute;
@@ -290,11 +331,15 @@
 
     .mini-form{
       margin-top:6px;
-      border-top:1px dashed #e5e7eb;
+      border-top:1px dashed #fed7aa;
       padding-top:6px;
     }
 
-    .empty{font-size:13px;color:#9ca3af;margin-top:6px;}
+    .empty{
+      font-size:13px;
+      color:#9ca3af;
+      margin-top:6px;
+    }
 
     table.user-table{
       width:100%;
@@ -306,10 +351,10 @@
     table.user-table td{
       text-align:left;
       padding:4px 6px;
-      border-bottom:1px solid #f3f4f6;
+      border-bottom:1px solid #fef3c7;
     }
     table.user-table th{
-      border-bottom:1px solid #e5e7eb;
+      border-bottom:1px solid #fed7aa;
       font-weight:600;
       color:#4b5563;
     }
@@ -321,24 +366,32 @@
       gap:12px;
       margin-top:10px;
     }
+    @media(max-width:900px){
+      .detail-layout{
+        grid-template-columns:1fr;
+      }
+    }
 
     .lesson-player-box{
       margin-top:0;
-      background:linear-gradient(135deg,#eff6ff,#f9fafb);
+      background:#fffbeb;
       border-radius:14px;
-      border:1px solid #dbeafe;
+      border:1px solid #fed7aa;
       padding:10px;
       display:flex;
       flex-direction:column;
       gap:4px;
-      box-shadow:0 10px 24px rgba(59,130,246,0.35);
     }
-    .progress-text{font-size:12px;color:#4b5563;margin-top:4px;}
+    .progress-text{
+      font-size:12px;
+      color:#4b5563;
+      margin-top:4px;
+    }
     .progress-bar-wrap{
       margin-top:4px;
-      background:#e5e7eb;
+      background:#fef3c7;
       border-radius:999px;
-      height:7px;
+      height:6px;
       overflow:hidden;
     }
     .progress-bar{
@@ -362,8 +415,8 @@
     .modal-backdrop{
       position:absolute;
       inset:0;
-      background:rgba(15,23,42,0.65);
-      backdrop-filter:blur(6px);
+      background:rgba(0,0,0,0.35);
+      backdrop-filter:blur(4px);
     }
     .modal-content{
       position:relative;
@@ -374,10 +427,11 @@
       background:#ffffff;
       border-radius:18px;
       padding:16px;
-      box-shadow:0 24px 60px rgba(15,23,42,0.75);
+      box-shadow:0 24px 60px rgba(148,85,17,0.45);
       display:flex;
       flex-direction:column;
       gap:10px;
+      border:1px solid #fed7aa;
     }
     .modal-header{
       display:flex;
@@ -386,20 +440,27 @@
       gap:8px;
       margin-bottom:4px;
     }
-    .modal-body{overflow-y:auto;}
+    .modal-body{
+      overflow-y:auto;
+    }
     .modal-close{
       border:none;
-      background:#e5e7eb;
+      background:#fef3c7;
       border-radius:999px;
       padding:4px 10px;
       cursor:pointer;
       font-size:13px;
+      font-weight:500;
+      color:#92400e;
+    }
+    .modal-close:hover{
+      background:#fde68a;
     }
 
     /* FOOTER */
     .footer{
-      background:#0f172a;
-      color:#e5e7eb;
+      background:#78350f;
+      color:#fef3c7;
       padding:12px 20px;
       font-size:12px;
       margin-top:auto;
@@ -413,45 +474,7 @@
       justify-content:space-between;
       align-items:center;
     }
-    .footer small{opacity:.8;}
-
-    /* ===== MOBIL MOSLASH ===== */
-    @media(max-width:768px){
-      .header{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:6px;
-      }
-      .nav{
-        width:100%;
-        justify-content:space-between;
-      }
-      .container{
-        padding:14px 10px 22px;
-      }
-      .grid-2{
-        grid-template-columns:minmax(0,1fr);
-      }
-      .card{
-        padding:14px 12px 16px;
-        border-radius:16px;
-      }
-      .btn,
-      .btn-outline{
-        width:100%;
-        text-align:center;
-        justify-content:center;
-      }
-      .course-grid{
-        grid-template-columns:minmax(0,1fr);
-      }
-      .detail-layout{
-        grid-template-columns:1fr;
-      }
-      .lesson-item{
-        padding:9px 9px;
-      }
-    }
+    .footer small{opacity:.9;}
   </style>
 
   <!-- FIREBASE (compat) -->
@@ -539,7 +562,7 @@
               <b>yashirin (Unlisted)</b> videolarni qo‘shishi mumkin.<br>
               • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va kurslar ichidagi darslarni tomosha qiladi.<br><br>
               Har bir dars bo‘yicha ko‘rilgan <b>foiz</b> saqlanib boradi. Dars kamida
-              <b>90%</b> ko‘rilganda tugallangan hisoblanadi va oldinga yana
+              <b>50%</b> ko‘rilganda tugallangan hisoblanadi va oldinga yana
               <b>bir nechta darslar ochiladi</b>.
             </p>
           </div>
@@ -584,7 +607,7 @@
           <div id="course-error" class="error"></div>
         </form>
 
-        <hr style="margin:14px 0;border:none;border-top:1px solid #e5e7eb;">
+        <hr style="margin:14px 0;border:none;border-top:1px solid #fed7aa;">
 
         <div class="section-header">
           <h3 style="font-size:15px;">Mavjud kurslar</h3>
@@ -593,7 +616,7 @@
         <div id="admin-course-list"></div>
         <div id="admin-empty" class="empty">Hozircha kurs yo‘q. Yuqoridan kurs qo‘shing.</div>
 
-        <hr style="margin:14px 0;border:none;border-top:1px solid #e5e7eb;">
+        <hr style="margin:14px 0;border:none;border-top:1px solid #fed7aa;">
 
         <div class="section-header">
           <h3 style="font-size:15px;">Foydalanuvchilar ro‘yxati</h3>
@@ -649,7 +672,7 @@
                 <div class="progress-bar" id="lesson-progress-bar"></div>
               </div>
               <div class="hint" style="margin-top:4px;">
-                Dars kamida <b>90%</b> ko‘rilganda tugallangan hisoblanadi.
+                Dars kamida <b>50%</b> ko‘rilganda tugallangan hisoblanadi.
                 1-dars tugallansa, oldinda <b>yana 3 ta dars</b> ochiladi.
               </div>
             </div>
@@ -709,7 +732,7 @@
   /* LOCAL STATE */
   let data = { currentUser: null, courses: [] };
   const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
-  const REMEMBER_CREDENTIALS_KEY = "talimEduRemember_v1";
+  const REMEMBER_LOGIN_KEY = "talimEduRememberLogin_v1";
 
   function loadCurrentUserFromLocal() {
     try {
@@ -723,17 +746,17 @@
     else localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data.currentUser));
   }
 
-  function saveRememberedCredentials(username, password) {
-    try {
-      localStorage.setItem(REMEMBER_CREDENTIALS_KEY, JSON.stringify({ username, password }));
-    } catch {}
+  function saveRememberLogin(username, password){
+    try{
+      localStorage.setItem(REMEMBER_LOGIN_KEY, JSON.stringify({username,password}));
+    }catch(e){}
   }
-  function loadRememberedCredentials() {
-    try {
-      const raw = localStorage.getItem(REMEMBER_CREDENTIALS_KEY);
-      if (!raw) return null;
+  function loadRememberLogin(){
+    try{
+      const raw = localStorage.getItem(REMEMBER_LOGIN_KEY);
+      if(!raw) return null;
       return JSON.parse(raw);
-    } catch { return null; }
+    }catch(e){return null;}
   }
 
   async function ensureDefaultAdmin() {
@@ -835,7 +858,7 @@
     if (!d.lessons) d.lessons = {};
     const prev = d.lessons[lessonId] || { percent:0, completed:false };
     const maxPercent = Math.max(prev.percent||0, percent||0);
-    const completed = prev.completed || completedFlag || maxPercent>=90;
+    const completed = prev.completed || completedFlag || maxPercent>=50;
     d.lessons[lessonId] = { percent:maxPercent, completed };
     await ref.set(d);
     return d;
@@ -1077,214 +1100,187 @@
     await openUserCourseDetail(courseId);
   });
 
-  /* COURSE DETAIL + PROGRESS (barqaror, ko‘p martalik tomosha) */
-  let currentCourseDetail = null;
-  let currentCourseProgress = null;
-  let currentPlayer = null;
-  let currentLessonId = null;
-  let progressInterval = null;
-  let lastSavedPercent = 0;
-  let pendingLessonToOpen = null;
+  /* COURSE DETAIL + PROGRESS */
+  let currentCourseDetail=null;
+  let currentCourseProgress=null;
+  let currentPlayer=null;
+  let currentLessonId=null;
+  let progressInterval=null;
+  let lastSavedPercent=0;
 
-  function saveCurrentLessonProgressOnce() {
-    try {
-      if (
-        !currentPlayer ||
-        !currentCourseDetail ||
-        !currentLessonId ||
-        !data.currentUser ||
-        typeof currentPlayer.getDuration !== "function"
-      ) return;
+  function saveCurrentLessonProgressOnce(){
+    try{
+      if(currentPlayer && typeof currentPlayer.getDuration==="function"){
+        const dur = currentPlayer.getDuration();
+        const cur = currentPlayer.getCurrentTime();
+        let percent = lastSavedPercent || 0;
+        if(dur && dur>0){
+          percent = Math.min(100,(cur/dur)*100);
+        }
+        percent = Math.round(percent);
 
-      const dur = currentPlayer.getDuration();
-      if (!dur || dur <= 0) return;
+        const user = data.currentUser;
+        const course = currentCourseDetail;
+        const lessonIdToSave = currentLessonId;
 
-      const cur = currentPlayer.getCurrentTime();
-      let percent = 0;
-      if (cur && dur > 0) {
-        percent = Math.min(100, (cur / dur) * 100);
+        if(user && course && lessonIdToSave && percent>0){
+          saveLessonProgress(
+            user.username,
+            course.id,
+            lessonIdToSave,
+            percent,
+            percent>=50
+          ).then(updated=>{
+            currentCourseProgress = updated;
+            renderCourseLessonsList();
+          }).catch(err=>console.error("final progress save error",err));
+        }
       }
-      percent = Math.round(Math.max(percent, lastSavedPercent || 0));
-      if (percent <= 0) return;
-
-      saveLessonProgress(
-        data.currentUser.username,
-        currentCourseDetail.id,
-        currentLessonId,
-        percent,
-        percent >= 90
-      )
-        .then(updated => {
-          currentCourseProgress = updated;
-          renderCourseLessonsList();
-        })
-        .catch(err => console.error("final progress save error", err));
-    } catch (err) {
-      console.error("saveCurrentLessonProgressOnce error", err);
+    }catch(err){
+      console.error("saveCurrentLessonProgressOnce error",err);
     }
   }
 
-  function stopCurrentPlayer() {
-    if (progressInterval) {
+  function stopCurrentPlayer(){
+    if(progressInterval) {
       clearInterval(progressInterval);
-      progressInterval = null;
+      progressInterval=null;
     }
-    if (currentPlayer && typeof currentPlayer.pauseVideo === "function") {
-      try { currentPlayer.pauseVideo(); } catch (e) {}
-    }
+
+    // chiqib ketayotganda oxirgi foizni ham saqlashga harakat
     saveCurrentLessonProgressOnce();
+
+    if(currentPlayer && currentPlayer.destroy){
+      try{ currentPlayer.destroy(); }catch(e){}
+    }
+    currentPlayer=null;
+    currentLessonId=null;
   }
 
-  function renderCourseLessonsList() {
-    const course = currentCourseDetail;
-    const progress = currentCourseProgress || { lessons: {} };
-    const lessons = course.lessons || [];
-    if (!lessons.length) {
-      detailLessons.innerHTML = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
+  function renderCourseLessonsList(){
+    const course=currentCourseDetail;
+    const progress=currentCourseProgress||{lessons:{}};
+    const lessons=course.lessons||[];
+    if(!lessons.length){
+      detailLessons.innerHTML=`<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
       return;
     }
 
     const progMap = progress.lessons || {};
     let maxCompletedIndex = -1;
-    lessons.forEach((lesson, idx) => {
-      const info = progMap[lesson.id] || { percent: 0, completed: false };
-      if (info.completed && idx > maxCompletedIndex) maxCompletedIndex = idx;
+    lessons.forEach((lesson,idx)=>{
+      const info = progMap[lesson.id] || {percent:0,completed:false};
+      if(info.completed && idx>maxCompletedIndex) maxCompletedIndex = idx;
     });
 
-    let html = `<div class="lesson-list">`;
-    lessons.forEach((lesson, idx) => {
-      const info = progMap[lesson.id] || { percent: 0, completed: false };
-      const percent = Math.round(info.percent || 0);
+    let html=`<div class="lesson-list">`;
+    lessons.forEach((lesson,idx)=>{
+      const info=(progMap)[lesson.id]||{percent:0,completed:false};
+      const percent=Math.round(info.percent||0);
 
-      let unlocked = (idx === 0);
-      if (maxCompletedIndex >= 0 && idx <= maxCompletedIndex + 3) {
-        unlocked = true; // 1-dars tugasa, oldinda 3 ta dars ochiladi
+      let unlocked = (idx===0);
+      if(maxCompletedIndex>=0 && idx <= maxCompletedIndex+3){
+        unlocked = true;
       }
 
-      const statusText = info.completed
-        ? "Tugallangan ✅"
-        : unlocked
-          ? (percent > 0 ? `Boshlangan (${percent}%)` : "Boshlanmagan")
-          : "Yopiq 🔒";
-
-      html += `
-        <div class="lesson-item ${unlocked ? "" : "locked"}"
-             data-lesson-id="${lesson.id}"
-             data-unlocked="${unlocked ? "1" : "0"}">
+      const statusText=info.completed
+        ?"Tugallangan ✅"
+        :unlocked?(percent>0?`Boshlangan (${percent}%)`:"Boshlanmagan")
+        :"Yopiq 🔒";
+      html+=`
+        <div class="lesson-item ${unlocked?"":"locked"}" data-lesson-id="${lesson.id}" data-unlocked="${unlocked?"1":"0"}">
           <div>
-            <div class="lesson-title">${idx + 1}-dars. ${lesson.title}</div>
+            <div class="lesson-title">${idx+1}-dars. ${lesson.title}</div>
             <div class="muted" style="font-size:11px;">Ko‘rilgan: ${percent}%</div>
           </div>
           <div class="lesson-status">${statusText}</div>
         </div>`;
     });
-    html += `</div>`;
-    detailLessons.innerHTML = html;
-  }
-
-  function startProgressInterval() {
-    if (!currentPlayer) return;
-    if (progressInterval) clearInterval(progressInterval);
-
-    progressInterval = setInterval(async () => {
-      if (!currentPlayer || typeof currentPlayer.getDuration !== "function") return;
-      const dur = currentPlayer.getDuration();
-      if (!dur || dur <= 0) return;
-
-      const cur = currentPlayer.getCurrentTime();
-      const percent = Math.min(100, (cur / dur) * 100);
-      const rounded = Math.round(percent);
-      lessonProgressText.textContent = `Ko‘rilgan: ${rounded}%`;
-      lessonProgressBar.style.width = rounded + "%";
-
-      if (!data.currentUser || !currentCourseDetail || !currentLessonId) return;
-
-      const lp = (currentCourseProgress?.lessons || {})[currentLessonId];
-      const alreadyCompleted = lp && lp.completed;
-      if (alreadyCompleted) return; // tugallangan darsni qayta ko‘rishda foiz yozilmaydi
-
-      if (rounded - lastSavedPercent >= 15 || rounded >= 90) {
-        lastSavedPercent = rounded;
-        try {
-          const updated = await saveLessonProgress(
-            data.currentUser.username,
-            currentCourseDetail.id,
-            currentLessonId,
-            rounded,
-            rounded >= 90
-          );
-          currentCourseProgress = updated;
-          renderCourseLessonsList();
-        } catch (err) { console.error("progress error", err); }
-      }
-    }, 5000);
+    html+=`</div>`;
+    detailLessons.innerHTML=html;
   }
 
   async function openLessonPlayer(lesson){
     if(!currentCourseDetail || !data.currentUser) return;
 
+    // Eski videoni “pauza” qilib, progressni saqlaymiz
     stopCurrentPlayer();
 
-    currentLessonId = lesson.id;
-    lessonPlayerTitle.textContent = lesson.title;
+    currentLessonId=lesson.id;
+    lessonPlayerTitle.textContent=lesson.title;
     lessonVideoWrapper.classList.remove("hidden");
-    lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
-    lessonProgressBar.style.width = "0%";
-    lastSavedPercent = 0;
-
-    const info = (currentCourseProgress.lessons || {})[lesson.id] || { percent:0 };
-    const resumePercent = info.percent && info.percent < 95 ? info.percent : 0;
-    lastSavedPercent = resumePercent;
+    lessonProgressText.textContent="Ko‘rilmoqda: 0%";
+    lessonProgressBar.style.width="0%";
+    lastSavedPercent=0;
 
     if(!ytApiReady){
-      lessonProgressText.textContent = "YouTube API yuklanmoqda...";
-      pendingLessonToOpen = lesson;
-      const check = setInterval(()=>{
+      lessonProgressText.textContent="YouTube API yuklanmoqda...";
+      const check=setInterval(()=>{
         if(ytApiReady){
           clearInterval(check);
-          if(pendingLessonToOpen){
-            const l = pendingLessonToOpen;
-            pendingLessonToOpen = null;
-            openLessonPlayer(l);
-          }
+          openLessonPlayer(lesson);
         }
       },500);
       return;
     }
 
-    if(!currentPlayer){
-      currentPlayer = new YT.Player("yt-player",{
-        videoId: lesson.videoId,
-        playerVars:{rel:0,modestbranding:1},
-        events:{
-          onReady:()=>{
-            if(resumePercent>0){
-              const dur=currentPlayer.getDuration();
-              const start=(resumePercent/100)*dur;
-              if(start && isFinite(start)) currentPlayer.seekTo(start,true);
-            }
-            currentPlayer.playVideo();
-            startProgressInterval();
+    // iframe konteynerini tozalab qayta yaratish — qora bo‘lib qolmasligi uchun
+    const playerContainer = document.getElementById("yt-player");
+    playerContainer.innerHTML = "";
+
+    currentPlayer=new YT.Player("yt-player",{
+      videoId:lesson.videoId,
+      playerVars:{rel:0,modestbranding:1},
+      events:{
+        onReady:()=>{
+          const info=(currentCourseProgress.lessons||{})[lesson.id]||{percent:0};
+          if(info.percent && info.percent<95){
+            const dur=currentPlayer.getDuration();
+            const start=(info.percent/100)*dur;
+            if(start && isFinite(start)) currentPlayer.seekTo(start,true);
           }
+          currentPlayer.playVideo();
+          startProgressInterval();
         }
-      });
-    }else{
-      if(resumePercent>0){
-        currentPlayer.loadVideoById({
-          videoId: lesson.videoId,
-          startSeconds: 0
-        });
-        setTimeout(()=>{
-          const dur=currentPlayer.getDuration();
-          const start=(resumePercent/100)*dur;
-          if(start && isFinite(start)) currentPlayer.seekTo(start,true);
-        },1000);
-      }else{
-        currentPlayer.loadVideoById(lesson.videoId);
       }
-      currentPlayer.playVideo();
-      startProgressInterval();
-    }
+    });
+  }
+
+  function startProgressInterval(){
+    if(!currentPlayer) return;
+    if(progressInterval) clearInterval(progressInterval);
+    progressInterval=setInterval(async ()=>{
+      if(!currentPlayer||typeof currentPlayer.getDuration!=="function") return;
+      const dur=currentPlayer.getDuration();
+      if(!dur||dur<=0) return;
+      const cur=currentPlayer.getCurrentTime();
+      const percent=Math.min(100,(cur/dur)*100);
+      const rounded=Math.round(percent);
+      lessonProgressText.textContent=`Ko‘rilgan: ${rounded}%`;
+      lessonProgressBar.style.width=rounded+"%";
+
+      if(!data.currentUser||!currentCourseDetail||!currentLessonId) return;
+
+      const lp = (currentCourseProgress?.lessons || {})[currentLessonId];
+      const alreadyCompleted = lp && lp.completed;
+      // Agar dars allaqachon tugallangan bo‘lsa, qayta tomosha progressini yozmaymiz
+      if(alreadyCompleted) return;
+
+      if(rounded-lastSavedPercent>=15 || rounded>=50){
+        lastSavedPercent=rounded;
+        try{
+          const updated=await saveLessonProgress(
+            data.currentUser.username,
+            currentCourseDetail.id,
+            currentLessonId,
+            rounded,
+            rounded>=50
+          );
+          currentCourseProgress=updated;
+          renderCourseLessonsList();
+        }catch(err){ console.error("progress error",err); }
+      }
+    },5000);
   }
 
   async function openUserCourseDetail(courseId){
@@ -1392,7 +1388,7 @@
       if(!user){ loginErrorEl.textContent="Login yoki parol noto‘g‘ri."; return; }
       data.currentUser={username:user.username,role:user.role};
       saveCurrentUserToLocal();
-      saveRememberedCredentials(u,p); // login/parolni eslab qolish
+      saveRememberLogin(u,p);
       loginForm.reset();
       updateUI();
       await refreshCourses();
@@ -1416,7 +1412,7 @@
       await registerUser(u,p);
       data.currentUser={username:u,role:"user"};
       saveCurrentUserToLocal();
-      saveRememberedCredentials(u,p); // yangi ro'yxatdan o'tganda ham eslab qolish
+      saveRememberLogin(u,p);
       registerForm.reset();
       updateUI();
       await refreshCourses();
@@ -1476,23 +1472,21 @@
     adminSection.classList.remove("hidden");
   });
 
+  // Tab yopilganda ham progressni oxirgi marta saqlashga urinamiz
   window.addEventListener("beforeunload",()=>{
-    saveCurrentLessonProgressOnce();
+    stopCurrentPlayer();
   });
 
   /* INIT */
   (async function initApp(){
     try{
       await ensureDefaultAdmin();
-
-      // Avval login/parolni localStorage'dan formaga yuklaymiz
-      const remembered = loadRememberedCredentials();
-      if (remembered) {
-        if (remembered.username) loginUsername.value = remembered.username;
-        if (remembered.password) loginPassword.value = remembered.password;
-      }
-
       data.currentUser=loadCurrentUserFromLocal();
+      const remembered = loadRememberLogin();
+      if(remembered){
+        loginUsername.value = remembered.username || "";
+        loginPassword.value = remembered.password || "";
+      }
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
