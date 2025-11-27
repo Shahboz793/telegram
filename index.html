@@ -29,7 +29,7 @@
     }
     .logo span{color:#f97316;}
     .nav{display:flex;align-items:center;gap:14px;font-size:14px;}
-    .nav a{color:#e5e7eb;opacity:.85;}
+    .nav a{color:#e5e7eb;opacity:.85;cursor:pointer;}
     .nav a:hover{opacity:1;}
     .nav .user-label{font-size:13px;opacity:.8;}
     .btn-outline{
@@ -71,11 +71,6 @@
       margin-bottom:10px;
     }
 
-    .hero-title{
-      font-size:24px;
-      font-weight:700;
-      margin-bottom:4px;
-    }
     .hero-text{
       font-size:14px;
       color:#4b5563;
@@ -165,6 +160,17 @@
       transform:translateY(0);
       box-shadow:0 6px 14px rgba(129,140,248,0.4);
     }
+    .btn-xs{
+      border-radius:999px;
+      border:1px solid #d1d5db;
+      padding:2px 6px;
+      font-size:11px;
+      background:#ffffff;
+      cursor:pointer;
+    }
+    .btn-xs:hover{
+      background:#f3f4f6;
+    }
     .hint{
       font-size:11px;
       color:#6b7280;
@@ -245,6 +251,8 @@
       font-size:12px;
       color:#6b7280;
       margin-top:4px;
+      gap:8px;
+      flex-wrap:wrap;
     }
 
     .lesson-list{
@@ -264,7 +272,12 @@
     .lesson-title{
       font-size:13px;
       font-weight:500;
-      margin-bottom:4px;
+    }
+    .lesson-controls{
+      margin-top:4px;
+      display:flex;
+      gap:4px;
+      flex-wrap:wrap;
     }
 
     .video-wrapper{
@@ -274,6 +287,7 @@
       overflow:hidden;
       border-radius:8px;
       background:#000;
+      margin-top:4px;
     }
     .video-wrapper iframe{
       position:absolute;
@@ -292,9 +306,27 @@
       color:#9ca3af;
       margin-top:6px;
     }
+
+    table.user-table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+      margin-top:4px;
+    }
+    table.user-table th,
+    table.user-table td{
+      text-align:left;
+      padding:4px 6px;
+      border-bottom:1px solid #f3f4f6;
+    }
+    table.user-table th{
+      border-bottom:1px solid #e5e7eb;
+      font-weight:600;
+      color:#4b5563;
+    }
   </style>
 
-  <!-- FIREBASE (compat versiya, initializeApp ishlashi uchun) -->
+  <!-- FIREBASE (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
@@ -304,8 +336,8 @@
   <header class="header">
     <div class="logo">Ta'lim <span>Edu</span></div>
     <nav class="nav">
-      <a href="#user-section" id="nav-courses">Kurslar</a>
-      <a href="#admin-section" id="nav-admin" class="hidden">Admin panel</a>
+      <a id="nav-courses">Kurslar</a>
+      <a id="nav-admin" class="hidden">Admin panel</a>
       <span class="user-label" id="current-user-label">Mehmon</span>
       <button class="btn-outline hidden" id="logout-btn">Chiqish</button>
     </nav>
@@ -386,7 +418,7 @@
         <div class="section-header">
           <div>
             <h2>Admin panel</h2>
-            <p class="sub">Bu qismga faqat admin kirishi mumkin. Kurslar va darslar shu yerda boshqariladi.</p>
+            <p class="sub">Bu qismga faqat admin kirishi mumkin. Kurslar, darslar va foydalanuvchilar shu yerda boshqariladi.</p>
           </div>
           <span class="pill">Rol: Admin</span>
         </div>
@@ -423,6 +455,14 @@
         </div>
         <div id="admin-course-list"></div>
         <div id="admin-empty" class="empty">Hozircha kurs yo‘q. Yuqoridan kurs qo‘shing.</div>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #e5e7eb;">
+
+        <div class="section-header">
+          <h3 style="font-size:15px;">Foydalanuvchilar ro‘yxati</h3>
+          <span class="muted" id="admin-user-count">0 ta foydalanuvchi</span>
+        </div>
+        <div id="admin-user-list" class="empty">Ma'lumotlar yuklanmoqda...</div>
       </div>
     </section>
 
@@ -437,13 +477,25 @@
           <span class="pill" id="user-role-pill">Rol: Foydalanuvchi</span>
         </div>
 
-        <div class="section-header">
-          <span class="muted" id="user-course-count">0 ta kurs</span>
+        <!-- Kurslar ro'yxati ko'rinishi -->
+        <div id="user-courses-view">
+          <div class="section-header">
+            <span class="muted" id="user-course-count">0 ta kurs</span>
+          </div>
+
+          <div id="user-course-list" class="course-grid"></div>
+          <div id="user-empty" class="empty">
+            Hozircha kurslar qo‘shilmagan. Admin panel orqali kurs qo‘shilishi kerak.
+          </div>
         </div>
 
-        <div id="user-course-list" class="course-grid"></div>
-        <div id="user-empty" class="empty">
-          Hozircha kurslar qo‘shilmagan. Admin panel orqali kurs qo‘shilishi kerak.
+        <!-- Bitta kurs ichiga kirilganda ko‘rinish -->
+        <div id="user-course-detail" class="hidden">
+          <button class="btn" id="user-back-btn" style="margin-bottom:8px;">← Kurslarga qaytish</button>
+          <h3 id="detail-title" style="font-size:18px;margin-bottom:4px;"></h3>
+          <p id="detail-desc" class="muted" style="margin-bottom:8px;"></p>
+          <div class="course-meta" id="detail-meta"></div>
+          <div id="detail-lessons" style="margin-top:8px;"></div>
         </div>
       </div>
     </section>
@@ -511,6 +563,7 @@
   const adminSection = document.getElementById("admin-section");
   const userSection = document.getElementById("user-section");
   const navAdmin = document.getElementById("nav-admin");
+  const navCourses = document.getElementById("nav-courses");
   const logoutBtn = document.getElementById("logout-btn");
   const currentUserLabel = document.getElementById("current-user-label");
   const userRolePill = document.getElementById("user-role-pill");
@@ -535,14 +588,25 @@
   const adminCourseCount = document.getElementById("admin-course-count");
   const adminEmpty = document.getElementById("admin-empty");
 
+  const adminUserList = document.getElementById("admin-user-list");
+  const adminUserCount = document.getElementById("admin-user-count");
+
+  const userCoursesView = document.getElementById("user-courses-view");
+  const userCourseDetail = document.getElementById("user-course-detail");
   const userCourseList = document.getElementById("user-course-list");
   const userCourseCount = document.getElementById("user-course-count");
   const userEmpty = document.getElementById("user-empty");
+  const userBackBtn = document.getElementById("user-back-btn");
+
+  const detailTitle = document.getElementById("detail-title");
+  const detailDesc = document.getElementById("detail-desc");
+  const detailMeta = document.getElementById("detail-meta");
+  const detailLessons = document.getElementById("detail-lessons");
 
   // ---------------- HELPERS ----------------
   function formatPrice(price) {
     const n = Number(price);
-    if (!price || isNaN(n)) return "";
+    if (price === "" || price === null || price === undefined || isNaN(n)) return "";
     if (n === 0) return "Bepul";
     return n.toLocaleString("uz-UZ") + " so'm";
   }
@@ -596,6 +660,10 @@
     });
   }
 
+  async function deleteCourseFromFirestore(courseId) {
+    await db.collection("courses").doc(courseId).delete();
+  }
+
   async function loadCoursesFromFirestore() {
     const snap = await db.collection("courses").get();
     data.courses = snap.docs.map(d => d.data());
@@ -607,7 +675,45 @@
     renderUserCourses();
   }
 
-  // ---------------- RENDER: ADMIN ----------------
+  async function loadUsersFromFirestore() {
+    const snap = await db.collection("users").get();
+    const users = snap.docs.map(d => d.data());
+    renderAdminUsers(users);
+  }
+
+  // ---------------- RENDER: ADMIN USERS ----------------
+  function renderAdminUsers(users) {
+    adminUserCount.textContent = users.length + " ta foydalanuvchi";
+    if (!users.length) {
+      adminUserList.className = "empty";
+      adminUserList.textContent = "Foydalanuvchilar hali yo‘q.";
+      return;
+    }
+
+    adminUserList.classList.remove("empty");
+    adminUserList.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Login</th>
+              <th>Rol</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${users.map(u => `
+              <tr>
+                <td>${u.username}</td>
+                <td>${u.role}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // ---------------- RENDER: ADMIN COURSES ----------------
   function renderAdminCourses() {
     const courses = data.courses || [];
     adminCourseList.innerHTML = "";
@@ -622,13 +728,41 @@
     courses.forEach(course => {
       const div = document.createElement("div");
       div.className = "course-card";
+
+      const priceText = formatPrice(course.price);
+      const lessons = course.lessons || [];
+
+      let lessonsHtmlAdmin = "";
+      if (lessons.length === 0) {
+        lessonsHtmlAdmin = `<div class="empty">Hali dars qo‘shilmagan.</div>`;
+      } else {
+        lessonsHtmlAdmin = `
+          <div class="lesson-list">
+            ${lessons.map((lesson, index) => `
+              <div class="lesson-item">
+                <div class="lesson-title">${index + 1}. ${lesson.title}</div>
+                <div class="lesson-controls">
+                  <button type="button" class="btn-xs btn-lesson-up" data-course-id="${course.id}" data-lesson-id="${lesson.id}">↑</button>
+                  <button type="button" class="btn-xs btn-lesson-down" data-course-id="${course.id}" data-lesson-id="${lesson.id}">↓</button>
+                  <button type="button" class="btn-xs btn-lesson-delete" data-course-id="${course.id}" data-lesson-id="${lesson.id}">X</button>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
       div.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
           ${course.category ? `<span class="badge">${course.category}</span>` : ""}
-          ${formatPrice(course.price) ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${formatPrice(course.price)}</span>` : ""}
-          <span class="badge">Darslar: ${course.lessons ? course.lessons.length : 0}</span>
+          ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
+          <span class="badge">Darslar: ${lessons.length}</span>
+        </div>
+        <div class="course-footer">
+          <span class="muted">Kurs ID: ${course.id}</span>
+          <button type="button" class="btn-xs btn-delete-course" data-course-id="${course.id}">Kursni o‘chirish</button>
         </div>
         <div class="mini-form">
           <div class="muted" style="margin-bottom:4px;">Ushbu kursga yangi dars/video qo‘shish:</div>
@@ -645,6 +779,7 @@
             <button type="submit" class="btn" style="margin-top:4px;">Darsni qo‘shish</button>
           </form>
         </div>
+        ${lessonsHtmlAdmin}
       `;
       adminCourseList.appendChild(div);
     });
@@ -669,7 +804,6 @@
     }
 
     try {
-      // joriy kursni topamiz
       const course = data.courses.find(c => c.id === courseId);
       if (!course) return;
 
@@ -689,7 +823,64 @@
     }
   });
 
-  // ---------------- RENDER: USER ----------------
+  // Kurs o'chirish + darslarni tartiblash + o'chirish
+  adminCourseList.addEventListener("click", async e => {
+    const deleteBtn = e.target.closest(".btn-delete-course");
+    const upBtn = e.target.closest(".btn-lesson-up");
+    const downBtn = e.target.closest(".btn-lesson-down");
+    const delLessonBtn = e.target.closest(".btn-lesson-delete");
+
+    // Kursni o'chirish
+    if (deleteBtn) {
+      const courseId = deleteBtn.dataset.courseId;
+      if (!confirm("Kursni o‘chirishni xohlaysizmi? Ushbu kursdagi barcha darslar ham o‘chadi.")) return;
+      try {
+        await deleteCourseFromFirestore(courseId);
+        await refreshCourses();
+      } catch (err) {
+        console.error(err);
+        alert("Kursni o‘chirishda xatolik yuz berdi.");
+      }
+      return;
+    }
+
+    // Dars tartibini o'zgartirish (UP/DOWN)
+    if (upBtn || downBtn || delLessonBtn) {
+      const btn = upBtn || downBtn || delLessonBtn;
+      const courseId = btn.dataset.courseId;
+      const lessonId = btn.dataset.lessonId;
+      const course = data.courses.find(c => c.id === courseId);
+      if (!course) return;
+      const lessons = course.lessons || [];
+      const index = lessons.findIndex(l => l.id === lessonId);
+      if (index === -1) return;
+
+      try {
+        if (upBtn) {
+          if (index === 0) return;
+          const tmp = lessons[index - 1];
+          lessons[index - 1] = lessons[index];
+          lessons[index] = tmp;
+        } else if (downBtn) {
+          if (index === lessons.length - 1) return;
+          const tmp = lessons[index + 1];
+          lessons[index + 1] = lessons[index];
+          lessons[index] = tmp;
+        } else if (delLessonBtn) {
+          if (!confirm("Ushbu darsni o‘chirishni xohlaysizmi?")) return;
+          lessons.splice(index, 1);
+        }
+
+        await updateCourseLessons(courseId, lessons);
+        await refreshCourses();
+      } catch (err) {
+        console.error(err);
+        alert("Darsni yangilashda xatolik yuz berdi.");
+      }
+    }
+  });
+
+  // ---------------- RENDER: USER COURSES ----------------
   function renderUserCourses() {
     const courses = data.courses || [];
     userCourseList.innerHTML = "";
@@ -708,24 +899,6 @@
       const priceText = formatPrice(course.price);
       const lessons = course.lessons || [];
 
-      let lessonsHtml = "";
-      if (lessons.length === 0) {
-        lessonsHtml = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
-      } else {
-        lessonsHtml = `
-          <div class="lesson-list">
-            ${lessons.map(lesson => `
-              <div class="lesson-item">
-                <div class="lesson-title">${lesson.title}</div>
-                <div class="video-wrapper">
-                  <iframe src="https://www.youtube.com/embed/${lesson.videoId}" allowfullscreen></iframe>
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        `;
-      }
-
       card.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
@@ -736,12 +909,66 @@
         </div>
         <div class="course-footer">
           <span class="muted">Kurs ID: ${course.id}</span>
+          <button type="button" class="btn btn-open-course" data-course-id="${course.id}">Kursga kirish</button>
         </div>
-        ${lessonsHtml}
       `;
       userCourseList.appendChild(card);
     });
   }
+
+  function showUserCoursesList() {
+    userCoursesView.classList.remove("hidden");
+    userCourseDetail.classList.add("hidden");
+  }
+
+  function openUserCourseDetail(courseId) {
+    const course = data.courses.find(c => c.id === courseId);
+    if (!course) return;
+
+    detailTitle.textContent = course.title;
+    detailDesc.textContent = course.description || "";
+    const priceText = formatPrice(course.price);
+
+    detailMeta.innerHTML = `
+      ${course.category ? `<span class="badge">${course.category}</span>` : ""}
+      ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
+      <span class="badge">Darslar: ${(course.lessons || []).length}</span>
+    `;
+
+    const lessons = course.lessons || [];
+    if (!lessons.length) {
+      detailLessons.innerHTML = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
+    } else {
+      detailLessons.innerHTML = `
+        <div class="lesson-list">
+          ${lessons.map(lesson => `
+            <div class="lesson-item">
+              <div class="lesson-title">${lesson.title}</div>
+              <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/${lesson.videoId}" allowfullscreen></iframe>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    userCoursesView.classList.add("hidden");
+    userCourseDetail.classList.remove("hidden");
+  }
+
+  // Kursga kirish tugmasi
+  userCourseList.addEventListener("click", e => {
+    const btn = e.target.closest(".btn-open-course");
+    if (!btn) return;
+    const courseId = btn.dataset.courseId;
+    openUserCourseDetail(courseId);
+  });
+
+  // Kurslardan kurs ichiga kirgandan qaytish
+  userBackBtn.addEventListener("click", () => {
+    showUserCoursesList();
+  });
 
   // ---------------- UI UPDATE ----------------
   function updateUI() {
@@ -764,14 +991,13 @@
     currentUserLabel.textContent = user.username;
 
     if (user.role === "admin") {
-      adminSection.classList.remove("hidden");
       navAdmin.classList.remove("hidden");
       userRolePill.textContent = "Rol: Admin (foydalanuvchi rejimi)";
     } else {
-      adminSection.classList.add("hidden");
       navAdmin.classList.add("hidden");
       userRolePill.textContent = "Rol: Foydalanuvchi";
     }
+    showUserCoursesList();
   }
 
   // ---------------- AUTH TABS ----------------
@@ -816,6 +1042,7 @@
       loginForm.reset();
       updateUI();
       await refreshCourses();
+      await loadUsersFromFirestore();
     } catch (err) {
       console.error(err);
       loginErrorEl.textContent = "Kirishda xatolik yuz berdi.";
@@ -847,6 +1074,7 @@
       registerForm.reset();
       updateUI();
       await refreshCourses();
+      await loadUsersFromFirestore();
     } catch (err) {
       if (err.message === "exists") {
         registerErrorEl.textContent = "Bu login band. Boshqa login tanlang.";
@@ -899,6 +1127,32 @@
     }
   });
 
+  // ---------------- NAV BOSGANDA HOLATLAR ----------------
+  navCourses.addEventListener("click", e => {
+    e.preventDefault();
+    if (!data.currentUser) {
+      // faqat ro'yxatdan o'tish / kirish ko'rsin
+      authSection.classList.remove("hidden");
+      adminSection.classList.add("hidden");
+      userSection.classList.add("hidden");
+      // login tabni yoqib qo'yamiz
+      const loginTabBtn = document.querySelector('.tab-btn[data-tab="login"]');
+      if (loginTabBtn) loginTabBtn.click();
+      return;
+    }
+    // Kirgan bo'lsa faqat kurslar paneli ko'rinsin
+    adminSection.classList.add("hidden");
+    userSection.classList.remove("hidden");
+    showUserCoursesList();
+  });
+
+  navAdmin.addEventListener("click", e => {
+    e.preventDefault();
+    if (!data.currentUser || data.currentUser.role !== "admin") return;
+    userSection.classList.add("hidden");
+    adminSection.classList.remove("hidden");
+  });
+
   // ---------------- INIT APP ----------------
   (async function initApp() {
     try {
@@ -906,6 +1160,7 @@
       data.currentUser = loadCurrentUserFromLocal();
       updateUI();
       await refreshCourses();
+      await loadUsersFromFirestore();
     } catch (err) {
       console.error("Init error:", err);
     }
