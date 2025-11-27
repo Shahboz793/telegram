@@ -591,7 +591,7 @@
               Har bir dars bo‘yicha ko‘rilgan <b>foiz</b> saqlanib boradi. Dars kamida
               <b>90%</b> ko‘rilganda tugallangan hisoblanadi va oldinga yana
               <b>bir nechta darslar ochiladi</b>. Agar darsga <b>quiz</b> bog‘langan bo‘lsa,
-              dars oxirida <b>quiz test</b> chiqariladi.
+              dars oxirida <b>quiz test</b> chiqariladi (natijalar bazaga saqlanmaydi).
             </p>
           </div>
         </div>
@@ -944,20 +944,19 @@
     return d;
   }
 
-  async function saveLessonQuizResult(username,courseId,lessonId,score,total){
+  // >>> YANGI: Quiz natijasini emas, faqat nechta marta ishlanganini saqlaymiz
+  async function saveLessonQuizResult(username,courseId,lessonId){
     const id = `${username}_${courseId}`;
     const ref = db.collection("progress").doc(id);
     const doc = await ref.get();
     let d = doc.exists ? doc.data() : { user:username, courseId, lessons:{} };
     if(!d.lessons) d.lessons = {};
     const prev = d.lessons[lessonId] || { percent:0, completed:false };
-    prev.quiz = {
-      taken:true,
-      score,
-      total,
-      updatedAt: Date.now()
+    const attempts = (prev.quizAttempts || 0) + 1;
+    d.lessons[lessonId] = {
+      ...prev,
+      quizAttempts: attempts
     };
-    d.lessons[lessonId] = prev;
     await ref.set(d);
     return d;
   }
@@ -1435,6 +1434,7 @@
     lessons.forEach((lesson, idx) => {
       const info = progMap[lesson.id] || { percent: 0, completed: false };
       const percent = Math.round(info.percent || 0);
+      const attempts = info.quizAttempts || 0;
 
       let unlocked = (idx === 0);
       if (maxCompletedIndex >= 0 && idx <= maxCompletedIndex + 3) {
@@ -1453,7 +1453,11 @@
              data-unlocked="${unlocked ? "1" : "0"}">
           <div>
             <div class="lesson-title">${idx + 1}-dars. ${lesson.title}</div>
-            <div class="muted" style="font-size:11px;">Ko‘rilgan: ${percent}% ${lesson.quiz && lesson.quiz.length ? " · Quiz: "+lesson.quiz.length+" savol" : ""}</div>
+            <div class="muted" style="font-size:11px;">
+              Ko‘rilgan: ${percent}%
+              ${lesson.quiz && lesson.quiz.length ? " · Quiz: "+lesson.quiz.length+" savol" : ""}
+              ${attempts>0 ? " · Quiz ishlangan: "+attempts+" marta" : ""}
+            </div>
           </div>
           <div class="lesson-status">${statusText}</div>
         </div>`;
@@ -1550,8 +1554,10 @@
       quizStartBtn.disabled = true;
       quizLockHint.textContent = "Quizni boshlash uchun darsni kamida 90% gacha ko‘ring.";
     }
-    if(lp.quiz && lp.quiz.taken){
-      quizLockHint.textContent += " (Bu quizni allaqachon ishlagansiz, istasangiz qayta ko‘rishingiz mumkin.)";
+
+    const attempts = lp.quizAttempts || 0;
+    if(attempts>0){
+      quizLockHint.textContent += " (Bu quizni "+attempts+" marta ishlagansiz, xohlasangiz yana ishlashingiz mumkin.)";
     }
   }
 
@@ -1653,9 +1659,7 @@
           const updated = await saveLessonQuizResult(
             data.currentUser.username,
             currentCourseDetail.id,
-            currentLessonId,
-            score,
-            total
+            currentLessonId
           );
           currentCourseProgress = updated;
           renderCourseLessonsList();
