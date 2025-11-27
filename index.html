@@ -8,7 +8,7 @@
     *{box-sizing:border-box;margin:0;padding:0}
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:linear-gradient(180deg,#0f172a 0%,#111827 25%,#f97316 25.1%,#fef3c7 60%,#f3f4f6 100%);
+      background:linear-gradient(180deg,#020617 0%,#0f172a 18%,#111827 28%,#f97316 28.1%,#fef3c7 60%,#f3f4f6 100%);
       color:#111827;
     }
     a{text-decoration:none;color:inherit}
@@ -19,18 +19,27 @@
       position:sticky;top:0;z-index:10;
       display:flex;align-items:center;justify-content:space-between;
       padding:10px 16px;
-      background:linear-gradient(90deg,#0f172a,#111827,#1e293b);
+      background:linear-gradient(90deg,#020617,#0f172a,#111827,#1f2937);
       color:#e5e7eb;
       border-bottom:1px solid rgba(148,163,184,0.4);
       box-shadow:0 12px 30px rgba(15,23,42,0.7);
     }
     .logo{
-      font-weight:800;font-size:22px;letter-spacing:.03em;
+      font-weight:900;font-size:22px;letter-spacing:.06em;text-transform:uppercase;
     }
-    .logo span{color:#f97316;}
+    .logo span{
+      color:#f97316;
+      text-shadow:0 0 18px rgba(249,115,22,0.9);
+    }
     .nav{display:flex;align-items:center;gap:12px;font-size:14px;}
-    .nav a{color:#e5e7eb;opacity:.85;cursor:pointer;}
+    .nav a{color:#e5e7eb;opacity:.85;cursor:pointer;position:relative;padding-bottom:2px;}
+    .nav a::after{
+      content:"";position:absolute;left:0;bottom:0;width:0;height:2px;
+      background:linear-gradient(90deg,#f97316,#facc15);
+      transition:width .2s ease;
+    }
     .nav a:hover{opacity:1;}
+    .nav a:hover::after{width:100%;}
     .nav .user-label{font-size:13px;opacity:.8;}
     .btn-outline{
       border:1px solid rgba(248,250,252,0.7);
@@ -38,15 +47,15 @@
       padding:6px 14px;
       font-size:13px;
       cursor:pointer;
-      background:rgba(15,23,42,0.4);
+      background:rgba(15,23,42,0.7);
       color:#e5e7eb;
-      box-shadow:0 4px 10px rgba(15,23,42,0.6);
-      transition:transform .1s ease,box-shadow .1s ease,background .1s ease;
+      box-shadow:0 0 14px rgba(15,23,42,0.8);
+      transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
     }
     .btn-outline:hover{
-      transform:translateY(-1px);
-      background:rgba(15,23,42,0.8);
-      box-shadow:0 8px 18px rgba(15,23,42,0.8);
+      transform:translateY(-1px) scale(1.02);
+      background:rgba(15,23,42,0.95);
+      box-shadow:0 0 22px rgba(59,130,246,0.8);
     }
 
     /* LAYOUT */
@@ -60,15 +69,15 @@
     .hidden{display:none;}
 
     .card{
-      background:rgba(255,255,255,0.96);
-      border-radius:18px;
+      background:rgba(255,255,255,0.98);
+      border-radius:22px;
       padding:18px 16px 20px;
-      box-shadow:0 18px 45px rgba(15,23,42,0.18);
+      box-shadow:0 22px 55px rgba(15,23,42,0.25);
       border:1px solid rgba(148,163,184,0.5);
-      backdrop-filter:blur(8px);
+      backdrop-filter:blur(10px);
     }
     .card h2{
-      font-size:18px;
+      font-size:19px;
       margin-bottom:6px;
     }
     .card p.sub{
@@ -93,6 +102,7 @@
       border-radius:999px;
       padding:4px;
       width:max-content;
+      box-shadow:0 3px 12px rgba(148,163,184,0.6);
     }
     .tab-btn{
       border:none;
@@ -133,39 +143,55 @@
       gap:10px;
     }
 
+    /* KO‘ZGA KO‘RINARLI ASOSIY BUTTON */
     .btn{
       align-self:flex-start;
-      padding:9px 18px;
+      padding:10px 20px;
       border-radius:999px;
       border:1px solid rgba(249,115,22,0.9);
       cursor:pointer;
       background:linear-gradient(135deg,#f97316,#ea580c,#facc15);
+      background-size:220% 220%;
       color:#ffffff;
-      font-weight:700;
+      font-weight:800;
       font-size:15px;
-      letter-spacing:.02em;
-      box-shadow:0 8px 22px rgba(248,113,22,0.7);
-      transition:transform .1s ease,box-shadow .1s ease,filter .1s ease;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      box-shadow:0 0 18px rgba(248,113,22,0.85);
+      transition:transform .15s ease,box-shadow .15s ease,filter .15s ease,background-position .4s ease;
+      animation:btnGlow 3s ease-in-out infinite;
     }
     .btn:hover{
-      transform:translateY(-2px);
-      box-shadow:0 14px 30px rgba(248,113,22,0.85);
-      filter:brightness(1.02);
+      transform:translateY(-2px) scale(1.02);
+      box-shadow:0 0 26px rgba(249,115,22,1);
+      filter:brightness(1.05);
+      background-position:100% 0;
     }
     .btn:active{
-      transform:translateY(0);
-      box-shadow:0 5px 15px rgba(248,113,22,0.75);
+      transform:translateY(0) scale(.99);
+      box-shadow:0 0 16px rgba(249,115,22,0.9);
     }
+
+    @keyframes btnGlow{
+      0%,100%{box-shadow:0 0 16px rgba(249,115,22,0.7);}
+      50%{box-shadow:0 0 30px rgba(249,115,22,1);}
+    }
+
     .btn-xs{
       border-radius:999px;
       border:1px solid #d1d5db;
-      padding:4px 8px;
+      padding:4px 9px;
       font-size:11px;
-      background:#ffffff;
+      background:linear-gradient(135deg,#ffffff,#f9fafb);
       cursor:pointer;
       box-shadow:0 2px 6px rgba(148,163,184,0.6);
+      transition:transform .12s ease,box-shadow .12s ease,background .12s ease;
     }
-    .btn-xs:hover{background:#f3f4f6;}
+    .btn-xs:hover{
+      background:#f3f4f6;
+      transform:translateY(-1px);
+      box-shadow:0 4px 10px rgba(148,163,184,0.8);
+    }
 
     .hint{font-size:11px;color:#6b7280;}
     .error{font-size:12px;color:#b91c1c;margin-top:2px;}
@@ -173,10 +199,11 @@
       font-size:11px;
       padding:4px 10px;
       border-radius:999px;
-      background:#eff6ff;
+      background:linear-gradient(135deg,#eff6ff,#dbeafe);
       color:#1d4ed8;
       width:max-content;
-      box-shadow:0 2px 6px rgba(59,130,246,0.4);
+      box-shadow:0 2px 8px rgba(59,130,246,0.5);
+      border:1px solid #bfdbfe;
     }
 
     /* COURSES */
@@ -197,15 +224,15 @@
     }
     .course-card{
       background:linear-gradient(135deg,#ffffff,#f9fafb);
-      border-radius:14px;
-      border:1px solid rgba(209,213,219,0.8);
-      padding:10px;
+      border-radius:18px;
+      border:1px solid rgba(209,213,219,0.9);
+      padding:11px;
       display:flex;
       flex-direction:column;
       gap:6px;
-      box-shadow:0 8px 18px rgba(148,163,184,0.4);
+      box-shadow:0 12px 26px rgba(148,163,184,0.4);
     }
-    .course-title{font-size:15px;font-weight:600;color:#111827;}
+    .course-title{font-size:15px;font-weight:700;color:#111827;}
     .course-desc{
       font-size:13px;
       color:#4b5563;
@@ -277,10 +304,10 @@
       padding-bottom:56.25%;
       height:0;
       overflow:hidden;
-      border-radius:12px;
+      border-radius:16px;
       background:#000;
       margin-top:6px;
-      box-shadow:0 12px 28px rgba(15,23,42,0.8);
+      box-shadow:0 18px 40px rgba(15,23,42,0.9);
     }
     .video-wrapper iframe{
       position:absolute;
@@ -325,13 +352,13 @@
     .lesson-player-box{
       margin-top:0;
       background:linear-gradient(135deg,#eff6ff,#f9fafb);
-      border-radius:14px;
+      border-radius:18px;
       border:1px solid #dbeafe;
       padding:10px;
       display:flex;
       flex-direction:column;
-      gap:4px;
-      box-shadow:0 10px 24px rgba(59,130,246,0.35);
+      gap:6px;
+      box-shadow:0 14px 32px rgba(59,130,246,0.4);
     }
     .progress-text{font-size:12px;color:#4b5563;margin-top:4px;}
     .progress-bar-wrap{
@@ -362,15 +389,15 @@
     .quiz-overlay-backdrop{
       position:absolute;
       inset:0;
-      background:rgba(15,23,42,0.85);
+      background:rgba(15,23,42,0.9);
       backdrop-filter:blur(6px);
     }
     .quiz-overlay-content{
       position:relative;
       z-index:1;
       width:100%;
-      max-width:900px;
-      max-height:90vh;
+      max-width:960px;
+      max-height:92vh;
       padding:16px;
       display:flex;
       justify-content:center;
@@ -380,65 +407,94 @@
       width:100%;
       max-height:100%;
       overflow-y:auto;
-      background:#fefce8;
-      border-radius:18px;
+      background:#fffbeb;
+      border-radius:22px;
       border:1px solid #fde68a;
-      box-shadow:0 24px 60px rgba(15,23,42,0.9);
-      padding:16px 14px 18px;
+      box-shadow:0 26px 70px rgba(15,23,42,0.95);
+      padding:20px 18px 22px;
     }
     .quiz-overlay-title{
-      font-size:22px;
-      font-weight:800;
+      font-size:24px;
+      font-weight:900;
       text-align:center;
       margin-bottom:8px;
       color:#92400e;
+      letter-spacing:.04em;
+      text-transform:uppercase;
     }
     .quiz-overlay-sub{
-      font-size:15px;
+      font-size:16px;
       text-align:center;
-      margin-bottom:12px;
+      margin-bottom:14px;
       color:#78350f;
     }
 
     .quiz-question{
-      margin-top:8px;
-      padding:8px;
-      border-radius:12px;
+      margin-top:10px;
+      padding:10px;
+      border-radius:16px;
       background:#ffffff;
       border:1px solid #e5e7eb;
+      box-shadow:0 8px 20px rgba(148,163,184,0.45);
     }
     .quiz-question-title{
-      font-weight:600;
-      margin-bottom:4px;
-      font-size:14px;
+      font-weight:700;
+      margin-bottom:6px;
+      font-size:17px;
+      color:#111827;
     }
     .quiz-options{
-      margin-top:4px;
+      margin-top:6px;
       display:flex;
       flex-direction:column;
-      gap:4px;
+      gap:6px;
     }
     .quiz-option label{
       display:flex;
       gap:6px;
       align-items:flex-start;
-      font-size:13px;
+      font-size:15px;
       cursor:pointer;
     }
+    .quiz-option input{
+      margin-top:3px;
+    }
     .quiz-result-item{
-      margin-top:6px;
-      padding:6px;
-      border-radius:10px;
+      margin-top:8px;
+      padding:8px;
+      border-radius:14px;
       background:#f9fafb;
       border:1px solid #e5e7eb;
     }
     .quiz-correct{
       color:#15803d;
-      font-weight:600;
+      font-weight:700;
     }
     .quiz-wrong{
       color:#b91c1c;
-      font-weight:600;
+      font-weight:700;
+    }
+
+    .quiz-top-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    #quiz-timer{
+      font-size:18px;
+      font-weight:800;
+      color:#b91c1c;
+      padding:4px 12px;
+      border-radius:999px;
+      background:#fee2e2;
+      border:1px solid #fecaca;
+      box-shadow:0 0 12px rgba(248,113,22,0.6);
+    }
+    .quiz-progress-small{
+      font-size:13px;
+      color:#92400e;
     }
 
     /* Kurs tanlash MODAL */
@@ -490,11 +546,12 @@
 
     /* FOOTER */
     .footer{
-      background:#0f172a;
+      background:#020617;
       color:#e5e7eb;
       padding:12px 20px;
       font-size:12px;
       margin-top:auto;
+      border-top:1px solid rgba(31,41,55,0.9);
     }
     .footer-inner{
       max-width:1120px;
@@ -526,7 +583,7 @@
       }
       .card{
         padding:14px 12px 16px;
-        border-radius:16px;
+        border-radius:18px;
       }
       .btn,
       .btn-outline{
@@ -547,8 +604,8 @@
         max-width:100%;
         height:100%;
       }
-      .quiz-overlay-title{font-size:20px;}
-      .quiz-overlay-sub{font-size:14px;}
+      .quiz-overlay-title{font-size:22px;}
+      .quiz-overlay-sub{font-size:15px;}
     }
   </style>
 
@@ -580,7 +637,6 @@
             <h2>Xush kelibsiz, online o‘quv markazimizga!</h2>
             <p class="sub">
               Bu yerda siz <b>bilimlaringizni oshirasiz</b> va “Ona tili Pro” kurslari orqali tayyorlana olasiz.
-              <br>Admin uchun demo login: <b>admin / admin123</b>
             </p>
 
             <div class="tabs">
@@ -592,7 +648,7 @@
             <form id="login-form" class="form">
               <div class="form-row">
                 <label for="login-username">Login</label>
-                <input id="login-username" required placeholder="Masalan: admin" />
+                <input id="login-username" required placeholder="Masalan: talaba01" />
               </div>
               <div class="form-row">
                 <label for="login-password">Parol</label>
@@ -744,7 +800,7 @@
               <div class="video-wrapper hidden" id="lesson-video-wrapper">
                 <div id="yt-player"></div>
               </div>
-              <!-- Yangi: to‘liq ekran (landshaft) tugmasi -->
+              <!-- Fullscreen (landshaft) tugmasi -->
               <button type="button" class="btn-xs hidden" id="lesson-fullscreen-btn" style="margin-top:4px;align-self:flex-start;">
                 To‘liq ekran (landshaft)
               </button>
@@ -852,11 +908,21 @@
     }catch{ return null; }
   }
 
+  /* PAROLNI HASH QILISH (SHA-256) */
+  async function hashPassword(str){
+    const enc = new TextEncoder().encode(str);
+    const buf = await crypto.subtle.digest("SHA-256", enc);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  }
+
   async function ensureDefaultAdmin(){
-    const ref = db.collection("users").doc("admin");
+    const adminUsername = "Shahbozbek0603";
+    const adminPlain = "06032768shahbozqwertyasdf";
+    const ref = db.collection("users").doc(adminUsername);
     const doc = await ref.get();
     if(!doc.exists){
-      await ref.set({ username:"admin", password:"admin123", role:"admin" });
+      const passwordHash = await hashPassword(adminPlain);
+      await ref.set({ username:adminUsername, passwordHash, role:"admin" });
     }
   }
 
@@ -946,6 +1012,11 @@
     return "Hali hammasi oldinda. Yana bir marta darsni ko‘rib, qayta urinish tavsiya qilinadi. Siz albatta uddalaysiz! 🌱";
   }
 
+  function getCurrentLesson(){
+    if(!data.currentUser || !currentCourseDetail || !currentLessonId) return null;
+    return (currentCourseDetail.lessons||[]).find(l=>l.id===currentLessonId) || null;
+  }
+
   /* PROGRESS (Firestore) */
   async function loadProgress(username,courseId){
     const id = `${username}_${courseId}`;
@@ -962,22 +1033,24 @@
     const doc = await ref.get();
     let d = doc.exists ? doc.data() : { user:username, courseId, lessons:{} };
     if(!d.lessons) d.lessons = {};
-    const prev = d.lessons[lessonId] || { percent:0, completed:false };
+    const prev = d.lessons[lessonId] || {};
     const maxPercent = Math.max(prev.percent||0, percent||0);
-    const completed = prev.completed || completedFlag || maxPercent>=90;
-    d.lessons[lessonId] = { ...prev, percent:maxPercent, completed };
+    const videoCompleted = prev.videoCompleted || completedFlag || maxPercent>=90;
+    d.lessons[lessonId] = { ...prev, percent:maxPercent, videoCompleted };
     await ref.set(d);
     return d;
   }
-  async function saveLessonQuizAttempt(username,courseId,lessonId){
+  async function saveLessonQuizAttempt(username,courseId,lessonId,scorePercent){
     const id = `${username}_${courseId}`;
     const ref = db.collection("progress").doc(id);
     const doc = await ref.get();
     let d = doc.exists ? doc.data() : { user:username, courseId, lessons:{} };
     if(!d.lessons) d.lessons = {};
-    const prev = d.lessons[lessonId] || { percent:0, completed:false };
+    const prev = d.lessons[lessonId] || {};
     const attempts = (prev.quizAttempts||0)+1;
-    d.lessons[lessonId] = { ...prev, quizAttempts:attempts };
+    const quizBestPercent = Math.max(prev.quizBestPercent||0, scorePercent||0);
+    const quizPassed = prev.quizPassed || scorePercent>=30;
+    d.lessons[lessonId] = { ...prev, quizAttempts:attempts, quizBestPercent, quizPassed };
     await ref.set(d);
     return d;
   }
@@ -994,7 +1067,19 @@
     const doc = await ref.get();
     if(!doc.exists) return null;
     const user = doc.data();
-    return user.password===p ? user : null;
+
+    // Agar passwordHash bo‘lsa (admin yoki kelajakda hash qilingan foydalanuvchilar)
+    if(user.passwordHash){
+      const hash = await hashPassword(p);
+      if(hash===user.passwordHash) return user;
+      return null;
+    }
+
+    // Oddiy foydalanuvchilar (plain password)
+    if(user.password !== undefined){
+      return user.password===p ? user : null;
+    }
+    return null;
   }
   async function addCourseToFirestore(course){
     await db.collection("courses").doc(course.id).set(course);
@@ -1038,7 +1123,7 @@
       </div>`;
   }
 
-  /* RENDER ADMIN COURSES + QUIZ BUILDER */
+  /* RENDER ADMIN COURSES + QUIZ BUILDER (vaqt bilan) */
   function renderAdminCourses(){
     const courses = data.courses||[];
     adminCourseList.innerHTML="";
@@ -1115,7 +1200,7 @@
 
             <div class="quiz-builder hidden">
               <div class="muted" style="font-size:11px;margin-bottom:4px;">
-                Har bir savol uchun matn va A/B/C/D variantlarni kiriting, keyin to‘g‘ri javobni tanlang.
+                Har bir savol uchun matn va A/B/C/D variantlarni kiriting, keyin to‘g‘ri javobni va vaqtni (soniya) tanlang.
               </div>
               <div class="quiz-questions"></div>
               <button type="button" class="btn-xs btn-add-question" style="margin-top:4px;">+ Savol qo‘shish</button>
@@ -1140,7 +1225,7 @@
     builder.classList.toggle("hidden", !e.target.checked);
   });
 
-  /* Quiz builder: savol qo‘shish */
+  /* Quiz builder: savol qo‘shish (vaqt bilan) */
   adminCourseList.addEventListener("click",e=>{
     const btn = e.target.closest(".btn-add-question");
     if(!btn) return;
@@ -1174,21 +1259,27 @@
           <input class="q-opt-d" required />
         </div>
       </div>
-      <div class="form-row" style="margin-top:4px;">
-        <label>To‘g‘ri javob</label>
-        <select class="q-correct">
-          <option value="0">A</option>
-          <option value="1">B</option>
-          <option value="2">C</option>
-          <option value="3">D</option>
-        </select>
+      <div class="form-grid" style="margin-top:4px;">
+        <div class="form-row">
+          <label>To‘g‘ri javob</label>
+          <select class="q-correct">
+            <option value="0">A</option>
+            <option value="1">B</option>
+            <option value="2">C</option>
+            <option value="3">D</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Savol vaqti (soniya)</label>
+          <input type="number" class="q-time" min="5" value="30" />
+        </div>
       </div>
       <hr style="margin-top:6px;border:none;border-top:1px dashed #e5e7eb;">
     `;
     container.appendChild(block);
   });
 
-  /* Admin: dars qo‘shish (quiz bilan) */
+  /* Admin: dars qo‘shish (quiz + timeLimit) */
   adminCourseList.addEventListener("submit",async e=>{
     if(!e.target.classList.contains("lesson-form")) return;
     e.preventDefault();
@@ -1214,13 +1305,16 @@
         const c = block.querySelector(".q-opt-c")?.value.trim() || "";
         const d = block.querySelector(".q-opt-d")?.value.trim() || "";
         const correctRaw = block.querySelector(".q-correct")?.value;
+        const timeRaw = parseInt(block.querySelector(".q-time")?.value,10);
         const correctIndex = correctRaw!==undefined ? parseInt(correctRaw,10) : 0;
+        const timeLimit = (!isNaN(timeRaw) && timeRaw>0) ? timeRaw : 30;
         if(text && a && b && c && d){
           quiz.push({
             id: Date.now().toString()+"_"+idx,
             question:text,
             options:[a,b,c,d],
-            correctIndex:isNaN(correctIndex)?0:correctIndex
+            correctIndex:isNaN(correctIndex)?0:correctIndex,
+            timeLimit:timeLimit
           });
         }
       });
@@ -1384,6 +1478,19 @@
 
   let currentLessonQuiz = [];
 
+  // Quiz vaqtli holati
+  let quizTimerId = null;
+  let quizCurrentIndex = 0;
+  let quizAnswers = {};
+  let quizRemaining = 0;
+
+  function clearQuizTimer(){
+    if(quizTimerId){
+      clearInterval(quizTimerId);
+      quizTimerId = null;
+    }
+  }
+
   /* Progressni bir marta majburan saqlash */
   async function saveCurrentLessonProgressOnce(){
     try{
@@ -1433,23 +1540,36 @@
     }
     const progMap = progress.lessons || {};
     let maxCompletedIndex = -1;
+
+    // Birinchi bo‘lib, qaysi darslar "to‘liq tugallangan" ekanini aniqlaymiz
     lessons.forEach((lesson,idx)=>{
-      const info = progMap[lesson.id] || { percent:0, completed:false };
-      if(info.completed && idx>maxCompletedIndex) maxCompletedIndex = idx;
+      const info = progMap[lesson.id] || { percent:0 };
+      const videoCompleted = info.videoCompleted || (info.percent>=90);
+      const hasQuiz = lesson.quiz && lesson.quiz.length>0;
+      const quizPassed = hasQuiz ? !!info.quizPassed : true;
+      const lessonCompleted = videoCompleted && quizPassed;
+      if(lessonCompleted && idx>maxCompletedIndex){
+        maxCompletedIndex = idx;
+      }
     });
 
     let html = `<div class="lesson-list">`;
     lessons.forEach((lesson,idx)=>{
-      const info = progMap[lesson.id] || { percent:0, completed:false };
+      const info = progMap[lesson.id] || { percent:0 };
       const percent = Math.round(info.percent||0);
       const attempts = info.quizAttempts || 0;
+
+      const videoCompleted = info.videoCompleted || (info.percent>=90);
+      const hasQuiz = lesson.quiz && lesson.quiz.length>0;
+      const quizPassed = hasQuiz ? !!info.quizPassed : true;
+      const lessonCompleted = videoCompleted && quizPassed;
 
       let unlocked = (idx===0);
       if(maxCompletedIndex>=0 && idx<=maxCompletedIndex+3){
         unlocked = true;
       }
 
-      const statusText = info.completed
+      const statusText = lessonCompleted
         ? "Tugallangan ✅"
         : unlocked
           ? (percent>0 ? `Boshlangan (${percent}%)` : "Boshlanmagan")
@@ -1463,7 +1583,7 @@
             <div class="lesson-title">${idx+1}-dars. ${lesson.title}</div>
             <div class="muted" style="font-size:11px;">
               Ko‘rilgan: ${percent}%
-              ${lesson.quiz && lesson.quiz.length ? " · Quiz: "+lesson.quiz.length+" savol" : ""}
+              ${hasQuiz ? " · Quiz: "+lesson.quiz.length+" savol" : ""}
               ${attempts>0 ? " · Quiz ishlangan: "+attempts+" marta" : ""}
             </div>
           </div>
@@ -1476,18 +1596,20 @@
 
   /* QUIZ OVERLAY FUNKSIYALARI */
   function closeQuizOverlay(){
+    clearQuizTimer();
     quizOverlay.classList.add("hidden");
     quizOverlayBox.innerHTML = "";
   }
 
   function showQuizInviteOverlay(){
     if(!currentLessonQuiz.length) return;
+    clearQuizTimer();
     quizOverlayBox.innerHTML = `
       <div>
         <div class="quiz-overlay-title">Dars yakunlandi!</div>
         <div class="quiz-overlay-sub">
           Endi bilimlaringizni <b>quiz</b> orqali sinab ko‘ring.<br>
-          Savollarga javob berib, natijani va xatolarni ko‘rib chiqing.
+          Har bir savolga alohida <b>vaqt</b> beriladi. Tayyormisiz?
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px;">
           <button type="button" class="btn" id="quiz-overlay-start-btn">Quizni boshlash</button>
@@ -1497,62 +1619,102 @@
     `;
     quizOverlay.classList.remove("hidden");
 
-    document.getElementById("quiz-overlay-start-btn").onclick = renderQuizQuestionsInOverlay;
+    document.getElementById("quiz-overlay-start-btn").onclick = startQuizFlow;
     document.getElementById("quiz-overlay-close-btn").onclick = closeQuizOverlay;
   }
 
-  function renderQuizQuestionsInOverlay(){
+  function startQuizFlow(){
     if(!currentLessonQuiz.length) return;
-    const total = currentLessonQuiz.length;
-    quizOverlayBox.innerHTML = `
-      <div>
-        <div class="quiz-overlay-title">Quiz — ${total} ta savol</div>
-        <div class="quiz-overlay-sub">
-          Har bir savolni diqqat bilan o‘qing va A/B/C/D variantlardan birini tanlang.
-        </div>
-        ${currentLessonQuiz.map((q,idx)=>`
-          <div class="quiz-question">
-            <div class="quiz-question-title">${idx+1}-savol. ${q.question}</div>
-            <div class="quiz-options">
-              ${q.options.map((opt,oi)=>`
-                <div class="quiz-option">
-                  <label>
-                    <input type="radio" name="quiz_q_${idx}" value="${oi}">
-                    <span>${["A","B","C","D"][oi]}) ${opt}</span>
-                  </label>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        `).join("")}
-        <button type="button" class="btn" id="quiz-overlay-submit-btn" style="margin-top:10px;">Quizni yakunlash</button>
-      </div>
-    `;
-    document.getElementById("quiz-overlay-submit-btn").onclick = submitQuizInOverlay;
+    quizCurrentIndex = 0;
+    quizAnswers = {};
+    clearQuizTimer();
+    showQuizQuestion();
   }
 
-  async function submitQuizInOverlay(){
-    if(!currentLessonQuiz.length) return;
-    let answers = {};
-    let score = 0;
+  function showQuizQuestion(){
     const total = currentLessonQuiz.length;
+    if(quizCurrentIndex<0 || quizCurrentIndex>=total) return;
+    const q = currentLessonQuiz[quizCurrentIndex];
+    const timeLimit = (q.timeLimit && q.timeLimit>0) ? q.timeLimit : 30;
+    quizRemaining = timeLimit;
 
-    currentLessonQuiz.forEach((q,idx)=>{
-      const radios = quizOverlayBox.querySelectorAll(`input[name="quiz_q_${idx}"]`);
-      let chosen = null;
-      radios.forEach(r=>{
-        if(r.checked) chosen = parseInt(r.value,10);
-      });
-      answers[idx] = isNaN(chosen)?null:chosen;
-      if(chosen===q.correctIndex) score++;
+    quizOverlayBox.innerHTML = `
+      <div>
+        <div class="quiz-top-row">
+          <div class="quiz-progress-small">
+            Savol: <b>${quizCurrentIndex+1}</b> / ${total}
+          </div>
+          <div id="quiz-timer">${quizRemaining} s</div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-title">${quizCurrentIndex+1}-savol. ${q.question}</div>
+          <div class="quiz-options">
+            ${q.options.map((opt,oi)=>`
+              <div class="quiz-option">
+                <label>
+                  <input type="radio" name="quiz_q_${quizCurrentIndex}" value="${oi}">
+                  <span>${["A","B","C","D"][oi]}) ${opt}</span>
+                </label>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px;gap:8px;">
+          <button type="button" class="btn-xs" id="quiz-next-btn">
+            ${quizCurrentIndex===total-1 ? "Natijani ko‘rish" : "Keyingi savol →"}
+          </button>
+        </div>
+      </div>
+    `;
+
+    const nextBtn = document.getElementById("quiz-next-btn");
+    nextBtn.onclick = ()=>goToNextQuestion(false);
+
+    clearQuizTimer();
+    quizTimerId = setInterval(()=>{
+      quizRemaining--;
+      const timerEl = document.getElementById("quiz-timer");
+      if(timerEl) timerEl.textContent = quizRemaining+" s";
+      if(quizRemaining<=0){
+        goToNextQuestion(true);
+      }
+    },1000);
+  }
+
+  function goToNextQuestion(autoDueTime){
+    clearQuizTimer();
+    const name = `quiz_q_${quizCurrentIndex}`;
+    const radios = quizOverlayBox.querySelectorAll(`input[name="${name}"]`);
+    let chosen = null;
+    radios.forEach(r=>{
+      if(r.checked) chosen = parseInt(r.value,10);
     });
+    quizAnswers[quizCurrentIndex] = isNaN(chosen)?null:chosen;
+
+    if(quizCurrentIndex < currentLessonQuiz.length-1){
+      quizCurrentIndex++;
+      showQuizQuestion();
+    }else{
+      finishQuizWithTimer();
+    }
+  }
+
+  async function finishQuizWithTimer(){
+    const total = currentLessonQuiz.length;
+    let score = 0;
+    currentLessonQuiz.forEach((q,idx)=>{
+      const ans = quizAnswers[idx];
+      if(ans===q.correctIndex) score++;
+    });
+    const percent = total ? Math.round((score/total)*100) : 0;
 
     try{
       if(data.currentUser && currentCourseDetail && currentLessonId){
         const updated = await saveLessonQuizAttempt(
           data.currentUser.username,
           currentCourseDetail.id,
-          currentLessonId
+          currentLessonId,
+          percent
         );
         currentCourseProgress = updated;
         renderCourseLessonsList();
@@ -1561,12 +1723,20 @@
       console.error("quiz attempt save error",err);
     }
 
-    renderQuizResultInOverlay(score,total,answers);
+    renderQuizResultInOverlay(score,total,quizAnswers);
   }
 
   function renderQuizResultInOverlay(score,total,answers){
     const percent = total ? Math.round((score/total)*100) : 0;
-    const motiv = getMotivationMessage(score,total);
+    const motivBase = getMotivationMessage(score,total);
+    const passed = percent>=30;
+
+    let infoText;
+    if(!passed){
+      infoText = "Siz bu darsni to‘liq o‘zlashtira olmadingiz. Avval dars videosini qayta ko‘rib, quizdan natijani kamida 30% qilish kerak. Shundagina keyingi darslar ochiladi va davom etishingiz mumkin.";
+    }else{
+      infoText = "Tabriklaymiz! Natijangiz 30% dan yuqori. Bu dars muvaffaqiyatli yakunlandi va keyingi 3 ta dars (agar mavjud bo‘lsa) ochildi. Endi kursni davom ettirishingiz mumkin.";
+    }
 
     let detailsHtml = "";
     currentLessonQuiz.forEach((q,idx)=>{
@@ -1598,14 +1768,39 @@
     quizOverlayBox.innerHTML = `
       <div>
         <div class="quiz-overlay-title">Natijangiz: ${score} / ${total} (${percent}%)</div>
-        <div class="quiz-overlay-sub">${motiv}</div>
+        <div class="quiz-overlay-sub">${infoText}<br><br>${motivBase}</div>
         ${detailsHtml}
-        <div style="display:flex;justify-content:center;margin-top:10px;">
+        <div style="display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <button type="button" class="btn-xs" id="quiz-review-lesson-btn">Darsni qayta ko‘rish</button>
           <button type="button" class="btn" id="quiz-overlay-continue-btn">Kursni davom ettirish</button>
         </div>
       </div>
     `;
-    document.getElementById("quiz-overlay-continue-btn").onclick = closeQuizOverlay;
+
+    const reviewBtn = document.getElementById("quiz-review-lesson-btn");
+    const contBtn = document.getElementById("quiz-overlay-continue-btn");
+
+    if(reviewBtn){
+      reviewBtn.onclick = ()=>{
+        const lesson = getCurrentLesson();
+        closeQuizOverlay();
+        if(lesson) openLessonPlayer(lesson);
+      };
+    }
+    if(contBtn){
+      contBtn.onclick = ()=>{
+        const lesson = getCurrentLesson();
+        closeQuizOverlay();
+        if(passed && currentCourseDetail && lesson){
+          const lessons = currentCourseDetail.lessons||[];
+          const idx = lessons.findIndex(l=>l.id===lesson.id);
+          if(idx>=0 && idx<lessons.length-1){
+            // Keyingi darsni avtomatik ochish
+            openLessonPlayer(lessons[idx+1]);
+          }
+        }
+      };
+    }
   }
 
   /* Fullscreen + landshaft */
@@ -1704,9 +1899,9 @@
 
       if(!data.currentUser || !currentCourseDetail || !currentLessonId) return;
 
-      const lp = (currentCourseProgress?.lessons||{})[currentLessonId];
-      const alreadyCompleted = lp && lp.completed;
-      if(alreadyCompleted) return;
+      const lp = (currentCourseProgress?.lessons||{})[currentLessonId] || {};
+      const videoCompleted = lp.videoCompleted || (lp.percent>=90);
+      if(videoCompleted) return; // video allaqachon 90% dan oshgan bo‘lsa, ortiqcha saqlamaymiz
 
       if(rounded - lastSavedPercent >= 15 || rounded>=90){
         lastSavedPercent = rounded;
@@ -1732,11 +1927,12 @@
     if(!currentCourseDetail || !data.currentUser) return;
 
     stopCurrentPlayer();
-    quizOverlay.classList.add("hidden");
-    quizOverlayBox.innerHTML = "";
+    closeQuizOverlay();
 
     currentLessonId = lesson.id;
     currentLessonQuiz = lesson.quiz || [];
+    quizCurrentIndex = 0;
+    quizAnswers = {};
     lessonPlayerTitle.textContent = lesson.title;
     lessonVideoWrapper.classList.remove("hidden");
     lessonFullscreenBtn.classList.remove("hidden");
@@ -1744,7 +1940,7 @@
     lessonProgressBar.style.width = "0%";
     lastSavedPercent = 0;
 
-    const info = (currentCourseProgress.lessons||{})[lesson.id] || { percent:0 };
+    const info = (currentCourseProgress?.lessons||{})[lesson.id] || { percent:0 };
     const resumePercent = info.percent && info.percent<95 ? info.percent : 0;
     lastSavedPercent = resumePercent;
 
@@ -1826,8 +2022,7 @@
 
   function showUserCoursesList(){
     stopCurrentPlayer();
-    quizOverlay.classList.add("hidden");
-    quizOverlayBox.innerHTML="";
+    closeQuizOverlay();
     userCoursesView.classList.remove("hidden");
     userCourseDetail.classList.add("hidden");
   }
