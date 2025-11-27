@@ -332,21 +332,6 @@
       color:#4b5563;
     }
 
-    .course-img{
-      width:100%;
-      max-height:180px;
-      object-fit:cover;
-      border-radius:10px;
-      margin-bottom:6px;
-    }
-    .course-img-lg{
-      width:100%;
-      max-height:260px;
-      object-fit:cover;
-      border-radius:12px;
-      margin-bottom:8px;
-    }
-
     /* LESSON PLAYER AREA */
     .lesson-player-box{
       margin-top:10px;
@@ -428,8 +413,7 @@
   <!-- FIREBASE (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-  <!-- YouTube Iframe API (progress uchun) -->
+  <!-- YouTube Iframe API -->
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
@@ -504,7 +488,7 @@
               Bu Ta'lim Edu uchun HTML + CSS + JS + Firestore asosida yaratilgan demo kurs tizimi.
             </p>
             <p class="hero-text">
-              • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga 30 ta va undan ortiq
+              • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga ko‘plab
               YouTube <b>yashirin (Unlisted)</b> videolarni qo‘shishi mumkin.<br>
               • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va <b>kurslar ichidagi darslarni tomosha qiladi</b>.<br><br>
               Darslar progressi saqlanadi: darsni kamida <b>90%</b> ko‘rmaguncha keyingi dars ochilmaydi.
@@ -544,11 +528,6 @@
               <label for="course-price">Narx (so'm)</label>
               <input id="course-price" type="number" min="0" placeholder="0 = bepul" />
             </div>
-          </div>
-          <div class="form-row">
-            <label for="course-image">Kurs rasmi (cover, ixtiyoriy)</label>
-            <input id="course-image" type="file" accept="image/*" />
-            <div class="hint">Bu rasm kurs kartochkasi va kurs ichida cover sifatida ko‘rinadi.</div>
           </div>
           <button type="submit" class="btn">Kursni qo‘shish</button>
           <div id="course-error" class="error"></div>
@@ -643,18 +622,16 @@
 </div>
 
 <script>
-  // --------- YOUTUBE IFRAME API HOLATI ---------
+  /* YOUTUBE API HOLATI */
   let ytApiReady = false;
-  function onYouTubeIframeAPIReady() {
-    ytApiReady = true;
-  }
+  function onYouTubeIframeAPIReady() { ytApiReady = true; }
 
-  // ---------------- FIREBASE INIT ----------------
+  /* FIREBASE INIT */
   const firebaseConfig = {
     apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
     authDomain: "shahboz-5d0a3.firebaseapp.com",
     projectId: "shahboz-5d0a3",
-    storageBucket: "shahboz-5d0a3.firebasestorage.app",
+    storageBucket: "shahboz-5d0a3.appspot.com",
     messagingSenderId: "352024095535",
     appId: "1:352024095535:web:6ca630de2c199a33c54fda",
     measurementId: "G-YS5RGZ00EB"
@@ -662,14 +639,9 @@
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-  const storage = firebase.storage();
 
-  // ---------------- LOCAL STATE ----------------
-  let data = {
-    currentUser: null,
-    courses: []
-  };
-
+  /* LOCAL STATE */
+  let data = { currentUser: null, courses: [] };
   const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
 
   function loadCurrentUserFromLocal() {
@@ -677,35 +649,22 @@
       const raw = localStorage.getItem(CURRENT_USER_KEY);
       if (!raw) return null;
       return JSON.parse(raw);
-    } catch (e) {
-      console.error("Current user parse error", e);
-      return null;
-    }
+    } catch { return null; }
   }
-
   function saveCurrentUserToLocal() {
-    if (!data.currentUser) {
-      localStorage.removeItem(CURRENT_USER_KEY);
-      return;
-    }
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data.currentUser));
+    if (!data.currentUser) localStorage.removeItem(CURRENT_USER_KEY);
+    else localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data.currentUser));
   }
 
-  // Default admin bo'lmasa, yaratib qo'yamiz
   async function ensureDefaultAdmin() {
     const ref = db.collection("users").doc("admin");
     const doc = await ref.get();
     if (!doc.exists) {
-      await ref.set({
-        username: "admin",
-        password: "admin123",
-        role: "admin"
-      });
-      console.log("Default admin created");
+      await ref.set({ username:"admin", password:"admin123", role:"admin" });
     }
   }
 
-  // ---------------- DOM ELEMENTS ----------------
+  /* DOM */
   const authSection = document.getElementById("auth-section");
   const adminSection = document.getElementById("admin-section");
   const userSection = document.getElementById("user-section");
@@ -715,7 +674,6 @@
   const currentUserLabel = document.getElementById("current-user-label");
   const userRolePill = document.getElementById("user-role-pill");
 
-  // Auth
   const tabButtons = document.querySelectorAll(".tab-btn");
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
@@ -728,7 +686,6 @@
   const regPassword = document.getElementById("reg-password");
   const regPassword2 = document.getElementById("reg-password2");
 
-  // Courses (admin + user)
   const courseForm = document.getElementById("course-form");
   const courseError = document.getElementById("course-error");
   const adminCourseList = document.getElementById("admin-course-list");
@@ -750,7 +707,6 @@
   const detailMeta = document.getElementById("detail-meta");
   const detailLessons = document.getElementById("detail-lessons");
 
-  const lessonPlayerBox = document.getElementById("lesson-player-box");
   const lessonPlayerTitle = document.getElementById("lesson-player-title");
   const lessonVideoWrapper = document.getElementById("lesson-video-wrapper");
   const lessonProgressText = document.getElementById("lesson-progress-text");
@@ -761,14 +717,14 @@
   const courseModalClose = document.getElementById("course-modal-close");
   const courseModalList = document.getElementById("course-modal-list");
 
-  // ---------------- HELPERS ----------------
+  /* HELPERS */
   function formatPrice(price) {
     const n = Number(price);
-    if (price === "" || price === null || price === undefined || isNaN(n)) return "";
+    if (!price && price !== 0) return "";
+    if (isNaN(n)) return "";
     if (n === 0) return "Bepul";
-    return n.toLocaleString("uz-UZ") + " so'm";
+    return n.toLocaleString("uz-UZ")+" so'm";
   }
-
   function extractYouTubeId(input) {
     if (!input) return "";
     let url = input.trim();
@@ -781,173 +737,122 @@
     return url;
   }
 
-  async function uploadCourseImage(file, courseId) {
-    if (!file) return "";
-    const safeName = file.name.replace(/\s+/g, "_");
-    const ref = storage.ref().child(`course_covers/${courseId}_${safeName}`);
-    const snapshot = await ref.put(file);
-    const url = await snapshot.ref.getDownloadURL();
-    return url;
-  }
-
-  // -------- PROGRESS (Firestore) ----------
+  /* PROGRESS Firestore */
   async function loadProgress(username, courseId) {
     const id = `${username}_${courseId}`;
     const ref = db.collection("progress").doc(id);
     const doc = await ref.get();
-    if (!doc.exists) return { user: username, courseId, lessons: {} };
+    if (!doc.exists) return { user:username, courseId, lessons:{} };
     const d = doc.data();
     if (!d.lessons) d.lessons = {};
     return d;
   }
-
   async function saveLessonProgress(username, courseId, lessonId, percent, completedFlag) {
     const id = `${username}_${courseId}`;
     const ref = db.collection("progress").doc(id);
     const doc = await ref.get();
-    let d;
-    if (doc.exists) d = doc.data();
-    else d = { user: username, courseId, lessons: {} };
+    let d = doc.exists ? doc.data() : { user:username, courseId, lessons:{} };
     if (!d.lessons) d.lessons = {};
-    const prev = d.lessons[lessonId] || { percent: 0, completed: false };
-    const maxPercent = Math.max(prev.percent || 0, percent || 0);
-    const completed = prev.completed || completedFlag || maxPercent >= 90;
-    d.lessons[lessonId] = { percent: maxPercent, completed };
+    const prev = d.lessons[lessonId] || { percent:0, completed:false };
+    const maxPercent = Math.max(prev.percent||0, percent||0);
+    const completed = prev.completed || completedFlag || maxPercent>=90;
+    d.lessons[lessonId] = { percent:maxPercent, completed };
     await ref.set(d);
     return d;
   }
 
-  // ---------------- FIRESTORE FUNKSIYALAR ----------------
-  async function registerUser(username, password) {
-    const ref = db.collection("users").doc(username);
+  /* FIRESTORE HELPERS */
+  async function registerUser(u,p){
+    const ref = db.collection("users").doc(u);
     const doc = await ref.get();
-    if (doc.exists) {
-      throw new Error("exists");
-    }
-    await ref.set({
-      username,
-      password,
-      role: "user"
-    });
+    if (doc.exists) throw new Error("exists");
+    await ref.set({ username:u, password:p, role:"user" });
   }
-
-  async function loginUser(username, password) {
-    const ref = db.collection("users").doc(username);
+  async function loginUser(u,p){
+    const ref = db.collection("users").doc(u);
     const doc = await ref.get();
     if (!doc.exists) return null;
     const user = doc.data();
-    if (user.password !== password) return null;
-    return user;
+    return user.password===p ? user : null;
   }
-
-  async function addCourseToFirestore(course) {
+  async function addCourseToFirestore(course){
     await db.collection("courses").doc(course.id).set(course);
   }
-
-  async function updateCourseLessons(courseId, lessons) {
-    await db.collection("courses").doc(courseId).update({
-      lessons: lessons
-    });
-  }
-
-  async function deleteCourseFromFirestore(courseId) {
+  async function deleteCourseFromFirestore(courseId){
     await db.collection("courses").doc(courseId).delete();
   }
-
-  async function loadCoursesFromFirestore() {
-    const snap = await db.collection("courses").get();
-    data.courses = snap.docs.map(d => d.data());
+  async function updateCourseLessons(courseId,lessons){
+    await db.collection("courses").doc(courseId).update({ lessons });
   }
-
-  async function refreshCourses() {
+  async function loadCoursesFromFirestore(){
+    const snap = await db.collection("courses").get();
+    data.courses = snap.docs.map(d=>d.data());
+  }
+  async function refreshCourses(){
     await loadCoursesFromFirestore();
     renderAdminCourses();
     renderUserCourses();
     renderCourseModalList();
   }
-
-  async function loadUsersFromFirestore() {
+  async function loadUsersFromFirestore(){
     const snap = await db.collection("users").get();
-    const users = snap.docs.map(d => d.data());
-    renderAdminUsers(users);
+    renderAdminUsers(snap.docs.map(d=>d.data()));
   }
 
-  // ---------------- RENDER: ADMIN USERS ----------------
-  function renderAdminUsers(users) {
-    adminUserCount.textContent = users.length + " ta foydalanuvchi";
-    if (!users.length) {
-      adminUserList.className = "empty";
-      adminUserList.textContent = "Foydalanuvchilar hali yo‘q.";
+  /* RENDER ADMIN USERS */
+  function renderAdminUsers(users){
+    adminUserCount.textContent = users.length+" ta foydalanuvchi";
+    if(!users.length){
+      adminUserList.className="empty";
+      adminUserList.textContent="Foydalanuvchilar hali yo‘q.";
       return;
     }
-
     adminUserList.classList.remove("empty");
     adminUserList.innerHTML = `
       <div style="overflow-x:auto;">
         <table class="user-table">
-          <thead>
-            <tr>
-              <th>Login</th>
-              <th>Rol</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Login</th><th>Rol</th></tr></thead>
           <tbody>
-            ${users.map(u => `
-              <tr>
-                <td>${u.username}</td>
-                <td>${u.role}</td>
-              </tr>
-            `).join("")}
+            ${users.map(u=>`<tr><td>${u.username}</td><td>${u.role}</td></tr>`).join("")}
           </tbody>
         </table>
-      </div>
-    `;
+      </div>`;
   }
 
-  // ---------------- RENDER: ADMIN COURSES ----------------
-  function renderAdminCourses() {
-    const courses = data.courses || [];
-    adminCourseList.innerHTML = "";
-    adminCourseCount.textContent = courses.length + " ta kurs";
+  /* RENDER ADMIN COURSES */
+  function renderAdminCourses(){
+    const courses = data.courses||[];
+    adminCourseList.innerHTML="";
+    adminCourseCount.textContent=courses.length+" ta kurs";
+    if(!courses.length){ adminEmpty.style.display="block"; return; }
+    adminEmpty.style.display="none";
 
-    if (courses.length === 0) {
-      adminEmpty.style.display = "block";
-      return;
-    }
-    adminEmpty.style.display = "none";
+    courses.forEach(course=>{
+      const div=document.createElement("div");
+      div.className="course-card";
+      const priceText=formatPrice(course.price);
+      const lessons=course.lessons||[];
 
-    courses.forEach(course => {
-      const div = document.createElement("div");
-      div.className = "course-card";
-
-      const priceText = formatPrice(course.price);
-      const lessons = course.lessons || [];
-
-      let lessonsHtmlAdmin = "";
-      if (lessons.length === 0) {
-        lessonsHtmlAdmin = `<div class="empty">Hali dars qo‘shilmagan.</div>`;
-      } else {
-        lessonsHtmlAdmin = `
+      let lessonsHtml="";
+      if(!lessons.length){
+        lessonsHtml=`<div class="empty">Hali dars qo‘shilmagan.</div>`;
+      }else{
+        lessonsHtml=`
           <div class="lesson-list">
-            ${lessons.map((lesson, index) => `
+            ${lessons.map((l,i)=>`
               <div class="lesson-item">
-                <div class="lesson-title">${index + 1}. ${lesson.title}</div>
-                <div class="lesson-status">
-                  <span class="muted">ID: ${lesson.id}</span>
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        `;
+                <div class="lesson-title">${i+1}. ${l.title}</div>
+                <div class="lesson-status"><span class="muted">ID: ${l.id}</span></div>
+              </div>`).join("")}
+          </div>`;
       }
 
-      div.innerHTML = `
-        ${course.imageUrl ? `<img src="${course.imageUrl}" alt="Kurs rasmi" class="course-img">` : ""}
+      div.innerHTML=`
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
-          ${course.category ? `<span class="badge">${course.category}</span>` : ""}
-          ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
+          ${course.category?`<span class="badge">${course.category}</span>`:""}
+          ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
           <span class="badge">Darslar: ${lessons.length}</span>
         </div>
         <div class="course-footer">
@@ -964,275 +869,216 @@
             <div class="form-row">
               <label>YouTube havolasi yoki ID</label>
               <input name="lessonUrl" required placeholder="https://youtu.be/... yoki faqat ID" />
-              <div class="hint">Videoni YouTube’da <b>Unlisted (yashirin)</b> qilib yuklash tavsiya etiladi.</div>
+              <div class="hint">Videoni YouTube’da <b>Unlisted</b> qilib yuklash tavsiya etiladi.</div>
             </div>
             <button type="submit" class="btn" style="margin-top:4px;">Darsni qo‘shish</button>
           </form>
         </div>
-        ${lessonsHtmlAdmin}
-      `;
+        ${lessonsHtml}`;
       adminCourseList.appendChild(div);
     });
   }
 
-  // Lesson qo'shish (admin)
-  adminCourseList.addEventListener("submit", async e => {
-    if (!e.target.classList.contains("lesson-form")) return;
+  adminCourseList.addEventListener("submit",async e=>{
+    if(!e.target.classList.contains("lesson-form")) return;
     e.preventDefault();
-    if (!data.currentUser || data.currentUser.role !== "admin") return;
+    if(!data.currentUser || data.currentUser.role!=="admin") return;
+    const form=e.target;
+    const courseId=form.dataset.courseId;
+    const title=form.lessonTitle.value.trim();
+    const url=form.lessonUrl.value.trim();
+    if(!title||!url) return;
+    const videoId=extractYouTubeId(url);
+    if(!videoId){ alert("YouTube havola/ID noto‘g‘ri."); return; }
 
-    const form = e.target;
-    const courseId = form.dataset.courseId;
-    const title = form.lessonTitle.value.trim();
-    const url = form.lessonUrl.value.trim();
-    if (!title || !url) return;
-
-    const videoId = extractYouTubeId(url);
-    if (!videoId) {
-      alert("YouTube havola/ID noto‘g‘ri bo‘lishi mumkin.");
-      return;
-    }
-
-    try {
-      const course = data.courses.find(c => c.id === courseId);
-      if (!course) return;
-
-      const lessons = course.lessons || [];
-      lessons.push({
-        id: Date.now().toString(),
-        title,
-        videoId
-      });
-
-      await updateCourseLessons(courseId, lessons);
+    try{
+      const course=data.courses.find(c=>c.id===courseId);
+      if(!course) return;
+      const lessons=course.lessons||[];
+      lessons.push({ id:Date.now().toString(), title, videoId });
+      await updateCourseLessons(courseId,lessons);
       await refreshCourses();
       form.reset();
-    } catch (err) {
+    }catch(err){
       console.error(err);
       alert("Darsni saqlashda xatolik yuz berdi.");
     }
   });
 
-  // Kurs o'chirish (admin)
-  adminCourseList.addEventListener("click", async e => {
-    const deleteBtn = e.target.closest(".btn-delete-course");
-    if (deleteBtn) {
-      const courseId = deleteBtn.dataset.courseId;
-      if (!confirm("Kursni o‘chirishni xohlaysizmi? Ushbu kursdagi barcha darslar ham o‘chadi.")) return;
-      try {
-        await deleteCourseFromFirestore(courseId);
-        await refreshCourses();
-      } catch (err) {
-        console.error(err);
-        alert("Kursni o‘chirishda xatolik yuz berdi.");
-      }
+  adminCourseList.addEventListener("click",async e=>{
+    const btn=e.target.closest(".btn-delete-course");
+    if(!btn) return;
+    const courseId=btn.dataset.courseId;
+    if(!confirm("Kursni o‘chirishni xohlaysizmi?")) return;
+    try{
+      await deleteCourseFromFirestore(courseId);
+      // Mahalliy ro‘yxatdan ham olib tashlaymiz
+      data.courses = data.courses.filter(c=>c.id!==courseId);
+      renderAdminCourses();
+      renderUserCourses();
+      renderCourseModalList();
+    }catch(err){
+      console.error("Delete error:",err);
+      alert("Kursni o‘chirishda xatolik yuz berdi.");
     }
   });
 
-  // ---------------- RENDER: USER COURSES (GRID) ----------------
-  function renderUserCourses() {
-    const courses = data.courses || [];
-    userCourseList.innerHTML = "";
-    userCourseCount.textContent = courses.length + " ta kurs";
+  /* USER COURSES GRID */
+  function renderUserCourses(){
+    const courses=data.courses||[];
+    userCourseList.innerHTML="";
+    userCourseCount.textContent=courses.length+" ta kurs";
+    if(!courses.length){ userEmpty.style.display="block"; return; }
+    userEmpty.style.display="none";
 
-    if (courses.length === 0) {
-      userEmpty.style.display = "block";
-      return;
-    }
-    userEmpty.style.display = "none";
-
-    courses.forEach(course => {
-      const card = document.createElement("div");
-      card.className = "course-card";
-
-      const priceText = formatPrice(course.price);
-      const lessons = course.lessons || [];
-
-      card.innerHTML = `
-        ${course.imageUrl ? `<img src="${course.imageUrl}" alt="Kurs rasmi" class="course-img">` : ""}
+    courses.forEach(course=>{
+      const card=document.createElement("div");
+      card.className="course-card";
+      const priceText=formatPrice(course.price);
+      const lessons=course.lessons||[];
+      card.innerHTML=`
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
-          ${course.category ? `<span class="badge">${course.category}</span>` : ""}
-          ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
+          ${course.category?`<span class="badge">${course.category}</span>`:""}
+          ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
           <span class="badge">Darslar: ${lessons.length}</span>
         </div>
         <div class="course-footer">
           <span class="muted">Kurs ID: ${course.id}</span>
           <button type="button" class="btn btn-open-course" data-course-id="${course.id}">Kursga kirish</button>
-        </div>
-      `;
+        </div>`;
       userCourseList.appendChild(card);
     });
   }
 
-  // ---------------- COURSE MODAL ----------------
-  function renderCourseModalList() {
-    const courses = data.courses || [];
-    courseModalList.innerHTML = "";
-
-    if (!courses.length) {
-      courseModalList.innerHTML = `<div class="empty">Hozircha kurslar yo'q.</div>`;
+  /* MODAL */
+  function renderCourseModalList(){
+    const courses=data.courses||[];
+    courseModalList.innerHTML="";
+    if(!courses.length){
+      courseModalList.innerHTML=`<div class="empty">Hozircha kurslar yo‘q.</div>`;
       return;
     }
-
-    courses.forEach(course => {
-      const div = document.createElement("div");
-      div.className = "course-card";
-      const priceText = formatPrice(course.price);
-      const lessons = course.lessons || [];
-
-      div.innerHTML = `
-        ${course.imageUrl ? `<img src="${course.imageUrl}" alt="Kurs rasmi" class="course-img">` : ""}
+    courses.forEach(course=>{
+      const div=document.createElement("div");
+      div.className="course-card";
+      const priceText=formatPrice(course.price);
+      const lessons=course.lessons||[];
+      div.innerHTML=`
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
-          ${course.category ? `<span class="badge">${course.category}</span>` : ""}
-          ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
+          ${course.category?`<span class="badge">${course.category}</span>`:""}
+          ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
           <span class="badge">Darslar: ${lessons.length}</span>
         </div>
         <div class="course-footer">
           <button type="button" class="btn btn-open-course-modal" data-course-id="${course.id}">Tanlash</button>
-        </div>
-      `;
+        </div>`;
       courseModalList.appendChild(div);
     });
   }
+  function openCourseModal(){ courseModal.classList.remove("hidden"); }
+  function closeCourseModal(){ courseModal.classList.add("hidden"); }
 
-  function openCourseModal() {
-    courseModal.classList.remove("hidden");
-  }
-  function closeCourseModal() {
-    courseModal.classList.add("hidden");
-  }
-
-  btnOpenCourseModal.addEventListener("click", () => {
+  btnOpenCourseModal.addEventListener("click",()=>{
     renderCourseModalList();
     openCourseModal();
   });
-  courseModalClose.addEventListener("click", closeCourseModal);
-  courseModal.addEventListener("click", e => {
-    if (e.target.classList.contains("modal-backdrop")) closeCourseModal();
+  courseModalClose.addEventListener("click",closeCourseModal);
+  courseModal.addEventListener("click",e=>{
+    if(e.target.classList.contains("modal-backdrop")) closeCourseModal();
   });
-
-  courseModalList.addEventListener("click", async e => {
-    const btn = e.target.closest(".btn-open-course-modal");
-    if (!btn) return;
-    const courseId = btn.dataset.courseId;
+  courseModalList.addEventListener("click",async e=>{
+    const btn=e.target.closest(".btn-open-course-modal");
+    if(!btn) return;
+    const courseId=btn.dataset.courseId;
     closeCourseModal();
     await openUserCourseDetail(courseId);
   });
 
-  // ---------------- BIR KURSNING DETAILI + PROGRESS ----------------
-  let currentCourseDetail = null;
-  let currentCourseProgress = null;
+  /* COURSE DETAIL + PROGRESS */
+  let currentCourseDetail=null;
+  let currentCourseProgress=null;
+  let currentPlayer=null;
+  let currentLessonId=null;
+  let progressInterval=null;
+  let lastSavedPercent=0;
 
-  let currentPlayer = null;
-  let currentLessonId = null;
-  let progressInterval = null;
-  let lastSavedPercent = 0;
-
-  function stopCurrentPlayer() {
-    if (progressInterval) {
-      clearInterval(progressInterval);
-      progressInterval = null;
-    }
-    if (currentPlayer && currentPlayer.destroy) {
-      currentPlayer.destroy();
-    }
-    currentPlayer = null;
-    currentLessonId = null;
-    lastSavedPercent = 0;
+  function stopCurrentPlayer(){
+    if(progressInterval) clearInterval(progressInterval);
+    progressInterval=null;
+    if(currentPlayer && currentPlayer.destroy) currentPlayer.destroy();
+    currentPlayer=null;
+    currentLessonId=null;
+    lastSavedPercent=0;
   }
 
-  function renderCourseLessonsList() {
-    const course = currentCourseDetail;
-    const progress = currentCourseProgress || { lessons: {} };
-    const lessons = course.lessons || [];
-
-    if (!lessons.length) {
-      detailLessons.innerHTML = `
-        ${course.imageUrl ? `<img src="${course.imageUrl}" alt="Kurs rasmi" class="course-img-lg">` : ""}
-        <div class="empty">Bu kursga hali dars qo‘shilmagan.</div>
-      `;
+  function renderCourseLessonsList(){
+    const course=currentCourseDetail;
+    const progress=currentCourseProgress||{lessons:{}};
+    const lessons=course.lessons||[];
+    if(!lessons.length){
+      detailLessons.innerHTML=`<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
       return;
     }
-
-    let coverHtml = "";
-    if (course.imageUrl) {
-      coverHtml = `<img src="${course.imageUrl}" alt="Kurs rasmi" class="course-img-lg">`;
-    }
-
-    let html = coverHtml + `<div class="lesson-list">`;
-    lessons.forEach((lesson, index) => {
-      const info = (progress.lessons || {})[lesson.id] || { percent: 0, completed: false };
-      const percent = Math.round(info.percent || 0);
-      const prevLesson = lessons[index - 1];
-      let unlocked = false;
-
-      if (index === 0) unlocked = true;
-      else if (prevLesson) {
-        const prevInfo = (progress.lessons || {})[prevLesson.id] || { percent: 0, completed: false };
-        unlocked = !!prevInfo.completed;
+    let html=`<div class="lesson-list">`;
+    lessons.forEach((lesson,idx)=>{
+      const info=(progress.lessons||{})[lesson.id]||{percent:0,completed:false};
+      const percent=Math.round(info.percent||0);
+      const prevLesson=lessons[idx-1];
+      let unlocked=false;
+      if(idx===0) unlocked=true;
+      else if(prevLesson){
+        const prevInfo=(progress.lessons||{})[prevLesson.id]||{percent:0,completed:false};
+        unlocked=!!prevInfo.completed;
       }
-
-      if (info.completed) unlocked = true; // tugallangan dars har doim ochiq
-
-      const statusText = info.completed
-        ? "Tugallangan ✅"
-        : unlocked
-          ? (percent > 0 ? `Boshlangan (${percent}%)` : "Boshlanmagan")
-          : "Yopiq 🔒";
-
-      html += `
-        <div class="lesson-item ${unlocked ? "" : "locked"}" data-lesson-id="${lesson.id}" data-unlocked="${unlocked ? "1" : "0"}">
+      if(info.completed) unlocked=true;
+      const statusText=info.completed
+        ?"Tugallangan ✅"
+        :unlocked?(percent>0?`Boshlangan (${percent}%)`:"Boshlanmagan")
+        :"Yopiq 🔒";
+      html+=`
+        <div class="lesson-item ${unlocked?"":"locked"}" data-lesson-id="${lesson.id}" data-unlocked="${unlocked?"1":"0"}">
           <div>
-            <div class="lesson-title">${index + 1}-dars. ${lesson.title}</div>
+            <div class="lesson-title">${idx+1}-dars. ${lesson.title}</div>
             <div class="muted" style="font-size:11px;">Ko‘rilgan: ${percent}%</div>
           </div>
           <div class="lesson-status">${statusText}</div>
-        </div>
-      `;
+        </div>`;
     });
-    html += `</div>`;
-    detailLessons.innerHTML = html;
+    html+=`</div>`;
+    detailLessons.innerHTML=html;
   }
 
-  async function openLessonPlayer(lesson) {
-    if (!currentCourseDetail || !data.currentUser) return;
-    currentLessonId = lesson.id;
-    lessonPlayerTitle.textContent = lesson.title;
+  async function openLessonPlayer(lesson){
+    if(!currentCourseDetail || !data.currentUser) return;
+    currentLessonId=lesson.id;
+    lessonPlayerTitle.textContent=lesson.title;
     lessonVideoWrapper.classList.remove("hidden");
-    lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
-    lessonProgressBar.style.width = "0%";
-    lastSavedPercent = 0;
-
+    lessonProgressText.textContent="Ko‘rilmoqda: 0%";
+    lessonProgressBar.style.width="0%";
+    lastSavedPercent=0;
     stopCurrentPlayer();
 
-    if (!ytApiReady) {
-      lessonProgressText.textContent = "YouTube API tayyorlanmoqda...";
-      const check = setInterval(() => {
-        if (ytApiReady) {
-          clearInterval(check);
-          openLessonPlayer(lesson);
-        }
-      }, 500);
+    if(!ytApiReady){
+      lessonProgressText.textContent="YouTube API yuklanmoqda...";
+      const check=setInterval(()=>{
+        if(ytApiReady){ clearInterval(check); openLessonPlayer(lesson); }
+      },500);
       return;
     }
-
-    currentPlayer = new YT.Player("yt-player", {
-      videoId: lesson.videoId,
-      playerVars: { rel: 0, modestbranding: 1 },
-      events: {
-        onReady: () => {
-          // oldingi progress bo'lsa, shunga yaqin joydan boshlash
-          const info = (currentCourseProgress.lessons || {})[lesson.id] || { percent: 0 };
-          if (info.percent && info.percent > 0 && info.percent < 95) {
-            const dur = currentPlayer.getDuration();
-            const startSec = (info.percent / 100) * dur;
-            if (startSec && !isNaN(startSec) && isFinite(startSec)) {
-              currentPlayer.seekTo(startSec, true);
-            }
+    currentPlayer=new YT.Player("yt-player",{
+      videoId:lesson.videoId,
+      playerVars:{rel:0,modestbranding:1},
+      events:{
+        onReady:()=>{
+          const info=(currentCourseProgress.lessons||{})[lesson.id]||{percent:0};
+          if(info.percent && info.percent<95){
+            const dur=currentPlayer.getDuration();
+            const start=(info.percent/100)*dur;
+            if(start && isFinite(start)) currentPlayer.seekTo(start,true);
           }
           currentPlayer.playVideo();
           startProgressInterval();
@@ -1241,303 +1087,229 @@
     });
   }
 
-  function startProgressInterval() {
-    if (!currentPlayer) return;
-    if (progressInterval) clearInterval(progressInterval);
-    progressInterval = setInterval(async () => {
-      if (!currentPlayer || typeof currentPlayer.getDuration !== "function") return;
-      const dur = currentPlayer.getDuration();
-      if (!dur || dur <= 0) return;
-      const cur = currentPlayer.getCurrentTime();
-      const percent = Math.min(100, (cur / dur) * 100);
-      const rounded = Math.round(percent);
-      lessonProgressText.textContent = `Ko‘rilgan: ${rounded}%`;
-      lessonProgressBar.style.width = `${rounded}%`;
-
-      if (!data.currentUser || !currentCourseDetail || !currentLessonId) return;
-
-      // faqat har 15% da yoki tugaganda yozamiz
-      if (rounded - lastSavedPercent >= 15 || rounded >= 90) {
-        lastSavedPercent = rounded;
-        try {
-          const updated = await saveLessonProgress(
+  function startProgressInterval(){
+    if(!currentPlayer) return;
+    if(progressInterval) clearInterval(progressInterval);
+    progressInterval=setInterval(async ()=>{
+      if(!currentPlayer||typeof currentPlayer.getDuration!=="function") return;
+      const dur=currentPlayer.getDuration();
+      if(!dur||dur<=0) return;
+      const cur=currentPlayer.getCurrentTime();
+      const percent=Math.min(100,(cur/dur)*100);
+      const rounded=Math.round(percent);
+      lessonProgressText.textContent=`Ko‘rilgan: ${rounded}%`;
+      lessonProgressBar.style.width=rounded+"%";
+      if(!data.currentUser||!currentCourseDetail||!currentLessonId) return;
+      if(rounded-lastSavedPercent>=15 || rounded>=90){
+        lastSavedPercent=rounded;
+        try{
+          const updated=await saveLessonProgress(
             data.currentUser.username,
             currentCourseDetail.id,
             currentLessonId,
             rounded,
-            rounded >= 90
+            rounded>=90
           );
-          currentCourseProgress = updated;
+          currentCourseProgress=updated;
           renderCourseLessonsList();
-        } catch (err) {
-          console.error("Progress save error:", err);
-        }
+        }catch(err){ console.error("progress error",err); }
       }
-    }, 5000);
+    },5000);
   }
 
-  async function openUserCourseDetail(courseId) {
-    const course = data.courses.find(c => c.id === courseId);
-    if (!course) return;
-    if (!data.currentUser) return;
-
-    currentCourseDetail = course;
-    currentCourseProgress = await loadProgress(data.currentUser.username, courseId);
-
-    detailTitle.textContent = course.title;
-    detailDesc.textContent = course.description || "";
-    const priceText = formatPrice(course.price);
-
-    detailMeta.innerHTML = `
-      ${course.category ? `<span class="badge">${course.category}</span>` : ""}
-      ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
-      <span class="badge">Darslar: ${(course.lessons || []).length}</span>
-    `;
-
+  async function openUserCourseDetail(courseId){
+    const course=data.courses.find(c=>c.id===courseId);
+    if(!course || !data.currentUser) return;
+    currentCourseDetail=course;
+    currentCourseProgress=await loadProgress(data.currentUser.username,courseId);
+    detailTitle.textContent=course.title;
+    detailDesc.textContent=course.description||"";
+    const priceText=formatPrice(course.price);
+    detailMeta.innerHTML=`
+      ${course.category?`<span class="badge">${course.category}</span>`:""}
+      ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
+      <span class="badge">Darslar: ${(course.lessons||[]).length}</span>`;
     renderCourseLessonsList();
-    lessonPlayerTitle.textContent = "Dars tanlanmagan.";
+    lessonPlayerTitle.textContent="Dars tanlanmagan.";
     lessonVideoWrapper.classList.add("hidden");
-    lessonProgressText.textContent = "";
-    lessonProgressBar.style.width = "0%";
-
+    lessonProgressText.textContent="";
+    lessonProgressBar.style.width="0%";
     userCoursesView.classList.add("hidden");
     userCourseDetail.classList.remove("hidden");
   }
 
-  // darsni tanlash
-  detailLessons.addEventListener("click", async e => {
-    const item = e.target.closest(".lesson-item");
-    if (!item) return;
-    const unlocked = item.dataset.unlocked === "1";
-    if (!unlocked) {
-      alert("Bu dars hozircha yopiq. Oldingi darsni kamida 90% tomosha qiling.");
-      return;
-    }
-    const lessonId = item.dataset.lessonId;
-    const lesson = (currentCourseDetail.lessons || []).find(l => l.id === lessonId);
-    if (!lesson) return;
+  detailLessons.addEventListener("click",async e=>{
+    const item=e.target.closest(".lesson-item");
+    if(!item) return;
+    const unlocked=item.dataset.unlocked==="1";
+    if(!unlocked){ alert("Bu dars hozircha yopiq. Oldingi darsni 90% gacha ko‘ring."); return; }
+    const lessonId=item.dataset.lessonId;
+    const lesson=(currentCourseDetail.lessons||[]).find(l=>l.id===lessonId);
+    if(!lesson) return;
     await openLessonPlayer(lesson);
   });
 
-  function showUserCoursesList() {
+  function showUserCoursesList(){
     stopCurrentPlayer();
     userCoursesView.classList.remove("hidden");
     userCourseDetail.classList.add("hidden");
   }
 
-  // Kursga kirish tugmasi (griddan)
-  userCourseList.addEventListener("click", async e => {
-    const btn = e.target.closest(".btn-open-course");
-    if (!btn) return;
-    const courseId = btn.dataset.courseId;
-    await openUserCourseDetail(courseId);
+  userCourseList.addEventListener("click",async e=>{
+    const btn=e.target.closest(".btn-open-course");
+    if(!btn) return;
+    await openUserCourseDetail(btn.dataset.courseId);
   });
+  userBackBtn.addEventListener("click",showUserCoursesList);
 
-  // Kurslardan kurs ichiga kirgandan qaytish
-  userBackBtn.addEventListener("click", () => {
-    showUserCoursesList();
-  });
-
-  // ---------------- UI UPDATE ----------------
-  function updateUI() {
-    const user = data.currentUser;
-
-    if (!user) {
+  /* UI UPDATE */
+  function updateUI(){
+    const user=data.currentUser;
+    if(!user){
       authSection.classList.remove("hidden");
       adminSection.classList.add("hidden");
       userSection.classList.add("hidden");
       navAdmin.classList.add("hidden");
       logoutBtn.classList.add("hidden");
-      currentUserLabel.textContent = "Mehmon";
-      userRolePill.textContent = "Rol: Foydalanuvchi";
+      currentUserLabel.textContent="Mehmon";
+      userRolePill.textContent="Rol: Foydalanuvchi";
       return;
     }
-
     authSection.classList.add("hidden");
     userSection.classList.remove("hidden");
     logoutBtn.classList.remove("hidden");
-    currentUserLabel.textContent = user.username;
-
-    if (user.role === "admin") {
+    currentUserLabel.textContent=user.username;
+    if(user.role==="admin"){
       navAdmin.classList.remove("hidden");
-      userRolePill.textContent = "Rol: Admin (foydalanuvchi rejimi)";
-    } else {
+      userRolePill.textContent="Rol: Admin (foydalanuvchi rejimi)";
+    }else{
       navAdmin.classList.add("hidden");
-      userRolePill.textContent = "Rol: Foydalanuvchi";
+      userRolePill.textContent="Rol: Foydalanuvchi";
     }
     showUserCoursesList();
   }
 
-  // ---------------- AUTH TABS ----------------
-  tabButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      tabButtons.forEach(b => b.classList.remove("active"));
+  /* AUTH TABS */
+  tabButtons.forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      tabButtons.forEach(b=>b.classList.remove("active"));
       btn.classList.add("active");
-      const tab = btn.dataset.tab;
-      if (tab === "login") {
+      const tab=btn.dataset.tab;
+      if(tab==="login"){
         loginForm.classList.remove("hidden");
         registerForm.classList.add("hidden");
-        loginErrorEl.textContent = "";
-      } else {
+        loginErrorEl.textContent="";
+      }else{
         loginForm.classList.add("hidden");
         registerForm.classList.remove("hidden");
-        registerErrorEl.textContent = "";
+        registerErrorEl.textContent="";
       }
     });
   });
 
-  // ---------------- LOGIN ----------------
-  loginForm.addEventListener("submit", async e => {
+  /* LOGIN */
+  loginForm.addEventListener("submit",async e=>{
     e.preventDefault();
-    loginErrorEl.textContent = "";
-
-    const username = loginUsername.value.trim();
-    const password = loginPassword.value;
-
-    if (!username || !password) {
-      loginErrorEl.textContent = "Login va parolni kiriting.";
-      return;
-    }
-
-    try {
-      const user = await loginUser(username, password);
-      if (!user) {
-        loginErrorEl.textContent = "Login yoki parol noto‘g‘ri.";
-        return;
-      }
-      data.currentUser = { username: user.username, role: user.role };
+    loginErrorEl.textContent="";
+    const u=loginUsername.value.trim();
+    const p=loginPassword.value;
+    if(!u||!p){ loginErrorEl.textContent="Login va parolni kiriting."; return; }
+    try{
+      const user=await loginUser(u,p);
+      if(!user){ loginErrorEl.textContent="Login yoki parol noto‘g‘ri."; return; }
+      data.currentUser={username:user.username,role:user.role};
       saveCurrentUserToLocal();
       loginForm.reset();
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
-    } catch (err) {
+    }catch(err){
       console.error(err);
-      loginErrorEl.textContent = "Kirishda xatolik yuz berdi.";
+      loginErrorEl.textContent="Kirishda xatolik yuz berdi.";
     }
   });
 
-  // ---------------- REGISTER ----------------
-  registerForm.addEventListener("submit", async e => {
+  /* REGISTER */
+  registerForm.addEventListener("submit",async e=>{
     e.preventDefault();
-    registerErrorEl.textContent = "";
-
-    const username = regUsername.value.trim();
-    const password = regPassword.value;
-    const password2 = regPassword2.value;
-
-    if (!username || !password) {
-      registerErrorEl.textContent = "Login va parolni kiriting.";
-      return;
-    }
-    if (password !== password2) {
-      registerErrorEl.textContent = "Parollar mos kelmadi.";
-      return;
-    }
-
-    try {
-      await registerUser(username, password);
-      data.currentUser = { username, role: "user" };
+    registerErrorEl.textContent="";
+    const u=regUsername.value.trim();
+    const p=regPassword.value;
+    const p2=regPassword2.value;
+    if(!u||!p){ registerErrorEl.textContent="Login va parolni kiriting."; return; }
+    if(p!==p2){ registerErrorEl.textContent="Parollar mos kelmadi."; return; }
+    try{
+      await registerUser(u,p);
+      data.currentUser={username:u,role:"user"};
       saveCurrentUserToLocal();
       registerForm.reset();
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
-    } catch (err) {
-      if (err.message === "exists") {
-        registerErrorEl.textContent = "Bu login band. Boshqa login tanlang.";
-      } else {
-        console.error(err);
-        registerErrorEl.textContent = "Ro‘yxatdan o‘tishda xatolik yuz berdi.";
-      }
+    }catch(err){
+      if(err.message==="exists") registerErrorEl.textContent="Bu login band.";
+      else{ console.error(err); registerErrorEl.textContent="Ro‘yxatdan o‘tishda xatolik."; }
     }
   });
 
-  // ---------------- LOGOUT ----------------
-  logoutBtn.addEventListener("click", () => {
-    data.currentUser = null;
+  logoutBtn.addEventListener("click",()=>{
+    data.currentUser=null;
     saveCurrentUserToLocal();
     updateUI();
   });
 
-  // ---------------- KURS QO'SHISH (ADMIN) ----------------
-  courseForm.addEventListener("submit", async e => {
+  /* COURSE ADD (ADMIN) */
+  courseForm.addEventListener("submit",async e=>{
     e.preventDefault();
-    if (!data.currentUser || data.currentUser.role !== "admin") return;
-
-    courseError.textContent = "";
-    const title = document.getElementById("course-title").value.trim();
-    const desc = document.getElementById("course-desc").value.trim();
-    const cat = document.getElementById("course-cat").value.trim();
-    const price = document.getElementById("course-price").value.trim();
-    const imageFile = document.getElementById("course-image").files[0] || null;
-
-    if (!title || !desc) {
-      courseError.textContent = "Kurs nomi va tavsifi majburiy.";
-      return;
-    }
-
-    const newId = Date.now().toString();
-    let imageUrl = "";
-
-    try {
-      if (imageFile) {
-        imageUrl = await uploadCourseImage(imageFile, newId);
-      }
-
-      const newCourse = {
-        id: newId,
-        title,
-        description: desc,
-        category: cat,
-        price,
-        imageUrl,
-        lessons: []
-      };
-
+    if(!data.currentUser || data.currentUser.role!=="admin") return;
+    courseError.textContent="";
+    const title=document.getElementById("course-title").value.trim();
+    const desc=document.getElementById("course-desc").value.trim();
+    const cat=document.getElementById("course-cat").value.trim();
+    const price=document.getElementById("course-price").value.trim();
+    if(!title||!desc){ courseError.textContent="Kurs nomi va tavsifi majburiy."; return; }
+    const newCourse={ id:Date.now().toString(), title, description:desc, category:cat, price, lessons:[] };
+    try{
       await addCourseToFirestore(newCourse);
       courseForm.reset();
       await refreshCourses();
-    } catch (err) {
+    }catch(err){
       console.error(err);
-      courseError.textContent = "Kursni saqlashda xatolik yuz berdi.";
+      courseError.textContent="Kursni saqlashda xatolik.";
     }
   });
 
-  // ---------------- NAV BOSGANDA HOLATLAR ----------------
-  navCourses.addEventListener("click", e => {
+  /* NAV */
+  navCourses.addEventListener("click",e=>{
     e.preventDefault();
-    if (!data.currentUser) {
+    if(!data.currentUser){
       authSection.classList.remove("hidden");
       adminSection.classList.add("hidden");
       userSection.classList.add("hidden");
-      const loginTabBtn = document.querySelector('.tab-btn[data-tab="login"]');
-      if (loginTabBtn) loginTabBtn.click();
+      const loginTabBtn=document.querySelector('.tab-btn[data-tab="login"]');
+      if(loginTabBtn) loginTabBtn.click();
       return;
     }
     adminSection.classList.add("hidden");
     userSection.classList.remove("hidden");
     showUserCoursesList();
   });
-
-  navAdmin.addEventListener("click", e => {
+  navAdmin.addEventListener("click",e=>{
     e.preventDefault();
-    if (!data.currentUser || data.currentUser.role !== "admin") return;
+    if(!data.currentUser || data.currentUser.role!=="admin") return;
     userSection.classList.add("hidden");
     adminSection.classList.remove("hidden");
   });
 
-  // ---------------- INIT APP ----------------
-  (async function initApp() {
-    try {
+  /* INIT */
+  (async function initApp(){
+    try{
       await ensureDefaultAdmin();
-      data.currentUser = loadCurrentUserFromLocal();
+      data.currentUser=loadCurrentUserFromLocal();
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
-    } catch (err) {
-      console.error("Init error:", err);
-    }
+    }catch(err){ console.error("init error",err); }
   })();
 </script>
 </body>
