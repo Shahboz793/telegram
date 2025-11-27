@@ -8,38 +8,45 @@
     *{box-sizing:border-box;margin:0;padding:0}
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:#f3f4f6;
+      background:linear-gradient(180deg,#0f172a 0%,#111827 25%,#f97316 25.1%,#fef3c7 60%,#f3f4f6 100%);
       color:#111827;
     }
     a{text-decoration:none;color:inherit}
-
     .page{min-height:100vh;display:flex;flex-direction:column;}
 
     /* HEADER */
     .header{
       position:sticky;top:0;z-index:10;
       display:flex;align-items:center;justify-content:space-between;
-      padding:10px 20px;
-      background:#0f172a;
+      padding:10px 16px;
+      background:linear-gradient(90deg,#0f172a,#111827,#1e293b);
       color:#e5e7eb;
-      border-bottom:1px solid #1f2937;
+      border-bottom:1px solid rgba(148,163,184,0.4);
+      box-shadow:0 12px 30px rgba(15,23,42,0.7);
     }
     .logo{
-      font-weight:800;font-size:20px;
+      font-weight:800;font-size:22px;letter-spacing:.03em;
     }
     .logo span{color:#f97316;}
-    .nav{display:flex;align-items:center;gap:14px;font-size:14px;}
+    .nav{display:flex;align-items:center;gap:12px;font-size:14px;}
     .nav a{color:#e5e7eb;opacity:.85;cursor:pointer;}
     .nav a:hover{opacity:1;}
     .nav .user-label{font-size:13px;opacity:.8;}
     .btn-outline{
-      border:1px solid #e5e7eb;
+      border:1px solid rgba(248,250,252,0.7);
       border-radius:999px;
-      padding:4px 10px;
+      padding:6px 14px;
       font-size:13px;
       cursor:pointer;
-      background:transparent;
+      background:rgba(15,23,42,0.4);
       color:#e5e7eb;
+      box-shadow:0 4px 10px rgba(15,23,42,0.6);
+      transition:transform .1s ease,box-shadow .1s ease,background .1s ease;
+    }
+    .btn-outline:hover{
+      transform:translateY(-1px);
+      background:rgba(15,23,42,0.8);
+      box-shadow:0 8px 18px rgba(15,23,42,0.8);
     }
 
     /* LAYOUT */
@@ -49,18 +56,16 @@
       padding:18px 12px 32px;
       flex:1 0 auto;
     }
-
-    .section{
-      margin-bottom:18px;
-    }
+    .section{margin-bottom:18px;}
     .hidden{display:none;}
 
     .card{
-      background:#ffffff;
-      border-radius:16px;
-      padding:16px 16px 18px;
-      box-shadow:0 18px 45px rgba(15,23,42,0.08);
-      border:1px solid #e5e7eb;
+      background:rgba(255,255,255,0.96);
+      border-radius:18px;
+      padding:18px 16px 20px;
+      box-shadow:0 18px 45px rgba(15,23,42,0.18);
+      border:1px solid rgba(148,163,184,0.5);
+      backdrop-filter:blur(8px);
     }
     .card h2{
       font-size:18px;
@@ -71,19 +76,12 @@
       color:#6b7280;
       margin-bottom:10px;
     }
-
-    .hero-text{
-      font-size:14px;
-      color:#4b5563;
-    }
+    .hero-text{font-size:14px;color:#4b5563;}
 
     .grid-2{
       display:grid;
       grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);
       gap:16px;
-    }
-    @media(max-width:900px){
-      .grid-2{grid-template-columns:minmax(0,1fr);}
     }
 
     /* FORM */
@@ -99,7 +97,7 @@
     .tab-btn{
       border:none;
       border-radius:999px;
-      padding:5px 12px;
+      padding:6px 14px;
       font-size:13px;
       cursor:pointer;
       background:transparent;
@@ -107,7 +105,7 @@
     }
     .tab-btn.active{
       background:#ffffff;
-      box-shadow:0 2px 8px rgba(15,23,42,0.18);
+      box-shadow:0 3px 10px rgba(15,23,42,0.26);
       color:#111827;
     }
 
@@ -117,22 +115,16 @@
       gap:10px;
       margin-top:6px;
     }
-    .form-row{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-    label{
-      font-size:13px;
-      color:#4b5563;
-    }
+    .form-row{display:flex;flex-direction:column;gap:4px;}
+    label{font-size:13px;color:#4b5563;}
     input,textarea,select{
-      border-radius:10px;
+      border-radius:12px;
       border:1px solid #d1d5db;
-      padding:8px 10px;
+      padding:9px 11px;
       background:#f9fafb;
-      font-size:14px;
+      font-size:15px;
       color:#111827;
+      box-shadow:0 2px 5px rgba(148,163,184,0.35) inset;
     }
     textarea{min-height:70px;resize:vertical;}
     .form-grid{
@@ -140,47 +132,43 @@
       grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
       gap:10px;
     }
+
     .btn{
       align-self:flex-start;
-      padding:8px 16px;
+      padding:9px 18px;
       border-radius:999px;
-      border:none;
+      border:1px solid rgba(249,115,22,0.9);
       cursor:pointer;
-      background:linear-gradient(90deg,#6366f1,#ec4899);
+      background:linear-gradient(135deg,#f97316,#ea580c,#facc15);
       color:#ffffff;
-      font-weight:600;
-      font-size:14px;
-      box-shadow:0 10px 22px rgba(129,140,248,0.45);
-      transition:transform .1s ease,box-shadow .1s ease;
+      font-weight:700;
+      font-size:15px;
+      letter-spacing:.02em;
+      box-shadow:0 8px 22px rgba(248,113,22,0.7);
+      transition:transform .1s ease,box-shadow .1s ease,filter .1s ease;
     }
     .btn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 14px 30px rgba(129,140,248,0.6);
+      transform:translateY(-2px);
+      box-shadow:0 14px 30px rgba(248,113,22,0.85);
+      filter:brightness(1.02);
     }
     .btn:active{
       transform:translateY(0);
-      box-shadow:0 6px 14px rgba(129,140,248,0.4);
+      box-shadow:0 5px 15px rgba(248,113,22,0.75);
     }
     .btn-xs{
       border-radius:999px;
       border:1px solid #d1d5db;
-      padding:2px 6px;
+      padding:4px 8px;
       font-size:11px;
       background:#ffffff;
       cursor:pointer;
+      box-shadow:0 2px 6px rgba(148,163,184,0.6);
     }
-    .btn-xs:hover{
-      background:#f3f4f6;
-    }
-    .hint{
-      font-size:11px;
-      color:#6b7280;
-    }
-    .error{
-      font-size:12px;
-      color:#b91c1c;
-      margin-top:2px;
-    }
+    .btn-xs:hover{background:#f3f4f6;}
+
+    .hint{font-size:11px;color:#6b7280;}
+    .error{font-size:12px;color:#b91c1c;margin-top:2px;}
     .pill{
       font-size:11px;
       padding:4px 10px;
@@ -188,6 +176,7 @@
       background:#eff6ff;
       color:#1d4ed8;
       width:max-content;
+      box-shadow:0 2px 6px rgba(59,130,246,0.4);
     }
 
     /* COURSES */
@@ -207,19 +196,16 @@
       margin-top:6px;
     }
     .course-card{
-      background:#f9fafb;
-      border-radius:12px;
-      border:1px solid #e5e7eb;
+      background:linear-gradient(135deg,#ffffff,#f9fafb);
+      border-radius:14px;
+      border:1px solid rgba(209,213,219,0.8);
       padding:10px;
       display:flex;
       flex-direction:column;
       gap:6px;
+      box-shadow:0 8px 18px rgba(148,163,184,0.4);
     }
-    .course-title{
-      font-size:15px;
-      font-weight:600;
-      color:#111827;
-    }
+    .course-title{font-size:15px;font-weight:600;color:#111827;}
     .course-desc{
       font-size:13px;
       color:#4b5563;
@@ -233,17 +219,13 @@
       font-size:11px;
     }
     .badge{
-      padding:2px 8px;
+      padding:3px 8px;
       border-radius:999px;
       background:#e5e7eb;
       color:#374151;
     }
-    .badge.free{
-      background:#dcfce7;color:#166534;
-    }
-    .badge.price{
-      background:#fef9c3;color:#854d0e;
-    }
+    .badge.free{background:#dcfce7;color:#166534;}
+    .badge.price{background:#fef9c3;color:#854d0e;}
 
     .course-footer{
       display:flex;
@@ -264,44 +246,41 @@
     }
     .lesson-item{
       background:#ffffff;
-      border-radius:10px;
+      border-radius:12px;
       border:1px solid #e5e7eb;
-      padding:8px 10px;
+      padding:9px 10px;
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:8px;
       cursor:pointer;
-      transition:background .1s ease,box-shadow .1s ease,transform .05s ease;
+      transition:background .1s ease,box-shadow .1s ease,transform .05s ease,border-color .1s ease;
+      box-shadow:0 4px 10px rgba(148,163,184,0.45);
     }
     .lesson-item:hover{
       background:#eef2ff;
-      box-shadow:0 4px 10px rgba(79,70,229,0.15);
+      box-shadow:0 7px 16px rgba(79,70,229,0.5);
       transform:translateY(-1px);
+      border-color:#818cf8;
     }
     .lesson-item.locked{
-      opacity:.5;
+      opacity:.55;
       cursor:not-allowed;
       box-shadow:none;
       background:#f9fafb;
     }
-    .lesson-title{
-      font-size:13px;
-      font-weight:500;
-    }
-    .lesson-status{
-      font-size:11px;
-      text-align:right;
-    }
+    .lesson-title{font-size:13px;font-weight:500;}
+    .lesson-status{font-size:11px;text-align:right;}
 
     .video-wrapper{
       position:relative;
       padding-bottom:56.25%;
       height:0;
       overflow:hidden;
-      border-radius:10px;
+      border-radius:12px;
       background:#000;
       margin-top:6px;
+      box-shadow:0 12px 28px rgba(15,23,42,0.8);
     }
     .video-wrapper iframe{
       position:absolute;
@@ -315,11 +294,7 @@
       padding-top:6px;
     }
 
-    .empty{
-      font-size:13px;
-      color:#9ca3af;
-      margin-top:6px;
-    }
+    .empty{font-size:13px;color:#9ca3af;margin-top:6px;}
 
     table.user-table{
       width:100%;
@@ -346,32 +321,24 @@
       gap:12px;
       margin-top:10px;
     }
-    @media(max-width:900px){
-      .detail-layout{
-        grid-template-columns:1fr;
-      }
-    }
 
     .lesson-player-box{
       margin-top:0;
-      background:#f9fafb;
-      border-radius:12px;
-      border:1px solid #e5e7eb;
+      background:linear-gradient(135deg,#eff6ff,#f9fafb);
+      border-radius:14px;
+      border:1px solid #dbeafe;
       padding:10px;
       display:flex;
       flex-direction:column;
       gap:4px;
+      box-shadow:0 10px 24px rgba(59,130,246,0.35);
     }
-    .progress-text{
-      font-size:12px;
-      color:#4b5563;
-      margin-top:4px;
-    }
+    .progress-text{font-size:12px;color:#4b5563;margin-top:4px;}
     .progress-bar-wrap{
       margin-top:4px;
       background:#e5e7eb;
       border-radius:999px;
-      height:6px;
+      height:7px;
       overflow:hidden;
     }
     .progress-bar{
@@ -395,8 +362,8 @@
     .modal-backdrop{
       position:absolute;
       inset:0;
-      background:rgba(15,23,42,0.55);
-      backdrop-filter:blur(4px);
+      background:rgba(15,23,42,0.65);
+      backdrop-filter:blur(6px);
     }
     .modal-content{
       position:relative;
@@ -405,9 +372,9 @@
       max-width:900px;
       max-height:85vh;
       background:#ffffff;
-      border-radius:16px;
+      border-radius:18px;
       padding:16px;
-      box-shadow:0 24px 60px rgba(15,23,42,0.35);
+      box-shadow:0 24px 60px rgba(15,23,42,0.75);
       display:flex;
       flex-direction:column;
       gap:10px;
@@ -419,9 +386,7 @@
       gap:8px;
       margin-bottom:4px;
     }
-    .modal-body{
-      overflow-y:auto;
-    }
+    .modal-body{overflow-y:auto;}
     .modal-close{
       border:none;
       background:#e5e7eb;
@@ -449,6 +414,44 @@
       align-items:center;
     }
     .footer small{opacity:.8;}
+
+    /* ===== MOBIL MOSLASH ===== */
+    @media(max-width:768px){
+      .header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:6px;
+      }
+      .nav{
+        width:100%;
+        justify-content:space-between;
+      }
+      .container{
+        padding:14px 10px 22px;
+      }
+      .grid-2{
+        grid-template-columns:minmax(0,1fr);
+      }
+      .card{
+        padding:14px 12px 16px;
+        border-radius:16px;
+      }
+      .btn,
+      .btn-outline{
+        width:100%;
+        text-align:center;
+        justify-content:center;
+      }
+      .course-grid{
+        grid-template-columns:minmax(0,1fr);
+      }
+      .detail-layout{
+        grid-template-columns:1fr;
+      }
+      .lesson-item{
+        padding:9px 9px;
+      }
+    }
   </style>
 
   <!-- FIREBASE (compat) -->
@@ -706,6 +709,7 @@
   /* LOCAL STATE */
   let data = { currentUser: null, courses: [] };
   const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
+  const REMEMBER_CREDENTIALS_KEY = "talimEduRemember_v1";
 
   function loadCurrentUserFromLocal() {
     try {
@@ -717,6 +721,19 @@
   function saveCurrentUserToLocal() {
     if (!data.currentUser) localStorage.removeItem(CURRENT_USER_KEY);
     else localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data.currentUser));
+  }
+
+  function saveRememberedCredentials(username, password) {
+    try {
+      localStorage.setItem(REMEMBER_CREDENTIALS_KEY, JSON.stringify({ username, password }));
+    } catch {}
+  }
+  function loadRememberedCredentials() {
+    try {
+      const raw = localStorage.getItem(REMEMBER_CREDENTIALS_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch { return null; }
   }
 
   async function ensureDefaultAdmin() {
@@ -1206,7 +1223,6 @@
   async function openLessonPlayer(lesson){
     if(!currentCourseDetail || !data.currentUser) return;
 
-    // eski darsni pauza qilamiz va progressni saqlaymiz
     stopCurrentPlayer();
 
     currentLessonId = lesson.id;
@@ -1376,6 +1392,7 @@
       if(!user){ loginErrorEl.textContent="Login yoki parol noto‘g‘ri."; return; }
       data.currentUser={username:user.username,role:user.role};
       saveCurrentUserToLocal();
+      saveRememberedCredentials(u,p); // login/parolni eslab qolish
       loginForm.reset();
       updateUI();
       await refreshCourses();
@@ -1399,6 +1416,7 @@
       await registerUser(u,p);
       data.currentUser={username:u,role:"user"};
       saveCurrentUserToLocal();
+      saveRememberedCredentials(u,p); // yangi ro'yxatdan o'tganda ham eslab qolish
       registerForm.reset();
       updateUI();
       await refreshCourses();
@@ -1458,7 +1476,6 @@
     adminSection.classList.remove("hidden");
   });
 
-  // Tab yopilganda ham progressni oxirgi marta saqlashga urinamiz
   window.addEventListener("beforeunload",()=>{
     saveCurrentLessonProgressOnce();
   });
@@ -1467,6 +1484,14 @@
   (async function initApp(){
     try{
       await ensureDefaultAdmin();
+
+      // Avval login/parolni localStorage'dan formaga yuklaymiz
+      const remembered = loadRememberedCredentials();
+      if (remembered) {
+        if (remembered.username) loginUsername.value = remembered.username;
+        if (remembered.password) loginPassword.value = remembered.password;
+      }
+
       data.currentUser=loadCurrentUserFromLocal();
       updateUI();
       await refreshCourses();
