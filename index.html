@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <title>Ta'lim Edu — Kurs Platforma (HTML + JS + Firestore)</title>
+  <title>Ta'lim Edu — Kurs Platforma (HTML + JS)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -71,6 +71,11 @@
       margin-bottom:10px;
     }
 
+    .hero-title{
+      font-size:24px;
+      font-weight:700;
+      margin-bottom:4px;
+    }
     .hero-text{
       font-size:14px;
       color:#4b5563;
@@ -250,9 +255,16 @@
       border-radius:8px;
       background:#000;
     }
-    .video-wrapper #yt-player-container{
+    .video-wrapper iframe{
       position:absolute;
       top:0;left:0;width:100%;height:100%;
+      border:0;
+    }
+
+    .mini-form{
+      margin-top:6px;
+      border-top:1px dashed #e5e7eb;
+      padding-top:6px;
     }
 
     .empty{
@@ -356,10 +368,24 @@
       color:#e5e7eb;
     }
 
-    .loading{
-      font-size:13px;
-      color:#6b7280;
-      margin-top:6px;
+    .course-actions{
+      display:flex;
+      gap:6px;
+      align-items:center;
+      margin-top:4px;
+      flex-wrap:wrap;
+    }
+    .link-btn{
+      font-size:11px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid #0ea5e9;
+      background:#e0f2fe;
+      color:#0369a1;
+      cursor:pointer;
+    }
+    .link-btn:hover{
+      background:#bae6fd;
     }
   </style>
 </head>
@@ -432,14 +458,14 @@
           <div class="card">
             <h2>Platforma haqida</h2>
             <p class="sub">
-              Bu Ta'lim Edu uchun HTML + CSS + JS + Firestore asosida yaratilgan demo kurs tizimi.
+              Bu Ta'lim Edu uchun HTML + CSS + JS asosida yaratilgan demo kurs tizimi.
             </p>
             <p class="hero-text">
-              • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga ko‘plab YouTube <b>Unlisted</b> videolarni qo‘shishi mumkin.<br>
+              • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga 30 ta va undan ortiq
+              YouTube <b>yashirin (Unlisted)</b> videolarni qo‘shishi mumkin.<br>
               • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va <b>kurslar ichidagi darslarni tomosha qiladi</b>.<br><br>
-              Ma'lumotlar Firestore’da saqlanadi, shuning uchun boshqa telefon va kompyuterdan kirganda ham kurslar ko‘rinadi.
+              Videolar YouTube’da saqlanadi, sayt esa ularni o‘z ichiga o‘rnatib beradi.
             </p>
-            <p id="load-status" class="loading">Ma'lumotlar yuklanmoqda...</p>
           </div>
         </div>
       </div>
@@ -475,6 +501,11 @@
               <label for="course-price">Narx (so'm)</label>
               <input id="course-price" type="number" min="0" placeholder="0 = bepul" />
             </div>
+          </div>
+          <div class="form-row">
+            <label for="course-telegram">Kursning Telegram havolasi (ixtiyoriy)</label>
+            <input id="course-telegram" placeholder="https://t.me/kanal yoki guruh" />
+            <p class="hint">Talabalar uchun kursga tegishli Telegram kanal/guruh havolasini qo‘shish mumkin.</p>
           </div>
           <button type="submit" class="btn">Kursni qo‘shish</button>
           <div id="course-error" class="error"></div>
@@ -515,110 +546,38 @@
   </main>
 </div>
 
-<!-- Barcha JS: Firestore + UI + YouTube player -->
-<script type="module">
-  // ---------- FIREBASE IMPORTLAR ----------
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+<script>
+  const LS_KEY = "talimEduAppData_v1";
 
-  // ---------- FIREBASE CONFIG — SENIKI QO'YILDI ----------
-  const firebaseConfig = {
-    apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
-    authDomain: "shahboz-5d0a3.firebaseapp.com",
-    projectId: "shahboz-5d0a3",
-    storageBucket: "shahboz-5d0a3.firebasestorage.app",
-    messagingSenderId: "352024095535",
-    appId: "1:352024095535:web:6ca630de2c199a33c54fda",
-    measurementId: "G-YS5RGZ00EB"
-  };
-
-  // Firebase init
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const DATA_DOC = doc(db, "talimEdu", "appData");
-
-  // ---------- LOCAL HOLAT ----------
-  const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
-
-  let data = {
-    users: [],
-    courses: [] // {id,title,description,category,price,lessons:[{id,title,videoId}]}
-  };
-  let currentUser = loadCurrentUserLocal();
-  let isDataLoaded = false;
-
-  const loadStatus = document.getElementById("load-status");
-
-  // Firestore'dan ma'lumot yuklash
-  async function loadDataFromFirestore() {
-    try {
-      const snap = await getDoc(DATA_DOC);
-      if (!snap.exists()) {
-        const initial = {
-          users: [
-            { username: "admin", password: "admin123", role: "admin" }
-          ],
-          courses: []
-        };
-        await setDoc(DATA_DOC, initial);
-        return initial;
-      }
-      const d = snap.data() || {};
-      if (!Array.isArray(d.users)) d.users = [];
-      if (!Array.isArray(d.courses)) d.courses = [];
-      if (!d.users.some(u => u.username === "admin" && u.role === "admin")) {
-        d.users.push({ username: "admin", password: "admin123", role: "admin" });
-      }
-      await setDoc(DATA_DOC, d);
-      return d;
-    } catch (err) {
-      console.error("Firestore yuklash xatosi:", err);
-      if (loadStatus) loadStatus.textContent = "Ma'lumotlarni yuklashda xato. Internet va Firebase sozlamalarini tekshiring.";
-      return {
+  function loadData() {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) {
+      const initial = {
         users: [
           { username: "admin", password: "admin123", role: "admin" }
         ],
-        courses: []
+        currentUser: null,
+        courses: [] // {id,title,description,category,price,telegram,lessons:[{id,title,videoId}]}
       };
+      localStorage.setItem(LS_KEY, JSON.stringify(initial));
+      return initial;
     }
-  }
-
-  async function saveDataToFirestore() {
-    try {
-      await setDoc(DATA_DOC, data);
-    } catch (err) {
-      console.error("Firestore saqlash xatosi:", err);
-      alert("Ma'lumotni Firestore'ga saqlashda xato bo‘ldi. Internetni tekshiring.");
-    }
-  }
-
-  function loadCurrentUserLocal() {
-    const raw = localStorage.getItem(CURRENT_USER_KEY);
-    if (!raw) return null;
     try {
       return JSON.parse(raw);
-    } catch {
-      return null;
+    } catch (e) {
+      console.error("JSON parse error, resetting storage", e);
+      localStorage.removeItem(LS_KEY);
+      return loadData();
     }
   }
 
-  function saveCurrentUserLocal() {
-    if (currentUser) {
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem(CURRENT_USER_KEY);
-    }
+  function saveData() {
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
   }
 
-  function ensureLoaded() {
-    if (!isDataLoaded) {
-      alert("Ma'lumotlar hali yuklanmoqda. Biroz kutib qayta urinib ko‘ring.");
-      return false;
-    }
-    return true;
-  }
+  let data = loadData();
 
-  // ---------- DOM ELEMENTLAR ----------
+  // DOM elements
   const authSection = document.getElementById("auth-section");
   const adminSection = document.getElementById("admin-section");
   const userSection = document.getElementById("user-section");
@@ -627,23 +586,13 @@
   const currentUserLabel = document.getElementById("current-user-label");
   const userRolePill = document.getElementById("user-role-pill");
 
+  // Auth tabs
   const tabButtons = document.querySelectorAll(".tab-btn");
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
   const loginErrorEl = document.getElementById("login-error");
   const registerErrorEl = document.getElementById("register-error");
 
-  const courseForm = document.getElementById("course-form");
-  const courseError = document.getElementById("course-error");
-  const adminCourseList = document.getElementById("admin-course-list");
-  const adminCourseCount = document.getElementById("admin-course-count");
-  const adminEmpty = document.getElementById("admin-empty");
-
-  const userCourseList = document.getElementById("user-course-list");
-  const userCourseCount = document.getElementById("user-course-count");
-  const userEmpty = document.getElementById("user-empty");
-
-  // ---------- TABS ----------
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       tabButtons.forEach(b => b.classList.remove("active"));
@@ -661,11 +610,9 @@
     });
   });
 
-  // ---------- LOGIN ----------
-  loginForm.addEventListener("submit", async e => {
+  // LOGIN
+  loginForm.addEventListener("submit", e => {
     e.preventDefault();
-    if (!ensureLoaded()) return;
-
     loginErrorEl.textContent = "";
     const username = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value;
@@ -676,17 +623,15 @@
       return;
     }
 
-    currentUser = { username: user.username, role: user.role };
-    saveCurrentUserLocal();
+    data.currentUser = { username: user.username, role: user.role };
+    saveData();
     loginForm.reset();
     updateUI();
   });
 
-  // ---------- REGISTER ----------
-  registerForm.addEventListener("submit", async e => {
+  // REGISTER
+  registerForm.addEventListener("submit", e => {
     e.preventDefault();
-    if (!ensureLoaded()) return;
-
     registerErrorEl.textContent = "";
     const username = document.getElementById("reg-username").value.trim();
     const password = document.getElementById("reg-password").value;
@@ -706,31 +651,36 @@
     }
 
     data.users.push({ username, password, role: "user" });
-    await saveDataToFirestore();
-    currentUser = { username, role: "user" };
-    saveCurrentUserLocal();
+    data.currentUser = { username, role: "user" };
+    saveData();
     registerForm.reset();
     updateUI();
   });
 
-  // ---------- LOGOUT ----------
+  // LOGOUT
   logoutBtn.addEventListener("click", () => {
-    currentUser = null;
-    saveCurrentUserLocal();
+    data.currentUser = null;
+    saveData();
     updateUI();
   });
 
-  // ---------- KURS QO‘SHISH (ADMIN) ----------
-  courseForm.addEventListener("submit", async e => {
+  // COURSE MANAGEMENT (ADMIN)
+  const courseForm = document.getElementById("course-form");
+  const courseError = document.getElementById("course-error");
+  const adminCourseList = document.getElementById("admin-course-list");
+  const adminCourseCount = document.getElementById("admin-course-count");
+  const adminEmpty = document.getElementById("admin-empty");
+
+  courseForm.addEventListener("submit", e => {
     e.preventDefault();
-    if (!ensureLoaded()) return;
-    if (!currentUser || currentUser.role !== "admin") return;
+    if (!data.currentUser || data.currentUser.role !== "admin") return;
 
     courseError.textContent = "";
     const title = document.getElementById("course-title").value.trim();
     const desc = document.getElementById("course-desc").value.trim();
     const cat = document.getElementById("course-cat").value.trim();
     const price = document.getElementById("course-price").value.trim();
+    const telegram = document.getElementById("course-telegram").value.trim();
 
     if (!title || !desc) {
       courseError.textContent = "Kurs nomi va tavsifi majburiy.";
@@ -743,10 +693,11 @@
       description: desc,
       category: cat,
       price,
+      telegram,
       lessons: []
     };
     data.courses.push(newCourse);
-    await saveDataToFirestore();
+    saveData();
     courseForm.reset();
     renderAdminCourses();
     renderUserCourses();
@@ -762,18 +713,21 @@
   function extractYouTubeId(input) {
     if (!input) return "";
     let url = input.trim();
+    // youtu.be/xxxx
     let m = url.match(/youtu\.be\/([^?&]+)/);
     if (m) return m[1];
+    // youtube.com/watch?v=xxxx
     m = url.match(/v=([^&]+)/);
     if (m) return m[1];
+    // youtube.com/embed/xxxx
     m = url.match(/embed\/([^?&]+)/);
     if (m) return m[1];
+    // faqat ID bo’lsa
     return url;
   }
 
-  // ---------- ADMIN KURSLAR RENDER ----------
   function renderAdminCourses() {
-    const courses = data.courses || [];
+    const courses = data.courses;
     adminCourseList.innerHTML = "";
     adminCourseCount.textContent = courses.length + " ta kurs";
 
@@ -813,7 +767,7 @@
         <div class="course-meta">
           ${course.category ? `<span class="badge">${course.category}</span>` : ""}
           ${formatPrice(course.price) ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${formatPrice(course.price)}</span>` : ""}
-          <span class="badge">Darslar: ${course.lessons ? course.lessons.length : 0}</span>
+          <span class="badge">Darslar: ${course.lessons.length}</span>
         </div>
         <div class="mini-form">
           <div class="muted" style="margin-bottom:4px;">Ushbu kursga yangi dars/video qo‘shish:</div>
@@ -837,11 +791,10 @@
   }
 
   // Dars qo‘shish (admin)
-  adminCourseList.addEventListener("submit", async e => {
+  adminCourseList.addEventListener("submit", e => {
     if (!e.target.classList.contains("lesson-form")) return;
     e.preventDefault();
-    if (!ensureLoaded()) return;
-    if (!currentUser || currentUser.role !== "admin") return;
+    if (!data.currentUser || data.currentUser.role !== "admin") return;
 
     const form = e.target;
     const courseId = form.dataset.courseId;
@@ -858,30 +811,28 @@
       return;
     }
 
-    course.lessons = course.lessons || [];
     course.lessons.push({
       id: Date.now().toString(),
       title,
       videoId
     });
-    await saveDataToFirestore();
+    saveData();
     form.reset();
     renderAdminCourses();
     renderUserCourses();
   });
 
   // Darsni o‘chirish (admin)
-  adminCourseList.addEventListener("click", async e => {
+  adminCourseList.addEventListener("click", e => {
     const btn = e.target.closest(".btn-xs[data-action='delete-lesson']");
     if (!btn) return;
-    if (!ensureLoaded()) return;
-    if (!currentUser || currentUser.role !== "admin") return;
+    if (!data.currentUser || data.currentUser.role !== "admin") return;
 
     const courseId = btn.dataset.courseId;
     const lessonId = btn.dataset.lessonId;
 
     const course = data.courses.find(c => c.id === courseId);
-    if (!course || !course.lessons) return;
+    if (!course) return;
 
     const idx = course.lessons.findIndex(l => l.id === lessonId);
     if (idx === -1) return;
@@ -889,17 +840,22 @@
     if (!confirm("Bu darsni o‘chirmoqchimisiz?")) return;
 
     course.lessons.splice(idx, 1);
-    await saveDataToFirestore();
+    saveData();
     renderAdminCourses();
     renderUserCourses();
   });
 
-  // ---------- USER VIEW + YOUTUBE PLAYER ----------
+  // USER VIEW
+  const userCourseList = document.getElementById("user-course-list");
+  const userCourseCount = document.getElementById("user-course-count");
+  const userEmpty = document.getElementById("user-empty");
+
+  // YouTube API / players
   let ytApiReady = false;
   const players = {}; // { [courseId]: { player: YT.Player, currentIndex:number } }
 
   function renderUserCourses() {
-    const courses = data.courses || [];
+    const courses = data.courses;
     userCourseList.innerHTML = "";
     userCourseCount.textContent = courses.length + " ta kurs";
 
@@ -946,25 +902,34 @@
         `;
       }
 
+      const actionsHtml = `
+        <div class="course-actions">
+          ${course.telegram ? `<a class="link-btn" href="${course.telegram}" target="_blank" rel="noopener noreferrer">Telegram havola</a>` : ""}
+        </div>
+      `;
+
       card.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
           ${course.category ? `<span class="badge">${course.category}</span>` : ""}
           ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
-          <span class="badge">Darslar: ${course.lessons ? course.lessons.length : 0}</span>
+          <span class="badge">Darslar: ${course.lessons.length}</span>
         </div>
         <div class="course-footer">
           <span class="muted">Kurs ID: ${course.id}</span>
         </div>
+        ${actionsHtml}
         ${lessonsHtml}
       `;
       userCourseList.appendChild(card);
     });
 
+    // Playlist render bo‘lgandan keyin playerlarni yangilaymiz
     setupAllPlayers();
   }
 
+  // Playlistda darsni bosganda video almashtirish
   userCourseList.addEventListener("click", e => {
     const btn = e.target.closest(".lesson-playlist-item");
     if (!btn) return;
@@ -972,7 +937,7 @@
     const courseId = btn.dataset.courseId;
     const index = Number(btn.dataset.index);
     const course = data.courses.find(c => c.id === courseId);
-    if (!course || !course.lessons || !course.lessons[index]) return;
+    if (!course || !course.lessons[index]) return;
 
     const lesson = course.lessons[index];
     const info = players[courseId];
@@ -1006,7 +971,7 @@
     }
 
     // yangidan yaratish
-    (data.courses || []).forEach(course => {
+    data.courses.forEach(course => {
       if (!course.lessons || course.lessons.length === 0) return;
       const containerId = "player-" + course.id;
       const container = document.getElementById(containerId);
@@ -1058,15 +1023,15 @@
     }
   }
 
-  // YouTube API callback'ni globalga ulab qo'yamiz
-  window.onYouTubeIframeAPIReady = function() {
+  // YouTube API callback
+  function onYouTubeIframeAPIReady() {
     ytApiReady = true;
     setupAllPlayers();
-  };
+  }
 
-  // ---------- UI UPDATE ----------
+  // UI UPDATE
   function updateUI() {
-    const user = currentUser;
+    const user = data.currentUser;
     if (!user) {
       authSection.classList.remove("hidden");
       adminSection.classList.add("hidden");
@@ -1096,17 +1061,10 @@
     renderUserCourses();
   }
 
-  // ---------- INIT ----------
-  (async function init() {
-    if (loadStatus) loadStatus.textContent = "Ma'lumotlar yuklanmoqda...";
-    data = await loadDataFromFirestore();
-    isDataLoaded = true;
-    if (loadStatus) loadStatus.textContent = "Ma'lumotlar muvaffaqiyatli yuklandi.";
-    updateUI();
-  })();
+  // Initial render
+  updateUI();
 </script>
-
-<!-- YouTube IFrame API (modul emas, oddiy script) -->
+<!-- YouTube IFrame API -->
 <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
