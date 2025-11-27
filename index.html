@@ -349,6 +349,56 @@
       transition:width .2s ease;
     }
 
+    /* QUIZ BOX */
+    .quiz-box{
+      margin-top:8px;
+      padding:8px 10px;
+      border-radius:12px;
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      box-shadow:0 6px 14px rgba(248,113,22,0.25);
+      font-size:13px;
+    }
+    .quiz-question{
+      margin-top:6px;
+      padding:6px;
+      border-radius:10px;
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+    }
+    .quiz-question-title{
+      font-weight:500;
+      margin-bottom:4px;
+    }
+    .quiz-options{
+      margin-top:4px;
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    .quiz-option label{
+      display:flex;
+      gap:6px;
+      align-items:flex-start;
+      font-size:13px;
+      cursor:pointer;
+    }
+    .quiz-result-item{
+      margin-top:6px;
+      padding:6px;
+      border-radius:10px;
+      background:#f9fafb;
+      border:1px solid #e5e7eb;
+    }
+    .quiz-correct{
+      color:#15803d;
+      font-weight:600;
+    }
+    .quiz-wrong{
+      color:#b91c1c;
+      font-weight:600;
+    }
+
     /* MODAL (kurs tanlash) */
     .modal{
       position:fixed;
@@ -540,7 +590,8 @@
               • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va kurslar ichidagi darslarni tomosha qiladi.<br><br>
               Har bir dars bo‘yicha ko‘rilgan <b>foiz</b> saqlanib boradi. Dars kamida
               <b>90%</b> ko‘rilganda tugallangan hisoblanadi va oldinga yana
-              <b>bir nechta darslar ochiladi</b>.
+              <b>bir nechta darslar ochiladi</b>. Agar darsga <b>quiz</b> bog‘langan bo‘lsa,
+              dars oxirida <b>quiz test</b> chiqariladi.
             </p>
           </div>
         </div>
@@ -652,7 +703,22 @@
                 Dars kamida <b>90%</b> ko‘rilganda tugallangan hisoblanadi.
                 1-dars tugallansa, oldinda <b>yana 3 ta dars</b> ochiladi.
               </div>
+
+              <!-- QUIZ BOX -->
+              <div class="quiz-box hidden" id="quiz-box">
+                <div id="quiz-intro">
+                  <p class="muted">
+                    Bu dars uchun <b>quiz test</b> mavjud. Video darsni ko‘rib bo‘lgach,
+                    bilimlaringizni sinab ko‘ring.
+                  </p>
+                  <button class="btn" id="quiz-start-btn">Quizni boshlash</button>
+                  <p class="hint" id="quiz-lock-hint"></p>
+                </div>
+                <div id="quiz-questions-box" class="hidden"></div>
+                <div id="quiz-result-box" class="hidden"></div>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -695,7 +761,6 @@
     ytApiReady = true;
     ytApiLoading = false;
   }
-  // API har qanday paytda kerak bo‘lib qolsa, qayta yuklab qo‘yish
   function ensureYouTubeApiLoaded() {
     if (window.YT && typeof window.YT.Player === "function") {
       ytApiReady = true;
@@ -816,6 +881,12 @@
   const courseModalClose = document.getElementById("course-modal-close");
   const courseModalList = document.getElementById("course-modal-list");
 
+  const quizBox = document.getElementById("quiz-box");
+  const quizStartBtn = document.getElementById("quiz-start-btn");
+  const quizLockHint = document.getElementById("quiz-lock-hint");
+  const quizQuestionsBox = document.getElementById("quiz-questions-box");
+  const quizResultBox = document.getElementById("quiz-result-box");
+
   /* HELPERS */
   function formatPrice(price) {
     const n = Number(price);
@@ -834,6 +905,15 @@
     m = url.match(/embed\/([^?&]+)/);
     if (m) return m[1];
     return url;
+  }
+
+  function getMotivationMessage(score,total){
+    if(!total) return "";
+    const percent = Math.round((score/total)*100);
+    if(percent===100) return "Ajoyib! Barcha savollarga to‘g‘ri javob berdingiz — zo‘r natija! 🔥";
+    if(percent>=80) return "Judayam yaxshi! Bir-ikki kichik xato — lekin bilimingiz mustahkam. Davom eting! 💪";
+    if(percent>=60) return "Yaxshi urinish! Ba’zi joylarni yana bir bor takrorlab chiqsangiz, natija yanada oshadi. 👍";
+    return "Hali hammasi oldinda. Yana bir marta darsni ko‘rib, qayta urinish tavsiya qilinadi. Siz albatta uddalaysiz! 🌱";
   }
 
   /* PROGRESS Firestore */
@@ -855,7 +935,29 @@
     const prev = d.lessons[lessonId] || { percent:0, completed:false };
     const maxPercent = Math.max(prev.percent||0, percent||0);
     const completed = prev.completed || completedFlag || maxPercent>=90;
-    d.lessons[lessonId] = { percent:maxPercent, completed };
+    d.lessons[lessonId] = {
+      ...prev,
+      percent:maxPercent,
+      completed
+    };
+    await ref.set(d);
+    return d;
+  }
+
+  async function saveLessonQuizResult(username,courseId,lessonId,score,total){
+    const id = `${username}_${courseId}`;
+    const ref = db.collection("progress").doc(id);
+    const doc = await ref.get();
+    let d = doc.exists ? doc.data() : { user:username, courseId, lessons:{} };
+    if(!d.lessons) d.lessons = {};
+    const prev = d.lessons[lessonId] || { percent:0, completed:false };
+    prev.quiz = {
+      taken:true,
+      score,
+      total,
+      updatedAt: Date.now()
+    };
+    d.lessons[lessonId] = prev;
     await ref.set(d);
     return d;
   }
@@ -918,7 +1020,7 @@
       </div>`;
   }
 
-  /* RENDER ADMIN COURSES */
+  /* RENDER ADMIN COURSES (quiz builder bilan) */
   function renderAdminCourses(){
     const courses = data.courses||[];
     adminCourseList.innerHTML="";
@@ -942,7 +1044,10 @@
               <div class="lesson-item">
                 <div>
                   <div class="lesson-title">${i+1}. ${l.title}</div>
-                  <div class="muted" style="font-size:11px;">ID: ${l.id}</div>
+                  <div class="muted" style="font-size:11px;">
+                    ID: ${l.id}
+                    ${l.quiz && l.quiz.length ? " · Quiz savollar: "+l.quiz.length+" ta" : ""}
+                  </div>
                 </div>
                 <div class="lesson-status">
                   <button type="button" class="btn-xs btn-lesson-up"
@@ -980,7 +1085,23 @@
               <input name="lessonUrl" required placeholder="https://youtu.be/... yoki faqat ID" />
               <div class="hint">Videoni YouTube’da <b>Unlisted</b> qilib yuklash tavsiya etiladi.</div>
             </div>
-            <button type="submit" class="btn" style="margin-top:4px;">Darsni qo‘shish</button>
+
+            <div class="form-row" style="margin-top:4px;">
+              <label>
+                <input type="checkbox" name="enableQuiz" class="quiz-toggle" />
+                Ushbu darsga <b>quiz savollari</b> qo‘shaman
+              </label>
+            </div>
+
+            <div class="quiz-builder hidden">
+              <div class="muted" style="font-size:11px;margin-bottom:4px;">
+                Har bir savol uchun matn va A/B/C/D variantlarni kiriting, keyin to‘g‘ri javobni tanlang.
+              </div>
+              <div class="quiz-questions"></div>
+              <button type="button" class="btn-xs btn-add-question" style="margin-top:4px;">+ Savol qo‘shish</button>
+            </div>
+
+            <button type="submit" class="btn" style="margin-top:6px;">Darsni qo‘shish</button>
           </form>
         </div>
         ${lessonsHtml}`;
@@ -988,6 +1109,64 @@
     });
   }
 
+  // Quiz builder: toggle
+  adminCourseList.addEventListener("change",e=>{
+    if(!e.target.classList.contains("quiz-toggle")) return;
+    const form = e.target.closest("form");
+    const builder = form.querySelector(".quiz-builder");
+    if(!builder) return;
+    builder.classList.toggle("hidden", !e.target.checked);
+  });
+
+  // Quiz builder: savol qo‘shish
+  adminCourseList.addEventListener("click",e=>{
+    const btn = e.target.closest(".btn-add-question");
+    if(!btn) return;
+    const form = btn.closest("form");
+    const container = form.querySelector(".quiz-questions");
+    if(!container) return;
+    const index = container.children.length + 1;
+    const block = document.createElement("div");
+    block.className = "quiz-question-block";
+    block.style.marginTop = "6px";
+    block.innerHTML = `
+      <div class="form-row">
+        <label>${index}-savol matni</label>
+        <input class="q-text" required placeholder="Savol matni" />
+      </div>
+      <div class="form-grid" style="margin-top:4px;">
+        <div class="form-row">
+          <label>A)</label>
+          <input class="q-opt-a" required />
+        </div>
+        <div class="form-row">
+          <label>B)</label>
+          <input class="q-opt-b" required />
+        </div>
+        <div class="form-row">
+          <label>C)</label>
+          <input class="q-opt-c" required />
+        </div>
+        <div class="form-row">
+          <label>D)</label>
+          <input class="q-opt-d" required />
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:4px;">
+        <label>To‘g‘ri javob</label>
+        <select class="q-correct">
+          <option value="0">A</option>
+          <option value="1">B</option>
+          <option value="2">C</option>
+          <option value="3">D</option>
+        </select>
+      </div>
+      <hr style="margin-top:6px;border:none;border-top:1px dashed #e5e7eb;">
+    `;
+    container.appendChild(block);
+  });
+
+  // Admin: dars qo‘shish (quiz bilan)
   adminCourseList.addEventListener("submit",async e=>{
     if(!e.target.classList.contains("lesson-form")) return;
     e.preventDefault();
@@ -1000,11 +1179,40 @@
     const videoId=extractYouTubeId(url);
     if(!videoId){ alert("YouTube havola/ID noto‘g‘ri."); return; }
 
+    // Quizni yig‘ib olish
+    let quiz = [];
+    const quizToggle = form.querySelector(".quiz-toggle");
+    if(quizToggle && quizToggle.checked){
+      const blocks = form.querySelectorAll(".quiz-question-block");
+      blocks.forEach((block,idx)=>{
+        const text = block.querySelector(".q-text")?.value.trim() || "";
+        const a = block.querySelector(".q-opt-a")?.value.trim() || "";
+        const b = block.querySelector(".q-opt-b")?.value.trim() || "";
+        const c = block.querySelector(".q-opt-c")?.value.trim() || "";
+        const d = block.querySelector(".q-opt-d")?.value.trim() || "";
+        const correctRaw = block.querySelector(".q-correct")?.value;
+        const correctIndex = correctRaw!==undefined ? parseInt(correctRaw,10) : 0;
+        if(text && a && b && c && d){
+          quiz.push({
+            id: Date.now().toString()+"_"+idx,
+            question:text,
+            options:[a,b,c,d],
+            correctIndex:isNaN(correctIndex)?0:correctIndex
+          });
+        }
+      });
+    }
+
     try{
       const course=data.courses.find(c=>c.id===courseId);
       if(!course) return;
       const lessons=course.lessons||[];
-      lessons.push({ id:Date.now().toString(), title, videoId });
+      lessons.push({
+        id:Date.now().toString(),
+        title,
+        videoId,
+        quiz:quiz
+      });
       await updateCourseLessons(courseId,lessons);
       await refreshCourses();
       form.reset();
@@ -1014,7 +1222,7 @@
     }
   });
 
-  // Admin tarafda kursni o‘chirish, darsni o‘chirish va tartiblash
+  // Admin: kursni o‘chirish, darsni o‘chirish va tartiblash
   adminCourseList.addEventListener("click", async e=>{
     const courseDel = e.target.closest(".btn-delete-course");
     const lessonDel = e.target.closest(".btn-lesson-delete");
@@ -1143,7 +1351,7 @@
     await openUserCourseDetail(courseId);
   });
 
-  /* COURSE DETAIL + PROGRESS */
+  /* COURSE DETAIL + PROGRESS + QUIZ */
   let currentCourseDetail = null;
   let currentCourseProgress = null;
   let currentPlayer = null;
@@ -1151,6 +1359,9 @@
   let progressInterval = null;
   let lastSavedPercent = 0;
   let pendingLessonToOpen = null;
+
+  let currentLessonQuiz = [];
+  let currentQuizTaken = false;
 
   function saveCurrentLessonProgressOnce() {
     try {
@@ -1183,6 +1394,7 @@
         .then(updated => {
           currentCourseProgress = updated;
           renderCourseLessonsList();
+          updateQuizLockState();
         })
         .catch(err => console.error("final progress save error", err));
     } catch (err) {
@@ -1195,9 +1407,7 @@
       clearInterval(progressInterval);
       progressInterval = null;
     }
-    // avval progressni saqlaymiz
     saveCurrentLessonProgressOnce();
-    // keyin playerni to‘liq tozalaymiz
     if (currentPlayer) {
       try { currentPlayer.stopVideo(); } catch(e){}
       try { currentPlayer.destroy(); } catch(e){}
@@ -1243,7 +1453,7 @@
              data-unlocked="${unlocked ? "1" : "0"}">
           <div>
             <div class="lesson-title">${idx + 1}-dars. ${lesson.title}</div>
-            <div class="muted" style="font-size:11px;">Ko‘rilgan: ${percent}%</div>
+            <div class="muted" style="font-size:11px;">Ko‘rilgan: ${percent}% ${lesson.quiz && lesson.quiz.length ? " · Quiz: "+lesson.quiz.length+" savol" : ""}</div>
           </div>
           <div class="lesson-status">${statusText}</div>
         </div>`;
@@ -1271,7 +1481,10 @@
 
       const lp = (currentCourseProgress?.lessons || {})[currentLessonId];
       const alreadyCompleted = lp && lp.completed;
-      if (alreadyCompleted) return; // tugallangan darsni qayta ko‘rishda foiz yozilmaydi
+      if (alreadyCompleted) {
+        updateQuizLockState(rounded);
+        return;
+      }
 
       if (rounded - lastSavedPercent >= 15 || rounded >= 90) {
         lastSavedPercent = rounded;
@@ -1285,15 +1498,189 @@
           );
           currentCourseProgress = updated;
           renderCourseLessonsList();
+          updateQuizLockState(rounded);
         } catch (err) { console.error("progress error", err); }
+      }else{
+        updateQuizLockState(rounded);
       }
     }, 5000);
+  }
+
+  /* QUIZ UI FUNKSIYALARI */
+  function resetQuizUI(){
+    currentLessonQuiz = [];
+    currentQuizTaken = false;
+    if(!quizBox) return;
+    quizBox.classList.add("hidden");
+    quizQuestionsBox.classList.add("hidden");
+    quizResultBox.classList.add("hidden");
+    quizLockHint.textContent = "";
+  }
+
+  function setupQuizForCurrentLesson(lesson){
+    const quiz = lesson.quiz || [];
+    currentLessonQuiz = quiz;
+    currentQuizTaken = false;
+    if(!quiz.length || !quizBox){
+      resetQuizUI();
+      return;
+    }
+    quizBox.classList.remove("hidden");
+    quizQuestionsBox.classList.add("hidden");
+    quizQuestionsBox.innerHTML = "";
+    quizResultBox.classList.add("hidden");
+    quizResultBox.innerHTML = "";
+    quizStartBtn.disabled = false;
+    quizStartBtn.textContent = "Quizni boshlash";
+    quizLockHint.textContent = "";
+    updateQuizLockState();
+  }
+
+  function updateQuizLockState(currentPercentOverride){
+    if(!currentLessonQuiz.length || !currentLessonId || !quizBox) return;
+    const lp = (currentCourseProgress?.lessons || {})[currentLessonId] || {};
+    const percent = currentPercentOverride!==undefined
+      ? currentPercentOverride
+      : Math.round(lp.percent || 0);
+    const unlocked = percent>=90;
+    if(unlocked){
+      quizStartBtn.disabled = false;
+      quizLockHint.textContent = "Dars bo‘yicha yetarlicha video ko‘rdingiz. Endi quizni boshlashingiz mumkin.";
+    }else{
+      quizStartBtn.disabled = true;
+      quizLockHint.textContent = "Quizni boshlash uchun darsni kamida 90% gacha ko‘ring.";
+    }
+    if(lp.quiz && lp.quiz.taken){
+      quizLockHint.textContent += " (Bu quizni allaqachon ishlagansiz, istasangiz qayta ko‘rishingiz mumkin.)";
+    }
+  }
+
+  function renderQuizQuestions(){
+    if(!currentLessonQuiz.length) return;
+    quizQuestionsBox.innerHTML = `
+      ${currentLessonQuiz.map((q,idx)=>`
+        <div class="quiz-question">
+          <div class="quiz-question-title">${idx+1}-savol. ${q.question}</div>
+          <div class="quiz-options">
+            ${q.options.map((opt,oi)=>`
+              <div class="quiz-option">
+                <label>
+                  <input type="radio" name="quiz_q_${idx}" value="${oi}">
+                  <span>${["A","B","C","D"][oi]}) ${opt}</span>
+                </label>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `).join("")}
+      <button type="button" class="btn" id="quiz-submit-btn" style="margin-top:8px;">Quizni yakunlash</button>
+    `;
+    quizQuestionsBox.classList.remove("hidden");
+    quizResultBox.classList.add("hidden");
+  }
+
+  function renderQuizResult(score,total,answers){
+    const percent = total ? Math.round((score/total)*100) : 0;
+    const motiv = getMotivationMessage(score,total);
+
+    let detailsHtml = "";
+    currentLessonQuiz.forEach((q,idx)=>{
+      const userAns = answers[idx];
+      const correctIdx = q.correctIndex || 0;
+      const correctLetter = ["A","B","C","D"][correctIdx];
+      const userLetter = userAns!=null ? ["A","B","C","D"][userAns] : null;
+      const isCorrect = userAns===correctIdx;
+
+      detailsHtml += `
+        <div class="quiz-result-item">
+          <div class="quiz-question-title">${idx+1}-savol. ${q.question}</div>
+          <div style="margin-top:4px;">
+            ${userAns==null
+              ? `<span class="quiz-wrong">Javob berilmagan</span>`
+              : isCorrect
+                ? `<span class="quiz-correct">To‘g‘ri javob berdingiz (${userLetter})</span>`
+                : `<span class="quiz-wrong">Xato javob (${userLetter})</span>`
+            }
+          </div>
+          <div style="margin-top:2px;">
+            To‘g‘ri javob: <span class="quiz-correct">${correctLetter}) ${q.options[correctIdx]}</span>
+          </div>
+        </div>
+      `;
+    });
+
+    quizResultBox.innerHTML = `
+      <div style="margin-bottom:6px;">
+        <b>Natija:</b> ${score} / ${total} ta to‘g‘ri (${percent}%)<br>
+        <span class="muted">${motiv}</span>
+      </div>
+      ${detailsHtml}
+      <button type="button" class="btn" id="quiz-continue-btn" style="margin-top:8px;">Kursni davom ettirish</button>
+    `;
+    quizResultBox.classList.remove("hidden");
+    quizQuestionsBox.classList.add("hidden");
+  }
+
+  if(quizStartBtn){
+    quizStartBtn.addEventListener("click",()=>{
+      if(quizStartBtn.disabled) return;
+      if(!currentLessonQuiz.length) return;
+      renderQuizQuestions();
+    });
+  }
+
+  if(quizQuestionsBox){
+    quizQuestionsBox.addEventListener("click",async e=>{
+      const btn = e.target.closest("#quiz-submit-btn");
+      if(!btn) return;
+      if(!currentLessonQuiz.length) return;
+
+      let answers = {};
+      let score = 0;
+      const total = currentLessonQuiz.length;
+      currentLessonQuiz.forEach((q,idx)=>{
+        const radios = quizQuestionsBox.querySelectorAll(`input[name="quiz_q_${idx}"]`);
+        let chosen = null;
+        radios.forEach(r=>{
+          if(r.checked) chosen = parseInt(r.value,10);
+        });
+        answers[idx] = isNaN(chosen)?null:chosen;
+        if(chosen===q.correctIndex) score++;
+      });
+
+      try{
+        if(data.currentUser && currentCourseDetail && currentLessonId){
+          const updated = await saveLessonQuizResult(
+            data.currentUser.username,
+            currentCourseDetail.id,
+            currentLessonId,
+            score,
+            total
+          );
+          currentCourseProgress = updated;
+          renderCourseLessonsList();
+          currentQuizTaken = true;
+        }
+      }catch(err){
+        console.error("quiz result save error",err);
+      }
+
+      renderQuizResult(score,total,answers);
+    });
+  }
+
+  if(quizResultBox){
+    quizResultBox.addEventListener("click",e=>{
+      const btn = e.target.closest("#quiz-continue-btn");
+      if(!btn) return;
+      quizResultBox.classList.add("hidden");
+      // Faqat yopamiz, kurs davom etaveradi
+    });
   }
 
   async function openLessonPlayer(lesson){
     if(!currentCourseDetail || !data.currentUser) return;
 
-    // avval eski playerni to‘liq tozalaymiz
     stopCurrentPlayer();
 
     currentLessonId = lesson.id;
@@ -1307,7 +1694,8 @@
     const resumePercent = info.percent && info.percent < 95 ? info.percent : 0;
     lastSavedPercent = resumePercent;
 
-    // YouTube API doim yuklangan bo‘lishi uchun
+    setupQuizForCurrentLesson(lesson);
+
     ensureYouTubeApiLoaded();
 
     if(!ytApiReady){
@@ -1326,7 +1714,6 @@
       return;
     }
 
-    // har safar yangi, toza player yaratamiz
     currentPlayer = new YT.Player("yt-player",{
       videoId: lesson.videoId,
       playerVars:{rel:0,modestbranding:1},
@@ -1343,8 +1730,8 @@
         },
         onStateChange:(event)=>{
           if(event.data === YT.PlayerState.ENDED){
-            // video tugaganda ham progressni saqlaymiz
             saveCurrentLessonProgressOnce();
+            updateQuizLockState(100);
           }
         }
       }
@@ -1368,6 +1755,7 @@
     lessonVideoWrapper.classList.add("hidden");
     lessonProgressText.textContent="";
     lessonProgressBar.style.width="0%";
+    resetQuizUI();
     userCoursesView.classList.add("hidden");
     userCourseDetail.classList.remove("hidden");
   }
@@ -1388,6 +1776,7 @@
 
   function showUserCoursesList(){
     stopCurrentPlayer();
+    resetQuizUI();
     userCoursesView.classList.remove("hidden");
     userCourseDetail.classList.add("hidden");
   }
@@ -1456,7 +1845,7 @@
       if(!user){ loginErrorEl.textContent="Login yoki parol noto‘g‘ri."; return; }
       data.currentUser={username:user.username,role:user.role};
       saveCurrentUserToLocal();
-      saveRememberedCredentials(u,p); // login/parolni eslab qolish
+      saveRememberedCredentials(u,p);
       loginForm.reset();
       updateUI();
       await refreshCourses();
@@ -1480,7 +1869,7 @@
       await registerUser(u,p);
       data.currentUser={username:u,role:"user"};
       saveCurrentUserToLocal();
-      saveRememberedCredentials(u,p); // yangi ro'yxatdan o'tganda ham eslab qolish
+      saveRememberedCredentials(u,p);
       registerForm.reset();
       updateUI();
       await refreshCourses();
@@ -1549,7 +1938,6 @@
     try{
       await ensureDefaultAdmin();
 
-      // Avval login/parolni localStorage'dan formaga yuklaymiz
       const remembered = loadRememberedCredentials();
       if (remembered) {
         if (remembered.username) loginUsername.value = remembered.username;
@@ -1561,12 +1949,11 @@
       await refreshCourses();
       await loadUsersFromFirestore();
 
-      // YouTube API har doim tayyor bo‘lishi uchun
       ensureYouTubeApiLoaded();
     }catch(err){ console.error("init error",err); }
   })();
 
-  // WATCHDOG: har 5 soniyada player / intervalni tekshirib, qotib qolgan bo‘lsa tozalaydi
+  // WATCHDOG
   setInterval(()=>{
     if(!currentPlayer && progressInterval){
       clearInterval(progressInterval);
