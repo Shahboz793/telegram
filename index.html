@@ -247,26 +247,6 @@
       margin-top:4px;
     }
 
-    .lesson-list{
-      margin-top:6px;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      border-top:1px dashed #e5e7eb;
-      padding-top:6px;
-    }
-    .lesson-item{
-      background:#ffffff;
-      border-radius:8px;
-      border:1px solid #e5e7eb;
-      padding:6px;
-    }
-    .lesson-title{
-      font-size:13px;
-      font-weight:500;
-      margin-bottom:4px;
-    }
-
     .video-wrapper{
       position:relative;
       padding-bottom:56.25%;
@@ -292,6 +272,121 @@
       color:#9ca3af;
       margin-top:6px;
     }
+
+    /* ADMIN LESSON LIST (delete) */
+    .admin-lessons{
+      margin-top:6px;
+      border-top:1px dashed #e5e7eb;
+      padding-top:6px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .admin-lesson-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:6px;
+      font-size:12px;
+      background:#f9fafb;
+      border-radius:8px;
+      padding:4px 6px;
+      border:1px solid #e5e7eb;
+    }
+    .admin-lesson-title{flex:1;}
+    .btn-xs{
+      border:none;
+      border-radius:999px;
+      padding:3px 8px;
+      font-size:11px;
+      cursor:pointer;
+      background:#fee2e2;
+      color:#b91c1c;
+    }
+    .btn-xs:hover{background:#fecaca;}
+
+    /* USER PLAYER + PLAYLIST */
+    .course-player{
+      margin-top:8px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .lesson-playlist{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      max-height:200px;
+      overflow:auto;
+    }
+    .lesson-playlist-item{
+      border:none;
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid #e5e7eb;
+      background:#f9fafb;
+      cursor:pointer;
+      text-align:left;
+    }
+    .lesson-playlist-item:hover{
+      background:#eff6ff;
+      border-color:#bfdbfe;
+    }
+    .lesson-playlist-item.active{
+      background:#111827;
+      color:#f9fafb;
+      border-color:#111827;
+    }
+    .lesson-thumb{
+      width:64px;
+      height:40px;
+      flex-shrink:0;
+      border-radius:6px;
+      overflow:hidden;
+      background:#111827;
+    }
+    .lesson-thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .lesson-info{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .lesson-meta{
+      font-size:11px;
+      color:#6b7280;
+    }
+    .lesson-playlist-item.active .lesson-meta{
+      color:#e5e7eb;
+    }
+
+    .course-actions{
+      display:flex;
+      gap:6px;
+      align-items:center;
+      margin-top:4px;
+      flex-wrap:wrap;
+    }
+    .link-btn{
+      font-size:11px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid #0ea5e9;
+      background:#e0f2fe;
+      color:#0369a1;
+      cursor:pointer;
+    }
+    .link-btn:hover{
+      background:#bae6fd;
+    }
   </style>
 </head>
 <body>
@@ -303,7 +398,7 @@
       <a href="#user-section" id="nav-courses">Kurslar</a>
       <a href="#admin-section" id="nav-admin" class="hidden">Admin panel</a>
       <span class="user-label" id="current-user-label">Mehmon</span>
-      <button class="btn-outline" id="logout-btn" class="hidden">Chiqish</button>
+      <button class="btn-outline" id="logout-btn" style="display:none;">Chiqish</button>
     </nav>
   </header>
 
@@ -407,6 +502,11 @@
               <input id="course-price" type="number" min="0" placeholder="0 = bepul" />
             </div>
           </div>
+          <div class="form-row">
+            <label for="course-telegram">Kursning Telegram havolasi (ixtiyoriy)</label>
+            <input id="course-telegram" placeholder="https://t.me/kanal yoki guruh" />
+            <p class="hint">Talabalar uchun kursga tegishli Telegram kanal/guruh havolasini qo‘shish mumkin.</p>
+          </div>
           <button type="submit" class="btn">Kursni qo‘shish</button>
           <div id="course-error" class="error"></div>
         </form>
@@ -457,7 +557,7 @@
           { username: "admin", password: "admin123", role: "admin" }
         ],
         currentUser: null,
-        courses: [] // {id,title,description,category,price,lessons:[{id,title,videoId}]}
+        courses: [] // {id,title,description,category,price,telegram,lessons:[{id,title,videoId}]}
       };
       localStorage.setItem(LS_KEY, JSON.stringify(initial));
       return initial;
@@ -580,6 +680,7 @@
     const desc = document.getElementById("course-desc").value.trim();
     const cat = document.getElementById("course-cat").value.trim();
     const price = document.getElementById("course-price").value.trim();
+    const telegram = document.getElementById("course-telegram").value.trim();
 
     if (!title || !desc) {
       courseError.textContent = "Kurs nomi va tavsifi majburiy.";
@@ -592,6 +693,7 @@
       description: desc,
       category: cat,
       price,
+      telegram,
       lessons: []
     };
     data.courses.push(newCourse);
@@ -638,6 +740,27 @@
     courses.forEach(course => {
       const div = document.createElement("div");
       div.className = "course-card";
+
+      let lessonsAdminHtml = "";
+      if (course.lessons && course.lessons.length > 0) {
+        lessonsAdminHtml = `
+          <div class="admin-lessons">
+            ${course.lessons.map((lesson, idx) => `
+              <div class="admin-lesson-row">
+                <span class="admin-lesson-title">${idx + 1}-dars: ${lesson.title}</span>
+                <button type="button"
+                        class="btn-xs"
+                        data-action="delete-lesson"
+                        data-course-id="${course.id}"
+                        data-lesson-id="${lesson.id}">
+                  O‘chirish
+                </button>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
       div.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
@@ -661,11 +784,13 @@
             <button type="submit" class="btn" style="margin-top:4px;">Darsni qo‘shish</button>
           </form>
         </div>
+        ${lessonsAdminHtml}
       `;
       adminCourseList.appendChild(div);
     });
   }
 
+  // Dars qo‘shish (admin)
   adminCourseList.addEventListener("submit", e => {
     if (!e.target.classList.contains("lesson-form")) return;
     e.preventDefault();
@@ -697,10 +822,37 @@
     renderUserCourses();
   });
 
+  // Darsni o‘chirish (admin)
+  adminCourseList.addEventListener("click", e => {
+    const btn = e.target.closest(".btn-xs[data-action='delete-lesson']");
+    if (!btn) return;
+    if (!data.currentUser || data.currentUser.role !== "admin") return;
+
+    const courseId = btn.dataset.courseId;
+    const lessonId = btn.dataset.lessonId;
+
+    const course = data.courses.find(c => c.id === courseId);
+    if (!course) return;
+
+    const idx = course.lessons.findIndex(l => l.id === lessonId);
+    if (idx === -1) return;
+
+    if (!confirm("Bu darsni o‘chirmoqchimisiz?")) return;
+
+    course.lessons.splice(idx, 1);
+    saveData();
+    renderAdminCourses();
+    renderUserCourses();
+  });
+
   // USER VIEW
   const userCourseList = document.getElementById("user-course-list");
   const userCourseCount = document.getElementById("user-course-count");
   const userEmpty = document.getElementById("user-empty");
+
+  // YouTube API / players
+  let ytApiReady = false;
+  const players = {}; // { [courseId]: { player: YT.Player, currentIndex:number } }
 
   function renderUserCourses() {
     const courses = data.courses;
@@ -718,24 +870,43 @@
       card.className = "course-card";
 
       const priceText = formatPrice(course.price);
+      const hasLessons = course.lessons && course.lessons.length > 0;
 
       let lessonsHtml = "";
-      if (course.lessons.length === 0) {
+      if (!hasLessons) {
         lessonsHtml = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
       } else {
         lessonsHtml = `
-          <div class="lesson-list">
-            ${course.lessons.map(lesson => `
-              <div class="lesson-item">
-                <div class="lesson-title">${lesson.title}</div>
-                <div class="video-wrapper">
-                  <iframe src="https://www.youtube.com/embed/${lesson.videoId}" allowfullscreen></iframe>
-                </div>
-              </div>
-            `).join("")}
+          <div class="course-player" data-course-id="${course.id}">
+            <div class="video-wrapper">
+              <div id="player-${course.id}"></div>
+            </div>
+            <div class="lesson-playlist">
+              ${course.lessons.map((lesson, idx) => `
+                <button type="button"
+                        class="lesson-playlist-item ${idx === 0 ? "active" : ""}"
+                        data-course-id="${course.id}"
+                        data-lesson-id="${lesson.id}"
+                        data-index="${idx}">
+                  <div class="lesson-thumb">
+                    <img src="https://img.youtube.com/vi/${lesson.videoId}/mqdefault.jpg" alt="">
+                  </div>
+                  <div class="lesson-info">
+                    <div class="lesson-title">${lesson.title}</div>
+                    <div class="lesson-meta">Dars ${idx + 1}</div>
+                  </div>
+                </button>
+              `).join("")}
+            </div>
           </div>
         `;
       }
+
+      const actionsHtml = `
+        <div class="course-actions">
+          ${course.telegram ? `<a class="link-btn" href="${course.telegram}" target="_blank" rel="noopener noreferrer">Telegram havola</a>` : ""}
+        </div>
+      `;
 
       card.innerHTML = `
         <div class="course-title">${course.title}</div>
@@ -748,10 +919,114 @@
         <div class="course-footer">
           <span class="muted">Kurs ID: ${course.id}</span>
         </div>
+        ${actionsHtml}
         ${lessonsHtml}
       `;
       userCourseList.appendChild(card);
     });
+
+    // Playlist render bo‘lgandan keyin playerlarni yangilaymiz
+    setupAllPlayers();
+  }
+
+  // Playlistda darsni bosganda video almashtirish
+  userCourseList.addEventListener("click", e => {
+    const btn = e.target.closest(".lesson-playlist-item");
+    if (!btn) return;
+
+    const courseId = btn.dataset.courseId;
+    const index = Number(btn.dataset.index);
+    const course = data.courses.find(c => c.id === courseId);
+    if (!course || !course.lessons[index]) return;
+
+    const lesson = course.lessons[index];
+    const info = players[courseId];
+    if (!info || !info.player || !lesson.videoId) return;
+
+    info.currentIndex = index;
+    info.player.loadVideoById(lesson.videoId);
+    updateActivePlaylistItem(courseId, index);
+  });
+
+  function updateActivePlaylistItem(courseId, activeIndex) {
+    const playlistItems = document.querySelectorAll(`.lesson-playlist-item[data-course-id="${courseId}"]`);
+    playlistItems.forEach(btn => {
+      const idx = Number(btn.dataset.index);
+      if (idx === activeIndex) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+  }
+
+  function setupAllPlayers() {
+    if (!ytApiReady) return;
+
+    // eski playerlarni tozalash
+    for (const cid in players) {
+      if (players[cid].player && typeof players[cid].player.destroy === "function") {
+        try { players[cid].player.destroy(); } catch (e) {}
+      }
+    }
+
+    // yangidan yaratish
+    data.courses.forEach(course => {
+      if (!course.lessons || course.lessons.length === 0) return;
+      const containerId = "player-" + course.id;
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      const firstLesson = course.lessons[0];
+      if (!firstLesson || !firstLesson.videoId) return;
+
+      players[course.id] = {
+        player: new YT.Player(containerId, {
+          videoId: firstLesson.videoId,
+          playerVars: {
+            rel: 0,
+            modestbranding: 1,
+            controls: 1,
+            fs: 0,
+            iv_load_policy: 3
+          },
+          events: {
+            'onStateChange': (event) => handlePlayerStateChange(event, course.id)
+          }
+        }),
+        currentIndex: 0
+      };
+    });
+  }
+
+  function handlePlayerStateChange(event, courseId) {
+    if (event.data !== YT.PlayerState.ENDED) return;
+
+    const course = data.courses.find(c => c.id === courseId);
+    if (!course || !course.lessons || course.lessons.length === 0) return;
+
+    const info = players[courseId];
+    if (!info) return;
+
+    const currentIndex = info.currentIndex || 0;
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= course.lessons.length) return;
+
+    const currentLesson = course.lessons[currentIndex];
+    const nextLesson = course.lessons[nextIndex];
+
+    const confirmText = `${currentLesson.title} tugadi. Keyingi dars "${nextLesson.title}" ga o'tasizmi?`;
+    if (confirm(confirmText)) {
+      info.currentIndex = nextIndex;
+      info.player.loadVideoById(nextLesson.videoId);
+      updateActivePlaylistItem(courseId, nextIndex);
+    }
+  }
+
+  // YouTube API callback
+  function onYouTubeIframeAPIReady() {
+    ytApiReady = true;
+    setupAllPlayers();
   }
 
   // UI UPDATE
@@ -789,5 +1064,7 @@
   // Initial render
   updateUI();
 </script>
+<!-- YouTube IFrame API -->
+<script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
