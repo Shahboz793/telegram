@@ -744,6 +744,10 @@
               <div class="video-wrapper hidden" id="lesson-video-wrapper">
                 <div id="yt-player"></div>
               </div>
+              <!-- Yangi: to‘liq ekran (landshaft) tugmasi -->
+              <button type="button" class="btn-xs hidden" id="lesson-fullscreen-btn" style="margin-top:4px;align-self:flex-start;">
+                To‘liq ekran (landshaft)
+              </button>
               <div class="progress-text" id="lesson-progress-text"></div>
               <div class="progress-bar-wrap">
                 <div class="progress-bar" id="lesson-progress-bar"></div>
@@ -911,6 +915,8 @@
 
   const quizOverlay = document.getElementById("quiz-overlay");
   const quizOverlayBox = document.getElementById("quiz-overlay-box");
+
+  const lessonFullscreenBtn = document.getElementById("lesson-fullscreen-btn");
 
   /* HELPERS */
   function formatPrice(price){
@@ -1414,6 +1420,7 @@
       currentPlayer=null;
     }
     lessonVideoWrapper.classList.add("hidden");
+    lessonFullscreenBtn.classList.add("hidden");
   }
 
   function renderCourseLessonsList(){
@@ -1601,6 +1608,46 @@
     document.getElementById("quiz-overlay-continue-btn").onclick = closeQuizOverlay;
   }
 
+  /* Fullscreen + landshaft */
+  function tryLockLandscape(){
+    try{
+      if(screen.orientation && screen.orientation.lock){
+        screen.orientation.lock('landscape').catch(()=>{});
+      }
+    }catch(e){}
+  }
+  function openVideoFullscreen(){
+    if(!lessonVideoWrapper || lessonVideoWrapper.classList.contains("hidden")) return;
+    const elem = lessonVideoWrapper;
+    const req = elem.requestFullscreen
+      || elem.webkitRequestFullscreen
+      || elem.mozRequestFullScreen
+      || elem.msRequestFullscreen;
+    if(!req) return;
+    try{
+      const result = req.call(elem);
+      if(result && typeof result.then==="function"){
+        result.then(()=>{ tryLockLandscape(); }).catch(()=>{});
+      }else{
+        tryLockLandscape();
+      }
+    }catch(e){
+      console.error("Fullscreen error",e);
+    }
+  }
+  if(lessonFullscreenBtn){
+    lessonFullscreenBtn.addEventListener("click",openVideoFullscreen);
+  }
+  document.addEventListener("fullscreenchange",()=>{
+    if(!document.fullscreenElement){
+      try{
+        if(screen.orientation && screen.orientation.unlock){
+          screen.orientation.unlock();
+        }
+      }catch(e){}
+    }
+  });
+
   /* PROGRESS INTERVAL — oxirgi 7 soniya mantiqi */
   function startProgressInterval(){
     if(!currentPlayer) return;
@@ -1692,6 +1739,7 @@
     currentLessonQuiz = lesson.quiz || [];
     lessonPlayerTitle.textContent = lesson.title;
     lessonVideoWrapper.classList.remove("hidden");
+    lessonFullscreenBtn.classList.remove("hidden");
     lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
     lessonProgressBar.style.width = "0%";
     lastSavedPercent = 0;
@@ -1753,6 +1801,7 @@
     renderCourseLessonsList();
     lessonPlayerTitle.textContent = "Dars tanlanmagan.";
     lessonVideoWrapper.classList.add("hidden");
+    lessonFullscreenBtn.classList.add("hidden");
     lessonProgressText.textContent = "";
     lessonProgressBar.style.width = "0%";
 
@@ -1802,6 +1851,7 @@
       logoutBtn.classList.add("hidden");
       currentUserLabel.textContent = "Mehmon";
       userRolePill.textContent = "Rol: Foydalanuvchi";
+      stopCurrentPlayer();
       return;
     }
     authSection.classList.add("hidden");
