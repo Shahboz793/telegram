@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <title>Ta'lim Edu — Kurs Platforma (HTML + JS + Firestore)</title>
+  <title>Ona tili Pro — Online o‘quv markazi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -13,7 +13,7 @@
     }
     a{text-decoration:none;color:inherit}
 
-    .page{min-height:100vh;}
+    .page{min-height:100vh;display:flex;flex-direction:column;}
 
     /* HEADER */
     .header{
@@ -47,6 +47,7 @@
       max-width:1120px;
       margin:0 auto;
       padding:18px 12px 32px;
+      flex:1 0 auto;
     }
 
     .section{
@@ -260,23 +261,29 @@
       display:flex;
       flex-direction:column;
       gap:6px;
-      border-top:1px dashed #e5e7eb;
-      padding-top:6px;
     }
     .lesson-item{
       background:#ffffff;
-      border-radius:8px;
+      border-radius:10px;
       border:1px solid #e5e7eb;
-      padding:6px;
+      padding:8px 10px;
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:8px;
       cursor:pointer;
+      transition:background .1s ease,box-shadow .1s ease,transform .05s ease;
+    }
+    .lesson-item:hover{
+      background:#eef2ff;
+      box-shadow:0 4px 10px rgba(79,70,229,0.15);
+      transform:translateY(-1px);
     }
     .lesson-item.locked{
       opacity:.5;
       cursor:not-allowed;
+      box-shadow:none;
+      background:#f9fafb;
     }
     .lesson-title{
       font-size:13px;
@@ -292,7 +299,7 @@
       padding-bottom:56.25%;
       height:0;
       overflow:hidden;
-      border-radius:8px;
+      border-radius:10px;
       background:#000;
       margin-top:6px;
     }
@@ -333,12 +340,27 @@
     }
 
     /* LESSON PLAYER AREA */
-    .lesson-player-box{
+    .detail-layout{
+      display:grid;
+      grid-template-columns:minmax(0,0.8fr) minmax(0,1.4fr);
+      gap:12px;
       margin-top:10px;
+    }
+    @media(max-width:900px){
+      .detail-layout{
+        grid-template-columns:1fr;
+      }
+    }
+
+    .lesson-player-box{
+      margin-top:0;
       background:#f9fafb;
       border-radius:12px;
       border:1px solid #e5e7eb;
       padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
     }
     .progress-text{
       font-size:12px;
@@ -408,6 +430,25 @@
       cursor:pointer;
       font-size:13px;
     }
+
+    /* FOOTER */
+    .footer{
+      background:#0f172a;
+      color:#e5e7eb;
+      padding:12px 20px;
+      font-size:12px;
+      margin-top:auto;
+    }
+    .footer-inner{
+      max-width:1120px;
+      margin:0 auto;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .footer small{opacity:.8;}
   </style>
 
   <!-- FIREBASE (compat) -->
@@ -420,7 +461,7 @@
 <div class="page">
   <!-- HEADER -->
   <header class="header">
-    <div class="logo">Ta'lim <span>Edu</span></div>
+    <div class="logo">Ona tili <span>Pro</span></div>
     <nav class="nav">
       <a id="nav-courses">Kurslar</a>
       <a id="nav-admin" class="hidden">Admin panel</a>
@@ -435,9 +476,9 @@
       <div class="grid-2">
         <div>
           <div class="card">
-            <h2>Xush kelibsiz!</h2>
+            <h2>Xush kelibsiz, online o‘quv markazimizga!</h2>
             <p class="sub">
-              Kirish yoki ro‘yxatdan o‘tish orqali kurs platformasiga ulanishingiz mumkin.
+              Bu yerda siz <b>bilimlaringizni oshirasiz</b> va “Ona tili Pro” kurslari orqali tayyorlana olasiz.
               <br>Admin uchun demo login: <b>admin / admin123</b>
             </p>
 
@@ -474,7 +515,10 @@
                 <label for="reg-password2">Parolni takrorlang</label>
                 <input id="reg-password2" type="password" required />
               </div>
-              <p class="hint">Ro‘yxatdan o‘tgan foydalanuvchilar <b>kurslarni ko‘rishi</b> mumkin, lekin admin panelga kira olmaydi.</p>
+              <p class="hint">
+                Ro‘yxatdan o‘tgan foydalanuvchilar kurslarni ko‘rishlari mumkin, lekin
+                <b>admin panelga kira olmaydi</b>.
+              </p>
               <button type="submit" class="btn">Ro‘yxatdan o‘tish</button>
               <div id="register-error" class="error"></div>
             </form>
@@ -483,15 +527,17 @@
 
         <div>
           <div class="card">
-            <h2>Platforma haqida</h2>
+            <h2>Kurs nomi: “Ona tili Pro” o‘quv markazi</h2>
             <p class="sub">
-              Bu Ta'lim Edu uchun HTML + CSS + JS + Firestore asosida yaratilgan demo kurs tizimi.
+              Ona tili va adabiyot bo‘yicha onlayn kurslar, testlar va video darslar jamlanmasi.
             </p>
             <p class="hero-text">
-              • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga ko‘plab
-              YouTube <b>yashirin (Unlisted)</b> videolarni qo‘shishi mumkin.<br>
-              • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va <b>kurslar ichidagi darslarni tomosha qiladi</b>.<br><br>
-              Darslar progressi saqlanadi: darsni kamida <b>90%</b> ko‘rmaguncha keyingi dars ochilmaydi.
+              • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga ko‘plab YouTube
+              <b>yashirin (Unlisted)</b> videolarni qo‘shishi mumkin.<br>
+              • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va kurslar ichidagi darslarni tomosha qiladi.<br><br>
+              Har bir dars bo‘yicha ko‘rilgan <b>foiz</b> saqlanib boradi. Dars kamida
+              <b>90%</b> ko‘rilganda tugallangan hisoblanadi va oldinga yana
+              <b>bir nechta darslar ochiladi</b>.
             </p>
           </div>
         </div>
@@ -504,7 +550,9 @@
         <div class="section-header">
           <div>
             <h2>Admin panel</h2>
-            <p class="sub">Bu qismga faqat admin kirishi mumkin. Kurslar, darslar va foydalanuvchilar shu yerda boshqariladi.</p>
+            <p class="sub">
+              Bu qismga faqat admin kirishi mumkin. Kurslar, darslar va foydalanuvchilar shu yerda boshqariladi.
+            </p>
           </div>
           <span class="pill">Rol: Admin</span>
         </div>
@@ -513,7 +561,7 @@
         <form id="course-form" class="form">
           <div class="form-row">
             <label for="course-title">Kurs nomi</label>
-            <input id="course-title" required placeholder="Masalan: Boshlang'ich JavaScript" />
+            <input id="course-title" required placeholder="Masalan: Ona tili Pro — 5-sinf" />
           </div>
           <div class="form-row">
             <label for="course-desc">Tavsif</label>
@@ -522,7 +570,7 @@
           <div class="form-grid">
             <div class="form-row">
               <label for="course-cat">Yo'nalish</label>
-              <input id="course-cat" placeholder="Dasturlash, Biznes, Dizayn..." />
+              <input id="course-cat" placeholder="Masalan: Ona tili, Adabiyot..." />
             </div>
             <div class="form-row">
               <label for="course-price">Narx (so'm)</label>
@@ -558,7 +606,9 @@
         <div class="section-header">
           <div>
             <h2>Kurslar paneli</h2>
-            <p class="sub">Ro‘yxatdan o‘tgan barcha foydalanuvchilar bu yerdagi kurslarni ko‘rishi mumkin.</p>
+            <p class="sub">
+              Ro‘yxatdan o‘tgan barcha foydalanuvchilar bu yerdagi kurslarni ko‘rishi mumkin.
+            </p>
           </div>
           <span class="pill" id="user-role-pill">Rol: Foydalanuvchi</span>
         </div>
@@ -583,25 +633,38 @@
           <p id="detail-desc" class="muted" style="margin-bottom:8px;"></p>
           <div class="course-meta" id="detail-meta"></div>
 
-          <div id="detail-lessons" style="margin-top:8px;"></div>
+          <div class="detail-layout">
+            <div id="detail-lessons"></div>
 
-          <div class="lesson-player-box" id="lesson-player-box">
-            <div class="muted" id="lesson-player-title">Dars tanlanmagan.</div>
-            <div class="video-wrapper hidden" id="lesson-video-wrapper">
-              <div id="yt-player"></div>
-            </div>
-            <div class="progress-text" id="lesson-progress-text"></div>
-            <div class="progress-bar-wrap">
-              <div class="progress-bar" id="lesson-progress-bar"></div>
-            </div>
-            <div class="hint" style="margin-top:4px;">
-              Dars kamida <b>90%</b> ko‘rilganda keyingi dars avtomatik ravishda ochiladi.
+            <div class="lesson-player-box" id="lesson-player-box">
+              <div class="muted" id="lesson-player-title">Dars tanlanmagan.</div>
+              <div class="video-wrapper hidden" id="lesson-video-wrapper">
+                <div id="yt-player"></div>
+              </div>
+              <div class="progress-text" id="lesson-progress-text"></div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar" id="lesson-progress-bar"></div>
+              </div>
+              <div class="hint" style="margin-top:4px;">
+                Dars kamida <b>90%</b> ko‘rilganda tugallangan hisoblanadi.
+                1-dars tugallansa, oldinda <b>yana 3 ta dars</b> ochiladi.
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <small>© Ona tili Pro online o‘quv markazi — bilimlaringiz uchun raqamli hamroh.</small>
+      <small>
+        Aloqa: <b>+998 90 000 00 00</b> · Telegram: <b>@onatili_pro</b>
+      </small>
+    </div>
+  </footer>
 </div>
 
 <!-- Kurs tanlash MODAL -->
@@ -912,7 +975,6 @@
     if(!confirm("Kursni o‘chirishni xohlaysizmi?")) return;
     try{
       await deleteCourseFromFirestore(courseId);
-      // Mahalliy ro‘yxatdan ham olib tashlaymiz
       data.courses = data.courses.filter(c=>c.id!==courseId);
       renderAdminCourses();
       renderUserCourses();
@@ -1007,12 +1069,47 @@
   let lastSavedPercent=0;
 
   function stopCurrentPlayer(){
-    if(progressInterval) clearInterval(progressInterval);
-    progressInterval=null;
-    if(currentPlayer && currentPlayer.destroy) currentPlayer.destroy();
+    if(progressInterval) {
+      clearInterval(progressInterval);
+      progressInterval=null;
+    }
+
+    if(currentPlayer && typeof currentPlayer.getDuration==="function"){
+      try{
+        const dur = currentPlayer.getDuration();
+        const cur = currentPlayer.getCurrentTime();
+        let percent = lastSavedPercent || 0;
+        if(dur && dur>0){
+          percent = Math.min(100,(cur/dur)*100);
+        }
+        percent = Math.round(percent);
+
+        const user = data.currentUser;
+        const course = currentCourseDetail;
+        const lessonIdToSave = currentLessonId;
+
+        if(user && course && lessonIdToSave && percent>0){
+          saveLessonProgress(
+            user.username,
+            course.id,
+            lessonIdToSave,
+            percent,
+            percent>=90
+          ).then(updated=>{
+            currentCourseProgress = updated;
+            renderCourseLessonsList();
+          }).catch(err=>console.error("final progress save error",err));
+        }
+      }catch(err){
+        console.error("stopCurrentPlayer error",err);
+      }
+    }
+
+    if(currentPlayer && currentPlayer.destroy){
+      try{ currentPlayer.destroy(); }catch(e){}
+    }
     currentPlayer=null;
     currentLessonId=null;
-    lastSavedPercent=0;
   }
 
   function renderCourseLessonsList(){
@@ -1023,18 +1120,24 @@
       detailLessons.innerHTML=`<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
       return;
     }
+
+    const progMap = progress.lessons || {};
+    let maxCompletedIndex = -1;
+    lessons.forEach((lesson,idx)=>{
+      const info = progMap[lesson.id] || {percent:0,completed:false};
+      if(info.completed && idx>maxCompletedIndex) maxCompletedIndex = idx;
+    });
+
     let html=`<div class="lesson-list">`;
     lessons.forEach((lesson,idx)=>{
-      const info=(progress.lessons||{})[lesson.id]||{percent:0,completed:false};
+      const info=(progMap)[lesson.id]||{percent:0,completed:false};
       const percent=Math.round(info.percent||0);
-      const prevLesson=lessons[idx-1];
-      let unlocked=false;
-      if(idx===0) unlocked=true;
-      else if(prevLesson){
-        const prevInfo=(progress.lessons||{})[prevLesson.id]||{percent:0,completed:false};
-        unlocked=!!prevInfo.completed;
+
+      let unlocked = (idx===0);
+      if(maxCompletedIndex>=0 && idx <= maxCompletedIndex+3){
+        unlocked = true;
       }
-      if(info.completed) unlocked=true;
+
       const statusText=info.completed
         ?"Tugallangan ✅"
         :unlocked?(percent>0?`Boshlangan (${percent}%)`:"Boshlanmagan")
@@ -1054,18 +1157,24 @@
 
   async function openLessonPlayer(lesson){
     if(!currentCourseDetail || !data.currentUser) return;
+
+    // Eski videoni “pauza” qilib, progressni saqlaymiz
+    stopCurrentPlayer();
+
     currentLessonId=lesson.id;
     lessonPlayerTitle.textContent=lesson.title;
     lessonVideoWrapper.classList.remove("hidden");
     lessonProgressText.textContent="Ko‘rilmoqda: 0%";
     lessonProgressBar.style.width="0%";
     lastSavedPercent=0;
-    stopCurrentPlayer();
 
     if(!ytApiReady){
       lessonProgressText.textContent="YouTube API yuklanmoqda...";
       const check=setInterval(()=>{
-        if(ytApiReady){ clearInterval(check); openLessonPlayer(lesson); }
+        if(ytApiReady){
+          clearInterval(check);
+          openLessonPlayer(lesson);
+        }
       },500);
       return;
     }
@@ -1099,7 +1208,14 @@
       const rounded=Math.round(percent);
       lessonProgressText.textContent=`Ko‘rilgan: ${rounded}%`;
       lessonProgressBar.style.width=rounded+"%";
+
       if(!data.currentUser||!currentCourseDetail||!currentLessonId) return;
+
+      const lp = (currentCourseProgress?.lessons || {})[currentLessonId];
+      const alreadyCompleted = lp && lp.completed;
+      // Agar dars allaqachon tugallangan bo‘lsa, qayta tomosha progressini yozmaymiz
+      if(alreadyCompleted) return;
+
       if(rounded-lastSavedPercent>=15 || rounded>=90){
         lastSavedPercent=rounded;
         try{
@@ -1142,7 +1258,10 @@
     const item=e.target.closest(".lesson-item");
     if(!item) return;
     const unlocked=item.dataset.unlocked==="1";
-    if(!unlocked){ alert("Bu dars hozircha yopiq. Oldingi darsni 90% gacha ko‘ring."); return; }
+    if(!unlocked){
+      alert("Bu dars hozircha yopiq. Oldingi darslarni tugallab keyin kiring.");
+      return;
+    }
     const lessonId=item.dataset.lessonId;
     const lesson=(currentCourseDetail.lessons||[]).find(l=>l.id===lessonId);
     if(!lesson) return;
@@ -1299,6 +1418,11 @@
     if(!data.currentUser || data.currentUser.role!=="admin") return;
     userSection.classList.add("hidden");
     adminSection.classList.remove("hidden");
+  });
+
+  // Tab yopilganda ham progressni oxirgi marta saqlashga urinamiz
+  window.addEventListener("beforeunload",()=>{
+    stopCurrentPlayer();
   });
 
   /* INIT */
