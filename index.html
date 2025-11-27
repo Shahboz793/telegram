@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <title>Ta'lim Edu — Kurs Platforma (HTML + JS)</title>
+  <title>Ta'lim Edu — Kurs Platforma (HTML + JS + Firestore)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -293,6 +293,10 @@
       margin-top:6px;
     }
   </style>
+
+  <!-- FIREBASE (compat versiya, initializeApp ishlashi uchun) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 <div class="page">
@@ -303,7 +307,7 @@
       <a href="#user-section" id="nav-courses">Kurslar</a>
       <a href="#admin-section" id="nav-admin" class="hidden">Admin panel</a>
       <span class="user-label" id="current-user-label">Mehmon</span>
-      <button class="btn-outline" id="logout-btn" class="hidden">Chiqish</button>
+      <button class="btn-outline hidden" id="logout-btn">Chiqish</button>
     </nav>
   </header>
 
@@ -363,7 +367,7 @@
           <div class="card">
             <h2>Platforma haqida</h2>
             <p class="sub">
-              Bu Ta'lim Edu uchun HTML + CSS + JS asosida yaratilgan demo kurs tizimi.
+              Bu Ta'lim Edu uchun HTML + CSS + JS + Firestore asosida yaratilgan demo kurs tizimi.
             </p>
             <p class="hero-text">
               • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga 30 ta va undan ortiq
@@ -447,37 +451,62 @@
 </div>
 
 <script>
-  const LS_KEY = "talimEduAppData_v1";
+  // ---------------- FIREBASE INIT ----------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
+    authDomain: "shahboz-5d0a3.firebaseapp.com",
+    projectId: "shahboz-5d0a3",
+    storageBucket: "shahboz-5d0a3.firebasestorage.app",
+    messagingSenderId: "352024095535",
+    appId: "1:352024095535:web:6ca630de2c199a33c54fda",
+    measurementId: "G-YS5RGZ00EB"
+  };
 
-  function loadData() {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) {
-      const initial = {
-        users: [
-          { username: "admin", password: "admin123", role: "admin" }
-        ],
-        currentUser: null,
-        courses: [] // {id,title,description,category,price,lessons:[{id,title,videoId}]}
-      };
-      localStorage.setItem(LS_KEY, JSON.stringify(initial));
-      return initial;
-    }
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // ---------------- LOCAL STATE ----------------
+  let data = {
+    currentUser: null,
+    courses: []
+  };
+
+  const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
+
+  function loadCurrentUserFromLocal() {
     try {
+      const raw = localStorage.getItem(CURRENT_USER_KEY);
+      if (!raw) return null;
       return JSON.parse(raw);
     } catch (e) {
-      console.error("JSON parse error, resetting storage", e);
-      localStorage.removeItem(LS_KEY);
-      return loadData();
+      console.error("Current user parse error", e);
+      return null;
     }
   }
 
-  function saveData() {
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
+  function saveCurrentUserToLocal() {
+    if (!data.currentUser) {
+      localStorage.removeItem(CURRENT_USER_KEY);
+      return;
+    }
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data.currentUser));
   }
 
-  let data = loadData();
+  // Default admin bo'lmasa, yaratib qo'yamiz
+  async function ensureDefaultAdmin() {
+    const ref = db.collection("users").doc("admin");
+    const doc = await ref.get();
+    if (!doc.exists) {
+      await ref.set({
+        username: "admin",
+        password: "admin123",
+        role: "admin"
+      });
+      console.log("Default admin created");
+    }
+  }
 
-  // DOM elements
+  // ---------------- DOM ELEMENTS ----------------
   const authSection = document.getElementById("auth-section");
   const adminSection = document.getElementById("admin-section");
   const userSection = document.getElementById("user-section");
@@ -486,121 +515,31 @@
   const currentUserLabel = document.getElementById("current-user-label");
   const userRolePill = document.getElementById("user-role-pill");
 
-  // Auth tabs
+  // Auth
   const tabButtons = document.querySelectorAll(".tab-btn");
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
   const loginErrorEl = document.getElementById("login-error");
   const registerErrorEl = document.getElementById("register-error");
 
-  tabButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      tabButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const tab = btn.dataset.tab;
-      if (tab === "login") {
-        loginForm.classList.remove("hidden");
-        registerForm.classList.add("hidden");
-        loginErrorEl.textContent = "";
-      } else {
-        loginForm.classList.add("hidden");
-        registerForm.classList.remove("hidden");
-        registerErrorEl.textContent = "";
-      }
-    });
-  });
+  const loginUsername = document.getElementById("login-username");
+  const loginPassword = document.getElementById("login-password");
+  const regUsername = document.getElementById("reg-username");
+  const regPassword = document.getElementById("reg-password");
+  const regPassword2 = document.getElementById("reg-password2");
 
-  // LOGIN
-  loginForm.addEventListener("submit", e => {
-    e.preventDefault();
-    loginErrorEl.textContent = "";
-    const username = document.getElementById("login-username").value.trim();
-    const password = document.getElementById("login-password").value;
-
-    const user = data.users.find(u => u.username === username && u.password === password);
-    if (!user) {
-      loginErrorEl.textContent = "Login yoki parol noto‘g‘ri.";
-      return;
-    }
-
-    data.currentUser = { username: user.username, role: user.role };
-    saveData();
-    loginForm.reset();
-    updateUI();
-  });
-
-  // REGISTER
-  registerForm.addEventListener("submit", e => {
-    e.preventDefault();
-    registerErrorEl.textContent = "";
-    const username = document.getElementById("reg-username").value.trim();
-    const password = document.getElementById("reg-password").value;
-    const password2 = document.getElementById("reg-password2").value;
-
-    if (!username || !password) {
-      registerErrorEl.textContent = "Login va parolni kiriting.";
-      return;
-    }
-    if (password !== password2) {
-      registerErrorEl.textContent = "Parollar mos kelmadi.";
-      return;
-    }
-    if (data.users.some(u => u.username === username)) {
-      registerErrorEl.textContent = "Bu login band. Boshqa login tanlang.";
-      return;
-    }
-
-    data.users.push({ username, password, role: "user" });
-    data.currentUser = { username, role: "user" };
-    saveData();
-    registerForm.reset();
-    updateUI();
-  });
-
-  // LOGOUT
-  logoutBtn.addEventListener("click", () => {
-    data.currentUser = null;
-    saveData();
-    updateUI();
-  });
-
-  // COURSE MANAGEMENT (ADMIN)
+  // Courses (admin + user)
   const courseForm = document.getElementById("course-form");
   const courseError = document.getElementById("course-error");
   const adminCourseList = document.getElementById("admin-course-list");
   const adminCourseCount = document.getElementById("admin-course-count");
   const adminEmpty = document.getElementById("admin-empty");
 
-  courseForm.addEventListener("submit", e => {
-    e.preventDefault();
-    if (!data.currentUser || data.currentUser.role !== "admin") return;
+  const userCourseList = document.getElementById("user-course-list");
+  const userCourseCount = document.getElementById("user-course-count");
+  const userEmpty = document.getElementById("user-empty");
 
-    courseError.textContent = "";
-    const title = document.getElementById("course-title").value.trim();
-    const desc = document.getElementById("course-desc").value.trim();
-    const cat = document.getElementById("course-cat").value.trim();
-    const price = document.getElementById("course-price").value.trim();
-
-    if (!title || !desc) {
-      courseError.textContent = "Kurs nomi va tavsifi majburiy.";
-      return;
-    }
-
-    const newCourse = {
-      id: Date.now().toString(),
-      title,
-      description: desc,
-      category: cat,
-      price,
-      lessons: []
-    };
-    data.courses.push(newCourse);
-    saveData();
-    courseForm.reset();
-    renderAdminCourses();
-    renderUserCourses();
-  });
-
+  // ---------------- HELPERS ----------------
   function formatPrice(price) {
     const n = Number(price);
     if (!price || isNaN(n)) return "";
@@ -624,8 +563,53 @@
     return url;
   }
 
+  // ---------------- FIRESTORE FUNKSIYALAR ----------------
+  async function registerUser(username, password) {
+    const ref = db.collection("users").doc(username);
+    const doc = await ref.get();
+    if (doc.exists) {
+      throw new Error("exists");
+    }
+    await ref.set({
+      username,
+      password,
+      role: "user"
+    });
+  }
+
+  async function loginUser(username, password) {
+    const ref = db.collection("users").doc(username);
+    const doc = await ref.get();
+    if (!doc.exists) return null;
+    const user = doc.data();
+    if (user.password !== password) return null;
+    return user;
+  }
+
+  async function addCourseToFirestore(course) {
+    await db.collection("courses").doc(course.id).set(course);
+  }
+
+  async function updateCourseLessons(courseId, lessons) {
+    await db.collection("courses").doc(courseId).update({
+      lessons: lessons
+    });
+  }
+
+  async function loadCoursesFromFirestore() {
+    const snap = await db.collection("courses").get();
+    data.courses = snap.docs.map(d => d.data());
+  }
+
+  async function refreshCourses() {
+    await loadCoursesFromFirestore();
+    renderAdminCourses();
+    renderUserCourses();
+  }
+
+  // ---------------- RENDER: ADMIN ----------------
   function renderAdminCourses() {
-    const courses = data.courses;
+    const courses = data.courses || [];
     adminCourseList.innerHTML = "";
     adminCourseCount.textContent = courses.length + " ta kurs";
 
@@ -644,7 +628,7 @@
         <div class="course-meta">
           ${course.category ? `<span class="badge">${course.category}</span>` : ""}
           ${formatPrice(course.price) ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${formatPrice(course.price)}</span>` : ""}
-          <span class="badge">Darslar: ${course.lessons.length}</span>
+          <span class="badge">Darslar: ${course.lessons ? course.lessons.length : 0}</span>
         </div>
         <div class="mini-form">
           <div class="muted" style="margin-bottom:4px;">Ushbu kursga yangi dars/video qo‘shish:</div>
@@ -666,7 +650,8 @@
     });
   }
 
-  adminCourseList.addEventListener("submit", e => {
+  // Lesson qo'shish (admin)
+  adminCourseList.addEventListener("submit", async e => {
     if (!e.target.classList.contains("lesson-form")) return;
     e.preventDefault();
     if (!data.currentUser || data.currentUser.role !== "admin") return;
@@ -677,33 +662,36 @@
     const url = form.lessonUrl.value.trim();
     if (!title || !url) return;
 
-    const course = data.courses.find(c => c.id === courseId);
-    if (!course) return;
-
     const videoId = extractYouTubeId(url);
     if (!videoId) {
       alert("YouTube havola/ID noto‘g‘ri bo‘lishi mumkin.");
       return;
     }
 
-    course.lessons.push({
-      id: Date.now().toString(),
-      title,
-      videoId
-    });
-    saveData();
-    form.reset();
-    renderAdminCourses();
-    renderUserCourses();
+    try {
+      // joriy kursni topamiz
+      const course = data.courses.find(c => c.id === courseId);
+      if (!course) return;
+
+      const lessons = course.lessons || [];
+      lessons.push({
+        id: Date.now().toString(),
+        title,
+        videoId
+      });
+
+      await updateCourseLessons(courseId, lessons);
+      await refreshCourses();
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      alert("Darsni saqlashda xatolik yuz berdi.");
+    }
   });
 
-  // USER VIEW
-  const userCourseList = document.getElementById("user-course-list");
-  const userCourseCount = document.getElementById("user-course-count");
-  const userEmpty = document.getElementById("user-empty");
-
+  // ---------------- RENDER: USER ----------------
   function renderUserCourses() {
-    const courses = data.courses;
+    const courses = data.courses || [];
     userCourseList.innerHTML = "";
     userCourseCount.textContent = courses.length + " ta kurs";
 
@@ -718,14 +706,15 @@
       card.className = "course-card";
 
       const priceText = formatPrice(course.price);
+      const lessons = course.lessons || [];
 
       let lessonsHtml = "";
-      if (course.lessons.length === 0) {
+      if (lessons.length === 0) {
         lessonsHtml = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
       } else {
         lessonsHtml = `
           <div class="lesson-list">
-            ${course.lessons.map(lesson => `
+            ${lessons.map(lesson => `
               <div class="lesson-item">
                 <div class="lesson-title">${lesson.title}</div>
                 <div class="video-wrapper">
@@ -743,7 +732,7 @@
         <div class="course-meta">
           ${course.category ? `<span class="badge">${course.category}</span>` : ""}
           ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
-          <span class="badge">Darslar: ${course.lessons.length}</span>
+          <span class="badge">Darslar: ${lessons.length}</span>
         </div>
         <div class="course-footer">
           <span class="muted">Kurs ID: ${course.id}</span>
@@ -754,22 +743,24 @@
     });
   }
 
-  // UI UPDATE
+  // ---------------- UI UPDATE ----------------
   function updateUI() {
     const user = data.currentUser;
+
     if (!user) {
       authSection.classList.remove("hidden");
       adminSection.classList.add("hidden");
       userSection.classList.add("hidden");
       navAdmin.classList.add("hidden");
-      logoutBtn.style.display = "none";
+      logoutBtn.classList.add("hidden");
       currentUserLabel.textContent = "Mehmon";
+      userRolePill.textContent = "Rol: Foydalanuvchi";
       return;
     }
 
     authSection.classList.add("hidden");
     userSection.classList.remove("hidden");
-    logoutBtn.style.display = "inline-block";
+    logoutBtn.classList.remove("hidden");
     currentUserLabel.textContent = user.username;
 
     if (user.role === "admin") {
@@ -781,13 +772,144 @@
       navAdmin.classList.add("hidden");
       userRolePill.textContent = "Rol: Foydalanuvchi";
     }
-
-    renderAdminCourses();
-    renderUserCourses();
   }
 
-  // Initial render
-  updateUI();
+  // ---------------- AUTH TABS ----------------
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      tabButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const tab = btn.dataset.tab;
+      if (tab === "login") {
+        loginForm.classList.remove("hidden");
+        registerForm.classList.add("hidden");
+        loginErrorEl.textContent = "";
+      } else {
+        loginForm.classList.add("hidden");
+        registerForm.classList.remove("hidden");
+        registerErrorEl.textContent = "";
+      }
+    });
+  });
+
+  // ---------------- LOGIN ----------------
+  loginForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    loginErrorEl.textContent = "";
+
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value;
+
+    if (!username || !password) {
+      loginErrorEl.textContent = "Login va parolni kiriting.";
+      return;
+    }
+
+    try {
+      const user = await loginUser(username, password);
+      if (!user) {
+        loginErrorEl.textContent = "Login yoki parol noto‘g‘ri.";
+        return;
+      }
+      data.currentUser = { username: user.username, role: user.role };
+      saveCurrentUserToLocal();
+      loginForm.reset();
+      updateUI();
+      await refreshCourses();
+    } catch (err) {
+      console.error(err);
+      loginErrorEl.textContent = "Kirishda xatolik yuz berdi.";
+    }
+  });
+
+  // ---------------- REGISTER ----------------
+  registerForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    registerErrorEl.textContent = "";
+
+    const username = regUsername.value.trim();
+    const password = regPassword.value;
+    const password2 = regPassword2.value;
+
+    if (!username || !password) {
+      registerErrorEl.textContent = "Login va parolni kiriting.";
+      return;
+    }
+    if (password !== password2) {
+      registerErrorEl.textContent = "Parollar mos kelmadi.";
+      return;
+    }
+
+    try {
+      await registerUser(username, password);
+      data.currentUser = { username, role: "user" };
+      saveCurrentUserToLocal();
+      registerForm.reset();
+      updateUI();
+      await refreshCourses();
+    } catch (err) {
+      if (err.message === "exists") {
+        registerErrorEl.textContent = "Bu login band. Boshqa login tanlang.";
+      } else {
+        console.error(err);
+        registerErrorEl.textContent = "Ro‘yxatdan o‘tishda xatolik yuz berdi.";
+      }
+    }
+  });
+
+  // ---------------- LOGOUT ----------------
+  logoutBtn.addEventListener("click", () => {
+    data.currentUser = null;
+    saveCurrentUserToLocal();
+    updateUI();
+  });
+
+  // ---------------- KURS QO'SHISH (ADMIN) ----------------
+  courseForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!data.currentUser || data.currentUser.role !== "admin") return;
+
+    courseError.textContent = "";
+    const title = document.getElementById("course-title").value.trim();
+    const desc = document.getElementById("course-desc").value.trim();
+    const cat = document.getElementById("course-cat").value.trim();
+    const price = document.getElementById("course-price").value.trim();
+
+    if (!title || !desc) {
+      courseError.textContent = "Kurs nomi va tavsifi majburiy.";
+      return;
+    }
+
+    const newCourse = {
+      id: Date.now().toString(),
+      title,
+      description: desc,
+      category: cat,
+      price,
+      lessons: []
+    };
+
+    try {
+      await addCourseToFirestore(newCourse);
+      courseForm.reset();
+      await refreshCourses();
+    } catch (err) {
+      console.error(err);
+      courseError.textContent = "Kursni saqlashda xatolik yuz berdi.";
+    }
+  });
+
+  // ---------------- INIT APP ----------------
+  (async function initApp() {
+    try {
+      await ensureDefaultAdmin();
+      data.currentUser = loadCurrentUserFromLocal();
+      updateUI();
+      await refreshCourses();
+    } catch (err) {
+      console.error("Init error:", err);
+    }
+  })();
 </script>
 </body>
 </html>
