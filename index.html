@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <title>Ta'lim Edu — Kurs Platforma (HTML + JS)</title>
+  <title>Ta'lim Edu — Kurs Platforma (HTML + JS + Firestore)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -71,11 +71,6 @@
       margin-bottom:10px;
     }
 
-    .hero-title{
-      font-size:24px;
-      font-weight:700;
-      margin-bottom:4px;
-    }
     .hero-text{
       font-size:14px;
       color:#4b5563;
@@ -247,26 +242,6 @@
       margin-top:4px;
     }
 
-    .lesson-list{
-      margin-top:6px;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      border-top:1px dashed #e5e7eb;
-      padding-top:6px;
-    }
-    .lesson-item{
-      background:#ffffff;
-      border-radius:8px;
-      border:1px solid #e5e7eb;
-      padding:6px;
-    }
-    .lesson-title{
-      font-size:13px;
-      font-weight:500;
-      margin-bottom:4px;
-    }
-
     .video-wrapper{
       position:relative;
       padding-bottom:56.25%;
@@ -275,21 +250,115 @@
       border-radius:8px;
       background:#000;
     }
-    .video-wrapper iframe{
+    .video-wrapper #yt-player-container{
       position:absolute;
       top:0;left:0;width:100%;height:100%;
-      border:0;
-    }
-
-    .mini-form{
-      margin-top:6px;
-      border-top:1px dashed #e5e7eb;
-      padding-top:6px;
     }
 
     .empty{
       font-size:13px;
       color:#9ca3af;
+      margin-top:6px;
+    }
+
+    /* ADMIN LESSON LIST (delete) */
+    .admin-lessons{
+      margin-top:6px;
+      border-top:1px dashed #e5e7eb;
+      padding-top:6px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .admin-lesson-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:6px;
+      font-size:12px;
+      background:#f9fafb;
+      border-radius:8px;
+      padding:4px 6px;
+      border:1px solid #e5e7eb;
+    }
+    .admin-lesson-title{flex:1;}
+    .btn-xs{
+      border:none;
+      border-radius:999px;
+      padding:3px 8px;
+      font-size:11px;
+      cursor:pointer;
+      background:#fee2e2;
+      color:#b91c1c;
+    }
+    .btn-xs:hover{background:#fecaca;}
+
+    /* USER PLAYER + PLAYLIST */
+    .course-player{
+      margin-top:8px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .lesson-playlist{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      max-height:200px;
+      overflow:auto;
+    }
+    .lesson-playlist-item{
+      border:none;
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid #e5e7eb;
+      background:#f9fafb;
+      cursor:pointer;
+      text-align:left;
+    }
+    .lesson-playlist-item:hover{
+      background:#eff6ff;
+      border-color:#bfdbfe;
+    }
+    .lesson-playlist-item.active{
+      background:#111827;
+      color:#f9fafb;
+      border-color:#111827;
+    }
+    .lesson-thumb{
+      width:64px;
+      height:40px;
+      flex-shrink:0;
+      border-radius:6px;
+      overflow:hidden;
+      background:#111827;
+    }
+    .lesson-thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .lesson-info{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .lesson-meta{
+      font-size:11px;
+      color:#6b7280;
+    }
+    .lesson-playlist-item.active .lesson-meta{
+      color:#e5e7eb;
+    }
+
+    .loading{
+      font-size:13px;
+      color:#6b7280;
       margin-top:6px;
     }
   </style>
@@ -303,7 +372,7 @@
       <a href="#user-section" id="nav-courses">Kurslar</a>
       <a href="#admin-section" id="nav-admin" class="hidden">Admin panel</a>
       <span class="user-label" id="current-user-label">Mehmon</span>
-      <button class="btn-outline" id="logout-btn" class="hidden">Chiqish</button>
+      <button class="btn-outline" id="logout-btn" style="display:none;">Chiqish</button>
     </nav>
   </header>
 
@@ -363,14 +432,14 @@
           <div class="card">
             <h2>Platforma haqida</h2>
             <p class="sub">
-              Bu Ta'lim Edu uchun HTML + CSS + JS asosida yaratilgan demo kurs tizimi.
+              Bu Ta'lim Edu uchun HTML + CSS + JS + Firestore asosida yaratilgan demo kurs tizimi.
             </p>
             <p class="hero-text">
-              • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga 30 ta va undan ortiq
-              YouTube <b>yashirin (Unlisted)</b> videolarni qo‘shishi mumkin.<br>
+              • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga ko‘plab YouTube <b>Unlisted</b> videolarni qo‘shishi mumkin.<br>
               • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va <b>kurslar ichidagi darslarni tomosha qiladi</b>.<br><br>
-              Videolar YouTube’da saqlanadi, sayt esa ularni o‘z ichiga o‘rnatib beradi.
+              Ma'lumotlar Firestore’da saqlanadi, shuning uchun boshqa telefon va kompyuterdan kirganda ham kurslar ko‘rinadi.
             </p>
+            <p id="load-status" class="loading">Ma'lumotlar yuklanmoqda...</p>
           </div>
         </div>
       </div>
@@ -446,38 +515,110 @@
   </main>
 </div>
 
-<script>
-  const LS_KEY = "talimEduAppData_v1";
+<!-- Barcha JS: Firestore + UI + YouTube player -->
+<script type="module">
+  // ---------- FIREBASE IMPORTLAR ----------
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-  function loadData() {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) {
-      const initial = {
+  // ---------- FIREBASE CONFIG — SENIKI QO'YILDI ----------
+  const firebaseConfig = {
+    apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
+    authDomain: "shahboz-5d0a3.firebaseapp.com",
+    projectId: "shahboz-5d0a3",
+    storageBucket: "shahboz-5d0a3.firebasestorage.app",
+    messagingSenderId: "352024095535",
+    appId: "1:352024095535:web:6ca630de2c199a33c54fda",
+    measurementId: "G-YS5RGZ00EB"
+  };
+
+  // Firebase init
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const DATA_DOC = doc(db, "talimEdu", "appData");
+
+  // ---------- LOCAL HOLAT ----------
+  const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
+
+  let data = {
+    users: [],
+    courses: [] // {id,title,description,category,price,lessons:[{id,title,videoId}]}
+  };
+  let currentUser = loadCurrentUserLocal();
+  let isDataLoaded = false;
+
+  const loadStatus = document.getElementById("load-status");
+
+  // Firestore'dan ma'lumot yuklash
+  async function loadDataFromFirestore() {
+    try {
+      const snap = await getDoc(DATA_DOC);
+      if (!snap.exists()) {
+        const initial = {
+          users: [
+            { username: "admin", password: "admin123", role: "admin" }
+          ],
+          courses: []
+        };
+        await setDoc(DATA_DOC, initial);
+        return initial;
+      }
+      const d = snap.data() || {};
+      if (!Array.isArray(d.users)) d.users = [];
+      if (!Array.isArray(d.courses)) d.courses = [];
+      if (!d.users.some(u => u.username === "admin" && u.role === "admin")) {
+        d.users.push({ username: "admin", password: "admin123", role: "admin" });
+      }
+      await setDoc(DATA_DOC, d);
+      return d;
+    } catch (err) {
+      console.error("Firestore yuklash xatosi:", err);
+      if (loadStatus) loadStatus.textContent = "Ma'lumotlarni yuklashda xato. Internet va Firebase sozlamalarini tekshiring.";
+      return {
         users: [
           { username: "admin", password: "admin123", role: "admin" }
         ],
-        currentUser: null,
-        courses: [] // {id,title,description,category,price,lessons:[{id,title,videoId}]}
+        courses: []
       };
-      localStorage.setItem(LS_KEY, JSON.stringify(initial));
-      return initial;
     }
+  }
+
+  async function saveDataToFirestore() {
+    try {
+      await setDoc(DATA_DOC, data);
+    } catch (err) {
+      console.error("Firestore saqlash xatosi:", err);
+      alert("Ma'lumotni Firestore'ga saqlashda xato bo‘ldi. Internetni tekshiring.");
+    }
+  }
+
+  function loadCurrentUserLocal() {
+    const raw = localStorage.getItem(CURRENT_USER_KEY);
+    if (!raw) return null;
     try {
       return JSON.parse(raw);
-    } catch (e) {
-      console.error("JSON parse error, resetting storage", e);
-      localStorage.removeItem(LS_KEY);
-      return loadData();
+    } catch {
+      return null;
     }
   }
 
-  function saveData() {
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
+  function saveCurrentUserLocal() {
+    if (currentUser) {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem(CURRENT_USER_KEY);
+    }
   }
 
-  let data = loadData();
+  function ensureLoaded() {
+    if (!isDataLoaded) {
+      alert("Ma'lumotlar hali yuklanmoqda. Biroz kutib qayta urinib ko‘ring.");
+      return false;
+    }
+    return true;
+  }
 
-  // DOM elements
+  // ---------- DOM ELEMENTLAR ----------
   const authSection = document.getElementById("auth-section");
   const adminSection = document.getElementById("admin-section");
   const userSection = document.getElementById("user-section");
@@ -486,13 +627,23 @@
   const currentUserLabel = document.getElementById("current-user-label");
   const userRolePill = document.getElementById("user-role-pill");
 
-  // Auth tabs
   const tabButtons = document.querySelectorAll(".tab-btn");
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
   const loginErrorEl = document.getElementById("login-error");
   const registerErrorEl = document.getElementById("register-error");
 
+  const courseForm = document.getElementById("course-form");
+  const courseError = document.getElementById("course-error");
+  const adminCourseList = document.getElementById("admin-course-list");
+  const adminCourseCount = document.getElementById("admin-course-count");
+  const adminEmpty = document.getElementById("admin-empty");
+
+  const userCourseList = document.getElementById("user-course-list");
+  const userCourseCount = document.getElementById("user-course-count");
+  const userEmpty = document.getElementById("user-empty");
+
+  // ---------- TABS ----------
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       tabButtons.forEach(b => b.classList.remove("active"));
@@ -510,9 +661,11 @@
     });
   });
 
-  // LOGIN
-  loginForm.addEventListener("submit", e => {
+  // ---------- LOGIN ----------
+  loginForm.addEventListener("submit", async e => {
     e.preventDefault();
+    if (!ensureLoaded()) return;
+
     loginErrorEl.textContent = "";
     const username = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value;
@@ -523,15 +676,17 @@
       return;
     }
 
-    data.currentUser = { username: user.username, role: user.role };
-    saveData();
+    currentUser = { username: user.username, role: user.role };
+    saveCurrentUserLocal();
     loginForm.reset();
     updateUI();
   });
 
-  // REGISTER
-  registerForm.addEventListener("submit", e => {
+  // ---------- REGISTER ----------
+  registerForm.addEventListener("submit", async e => {
     e.preventDefault();
+    if (!ensureLoaded()) return;
+
     registerErrorEl.textContent = "";
     const username = document.getElementById("reg-username").value.trim();
     const password = document.getElementById("reg-password").value;
@@ -551,29 +706,25 @@
     }
 
     data.users.push({ username, password, role: "user" });
-    data.currentUser = { username, role: "user" };
-    saveData();
+    await saveDataToFirestore();
+    currentUser = { username, role: "user" };
+    saveCurrentUserLocal();
     registerForm.reset();
     updateUI();
   });
 
-  // LOGOUT
+  // ---------- LOGOUT ----------
   logoutBtn.addEventListener("click", () => {
-    data.currentUser = null;
-    saveData();
+    currentUser = null;
+    saveCurrentUserLocal();
     updateUI();
   });
 
-  // COURSE MANAGEMENT (ADMIN)
-  const courseForm = document.getElementById("course-form");
-  const courseError = document.getElementById("course-error");
-  const adminCourseList = document.getElementById("admin-course-list");
-  const adminCourseCount = document.getElementById("admin-course-count");
-  const adminEmpty = document.getElementById("admin-empty");
-
-  courseForm.addEventListener("submit", e => {
+  // ---------- KURS QO‘SHISH (ADMIN) ----------
+  courseForm.addEventListener("submit", async e => {
     e.preventDefault();
-    if (!data.currentUser || data.currentUser.role !== "admin") return;
+    if (!ensureLoaded()) return;
+    if (!currentUser || currentUser.role !== "admin") return;
 
     courseError.textContent = "";
     const title = document.getElementById("course-title").value.trim();
@@ -595,7 +746,7 @@
       lessons: []
     };
     data.courses.push(newCourse);
-    saveData();
+    await saveDataToFirestore();
     courseForm.reset();
     renderAdminCourses();
     renderUserCourses();
@@ -611,21 +762,18 @@
   function extractYouTubeId(input) {
     if (!input) return "";
     let url = input.trim();
-    // youtu.be/xxxx
     let m = url.match(/youtu\.be\/([^?&]+)/);
     if (m) return m[1];
-    // youtube.com/watch?v=xxxx
     m = url.match(/v=([^&]+)/);
     if (m) return m[1];
-    // youtube.com/embed/xxxx
     m = url.match(/embed\/([^?&]+)/);
     if (m) return m[1];
-    // faqat ID bo’lsa
     return url;
   }
 
+  // ---------- ADMIN KURSLAR RENDER ----------
   function renderAdminCourses() {
-    const courses = data.courses;
+    const courses = data.courses || [];
     adminCourseList.innerHTML = "";
     adminCourseCount.textContent = courses.length + " ta kurs";
 
@@ -638,13 +786,34 @@
     courses.forEach(course => {
       const div = document.createElement("div");
       div.className = "course-card";
+
+      let lessonsAdminHtml = "";
+      if (course.lessons && course.lessons.length > 0) {
+        lessonsAdminHtml = `
+          <div class="admin-lessons">
+            ${course.lessons.map((lesson, idx) => `
+              <div class="admin-lesson-row">
+                <span class="admin-lesson-title">${idx + 1}-dars: ${lesson.title}</span>
+                <button type="button"
+                        class="btn-xs"
+                        data-action="delete-lesson"
+                        data-course-id="${course.id}"
+                        data-lesson-id="${lesson.id}">
+                  O‘chirish
+                </button>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
       div.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
           ${course.category ? `<span class="badge">${course.category}</span>` : ""}
           ${formatPrice(course.price) ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${formatPrice(course.price)}</span>` : ""}
-          <span class="badge">Darslar: ${course.lessons.length}</span>
+          <span class="badge">Darslar: ${course.lessons ? course.lessons.length : 0}</span>
         </div>
         <div class="mini-form">
           <div class="muted" style="margin-bottom:4px;">Ushbu kursga yangi dars/video qo‘shish:</div>
@@ -661,15 +830,18 @@
             <button type="submit" class="btn" style="margin-top:4px;">Darsni qo‘shish</button>
           </form>
         </div>
+        ${lessonsAdminHtml}
       `;
       adminCourseList.appendChild(div);
     });
   }
 
-  adminCourseList.addEventListener("submit", e => {
+  // Dars qo‘shish (admin)
+  adminCourseList.addEventListener("submit", async e => {
     if (!e.target.classList.contains("lesson-form")) return;
     e.preventDefault();
-    if (!data.currentUser || data.currentUser.role !== "admin") return;
+    if (!ensureLoaded()) return;
+    if (!currentUser || currentUser.role !== "admin") return;
 
     const form = e.target;
     const courseId = form.dataset.courseId;
@@ -686,24 +858,48 @@
       return;
     }
 
+    course.lessons = course.lessons || [];
     course.lessons.push({
       id: Date.now().toString(),
       title,
       videoId
     });
-    saveData();
+    await saveDataToFirestore();
     form.reset();
     renderAdminCourses();
     renderUserCourses();
   });
 
-  // USER VIEW
-  const userCourseList = document.getElementById("user-course-list");
-  const userCourseCount = document.getElementById("user-course-count");
-  const userEmpty = document.getElementById("user-empty");
+  // Darsni o‘chirish (admin)
+  adminCourseList.addEventListener("click", async e => {
+    const btn = e.target.closest(".btn-xs[data-action='delete-lesson']");
+    if (!btn) return;
+    if (!ensureLoaded()) return;
+    if (!currentUser || currentUser.role !== "admin") return;
+
+    const courseId = btn.dataset.courseId;
+    const lessonId = btn.dataset.lessonId;
+
+    const course = data.courses.find(c => c.id === courseId);
+    if (!course || !course.lessons) return;
+
+    const idx = course.lessons.findIndex(l => l.id === lessonId);
+    if (idx === -1) return;
+
+    if (!confirm("Bu darsni o‘chirmoqchimisiz?")) return;
+
+    course.lessons.splice(idx, 1);
+    await saveDataToFirestore();
+    renderAdminCourses();
+    renderUserCourses();
+  });
+
+  // ---------- USER VIEW + YOUTUBE PLAYER ----------
+  let ytApiReady = false;
+  const players = {}; // { [courseId]: { player: YT.Player, currentIndex:number } }
 
   function renderUserCourses() {
-    const courses = data.courses;
+    const courses = data.courses || [];
     userCourseList.innerHTML = "";
     userCourseCount.textContent = courses.length + " ta kurs";
 
@@ -718,21 +914,34 @@
       card.className = "course-card";
 
       const priceText = formatPrice(course.price);
+      const hasLessons = course.lessons && course.lessons.length > 0;
 
       let lessonsHtml = "";
-      if (course.lessons.length === 0) {
+      if (!hasLessons) {
         lessonsHtml = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
       } else {
         lessonsHtml = `
-          <div class="lesson-list">
-            ${course.lessons.map(lesson => `
-              <div class="lesson-item">
-                <div class="lesson-title">${lesson.title}</div>
-                <div class="video-wrapper">
-                  <iframe src="https://www.youtube.com/embed/${lesson.videoId}" allowfullscreen></iframe>
-                </div>
-              </div>
-            `).join("")}
+          <div class="course-player" data-course-id="${course.id}">
+            <div class="video-wrapper">
+              <div id="player-${course.id}"></div>
+            </div>
+            <div class="lesson-playlist">
+              ${course.lessons.map((lesson, idx) => `
+                <button type="button"
+                        class="lesson-playlist-item ${idx === 0 ? "active" : ""}"
+                        data-course-id="${course.id}"
+                        data-lesson-id="${lesson.id}"
+                        data-index="${idx}">
+                  <div class="lesson-thumb">
+                    <img src="https://img.youtube.com/vi/${lesson.videoId}/mqdefault.jpg" alt="">
+                  </div>
+                  <div class="lesson-info">
+                    <div class="lesson-title">${lesson.title}</div>
+                    <div class="lesson-meta">Dars ${idx + 1}</div>
+                  </div>
+                </button>
+              `).join("")}
+            </div>
           </div>
         `;
       }
@@ -743,7 +952,7 @@
         <div class="course-meta">
           ${course.category ? `<span class="badge">${course.category}</span>` : ""}
           ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
-          <span class="badge">Darslar: ${course.lessons.length}</span>
+          <span class="badge">Darslar: ${course.lessons ? course.lessons.length : 0}</span>
         </div>
         <div class="course-footer">
           <span class="muted">Kurs ID: ${course.id}</span>
@@ -752,11 +961,112 @@
       `;
       userCourseList.appendChild(card);
     });
+
+    setupAllPlayers();
   }
 
-  // UI UPDATE
+  userCourseList.addEventListener("click", e => {
+    const btn = e.target.closest(".lesson-playlist-item");
+    if (!btn) return;
+
+    const courseId = btn.dataset.courseId;
+    const index = Number(btn.dataset.index);
+    const course = data.courses.find(c => c.id === courseId);
+    if (!course || !course.lessons || !course.lessons[index]) return;
+
+    const lesson = course.lessons[index];
+    const info = players[courseId];
+    if (!info || !info.player || !lesson.videoId) return;
+
+    info.currentIndex = index;
+    info.player.loadVideoById(lesson.videoId);
+    updateActivePlaylistItem(courseId, index);
+  });
+
+  function updateActivePlaylistItem(courseId, activeIndex) {
+    const playlistItems = document.querySelectorAll(`.lesson-playlist-item[data-course-id="${courseId}"]`);
+    playlistItems.forEach(btn => {
+      const idx = Number(btn.dataset.index);
+      if (idx === activeIndex) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+  }
+
+  function setupAllPlayers() {
+    if (!ytApiReady) return;
+
+    // eski playerlarni tozalash
+    for (const cid in players) {
+      if (players[cid].player && typeof players[cid].player.destroy === "function") {
+        try { players[cid].player.destroy(); } catch (e) {}
+      }
+    }
+
+    // yangidan yaratish
+    (data.courses || []).forEach(course => {
+      if (!course.lessons || course.lessons.length === 0) return;
+      const containerId = "player-" + course.id;
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      const firstLesson = course.lessons[0];
+      if (!firstLesson || !firstLesson.videoId) return;
+
+      players[course.id] = {
+        player: new YT.Player(containerId, {
+          videoId: firstLesson.videoId,
+          playerVars: {
+            rel: 0,
+            modestbranding: 1,
+            controls: 1,
+            fs: 0,
+            iv_load_policy: 3
+          },
+          events: {
+            'onStateChange': (event) => handlePlayerStateChange(event, course.id)
+          }
+        }),
+        currentIndex: 0
+      };
+    });
+  }
+
+  function handlePlayerStateChange(event, courseId) {
+    if (event.data !== YT.PlayerState.ENDED) return;
+
+    const course = data.courses.find(c => c.id === courseId);
+    if (!course || !course.lessons || course.lessons.length === 0) return;
+
+    const info = players[courseId];
+    if (!info) return;
+
+    const currentIndex = info.currentIndex || 0;
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= course.lessons.length) return;
+
+    const currentLesson = course.lessons[currentIndex];
+    const nextLesson = course.lessons[nextIndex];
+
+    const confirmText = `${currentLesson.title} tugadi. Keyingi dars "${nextLesson.title}" ga o'tasizmi?`;
+    if (confirm(confirmText)) {
+      info.currentIndex = nextIndex;
+      info.player.loadVideoById(nextLesson.videoId);
+      updateActivePlaylistItem(courseId, nextIndex);
+    }
+  }
+
+  // YouTube API callback'ni globalga ulab qo'yamiz
+  window.onYouTubeIframeAPIReady = function() {
+    ytApiReady = true;
+    setupAllPlayers();
+  };
+
+  // ---------- UI UPDATE ----------
   function updateUI() {
-    const user = data.currentUser;
+    const user = currentUser;
     if (!user) {
       authSection.classList.remove("hidden");
       adminSection.classList.add("hidden");
@@ -786,8 +1096,17 @@
     renderUserCourses();
   }
 
-  // Initial render
-  updateUI();
+  // ---------- INIT ----------
+  (async function init() {
+    if (loadStatus) loadStatus.textContent = "Ma'lumotlar yuklanmoqda...";
+    data = await loadDataFromFirestore();
+    isDataLoaded = true;
+    if (loadStatus) loadStatus.textContent = "Ma'lumotlar muvaffaqiyatli yuklandi.";
+    updateUI();
+  })();
 </script>
+
+<!-- YouTube IFrame API (modul emas, oddiy script) -->
+<script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
