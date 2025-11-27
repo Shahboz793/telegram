@@ -349,32 +349,74 @@
       transition:width .2s ease;
     }
 
-    /* QUIZ BOX */
-    .quiz-box{
-      margin-top:8px;
-      padding:8px 10px;
-      border-radius:12px;
-      background:#fff7ed;
-      border:1px solid #fed7aa;
-      box-shadow:0 6px 14px rgba(248,113,22,0.25);
-      font-size:13px;
+    /* QUIZ OVERLAY (FULL SCREEN) */
+    .quiz-overlay{
+      position:fixed;
+      inset:0;
+      z-index:60;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
+    .quiz-overlay.hidden{display:none;}
+    .quiz-overlay-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(15,23,42,0.85);
+      backdrop-filter:blur(6px);
+    }
+    .quiz-overlay-content{
+      position:relative;
+      z-index:1;
+      width:100%;
+      max-width:900px;
+      max-height:90vh;
+      padding:16px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    .quiz-overlay-box{
+      width:100%;
+      max-height:100%;
+      overflow-y:auto;
+      background:#fefce8;
+      border-radius:18px;
+      border:1px solid #fde68a;
+      box-shadow:0 24px 60px rgba(15,23,42,0.9);
+      padding:16px 14px 18px;
+    }
+    .quiz-overlay-title{
+      font-size:22px;
+      font-weight:800;
+      text-align:center;
+      margin-bottom:8px;
+      color:#92400e;
+    }
+    .quiz-overlay-sub{
+      font-size:15px;
+      text-align:center;
+      margin-bottom:12px;
+      color:#78350f;
+    }
+
     .quiz-question{
-      margin-top:6px;
-      padding:6px;
-      border-radius:10px;
+      margin-top:8px;
+      padding:8px;
+      border-radius:12px;
       background:#ffffff;
       border:1px solid #e5e7eb;
     }
     .quiz-question-title{
-      font-weight:500;
+      font-weight:600;
       margin-bottom:4px;
+      font-size:14px;
     }
     .quiz-options{
       margin-top:4px;
       display:flex;
       flex-direction:column;
-      gap:3px;
+      gap:4px;
     }
     .quiz-option label{
       display:flex;
@@ -399,7 +441,7 @@
       font-weight:600;
     }
 
-    /* MODAL (kurs tanlash) */
+    /* Kurs tanlash MODAL */
     .modal{
       position:fixed;
       inset:0;
@@ -490,7 +532,6 @@
       .btn-outline{
         width:100%;
         text-align:center;
-        justify-content:center;
       }
       .course-grid{
         grid-template-columns:minmax(0,1fr);
@@ -501,13 +542,20 @@
       .lesson-item{
         padding:9px 9px;
       }
+      .quiz-overlay-box{
+        border-radius:0;
+        max-width:100%;
+        height:100%;
+      }
+      .quiz-overlay-title{font-size:20px;}
+      .quiz-overlay-sub{font-size:14px;}
     }
   </style>
 
   <!-- FIREBASE (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <!-- YouTube Iframe API (asosiy skript) -->
+  <!-- YOUTUBE IFRAME API -->
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
@@ -590,8 +638,9 @@
               • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va kurslar ichidagi darslarni tomosha qiladi.<br><br>
               Har bir dars bo‘yicha ko‘rilgan <b>foiz</b> saqlanib boradi. Dars kamida
               <b>90%</b> ko‘rilganda tugallangan hisoblanadi va oldinga yana
-              <b>bir nechta darslar ochiladi</b>. Agar darsga <b>quiz</b> bog‘langan bo‘lsa,
-              dars oxirida <b>quiz test</b> chiqariladi (natijalar bazaga saqlanmaydi).
+              <b>3 ta dars</b> ochiladi.<br>
+              Agar darsga <b>quiz</b> biriktirilgan bo‘lsa, dars tugayotganida
+              ekranni batamom egallagan <b>katta quiz oynasi</b> chiqadi.
             </p>
           </div>
         </div>
@@ -672,7 +721,7 @@
           <span class="muted" id="user-course-count">0 ta kurs</span>
         </div>
 
-        <!-- Kurslar ro'yxati (mini ko‘rinish) -->
+        <!-- Kurslar ro'yxati -->
         <div id="user-courses-view">
           <div id="user-course-list" class="course-grid"></div>
           <div id="user-empty" class="empty">
@@ -680,7 +729,7 @@
           </div>
         </div>
 
-        <!-- Bitta kurs ichiga kirilganda ko‘rinish -->
+        <!-- Bitta kurs ichiga kirilganda -->
         <div id="user-course-detail" class="hidden">
           <button class="btn" id="user-back-btn" style="margin-bottom:8px;">← Kurslar paneliga qaytish</button>
           <h3 id="detail-title" style="font-size:18px;margin-bottom:4px;"></h3>
@@ -690,7 +739,7 @@
           <div class="detail-layout">
             <div id="detail-lessons"></div>
 
-            <div class="lesson-player-box" id="lesson-player-box">
+            <div class="lesson-player-box">
               <div class="muted" id="lesson-player-title">Dars tanlanmagan.</div>
               <div class="video-wrapper hidden" id="lesson-video-wrapper">
                 <div id="yt-player"></div>
@@ -702,20 +751,8 @@
               <div class="hint" style="margin-top:4px;">
                 Dars kamida <b>90%</b> ko‘rilganda tugallangan hisoblanadi.
                 1-dars tugallansa, oldinda <b>yana 3 ta dars</b> ochiladi.
-              </div>
-
-              <!-- QUIZ BOX -->
-              <div class="quiz-box hidden" id="quiz-box">
-                <div id="quiz-intro">
-                  <p class="muted">
-                    Bu dars uchun <b>quiz test</b> mavjud. Video darsni ko‘rib bo‘lgach,
-                    bilimlaringizni sinab ko‘ring.
-                  </p>
-                  <button class="btn" id="quiz-start-btn">Quizni boshlash</button>
-                  <p class="hint" id="quiz-lock-hint"></p>
-                </div>
-                <div id="quiz-questions-box" class="hidden"></div>
-                <div id="quiz-result-box" class="hidden"></div>
+                Agar darsga quiz biriktirilgan bo‘lsa, dars tugayotganida
+                ekranni egallagan <b>quiz oynasi</b> chiqadi.
               </div>
             </div>
 
@@ -753,28 +790,20 @@
   </div>
 </div>
 
+<!-- QUIZ FULLSCREEN OVERLAY -->
+<div id="quiz-overlay" class="quiz-overlay hidden">
+  <div class="quiz-overlay-backdrop"></div>
+  <div class="quiz-overlay-content">
+    <div class="quiz-overlay-box" id="quiz-overlay-box">
+      <!-- JS orqali to‘ldiriladi -->
+    </div>
+  </div>
+</div>
+
 <script>
   /* YOUTUBE API HOLATI */
   let ytApiReady = false;
-  let ytApiLoading = false;
-  function onYouTubeIframeAPIReady() {
-    ytApiReady = true;
-    ytApiLoading = false;
-  }
-  function ensureYouTubeApiLoaded() {
-    if (window.YT && typeof window.YT.Player === "function") {
-      ytApiReady = true;
-      return;
-    }
-    if (ytApiLoading) return;
-    ytApiLoading = true;
-    const existing = document.querySelector('script[src*="youtube.com/iframe_api"]');
-    if (existing) return;
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    tag.async = true;
-    document.head.appendChild(tag);
-  }
+  function onYouTubeIframeAPIReady(){ ytApiReady = true; }
 
   /* FIREBASE INIT */
   const firebaseConfig = {
@@ -791,39 +820,38 @@
   const db = firebase.firestore();
 
   /* LOCAL STATE */
-  let data = { currentUser: null, courses: [] };
+  let data = { currentUser:null, courses:[] };
   const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
   const REMEMBER_CREDENTIALS_KEY = "talimEduRemember_v1";
 
-  function loadCurrentUserFromLocal() {
-    try {
+  function loadCurrentUserFromLocal(){
+    try{
       const raw = localStorage.getItem(CURRENT_USER_KEY);
-      if (!raw) return null;
+      if(!raw) return null;
       return JSON.parse(raw);
-    } catch { return null; }
+    }catch{ return null; }
   }
-  function saveCurrentUserToLocal() {
-    if (!data.currentUser) localStorage.removeItem(CURRENT_USER_KEY);
+  function saveCurrentUserToLocal(){
+    if(!data.currentUser) localStorage.removeItem(CURRENT_USER_KEY);
     else localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data.currentUser));
   }
-
-  function saveRememberedCredentials(username, password) {
-    try {
-      localStorage.setItem(REMEMBER_CREDENTIALS_KEY, JSON.stringify({ username, password }));
-    } catch {}
+  function saveRememberedCredentials(username,password){
+    try{
+      localStorage.setItem(REMEMBER_CREDENTIALS_KEY, JSON.stringify({username,password}));
+    }catch{}
   }
-  function loadRememberedCredentials() {
-    try {
+  function loadRememberedCredentials(){
+    try{
       const raw = localStorage.getItem(REMEMBER_CREDENTIALS_KEY);
-      if (!raw) return null;
+      if(!raw) return null;
       return JSON.parse(raw);
-    } catch { return null; }
+    }catch{ return null; }
   }
 
-  async function ensureDefaultAdmin() {
+  async function ensureDefaultAdmin(){
     const ref = db.collection("users").doc("admin");
     const doc = await ref.get();
-    if (!doc.exists) {
+    if(!doc.exists){
       await ref.set({ username:"admin", password:"admin123", role:"admin" });
     }
   }
@@ -881,32 +909,28 @@
   const courseModalClose = document.getElementById("course-modal-close");
   const courseModalList = document.getElementById("course-modal-list");
 
-  const quizBox = document.getElementById("quiz-box");
-  const quizStartBtn = document.getElementById("quiz-start-btn");
-  const quizLockHint = document.getElementById("quiz-lock-hint");
-  const quizQuestionsBox = document.getElementById("quiz-questions-box");
-  const quizResultBox = document.getElementById("quiz-result-box");
+  const quizOverlay = document.getElementById("quiz-overlay");
+  const quizOverlayBox = document.getElementById("quiz-overlay-box");
 
   /* HELPERS */
-  function formatPrice(price) {
+  function formatPrice(price){
     const n = Number(price);
-    if (!price && price !== 0) return "";
-    if (isNaN(n)) return "";
-    if (n === 0) return "Bepul";
+    if(!price && price!==0) return "";
+    if(isNaN(n)) return "";
+    if(n===0) return "Bepul";
     return n.toLocaleString("uz-UZ")+" so'm";
   }
-  function extractYouTubeId(input) {
-    if (!input) return "";
+  function extractYouTubeId(input){
+    if(!input) return "";
     let url = input.trim();
     let m = url.match(/youtu\.be\/([^?&]+)/);
-    if (m) return m[1];
+    if(m) return m[1];
     m = url.match(/v=([^&]+)/);
-    if (m) return m[1];
+    if(m) return m[1];
     m = url.match(/embed\/([^?&]+)/);
-    if (m) return m[1];
+    if(m) return m[1];
     return url;
   }
-
   function getMotivationMessage(score,total){
     if(!total) return "";
     const percent = Math.round((score/total)*100);
@@ -916,47 +940,38 @@
     return "Hali hammasi oldinda. Yana bir marta darsni ko‘rib, qayta urinish tavsiya qilinadi. Siz albatta uddalaysiz! 🌱";
   }
 
-  /* PROGRESS Firestore */
-  async function loadProgress(username, courseId) {
+  /* PROGRESS (Firestore) */
+  async function loadProgress(username,courseId){
     const id = `${username}_${courseId}`;
     const ref = db.collection("progress").doc(id);
     const doc = await ref.get();
-    if (!doc.exists) return { user:username, courseId, lessons:{} };
+    if(!doc.exists) return { user:username, courseId, lessons:{} };
     const d = doc.data();
-    if (!d.lessons) d.lessons = {};
+    if(!d.lessons) d.lessons = {};
     return d;
   }
-  async function saveLessonProgress(username, courseId, lessonId, percent, completedFlag) {
-    const id = `${username}_${courseId}`;
-    const ref = db.collection("progress").doc(id);
-    const doc = await ref.get();
-    let d = doc.exists ? doc.data() : { user:username, courseId, lessons:{} };
-    if (!d.lessons) d.lessons = {};
-    const prev = d.lessons[lessonId] || { percent:0, completed:false };
-    const maxPercent = Math.max(prev.percent||0, percent||0);
-    const completed = prev.completed || completedFlag || maxPercent>=90;
-    d.lessons[lessonId] = {
-      ...prev,
-      percent:maxPercent,
-      completed
-    };
-    await ref.set(d);
-    return d;
-  }
-
-  // >>> YANGI: Quiz natijasini emas, faqat nechta marta ishlanganini saqlaymiz
-  async function saveLessonQuizResult(username,courseId,lessonId){
+  async function saveLessonProgress(username,courseId,lessonId,percent,completedFlag){
     const id = `${username}_${courseId}`;
     const ref = db.collection("progress").doc(id);
     const doc = await ref.get();
     let d = doc.exists ? doc.data() : { user:username, courseId, lessons:{} };
     if(!d.lessons) d.lessons = {};
     const prev = d.lessons[lessonId] || { percent:0, completed:false };
-    const attempts = (prev.quizAttempts || 0) + 1;
-    d.lessons[lessonId] = {
-      ...prev,
-      quizAttempts: attempts
-    };
+    const maxPercent = Math.max(prev.percent||0, percent||0);
+    const completed = prev.completed || completedFlag || maxPercent>=90;
+    d.lessons[lessonId] = { ...prev, percent:maxPercent, completed };
+    await ref.set(d);
+    return d;
+  }
+  async function saveLessonQuizAttempt(username,courseId,lessonId){
+    const id = `${username}_${courseId}`;
+    const ref = db.collection("progress").doc(id);
+    const doc = await ref.get();
+    let d = doc.exists ? doc.data() : { user:username, courseId, lessons:{} };
+    if(!d.lessons) d.lessons = {};
+    const prev = d.lessons[lessonId] || { percent:0, completed:false };
+    const attempts = (prev.quizAttempts||0)+1;
+    d.lessons[lessonId] = { ...prev, quizAttempts:attempts };
     await ref.set(d);
     return d;
   }
@@ -965,13 +980,13 @@
   async function registerUser(u,p){
     const ref = db.collection("users").doc(u);
     const doc = await ref.get();
-    if (doc.exists) throw new Error("exists");
+    if(doc.exists) throw new Error("exists");
     await ref.set({ username:u, password:p, role:"user" });
   }
   async function loginUser(u,p){
     const ref = db.collection("users").doc(u);
     const doc = await ref.get();
-    if (!doc.exists) return null;
+    if(!doc.exists) return null;
     const user = doc.data();
     return user.password===p ? user : null;
   }
@@ -1012,32 +1027,30 @@
       <div style="overflow-x:auto;">
         <table class="user-table">
           <thead><tr><th>Login</th><th>Rol</th></tr></thead>
-          <tbody>
-            ${users.map(u=>`<tr><td>${u.username}</td><td>${u.role}</td></tr>`).join("")}
-          </tbody>
+          <tbody>${users.map(u=>`<tr><td>${u.username}</td><td>${u.role}</td></tr>`).join("")}</tbody>
         </table>
       </div>`;
   }
 
-  /* RENDER ADMIN COURSES (quiz builder bilan) */
+  /* RENDER ADMIN COURSES + QUIZ BUILDER */
   function renderAdminCourses(){
     const courses = data.courses||[];
     adminCourseList.innerHTML="";
-    adminCourseCount.textContent=courses.length+" ta kurs";
+    adminCourseCount.textContent = courses.length+" ta kurs";
     if(!courses.length){ adminEmpty.style.display="block"; return; }
     adminEmpty.style.display="none";
 
     courses.forEach(course=>{
-      const div=document.createElement("div");
-      div.className="course-card";
-      const priceText=formatPrice(course.price);
-      const lessons=course.lessons||[];
+      const div = document.createElement("div");
+      div.className = "course-card";
+      const priceText = formatPrice(course.price);
+      const lessons = course.lessons||[];
 
-      let lessonsHtml="";
+      let lessonsHtml = "";
       if(!lessons.length){
-        lessonsHtml=`<div class="empty">Hali dars qo‘shilmagan.</div>`;
+        lessonsHtml = `<div class="empty">Hali dars qo‘shilmagan.</div>`;
       }else{
-        lessonsHtml=`
+        lessonsHtml = `
           <div class="lesson-list">
             ${lessons.map((l,i)=>`
               <div class="lesson-item">
@@ -1056,11 +1069,12 @@
                   <button type="button" class="btn-xs btn-lesson-delete"
                           data-course-id="${course.id}" data-lesson-id="${l.id}">O‘chirish</button>
                 </div>
-              </div>`).join("")}
+              </div>
+            `).join("")}
           </div>`;
       }
 
-      div.innerHTML=`
+      div.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
@@ -1072,6 +1086,7 @@
           <span class="muted">Kurs ID: ${course.id}</span>
           <button type="button" class="btn-xs btn-delete-course" data-course-id="${course.id}">Kursni o‘chirish</button>
         </div>
+
         <div class="mini-form">
           <div class="muted" style="margin-bottom:4px;">Ushbu kursga yangi dars/video qo‘shish:</div>
           <form class="lesson-form" data-course-id="${course.id}">
@@ -1103,12 +1118,14 @@
             <button type="submit" class="btn" style="margin-top:6px;">Darsni qo‘shish</button>
           </form>
         </div>
-        ${lessonsHtml}`;
+
+        ${lessonsHtml}
+      `;
       adminCourseList.appendChild(div);
     });
   }
 
-  // Quiz builder: toggle
+  /* Quiz builder: on/off */
   adminCourseList.addEventListener("change",e=>{
     if(!e.target.classList.contains("quiz-toggle")) return;
     const form = e.target.closest("form");
@@ -1117,7 +1134,7 @@
     builder.classList.toggle("hidden", !e.target.checked);
   });
 
-  // Quiz builder: savol qo‘shish
+  /* Quiz builder: savol qo‘shish */
   adminCourseList.addEventListener("click",e=>{
     const btn = e.target.closest(".btn-add-question");
     if(!btn) return;
@@ -1165,20 +1182,21 @@
     container.appendChild(block);
   });
 
-  // Admin: dars qo‘shish (quiz bilan)
+  /* Admin: dars qo‘shish (quiz bilan) */
   adminCourseList.addEventListener("submit",async e=>{
     if(!e.target.classList.contains("lesson-form")) return;
     e.preventDefault();
     if(!data.currentUser || data.currentUser.role!=="admin") return;
-    const form=e.target;
-    const courseId=form.dataset.courseId;
-    const title=form.lessonTitle.value.trim();
-    const url=form.lessonUrl.value.trim();
-    if(!title||!url) return;
-    const videoId=extractYouTubeId(url);
+
+    const form = e.target;
+    const courseId = form.dataset.courseId;
+    const title = form.lessonTitle.value.trim();
+    const url = form.lessonUrl.value.trim();
+    if(!title || !url) return;
+    const videoId = extractYouTubeId(url);
     if(!videoId){ alert("YouTube havola/ID noto‘g‘ri."); return; }
 
-    // Quizni yig‘ib olish
+    // quiz
     let quiz = [];
     const quizToggle = form.querySelector(".quiz-toggle");
     if(quizToggle && quizToggle.checked){
@@ -1203,14 +1221,14 @@
     }
 
     try{
-      const course=data.courses.find(c=>c.id===courseId);
+      const course = data.courses.find(c=>c.id===courseId);
       if(!course) return;
-      const lessons=course.lessons||[];
+      const lessons = course.lessons || [];
       lessons.push({
-        id:Date.now().toString(),
+        id: Date.now().toString(),
         title,
         videoId,
-        quiz:quiz
+        quiz
       });
       await updateCourseLessons(courseId,lessons);
       await refreshCourses();
@@ -1221,15 +1239,15 @@
     }
   });
 
-  // Admin: kursni o‘chirish, darsni o‘chirish va tartiblash
-  adminCourseList.addEventListener("click", async e=>{
+  /* Admin: kurs / dars o‘chirish va tartiblash */
+  adminCourseList.addEventListener("click",async e=>{
     const courseDel = e.target.closest(".btn-delete-course");
     const lessonDel = e.target.closest(".btn-lesson-delete");
     const lessonUp  = e.target.closest(".btn-lesson-up");
     const lessonDown= e.target.closest(".btn-lesson-down");
 
     if(courseDel){
-      const courseId=courseDel.dataset.courseId;
+      const courseId = courseDel.dataset.courseId;
       if(!confirm("Kursni o‘chirishni xohlaysizmi?")) return;
       try{
         await deleteCourseFromFirestore(courseId);
@@ -1238,7 +1256,7 @@
         renderUserCourses();
         renderCourseModalList();
       }catch(err){
-        console.error("Delete error:",err);
+        console.error(err);
         alert("Kursni o‘chirishda xatolik yuz berdi.");
       }
       return;
@@ -1262,10 +1280,10 @@
         lessons.splice(idx,1);
       }else if(lessonUp){
         if(idx===0) return;
-        [lessons[idx-1],lessons[idx]]=[lessons[idx],lessons[idx-1]];
+        [lessons[idx-1],lessons[idx]] = [lessons[idx],lessons[idx-1]];
       }else if(lessonDown){
         if(idx===lessons.length-1) return;
-        [lessons[idx],lessons[idx+1]]=[lessons[idx+1],lessons[idx]];
+        [lessons[idx],lessons[idx+1]] = [lessons[idx+1],lessons[idx]];
       }
       await updateCourseLessons(courseId,lessons);
       await refreshCourses();
@@ -1277,18 +1295,18 @@
 
   /* USER COURSES GRID */
   function renderUserCourses(){
-    const courses=data.courses||[];
+    const courses = data.courses||[];
     userCourseList.innerHTML="";
-    userCourseCount.textContent=courses.length+" ta kurs";
+    userCourseCount.textContent = courses.length+" ta kurs";
     if(!courses.length){ userEmpty.style.display="block"; return; }
     userEmpty.style.display="none";
 
     courses.forEach(course=>{
-      const card=document.createElement("div");
+      const card = document.createElement("div");
       card.className="course-card";
-      const priceText=formatPrice(course.price);
-      const lessons=course.lessons||[];
-      card.innerHTML=`
+      const priceText = formatPrice(course.price);
+      const lessons = course.lessons||[];
+      card.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
@@ -1304,20 +1322,20 @@
     });
   }
 
-  /* MODAL */
+  /* MODAL Kurs tanlash */
   function renderCourseModalList(){
-    const courses=data.courses||[];
+    const courses = data.courses||[];
     courseModalList.innerHTML="";
     if(!courses.length){
       courseModalList.innerHTML=`<div class="empty">Hozircha kurslar yo‘q.</div>`;
       return;
     }
     courses.forEach(course=>{
-      const div=document.createElement("div");
+      const div = document.createElement("div");
       div.className="course-card";
-      const priceText=formatPrice(course.price);
-      const lessons=course.lessons||[];
-      div.innerHTML=`
+      const priceText = formatPrice(course.price);
+      const lessons = course.lessons||[];
+      div.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
@@ -1343,116 +1361,99 @@
     if(e.target.classList.contains("modal-backdrop")) closeCourseModal();
   });
   courseModalList.addEventListener("click",async e=>{
-    const btn=e.target.closest(".btn-open-course-modal");
+    const btn = e.target.closest(".btn-open-course-modal");
     if(!btn) return;
-    const courseId=btn.dataset.courseId;
+    const courseId = btn.dataset.courseId;
     closeCourseModal();
     await openUserCourseDetail(courseId);
   });
 
-  /* COURSE DETAIL + PROGRESS + QUIZ */
+  /* LESSON / PLAYER / QUIZ STATE */
   let currentCourseDetail = null;
   let currentCourseProgress = null;
   let currentPlayer = null;
   let currentLessonId = null;
   let progressInterval = null;
   let lastSavedPercent = 0;
-  let pendingLessonToOpen = null;
 
   let currentLessonQuiz = [];
-  let currentQuizTaken = false;
 
-  function saveCurrentLessonProgressOnce() {
-    try {
-      if (
-        !currentPlayer ||
-        !currentCourseDetail ||
-        !currentLessonId ||
-        !data.currentUser ||
-        typeof currentPlayer.getDuration !== "function"
-      ) return;
-
+  /* Progressni bir marta majburan saqlash */
+  async function saveCurrentLessonProgressOnce(){
+    try{
+      if(!currentPlayer || !currentCourseDetail || !currentLessonId || !data.currentUser) return;
+      if(typeof currentPlayer.getDuration!=="function") return;
       const dur = currentPlayer.getDuration();
-      if (!dur || dur <= 0) return;
-
-      const cur = currentPlayer.getCurrentTime();
-      let percent = 0;
-      if (cur && dur > 0) {
-        percent = Math.min(100, (cur / dur) * 100);
-      }
-      percent = Math.round(Math.max(percent, lastSavedPercent || 0));
-      if (percent <= 0) return;
-
-      saveLessonProgress(
+      if(!dur || dur<=0) return;
+      const cur = currentPlayer.getCurrentTime()||0;
+      const percent = Math.min(100, (cur/dur)*100);
+      const rounded = Math.round(Math.max(percent,lastSavedPercent||0));
+      if(rounded<=0) return;
+      const updated = await saveLessonProgress(
         data.currentUser.username,
         currentCourseDetail.id,
         currentLessonId,
-        percent,
-        percent >= 90
-      )
-        .then(updated => {
-          currentCourseProgress = updated;
-          renderCourseLessonsList();
-          updateQuizLockState();
-        })
-        .catch(err => console.error("final progress save error", err));
-    } catch (err) {
-      console.error("saveCurrentLessonProgressOnce error", err);
+        rounded,
+        rounded>=90
+      );
+      currentCourseProgress = updated;
+      renderCourseLessonsList();
+    }catch(err){
+      console.error("saveCurrentLessonProgressOnce error",err);
     }
   }
 
-  function stopCurrentPlayer() {
-    if (progressInterval) {
+  function stopCurrentPlayer(){
+    if(progressInterval){
       clearInterval(progressInterval);
-      progressInterval = null;
+      progressInterval=null;
     }
-    saveCurrentLessonProgressOnce();
-    if (currentPlayer) {
-      try { currentPlayer.stopVideo(); } catch(e){}
-      try { currentPlayer.destroy(); } catch(e){}
-      currentPlayer = null;
+    if(currentPlayer){
+      try{ currentPlayer.stopVideo(); }catch(e){}
+      try{ currentPlayer.destroy(); }catch(e){}
+      currentPlayer=null;
     }
+    lessonVideoWrapper.classList.add("hidden");
   }
 
-  function renderCourseLessonsList() {
+  function renderCourseLessonsList(){
     const course = currentCourseDetail;
-    const progress = currentCourseProgress || { lessons: {} };
-    const lessons = course.lessons || [];
-    if (!lessons.length) {
+    const progress = currentCourseProgress || { lessons:{} };
+    const lessons = course?.lessons || [];
+    if(!lessons.length){
       detailLessons.innerHTML = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
       return;
     }
-
     const progMap = progress.lessons || {};
     let maxCompletedIndex = -1;
-    lessons.forEach((lesson, idx) => {
-      const info = progMap[lesson.id] || { percent: 0, completed: false };
-      if (info.completed && idx > maxCompletedIndex) maxCompletedIndex = idx;
+    lessons.forEach((lesson,idx)=>{
+      const info = progMap[lesson.id] || { percent:0, completed:false };
+      if(info.completed && idx>maxCompletedIndex) maxCompletedIndex = idx;
     });
 
     let html = `<div class="lesson-list">`;
-    lessons.forEach((lesson, idx) => {
-      const info = progMap[lesson.id] || { percent: 0, completed: false };
-      const percent = Math.round(info.percent || 0);
+    lessons.forEach((lesson,idx)=>{
+      const info = progMap[lesson.id] || { percent:0, completed:false };
+      const percent = Math.round(info.percent||0);
       const attempts = info.quizAttempts || 0;
 
-      let unlocked = (idx === 0);
-      if (maxCompletedIndex >= 0 && idx <= maxCompletedIndex + 3) {
+      let unlocked = (idx===0);
+      if(maxCompletedIndex>=0 && idx<=maxCompletedIndex+3){
         unlocked = true;
       }
 
       const statusText = info.completed
         ? "Tugallangan ✅"
         : unlocked
-          ? (percent > 0 ? `Boshlangan (${percent}%)` : "Boshlanmagan")
+          ? (percent>0 ? `Boshlangan (${percent}%)` : "Boshlanmagan")
           : "Yopiq 🔒";
 
       html += `
-        <div class="lesson-item ${unlocked ? "" : "locked"}"
+        <div class="lesson-item ${unlocked?"":"locked"}"
              data-lesson-id="${lesson.id}"
-             data-unlocked="${unlocked ? "1" : "0"}">
+             data-unlocked="${unlocked?"1":"0"}">
           <div>
-            <div class="lesson-title">${idx + 1}-dars. ${lesson.title}</div>
+            <div class="lesson-title">${idx+1}-dars. ${lesson.title}</div>
             <div class="muted" style="font-size:11px;">
               Ko‘rilgan: ${percent}%
               ${lesson.quiz && lesson.quiz.length ? " · Quiz: "+lesson.quiz.length+" savol" : ""}
@@ -1466,133 +1467,104 @@
     detailLessons.innerHTML = html;
   }
 
-  function startProgressInterval() {
-    if (!currentPlayer) return;
-    if (progressInterval) clearInterval(progressInterval);
-
-    progressInterval = setInterval(async () => {
-      if (!currentPlayer || typeof currentPlayer.getDuration !== "function") return;
-      const dur = currentPlayer.getDuration();
-      if (!dur || dur <= 0) return;
-
-      const cur = currentPlayer.getCurrentTime();
-      const percent = Math.min(100, (cur / dur) * 100);
-      const rounded = Math.round(percent);
-      lessonProgressText.textContent = `Ko‘rilgan: ${rounded}%`;
-      lessonProgressBar.style.width = rounded + "%";
-
-      if (!data.currentUser || !currentCourseDetail || !currentLessonId) return;
-
-      const lp = (currentCourseProgress?.lessons || {})[currentLessonId];
-      const alreadyCompleted = lp && lp.completed;
-      if (alreadyCompleted) {
-        updateQuizLockState(rounded);
-        return;
-      }
-
-      if (rounded - lastSavedPercent >= 15 || rounded >= 90) {
-        lastSavedPercent = rounded;
-        try {
-          const updated = await saveLessonProgress(
-            data.currentUser.username,
-            currentCourseDetail.id,
-            currentLessonId,
-            rounded,
-            rounded >= 90
-          );
-          currentCourseProgress = updated;
-          renderCourseLessonsList();
-          updateQuizLockState(rounded);
-        } catch (err) { console.error("progress error", err); }
-      }else{
-        updateQuizLockState(rounded);
-      }
-    }, 5000);
+  /* QUIZ OVERLAY FUNKSIYALARI */
+  function closeQuizOverlay(){
+    quizOverlay.classList.add("hidden");
+    quizOverlayBox.innerHTML = "";
   }
 
-  /* QUIZ UI FUNKSIYALARI */
-  function resetQuizUI(){
-    currentLessonQuiz = [];
-    currentQuizTaken = false;
-    if(!quizBox) return;
-    quizBox.classList.add("hidden");
-    quizQuestionsBox.classList.add("hidden");
-    quizResultBox.classList.add("hidden");
-    quizLockHint.textContent = "";
-  }
-
-  function setupQuizForCurrentLesson(lesson){
-    const quiz = lesson.quiz || [];
-    currentLessonQuiz = quiz;
-    currentQuizTaken = false;
-    if(!quiz.length || !quizBox){
-      resetQuizUI();
-      return;
-    }
-    quizBox.classList.remove("hidden");
-    quizQuestionsBox.classList.add("hidden");
-    quizQuestionsBox.innerHTML = "";
-    quizResultBox.classList.add("hidden");
-    quizResultBox.innerHTML = "";
-    quizStartBtn.disabled = false;
-    quizStartBtn.textContent = "Quizni boshlash";
-    quizLockHint.textContent = "";
-    updateQuizLockState();
-  }
-
-  function updateQuizLockState(currentPercentOverride){
-    if(!currentLessonQuiz.length || !currentLessonId || !quizBox) return;
-    const lp = (currentCourseProgress?.lessons || {})[currentLessonId] || {};
-    const percent = currentPercentOverride!==undefined
-      ? currentPercentOverride
-      : Math.round(lp.percent || 0);
-    const unlocked = percent>=90;
-    if(unlocked){
-      quizStartBtn.disabled = false;
-      quizLockHint.textContent = "Dars bo‘yicha yetarlicha video ko‘rdingiz. Endi quizni boshlashingiz mumkin.";
-    }else{
-      quizStartBtn.disabled = true;
-      quizLockHint.textContent = "Quizni boshlash uchun darsni kamida 90% gacha ko‘ring.";
-    }
-
-    const attempts = lp.quizAttempts || 0;
-    if(attempts>0){
-      quizLockHint.textContent += " (Bu quizni "+attempts+" marta ishlagansiz, xohlasangiz yana ishlashingiz mumkin.)";
-    }
-  }
-
-  function renderQuizQuestions(){
+  function showQuizInviteOverlay(){
     if(!currentLessonQuiz.length) return;
-    quizQuestionsBox.innerHTML = `
-      ${currentLessonQuiz.map((q,idx)=>`
-        <div class="quiz-question">
-          <div class="quiz-question-title">${idx+1}-savol. ${q.question}</div>
-          <div class="quiz-options">
-            ${q.options.map((opt,oi)=>`
-              <div class="quiz-option">
-                <label>
-                  <input type="radio" name="quiz_q_${idx}" value="${oi}">
-                  <span>${["A","B","C","D"][oi]}) ${opt}</span>
-                </label>
-              </div>
-            `).join("")}
-          </div>
+    quizOverlayBox.innerHTML = `
+      <div>
+        <div class="quiz-overlay-title">Dars yakunlandi!</div>
+        <div class="quiz-overlay-sub">
+          Endi bilimlaringizni <b>quiz</b> orqali sinab ko‘ring.<br>
+          Savollarga javob berib, natijani va xatolarni ko‘rib chiqing.
         </div>
-      `).join("")}
-      <button type="button" class="btn" id="quiz-submit-btn" style="margin-top:8px;">Quizni yakunlash</button>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px;">
+          <button type="button" class="btn" id="quiz-overlay-start-btn">Quizni boshlash</button>
+          <button type="button" class="btn-xs" id="quiz-overlay-close-btn">Keyinroq</button>
+        </div>
+      </div>
     `;
-    quizQuestionsBox.classList.remove("hidden");
-    quizResultBox.classList.add("hidden");
+    quizOverlay.classList.remove("hidden");
+
+    document.getElementById("quiz-overlay-start-btn").onclick = renderQuizQuestionsInOverlay;
+    document.getElementById("quiz-overlay-close-btn").onclick = closeQuizOverlay;
   }
 
-  function renderQuizResult(score,total,answers){
+  function renderQuizQuestionsInOverlay(){
+    if(!currentLessonQuiz.length) return;
+    const total = currentLessonQuiz.length;
+    quizOverlayBox.innerHTML = `
+      <div>
+        <div class="quiz-overlay-title">Quiz — ${total} ta savol</div>
+        <div class="quiz-overlay-sub">
+          Har bir savolni diqqat bilan o‘qing va A/B/C/D variantlardan birini tanlang.
+        </div>
+        ${currentLessonQuiz.map((q,idx)=>`
+          <div class="quiz-question">
+            <div class="quiz-question-title">${idx+1}-savol. ${q.question}</div>
+            <div class="quiz-options">
+              ${q.options.map((opt,oi)=>`
+                <div class="quiz-option">
+                  <label>
+                    <input type="radio" name="quiz_q_${idx}" value="${oi}">
+                    <span>${["A","B","C","D"][oi]}) ${opt}</span>
+                  </label>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `).join("")}
+        <button type="button" class="btn" id="quiz-overlay-submit-btn" style="margin-top:10px;">Quizni yakunlash</button>
+      </div>
+    `;
+    document.getElementById("quiz-overlay-submit-btn").onclick = submitQuizInOverlay;
+  }
+
+  async function submitQuizInOverlay(){
+    if(!currentLessonQuiz.length) return;
+    let answers = {};
+    let score = 0;
+    const total = currentLessonQuiz.length;
+
+    currentLessonQuiz.forEach((q,idx)=>{
+      const radios = quizOverlayBox.querySelectorAll(`input[name="quiz_q_${idx}"]`);
+      let chosen = null;
+      radios.forEach(r=>{
+        if(r.checked) chosen = parseInt(r.value,10);
+      });
+      answers[idx] = isNaN(chosen)?null:chosen;
+      if(chosen===q.correctIndex) score++;
+    });
+
+    try{
+      if(data.currentUser && currentCourseDetail && currentLessonId){
+        const updated = await saveLessonQuizAttempt(
+          data.currentUser.username,
+          currentCourseDetail.id,
+          currentLessonId
+        );
+        currentCourseProgress = updated;
+        renderCourseLessonsList();
+      }
+    }catch(err){
+      console.error("quiz attempt save error",err);
+    }
+
+    renderQuizResultInOverlay(score,total,answers);
+  }
+
+  function renderQuizResultInOverlay(score,total,answers){
     const percent = total ? Math.round((score/total)*100) : 0;
     const motiv = getMotivationMessage(score,total);
 
     let detailsHtml = "";
     currentLessonQuiz.forEach((q,idx)=>{
       const userAns = answers[idx];
-      const correctIdx = q.correctIndex || 0;
+      const correctIdx = q.correctIndex||0;
       const correctLetter = ["A","B","C","D"][correctIdx];
       const userLetter = userAns!=null ? ["A","B","C","D"][userAns] : null;
       const isCorrect = userAns===correctIdx;
@@ -1601,10 +1573,11 @@
         <div class="quiz-result-item">
           <div class="quiz-question-title">${idx+1}-savol. ${q.question}</div>
           <div style="margin-top:4px;">
-            ${userAns==null
+            ${
+              userAns==null
               ? `<span class="quiz-wrong">Javob berilmagan</span>`
               : isCorrect
-                ? `<span class="quiz-correct">To‘g‘ri javob berdingiz (${userLetter})</span>`
+                ? `<span class="quiz-correct">To‘g‘ri javob (${userLetter})</span>`
                 : `<span class="quiz-wrong">Xato javob (${userLetter})</span>`
             }
           </div>
@@ -1615,104 +1588,124 @@
       `;
     });
 
-    quizResultBox.innerHTML = `
-      <div style="margin-bottom:6px;">
-        <b>Natija:</b> ${score} / ${total} ta to‘g‘ri (${percent}%)<br>
-        <span class="muted">${motiv}</span>
+    quizOverlayBox.innerHTML = `
+      <div>
+        <div class="quiz-overlay-title">Natijangiz: ${score} / ${total} (${percent}%)</div>
+        <div class="quiz-overlay-sub">${motiv}</div>
+        ${detailsHtml}
+        <div style="display:flex;justify-content:center;margin-top:10px;">
+          <button type="button" class="btn" id="quiz-overlay-continue-btn">Kursni davom ettirish</button>
+        </div>
       </div>
-      ${detailsHtml}
-      <button type="button" class="btn" id="quiz-continue-btn" style="margin-top:8px;">Kursni davom ettirish</button>
     `;
-    quizResultBox.classList.remove("hidden");
-    quizQuestionsBox.classList.add("hidden");
+    document.getElementById("quiz-overlay-continue-btn").onclick = closeQuizOverlay;
   }
 
-  if(quizStartBtn){
-    quizStartBtn.addEventListener("click",()=>{
-      if(quizStartBtn.disabled) return;
-      if(!currentLessonQuiz.length) return;
-      renderQuizQuestions();
-    });
-  }
+  /* PROGRESS INTERVAL — oxirgi 7 soniya mantiqi */
+  function startProgressInterval(){
+    if(!currentPlayer) return;
+    if(progressInterval) clearInterval(progressInterval);
 
-  if(quizQuestionsBox){
-    quizQuestionsBox.addEventListener("click",async e=>{
-      const btn = e.target.closest("#quiz-submit-btn");
-      if(!btn) return;
-      if(!currentLessonQuiz.length) return;
+    progressInterval = setInterval(async ()=>{
+      if(!currentPlayer || typeof currentPlayer.getDuration!=="function") return;
+      const dur = currentPlayer.getDuration();
+      if(!dur || dur<=0) return;
+      const cur = currentPlayer.getCurrentTime()||0;
+      const remaining = dur - cur;
 
-      let answers = {};
-      let score = 0;
-      const total = currentLessonQuiz.length;
-      currentLessonQuiz.forEach((q,idx)=>{
-        const radios = quizQuestionsBox.querySelectorAll(`input[name="quiz_q_${idx}"]`);
-        let chosen = null;
-        radios.forEach(r=>{
-          if(r.checked) chosen = parseInt(r.value,10);
-        });
-        answers[idx] = isNaN(chosen)?null:chosen;
-        if(chosen===q.correctIndex) score++;
-      });
+      // Oxirgi 7 soniyadan oldin to‘xtatish
+      if(remaining<=7){
+        const effectiveTime = Math.max(0, dur - 7);
+        const effPercent = dur>0 ? Math.min(100,(effectiveTime/dur)*100) : 0;
+        const roundedEff = Math.round(effPercent);
 
-      try{
+        lessonProgressText.textContent = `Ko‘rilgan: ${roundedEff}%`;
+        lessonProgressBar.style.width = roundedEff+"%";
+
         if(data.currentUser && currentCourseDetail && currentLessonId){
-          const updated = await saveLessonQuizResult(
+          lastSavedPercent = Math.max(lastSavedPercent,roundedEff);
+          try{
+            const updated = await saveLessonProgress(
+              data.currentUser.username,
+              currentCourseDetail.id,
+              currentLessonId,
+              roundedEff,
+              roundedEff>=90
+            );
+            currentCourseProgress = updated;
+            renderCourseLessonsList();
+          }catch(err){
+            console.error("progress (last7) error",err);
+          }
+        }
+
+        try{ currentPlayer.pauseVideo(); }catch(e){}
+        stopCurrentPlayer();
+
+        // Agar quiz bo‘lsa — katta ekranda taklif
+        if(currentLessonQuiz.length){
+          showQuizInviteOverlay();
+        }
+
+        return;
+      }
+
+      const percent = Math.min(100,(cur/dur)*100);
+      const rounded = Math.round(percent);
+      lessonProgressText.textContent = `Ko‘rilgan: ${rounded}%`;
+      lessonProgressBar.style.width = rounded+"%";
+
+      if(!data.currentUser || !currentCourseDetail || !currentLessonId) return;
+
+      const lp = (currentCourseProgress?.lessons||{})[currentLessonId];
+      const alreadyCompleted = lp && lp.completed;
+      if(alreadyCompleted) return;
+
+      if(rounded - lastSavedPercent >= 15 || rounded>=90){
+        lastSavedPercent = rounded;
+        try{
+          const updated = await saveLessonProgress(
             data.currentUser.username,
             currentCourseDetail.id,
-            currentLessonId
+            currentLessonId,
+            rounded,
+            rounded>=90
           );
           currentCourseProgress = updated;
           renderCourseLessonsList();
-          currentQuizTaken = true;
+        }catch(err){
+          console.error("progress error",err);
         }
-      }catch(err){
-        console.error("quiz result save error",err);
       }
-
-      renderQuizResult(score,total,answers);
-    });
+    },5000);
   }
 
-  if(quizResultBox){
-    quizResultBox.addEventListener("click",e=>{
-      const btn = e.target.closest("#quiz-continue-btn");
-      if(!btn) return;
-      quizResultBox.classList.add("hidden");
-      // Faqat yopamiz, kurs davom etaveradi
-    });
-  }
-
+  /* Darsni ochish */
   async function openLessonPlayer(lesson){
     if(!currentCourseDetail || !data.currentUser) return;
 
     stopCurrentPlayer();
+    quizOverlay.classList.add("hidden");
+    quizOverlayBox.innerHTML = "";
 
     currentLessonId = lesson.id;
+    currentLessonQuiz = lesson.quiz || [];
     lessonPlayerTitle.textContent = lesson.title;
     lessonVideoWrapper.classList.remove("hidden");
     lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
     lessonProgressBar.style.width = "0%";
     lastSavedPercent = 0;
 
-    const info = (currentCourseProgress.lessons || {})[lesson.id] || { percent:0 };
-    const resumePercent = info.percent && info.percent < 95 ? info.percent : 0;
+    const info = (currentCourseProgress.lessons||{})[lesson.id] || { percent:0 };
+    const resumePercent = info.percent && info.percent<95 ? info.percent : 0;
     lastSavedPercent = resumePercent;
 
-    setupQuizForCurrentLesson(lesson);
-
-    ensureYouTubeApiLoaded();
-
     if(!ytApiReady){
-      lessonProgressText.textContent = "YouTube API yuklanmoqda...";
-      pendingLessonToOpen = lesson;
+      lessonProgressText.textContent="YouTube API yuklanmoqda...";
       const check = setInterval(()=>{
         if(ytApiReady){
           clearInterval(check);
-          if(pendingLessonToOpen){
-            const l = pendingLessonToOpen;
-            pendingLessonToOpen = null;
-            openLessonPlayer(l);
-          }
+          openLessonPlayer(lesson);
         }
       },500);
       return;
@@ -1734,87 +1727,93 @@
         },
         onStateChange:(event)=>{
           if(event.data === YT.PlayerState.ENDED){
-            saveCurrentLessonProgressOnce();
-            updateQuizLockState(100);
+            // Dars oxirigacha ketib qolsa ham 7 soniya mantiqi ishlagan bo‘ladi
           }
         }
       }
     });
   }
 
+  /* Kurs detali */
   async function openUserCourseDetail(courseId){
-    const course=data.courses.find(c=>c.id===courseId);
+    const course = data.courses.find(c=>c.id===courseId);
     if(!course || !data.currentUser) return;
-    currentCourseDetail=course;
-    currentCourseProgress=await loadProgress(data.currentUser.username,courseId);
-    detailTitle.textContent=course.title;
-    detailDesc.textContent=course.description||"";
-    const priceText=formatPrice(course.price);
-    detailMeta.innerHTML=`
+
+    currentCourseDetail = course;
+    currentCourseProgress = await loadProgress(data.currentUser.username,courseId);
+
+    detailTitle.textContent = course.title;
+    detailDesc.textContent = course.description||"";
+    const priceText = formatPrice(course.price);
+    detailMeta.innerHTML = `
       ${course.category?`<span class="badge">${course.category}</span>`:""}
       ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
-      <span class="badge">Darslar: ${(course.lessons||[]).length}</span>`;
+      <span class="badge">Darslar: ${(course.lessons||[]).length}</span>
+    `;
     renderCourseLessonsList();
-    lessonPlayerTitle.textContent="Dars tanlanmagan.";
+    lessonPlayerTitle.textContent = "Dars tanlanmagan.";
     lessonVideoWrapper.classList.add("hidden");
-    lessonProgressText.textContent="";
-    lessonProgressBar.style.width="0%";
-    resetQuizUI();
+    lessonProgressText.textContent = "";
+    lessonProgressBar.style.width = "0%";
+
     userCoursesView.classList.add("hidden");
     userCourseDetail.classList.remove("hidden");
   }
 
+  /* Darslar listi click */
   detailLessons.addEventListener("click",async e=>{
-    const item=e.target.closest(".lesson-item");
+    const item = e.target.closest(".lesson-item");
     if(!item) return;
-    const unlocked=item.dataset.unlocked==="1";
+    const unlocked = item.dataset.unlocked==="1";
     if(!unlocked){
       alert("Bu dars hozircha yopiq. Oldingi darslarni tugallab keyin kiring.");
       return;
     }
-    const lessonId=item.dataset.lessonId;
-    const lesson=(currentCourseDetail.lessons||[]).find(l=>l.id===lessonId);
+    const lessonId = item.dataset.lessonId;
+    const lesson = (currentCourseDetail.lessons||[]).find(l=>l.id===lessonId);
     if(!lesson) return;
     await openLessonPlayer(lesson);
   });
 
   function showUserCoursesList(){
     stopCurrentPlayer();
-    resetQuizUI();
+    quizOverlay.classList.add("hidden");
+    quizOverlayBox.innerHTML="";
     userCoursesView.classList.remove("hidden");
     userCourseDetail.classList.add("hidden");
   }
 
   userCourseList.addEventListener("click",async e=>{
-    const btn=e.target.closest(".btn-open-course");
+    const btn = e.target.closest(".btn-open-course");
     if(!btn) return;
-    await openUserCourseDetail(btn.dataset.courseId);
+    const courseId = btn.dataset.courseId;
+    await openUserCourseDetail(courseId);
   });
   userBackBtn.addEventListener("click",showUserCoursesList);
 
   /* UI UPDATE */
   function updateUI(){
-    const user=data.currentUser;
+    const user = data.currentUser;
     if(!user){
       authSection.classList.remove("hidden");
       adminSection.classList.add("hidden");
       userSection.classList.add("hidden");
       navAdmin.classList.add("hidden");
       logoutBtn.classList.add("hidden");
-      currentUserLabel.textContent="Mehmon";
-      userRolePill.textContent="Rol: Foydalanuvchi";
+      currentUserLabel.textContent = "Mehmon";
+      userRolePill.textContent = "Rol: Foydalanuvchi";
       return;
     }
     authSection.classList.add("hidden");
     userSection.classList.remove("hidden");
     logoutBtn.classList.remove("hidden");
-    currentUserLabel.textContent=user.username;
+    currentUserLabel.textContent = user.username;
     if(user.role==="admin"){
       navAdmin.classList.remove("hidden");
-      userRolePill.textContent="Rol: Admin (foydalanuvchi rejimi)";
+      userRolePill.textContent = "Rol: Admin (foydalanuvchi rejimi)";
     }else{
       navAdmin.classList.add("hidden");
-      userRolePill.textContent="Rol: Foydalanuvchi";
+      userRolePill.textContent = "Rol: Foydalanuvchi";
     }
     showUserCoursesList();
   }
@@ -1824,7 +1823,7 @@
     btn.addEventListener("click",()=>{
       tabButtons.forEach(b=>b.classList.remove("active"));
       btn.classList.add("active");
-      const tab=btn.dataset.tab;
+      const tab = btn.dataset.tab;
       if(tab==="login"){
         loginForm.classList.remove("hidden");
         registerForm.classList.add("hidden");
@@ -1841,13 +1840,19 @@
   loginForm.addEventListener("submit",async e=>{
     e.preventDefault();
     loginErrorEl.textContent="";
-    const u=loginUsername.value.trim();
-    const p=loginPassword.value;
-    if(!u||!p){ loginErrorEl.textContent="Login va parolni kiriting."; return; }
+    const u = loginUsername.value.trim();
+    const p = loginPassword.value;
+    if(!u || !p){
+      loginErrorEl.textContent = "Login va parolni kiriting.";
+      return;
+    }
     try{
-      const user=await loginUser(u,p);
-      if(!user){ loginErrorEl.textContent="Login yoki parol noto‘g‘ri."; return; }
-      data.currentUser={username:user.username,role:user.role};
+      const user = await loginUser(u,p);
+      if(!user){
+        loginErrorEl.textContent = "Login yoki parol noto‘g‘ri.";
+        return;
+      }
+      data.currentUser = { username:user.username, role:user.role };
       saveCurrentUserToLocal();
       saveRememberedCredentials(u,p);
       loginForm.reset();
@@ -1864,14 +1869,20 @@
   registerForm.addEventListener("submit",async e=>{
     e.preventDefault();
     registerErrorEl.textContent="";
-    const u=regUsername.value.trim();
-    const p=regPassword.value;
-    const p2=regPassword2.value;
-    if(!u||!p){ registerErrorEl.textContent="Login va parolni kiriting."; return; }
-    if(p!==p2){ registerErrorEl.textContent="Parollar mos kelmadi."; return; }
+    const u = regUsername.value.trim();
+    const p = regPassword.value;
+    const p2 = regPassword2.value;
+    if(!u || !p){
+      registerErrorEl.textContent="Login va parolni kiriting.";
+      return;
+    }
+    if(p!==p2){
+      registerErrorEl.textContent="Parollar mos kelmadi.";
+      return;
+    }
     try{
       await registerUser(u,p);
-      data.currentUser={username:u,role:"user"};
+      data.currentUser = { username:u, role:"user" };
       saveCurrentUserToLocal();
       saveRememberedCredentials(u,p);
       registerForm.reset();
@@ -1880,7 +1891,10 @@
       await loadUsersFromFirestore();
     }catch(err){
       if(err.message==="exists") registerErrorEl.textContent="Bu login band.";
-      else{ console.error(err); registerErrorEl.textContent="Ro‘yxatdan o‘tishda xatolik."; }
+      else{
+        console.error(err);
+        registerErrorEl.textContent="Ro‘yxatdan o‘tishda xatolik.";
+      }
     }
   });
 
@@ -1890,27 +1904,6 @@
     updateUI();
   });
 
-  /* COURSE ADD (ADMIN) */
-  courseForm.addEventListener("submit",async e=>{
-    e.preventDefault();
-    if(!data.currentUser || data.currentUser.role!=="admin") return;
-    courseError.textContent="";
-    const title=document.getElementById("course-title").value.trim();
-    const desc=document.getElementById("course-desc").value.trim();
-    const cat=document.getElementById("course-cat").value.trim();
-    const price=document.getElementById("course-price").value.trim();
-    if(!title||!desc){ courseError.textContent="Kurs nomi va tavsifi majburiy."; return; }
-    const newCourse={ id:Date.now().toString(), title, description:desc, category:cat, price, lessons:[] };
-    try{
-      await addCourseToFirestore(newCourse);
-      courseForm.reset();
-      await refreshCourses();
-    }catch(err){
-      console.error(err);
-      courseError.textContent="Kursni saqlashda xatolik.";
-    }
-  });
-
   /* NAV */
   navCourses.addEventListener("click",e=>{
     e.preventDefault();
@@ -1918,7 +1911,7 @@
       authSection.classList.remove("hidden");
       adminSection.classList.add("hidden");
       userSection.classList.add("hidden");
-      const loginTabBtn=document.querySelector('.tab-btn[data-tab="login"]');
+      const loginTabBtn = document.querySelector('.tab-btn[data-tab="login"]');
       if(loginTabBtn) loginTabBtn.click();
       return;
     }
@@ -1943,27 +1936,19 @@
       await ensureDefaultAdmin();
 
       const remembered = loadRememberedCredentials();
-      if (remembered) {
-        if (remembered.username) loginUsername.value = remembered.username;
-        if (remembered.password) loginPassword.value = remembered.password;
+      if(remembered){
+        if(remembered.username) loginUsername.value = remembered.username;
+        if(remembered.password) loginPassword.value = remembered.password;
       }
 
-      data.currentUser=loadCurrentUserFromLocal();
+      data.currentUser = loadCurrentUserFromLocal();
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
-
-      ensureYouTubeApiLoaded();
-    }catch(err){ console.error("init error",err); }
-  })();
-
-  // WATCHDOG
-  setInterval(()=>{
-    if(!currentPlayer && progressInterval){
-      clearInterval(progressInterval);
-      progressInterval = null;
+    }catch(err){
+      console.error("init error",err);
     }
-  },5000);
+  })();
 </script>
 </body>
 </html>
