@@ -1,743 +1,793 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uz">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>TestMaster — BUXORO_EDU (Cloud)</title>
+  <meta charset="UTF-8" />
+  <title>Ta'lim Edu — Kurs Platforma (HTML + JS)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root{
-      --grad1:#111827; --grad2:#0b1220;
-      --card:rgba(255,255,255,.08); --glass:rgba(255,255,255,.06);
-      --text:#e5e7eb; --muted:#9ca3af; --border:rgba(255,255,255,.16);
-      --primary:#60a5fa;--primary-2:#3b82f6;--accent:#a78bfa;
-      --good:#22c55e;--bad:#ef4444;--amber:#f59e0b;
-      --shadow:0 24px 60px rgba(0,0,0,.35); --radius:18px;
-    }
-    *{box-sizing:border-box}
+    *{box-sizing:border-box;margin:0;padding:0}
     body{
-      margin:0; font-family:Inter,system-ui,Arial,Segoe UI,Roboto,sans-serif; color:var(--text);
-      background: radial-gradient(1200px 700px at 15% 10%, rgba(96,165,250,.18), transparent 50%),
-                  radial-gradient(1000px 600px at 85% 10%, rgba(167,139,250,.2), transparent 50%),
-                  linear-gradient(160deg, var(--grad1), var(--grad2));
-      min-height:100dvh;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#f3f4f6;
+      color:#111827;
     }
-    .wrap{max-width:1100px;margin:28px auto;padding:18px}
-    .brand{
-      display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:20px;
-      background:linear-gradient(90deg, rgba(96,165,250,.12), rgba(167,139,250,.12));
-      border:1px solid var(--border); box-shadow:var(--shadow)
+    a{text-decoration:none;color:inherit}
+
+    .page{min-height:100vh;}
+
+    /* HEADER */
+    .header{
+      position:sticky;top:0;z-index:10;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 20px;
+      background:#0f172a;
+      color:#e5e7eb;
+      border-bottom:1px solid #1f2937;
     }
     .logo{
-      width:46px;height:46px;border-radius:12px;
-      background:conic-gradient(from 0deg, #60a5fa, #a78bfa, #60a5fa);
-      filter:brightness(1.05) saturate(1.2); box-shadow:0 10px 30px rgba(96,165,250,.35);
+      font-weight:800;font-size:20px;
     }
-    h1{margin:0;font-size:22px;letter-spacing:.3px}
-    .brand small{color:var(--muted)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
-    @media (max-width:860px){ .grid{grid-template-columns:1fr} }
+    .logo span{color:#f97316;}
+    .nav{display:flex;align-items:center;gap:14px;font-size:14px;}
+    .nav a{color:#e5e7eb;opacity:.85;}
+    .nav a:hover{opacity:1;}
+    .nav .user-label{font-size:13px;opacity:.8;}
+    .btn-outline{
+      border:1px solid #e5e7eb;
+      border-radius:999px;
+      padding:4px 10px;
+      font-size:13px;
+      cursor:pointer;
+      background:transparent;
+      color:#e5e7eb;
+    }
+
+    /* LAYOUT */
+    .container{
+      max-width:1120px;
+      margin:0 auto;
+      padding:18px 12px 32px;
+    }
+
+    .section{
+      margin-bottom:18px;
+    }
+    .hidden{display:none;}
 
     .card{
-      background:var(--card); backdrop-filter: blur(10px);
-      border:1px solid var(--border); border-radius:var(--radius);
-      box-shadow:var(--shadow); padding:16px; margin-bottom:16px
+      background:#ffffff;
+      border-radius:16px;
+      padding:16px 16px 18px;
+      box-shadow:0 18px 45px rgba(15,23,42,0.08);
+      border:1px solid #e5e7eb;
     }
-    .panel-title{display:flex;align-items:center;gap:10px}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--glass);color:var(--muted);font-size:12px}
-
-    input{
-      width:100%; padding:12px 12px; border-radius:12px; border:1px solid var(--border);
-      background:rgba(255,255,255,.04); color:var(--text); outline:none
+    .card h2{
+      font-size:18px;
+      margin-bottom:6px;
     }
-    input::placeholder{color:#94a3b8}
-    label{display:block;margin:10px 0 6px;font-size:13px;color:var(--muted)}
+    .card p.sub{
+      font-size:13px;
+      color:#6b7280;
+      margin-bottom:10px;
+    }
 
+    .hero-title{
+      font-size:24px;
+      font-weight:700;
+      margin-bottom:4px;
+    }
+    .hero-text{
+      font-size:14px;
+      color:#4b5563;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);
+      gap:16px;
+    }
+    @media(max-width:900px){
+      .grid-2{grid-template-columns:minmax(0,1fr);}
+    }
+
+    /* FORM */
+    .tabs{
+      display:flex;
+      gap:4px;
+      margin-bottom:10px;
+      background:#e5e7eb;
+      border-radius:999px;
+      padding:4px;
+      width:max-content;
+    }
+    .tab-btn{
+      border:none;
+      border-radius:999px;
+      padding:5px 12px;
+      font-size:13px;
+      cursor:pointer;
+      background:transparent;
+      color:#374151;
+    }
+    .tab-btn.active{
+      background:#ffffff;
+      box-shadow:0 2px 8px rgba(15,23,42,0.18);
+      color:#111827;
+    }
+
+    .form{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:6px;
+    }
+    .form-row{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    label{
+      font-size:13px;
+      color:#4b5563;
+    }
+    input,textarea,select{
+      border-radius:10px;
+      border:1px solid #d1d5db;
+      padding:8px 10px;
+      background:#f9fafb;
+      font-size:14px;
+      color:#111827;
+    }
+    textarea{min-height:70px;resize:vertical;}
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:10px;
+    }
     .btn{
-      padding:10px 14px;border-radius:12px;border:1px solid var(--border);
-      background:rgba(255,255,255,.06); color:var(--text); cursor:pointer; transition:.15s
+      align-self:flex-start;
+      padding:8px 16px;
+      border-radius:999px;
+      border:none;
+      cursor:pointer;
+      background:linear-gradient(90deg,#6366f1,#ec4899);
+      color:#ffffff;
+      font-weight:600;
+      font-size:14px;
+      box-shadow:0 10px 22px rgba(129,140,248,0.45);
+      transition:transform .1s ease,box-shadow .1s ease;
     }
-    .btn:hover{transform:translateY(-1px); box-shadow:0 10px 24px rgba(0,0,0,.25)}
-    .btn.primary{background:linear-gradient(180deg, rgba(96,165,250,.35), rgba(96,165,250,.25)); border-color:#3b82f6}
-    .btn.ghost{background:rgba(255,255,255,.04)}
-    .btn.small{padding:7px 10px;font-size:13px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .flex{display:flex;gap:10px;align-items:center}
-    .space{flex:1}
-    .hidden{display:none!important}
-
-    .answer-pad{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
-    .opt{
-      padding:16px 22px;border-radius:14px;border:1px solid var(--border);min-width:76px;
-      text-align:center;font-weight:800;font-size:18px;cursor:pointer;transition:.12s;
-      background:rgba(255,255,255,.04); display:flex; align-items:center; justify-content:center; gap:10px;
+    .btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 14px 30px rgba(129,140,248,0.6);
     }
-    .opt .hk{
-      font-size:11px; padding:2px 7px; border-radius:999px;
-      border:1px solid var(--border); background:var(--glass); color:var(--muted);
-      line-height:1; letter-spacing:.3px;
+    .btn:active{
+      transform:translateY(0);
+      box-shadow:0 6px 14px rgba(129,140,248,0.4);
     }
-    .opt[data-v="A"]{background:linear-gradient(180deg, rgba(96,165,250,.10), rgba(96,165,250,.06))}
-    .opt[data-v="B"]{background:linear-gradient(180deg, rgba(34,197,94,.10), rgba(34,197,94,.06))}
-    .opt[data-v="C"]{background:linear-gradient(180deg, rgba(245,158,11,.12), rgba(245,158,11,.06))}
-    .opt[data-v="D"]{background:linear-gradient(180deg, rgba(244,114,182,.12), rgba(244,114,182,.06))}
-    .opt:hover{transform:translateY(-2px)}
-    .opt.active-admin{background:#fee2e2!important; border-color:#fca5a5!important; box-shadow:0 0 0 3px rgba(239,68,68,.25); transform:translateY(-2px)}
-    .opt.active-user{background:#dbeafe!important; border-color:#60a5fa!important; box-shadow:0 0 0 3px rgba(59,130,246,.25); transform:translateY(-2px)}
+    .hint{
+      font-size:11px;
+      color:#6b7280;
+    }
+    .error{
+      font-size:12px;
+      color:#b91c1c;
+      margin-top:2px;
+    }
+    .pill{
+      font-size:11px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:#eff6ff;
+      color:#1d4ed8;
+      width:max-content;
+    }
 
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
-    th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+    /* COURSES */
+    .section-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .muted{font-size:13px;color:#6b7280;}
 
-    .tag{display:inline-block;padding:6px 10px;border-radius:999px;
-      background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);font-size:12px}
+    .course-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:12px;
+      margin-top:6px;
+    }
+    .course-card{
+      background:#f9fafb;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .course-title{
+      font-size:15px;
+      font-weight:600;
+      color:#111827;
+    }
+    .course-desc{
+      font-size:13px;
+      color:#4b5563;
+      max-height:60px;
+      overflow:hidden;
+    }
+    .course-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      font-size:11px;
+    }
+    .badge{
+      padding:2px 8px;
+      border-radius:999px;
+      background:#e5e7eb;
+      color:#374151;
+    }
+    .badge.free{
+      background:#dcfce7;color:#166534;
+    }
+    .badge.price{
+      background:#fef9c3;color:#854d0e;
+    }
 
-    .active-card{ outline:2px solid #60a5fa; border-color:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.25) }
-    .focus-q{ outline:2px solid #60a5fa; border-color:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.25) }
-    .my-row{ background: rgba(96,165,250,.15); }
-    .adm-qrow{ margin:8px 0; padding:12px; border:1px dashed var(--border); border-radius:14px; }
+    .course-footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:12px;
+      color:#6b7280;
+      margin-top:4px;
+    }
+
+    .lesson-list{
+      margin-top:6px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      border-top:1px dashed #e5e7eb;
+      padding-top:6px;
+    }
+    .lesson-item{
+      background:#ffffff;
+      border-radius:8px;
+      border:1px solid #e5e7eb;
+      padding:6px;
+    }
+    .lesson-title{
+      font-size:13px;
+      font-weight:500;
+      margin-bottom:4px;
+    }
+
+    .video-wrapper{
+      position:relative;
+      padding-bottom:56.25%;
+      height:0;
+      overflow:hidden;
+      border-radius:8px;
+      background:#000;
+    }
+    .video-wrapper iframe{
+      position:absolute;
+      top:0;left:0;width:100%;height:100%;
+      border:0;
+    }
+
+    .mini-form{
+      margin-top:6px;
+      border-top:1px dashed #e5e7eb;
+      padding-top:6px;
+    }
+
+    .empty{
+      font-size:13px;
+      color:#9ca3af;
+      margin-top:6px;
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="brand">
-      <div class="logo"></div>
-      <div>
-        <h1>TestMaster — BUXORO_EDU</h1>
-        <small>Bulutga saqlanadigan professional test tizimi (Firestore)</small>
-      </div>
-      <div class="space"></div>
-      <span class="pill">Cloud v1.7 — Copy Only</span>
-    </div>
+<div class="page">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">Ta'lim <span>Edu</span></div>
+    <nav class="nav">
+      <a href="#user-section" id="nav-courses">Kurslar</a>
+      <a href="#admin-section" id="nav-admin" class="hidden">Admin panel</a>
+      <span class="user-label" id="current-user-label">Mehmon</span>
+      <button class="btn-outline" id="logout-btn" class="hidden">Chiqish</button>
+    </nav>
+  </header>
 
-    <div class="grid" id="authGrid">
-      <!-- Foydalanuvchi: faqat ism -->
-      <div class="card" id="authCard">
-        <div class="panel-title">
-          <strong>Foydalanuvchi</strong><span class="pill">Parolsiz (faqat ism)</span>
-        </div>
-        <div id="loginPanel" style="margin-top:10px">
-          <label>Ismingizni yozing (istalgan ism, unikallik shart emas)</label>
-          <input id="userName" placeholder="Masalan: Ali yoki Dilnoza" />
-          <div class="flex" style="margin-top:10px">
-            <button class="btn primary" id="btnUserLogin">Kirish</button>
-            <div class="space"></div>
-          </div>
-          <div style="margin-top:10px;color:var(--muted);font-size:13px">
-            Parol kerak emas. Xohlagan ismingizni kiriting va testlarni ishga tushiring.
-          </div>
-        </div>
-      </div>
+  <main class="container">
+    <!-- AUTH SECTION -->
+    <section id="auth-section" class="section">
+      <div class="grid-2">
+        <div>
+          <div class="card">
+            <h2>Xush kelibsiz!</h2>
+            <p class="sub">
+              Kirish yoki ro‘yxatdan o‘tish orqali kurs platformasiga ulanishingiz mumkin.
+              <br>Admin uchun demo login: <b>admin / admin123</b>
+            </p>
 
-      <!-- Admin auth -->
-      <div class="card" id="adminAuthCard">
-        <div class="panel-title"><strong>Admin kirish</strong><span class="pill">Maxfiy</span></div>
-        <div class="row" style="margin-top:8px">
-          <div><input id="adminLogin" placeholder="admin login" /></div>
-          <div><input id="adminCode" placeholder="kod" type="password" /></div>
-        </div>
-        <div class="flex" style="margin-top:8px">
-          <button class="btn primary" id="btnAdminLogin">Admin sifatida kirish</button>
-          <div class="space"></div>
-          <span style="color:var(--muted);font-size:13px">Admin qiymatlari ko‘rsatilmaydi.</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Admin panel -->
-    <div class="card hidden" id="adminCard">
-      <div class="flex">
-        <div class="panel-title"><strong>Admin — boshqaruv</strong><span class="pill">Test yaratish / O‘chirish / Hisobot</span></div>
-        <div class="space"></div>
-        <button class="btn small" id="btnLogout1">Chiqish</button>
-      </div>
-
-      <div class="grid" style="margin-top:10px">
-        <div class="card" style="margin:0">
-          <strong>Test yaratish</strong>
-          <div style="margin-top:10px">
-            <label>Test nomi</label><input id="tName" />
-            <label style="margin-top:10px">Maxsus kod</label><input id="tCode" />
-            <label style="margin-top:10px">Savollar soni</label><input id="tCount" type="number" value="5" min="1" />
-            <div class="flex" style="margin-top:10px">
-              <button class="btn" id="btnBuildGrid">Javob panellari</button>
-              <button class="btn primary" id="btnSaveTest">Saqlash</button>
+            <div class="tabs">
+              <button class="tab-btn active" data-tab="login">Kirish</button>
+              <button class="tab-btn" data-tab="register">Ro‘yxatdan o‘tish</button>
             </div>
-            <div id="answerGrid" style="margin-top:10px"></div>
+
+            <!-- Login form -->
+            <form id="login-form" class="form">
+              <div class="form-row">
+                <label for="login-username">Login</label>
+                <input id="login-username" required placeholder="Masalan: admin" />
+              </div>
+              <div class="form-row">
+                <label for="login-password">Parol</label>
+                <input id="login-password" type="password" required />
+              </div>
+              <button type="submit" class="btn">Kirish</button>
+              <div id="login-error" class="error"></div>
+            </form>
+
+            <!-- Register form -->
+            <form id="register-form" class="form hidden">
+              <div class="form-row">
+                <label for="reg-username">Login</label>
+                <input id="reg-username" required placeholder="Masalan: talaba01" />
+              </div>
+              <div class="form-row">
+                <label for="reg-password">Parol</label>
+                <input id="reg-password" type="password" required />
+              </div>
+              <div class="form-row">
+                <label for="reg-password2">Parolni takrorlang</label>
+                <input id="reg-password2" type="password" required />
+              </div>
+              <p class="hint">Ro‘yxatdan o‘tgan foydalanuvchilar <b>kurslarni ko‘rishi</b> mumkin, lekin admin panelga kira olmaydi.</p>
+              <button type="submit" class="btn">Ro‘yxatdan o‘tish</button>
+              <div id="register-error" class="error"></div>
+            </form>
           </div>
         </div>
 
-        <div class="card" style="margin:0">
-          <strong>Saqlangan testlar</strong>
-          <div class="panel-title" style="margin-top:8px"><span class="pill" id="testsCount">0 ta</span></div>
-          <div id="adminTests" style="margin-top:10px"></div>
+        <div>
+          <div class="card">
+            <h2>Platforma haqida</h2>
+            <p class="sub">
+              Bu Ta'lim Edu uchun HTML + CSS + JS asosida yaratilgan demo kurs tizimi.
+            </p>
+            <p class="hero-text">
+              • <b>Admin</b> — kurs yaratadi, har bir kurs ichiga 30 ta va undan ortiq
+              YouTube <b>yashirin (Unlisted)</b> videolarni qo‘shishi mumkin.<br>
+              • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va <b>kurslar ichidagi darslarni tomosha qiladi</b>.<br><br>
+              Videolar YouTube’da saqlanadi, sayt esa ularni o‘z ichiga o‘rnatib beradi.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- User panel -->
-    <div class="card hidden" id="userCard">
-      <div class="flex">
-        <div class="panel-title"><strong>Testlar</strong><span class="pill">Tez kirish</span></div>
-        <div class="space"></div>
-        <span id="whoTag" class="tag"></span>
-        <button class="btn small" id="btnLogout2">Chiqish</button>
+    <!-- ADMIN SECTION -->
+    <section id="admin-section" class="section hidden">
+      <div class="card">
+        <div class="section-header">
+          <div>
+            <h2>Admin panel</h2>
+            <p class="sub">Bu qismga faqat admin kirishi mumkin. Kurslar va darslar shu yerda boshqariladi.</p>
+          </div>
+          <span class="pill">Rol: Admin</span>
+        </div>
+
+        <h3 style="font-size:15px;margin-bottom:4px;">Yangi kurs qo‘shish</h3>
+        <form id="course-form" class="form">
+          <div class="form-row">
+            <label for="course-title">Kurs nomi</label>
+            <input id="course-title" required placeholder="Masalan: Boshlang'ich JavaScript" />
+          </div>
+          <div class="form-row">
+            <label for="course-desc">Tavsif</label>
+            <textarea id="course-desc" required placeholder="Kurs mazmuni, maqsadi, kimlar uchun..."></textarea>
+          </div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="course-cat">Yo'nalish</label>
+              <input id="course-cat" placeholder="Dasturlash, Biznes, Dizayn..." />
+            </div>
+            <div class="form-row">
+              <label for="course-price">Narx (so'm)</label>
+              <input id="course-price" type="number" min="0" placeholder="0 = bepul" />
+            </div>
+          </div>
+          <button type="submit" class="btn">Kursni qo‘shish</button>
+          <div id="course-error" class="error"></div>
+        </form>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #e5e7eb;">
+
+        <div class="section-header">
+          <h3 style="font-size:15px;">Mavjud kurslar</h3>
+          <span class="muted" id="admin-course-count">0 ta kurs</span>
+        </div>
+        <div id="admin-course-list"></div>
+        <div id="admin-empty" class="empty">Hozircha kurs yo‘q. Yuqoridan kurs qo‘shing.</div>
       </div>
+    </section>
 
-      <div class="flex" style="gap:8px;flex-wrap:wrap;margin-top:8px">
-        <input id="codeInput" placeholder="Kod: masalan ENG101" style="max-width:260px">
-        <button class="btn primary" id="btnStartByCode">Kodni ishga tushirish</button>
+    <!-- USER SECTION -->
+    <section id="user-section" class="section hidden">
+      <div class="card">
+        <div class="section-header">
+          <div>
+            <h2>Kurslar paneli</h2>
+            <p class="sub">Ro‘yxatdan o‘tgan barcha foydalanuvchilar bu yerdagi kurslarni ko‘rishi mumkin.</p>
+          </div>
+          <span class="pill" id="user-role-pill">Rol: Foydalanuvchi</span>
+        </div>
 
-        <input id="nameSearch" placeholder="Nom bo‘yicha qidirish..." style="min-width:220px">
-        <button class="btn" id="btnClearSearch">Tozalash</button>
+        <div class="section-header">
+          <span class="muted" id="user-course-count">0 ta kurs</span>
+        </div>
 
-        <button class="btn" id="btnShowAll">Barcha testlar</button>
+        <div id="user-course-list" class="course-grid"></div>
+        <div id="user-empty" class="empty">
+          Hozircha kurslar qo‘shilmagan. Admin panel orqali kurs qo‘shilishi kerak.
+        </div>
       </div>
+    </section>
+  </main>
+</div>
 
-      <div id="testsList" style="margin-top:12px"></div>
-    </div>
+<script>
+  const LS_KEY = "talimEduAppData_v1";
 
-    <!-- Test o‘ynash -->
-    <div class="card hidden" id="playCard">
-      <div class="flex">
-        <div class="panel-title"><strong id="playTitle">Test</strong><span class="pill">Ishlash</span></div>
-        <div class="space"></div>
-        <button class="btn small" id="btnBack1">⬅️ Orqaga</button>
-      </div>
-      <div id="playBody" style="margin-top:12px"></div>
-      <div class="flex" style="margin-top:12px">
-        <div class="space"></div>
-        <button class="btn primary" id="finishBtn">Yakunlash (Ctrl+Enter)</button>
-      </div>
-    </div>
-
-    <!-- Natijalar -->
-    <div class="card hidden" id="resultsCard">
-      <div class="flex">
-        <div class="panel-title"><strong id="resTitle">Natijalar</strong><span class="pill">Reyting</span></div>
-        <div class="space"></div>
-        <button class="btn small" id="btnBack2">⬅️ Orqaga</button>
-      </div>
-      <div id="leaderboardWrap" style="margin-top:12px"></div>
-      <div id="detailWrap" style="margin-top:12px"></div>
-      <div class="flex" style="margin-top:12px">
-        <div class="space"></div>
-        <!-- faqat nusxa olish -->
-        <button class="btn" id="btnCopy">📋 Nusxa olish</button>
-      </div>
-    </div>
-  </div>
-
-  <footer style="opacity:.8;text-align:center;margin:18px 0">
-    © 2025 TestMaster — Firestore Cloud (Copy Only)
-  </footer>
-
-<!-- ===== FIREBASE / FIRESTORE ===== -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-  import {
-    getFirestore, doc, getDoc, setDoc, deleteDoc,
-    collection, getDocs, query, where, writeBatch
-  } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-
-  /* ——— Config (Siz bergan yangi project) ——— */
-  const firebaseConfig = {
-    apiKey: "AIzaSyBJNZlgnfh_UI96SLYX_RLLpElbYEozazA",
-    authDomain: "buxoroedu-87f52.firebaseapp.com",
-    projectId: "buxoroedu-87f52",
-    storageBucket: "buxoroedu-87f52.appspot.com",
-    messagingSenderId: "444519456395",
-    appId: "1:444519456395:web:d8ca35794b173b9e78be8e",
-    measurementId: "G-6T2K290W9Y"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
-
-  /* ——— Helpers ——— */
-  const $ = (id)=>document.getElementById(id);
-  function show(id,on=true){ const el=$(id); if(el) el.classList.toggle('hidden', !on) }
-  function escapeHtml(s){ return (s||'').toString().replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])) }
-
-  /* ——— Qidiruv klaviatura holati ——— */
-  let __searchItems = [];
-  let __searchIndex = -1;
-  let __searchTimer = null; /* <- oldingi kodingizda yo‘q edi, qo‘shildi */
-  function setActiveCard(idx){
-    __searchIndex = idx;
-    document.querySelectorAll('#testsList .card').forEach(el=> el.classList.remove('active-card'));
-    const el = document.getElementById('srch_'+idx);
-    if(el){ el.classList.add('active-card'); el.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
-  }
-
-  /* ——— Cache ——— */
-  const CACHE = { tests:null, lastTestsAt:0 };
-  async function cachedAllTests(force=false){
-    if(!force && CACHE.tests && (Date.now()-CACHE.lastTestsAt<15000)) return CACHE.tests;
-    const qs = await getDocs(collection(db,'tests')); const arr=[]; qs.forEach(d=>arr.push(d.data()));
-    arr.sort((a,b)=>a.name.localeCompare(b.name));
-    CACHE.tests=arr; CACHE.lastTestsAt=Date.now(); return arr;
-  }
-
-  /* ——— Batch delete helper ——— */
-  async function __batchDeleteSnap(db, snap){
-    const refs=[]; snap.forEach(d=>refs.push(d.ref));
-    for(let i=0;i<refs.length;i+=450){
-      const batch = writeBatch(db);
-      refs.slice(i,i+450).forEach(r=>batch.delete(r));
-      await batch.commit();
+  function loadData() {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) {
+      const initial = {
+        users: [
+          { username: "admin", password: "admin123", role: "admin" }
+        ],
+        currentUser: null,
+        courses: [] // {id,title,description,category,price,lessons:[{id,title,videoId}]}
+      };
+      localStorage.setItem(LS_KEY, JSON.stringify(initial));
+      return initial;
+    }
+    try {
+      return JSON.parse(raw);
+    } catch (e) {
+      console.error("JSON parse error, resetting storage", e);
+      localStorage.removeItem(LS_KEY);
+      return loadData();
     }
   }
 
-  /* ——— DB qatlam (users yo‘q) ——— */
-  const DB = {
-    async saveTest({name, code, count, key}){
-      await setDoc(doc(db,'tests', code), { name, code, count, key, updatedAt: Date.now() });
-      CACHE.tests=null;
-    },
-    async allTests(){ return cachedAllTests(); },
+  function saveData() {
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+  }
 
-    async getAttempts(code, login){
-      const id = `${code}__${login.toLowerCase()}`;
-      const snap = await getDoc(doc(db,'attempts', id));
-      return snap.exists() ? (snap.data().count||0) : 0;
-    },
-    async incAttempt(code, login){
-      const id = `${code}__${login.toLowerCase()}`;
-      const n = await this.getAttempts(code, login)+1;
-      await setDoc(doc(db,'attempts', id), { code, login, count:n, updatedAt: Date.now() });
-      return n;
-    },
+  let data = loadData();
 
-    async getResults(code){
-      const qs = await getDocs(query(collection(db,'results'), where('code','==',code)));
-      const arr=[]; qs.forEach(d=>arr.push(d.data()));
-      return arr.sort((a,b)=> b.score-a.score || a.date-b.date);
-    },
-    async upsertBestResult(rec){
-      const id = `${rec.code}__${rec.login.toLowerCase()}`;
-      const ref = doc(db,'results', id);
-      const cur = await getDoc(ref);
-      if(!cur.exists() || (rec.score > (cur.data().score||0))){
-        await setDoc(ref, rec);
+  // DOM elements
+  const authSection = document.getElementById("auth-section");
+  const adminSection = document.getElementById("admin-section");
+  const userSection = document.getElementById("user-section");
+  const navAdmin = document.getElementById("nav-admin");
+  const logoutBtn = document.getElementById("logout-btn");
+  const currentUserLabel = document.getElementById("current-user-label");
+  const userRolePill = document.getElementById("user-role-pill");
+
+  // Auth tabs
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const loginErrorEl = document.getElementById("login-error");
+  const registerErrorEl = document.getElementById("register-error");
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      tabButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const tab = btn.dataset.tab;
+      if (tab === "login") {
+        loginForm.classList.remove("hidden");
+        registerForm.classList.add("hidden");
+        loginErrorEl.textContent = "";
+      } else {
+        loginForm.classList.add("hidden");
+        registerForm.classList.remove("hidden");
+        registerErrorEl.textContent = "";
       }
-    },
-    async bestOfUser(code, login){
-      const id = `${code}__${login.toLowerCase()}`;
-      const snap = await getDoc(doc(db,'results', id));
-      return snap.exists()? snap.data(): null;
-    },
+    });
+  });
 
-    async deleteTestDeep(code){
-      const resSnap = await getDocs(query(collection(db,'results'), where('code','==',code)));
-      await __batchDeleteSnap(db, resSnap);
-      const attSnap = await getDocs(query(collection(db,'attempts'), where('code','==',code)));
-      await __batchDeleteSnap(db, attSnap);
-      await deleteDoc(doc(db,'tests', code));
-      CACHE.tests=null;
+  // LOGIN
+  loginForm.addEventListener("submit", e => {
+    e.preventDefault();
+    loginErrorEl.textContent = "";
+    const username = document.getElementById("login-username").value.trim();
+    const password = document.getElementById("login-password").value;
+
+    const user = data.users.find(u => u.username === username && u.password === password);
+    if (!user) {
+      loginErrorEl.textContent = "Login yoki parol noto‘g‘ri.";
+      return;
     }
-  };
 
-  /* ——— Sessiya / UI ——— */
-  let SESSION = { role:null, login:null };
-  function logout(){
-    SESSION={role:null,login:null};
-    show('adminCard',false); show('userCard',false); show('playCard',false); show('resultsCard',false);
-    show('authCard',true); show('adminAuthCard',true);
-  }
+    data.currentUser = { username: user.username, role: user.role };
+    saveData();
+    loginForm.reset();
+    updateUI();
+  });
 
-  async function backToList(){
-    if(SESSION.role==='user'){ show('playCard',false); show('resultsCard',false); show('userCard',true); await showAllTests(); }
-    else if(SESSION.role==='admin'){ show('resultsCard',false); show('playCard',false); show('adminCard',true); await renderAdminLists(); }
-    else { logout(); }
-  }
+  // REGISTER
+  registerForm.addEventListener("submit", e => {
+    e.preventDefault();
+    registerErrorEl.textContent = "";
+    const username = document.getElementById("reg-username").value.trim();
+    const password = document.getElementById("reg-password").value;
+    const password2 = document.getElementById("reg-password2").value;
 
-  /* ——— Parolsiz kirish (faqat ism) ——— */
-  async function loginUser(){
-    const name = ($('userName').value||'').trim();
-    if(!name) return alert('Ism kiriting');
-    SESSION = { role:'user', login: name };
-    const who = $('whoTag'); if(who) who.textContent = name;
-    try{ localStorage.setItem('tm_last_login_name', name); }catch(e){}
-    show('authCard',false); show('adminAuthCard',false); show('userCard',true);
-    await showAllTests();
-  }
-
-  $('userName').addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); loginUser(); } });
-  $('btnUserLogin').addEventListener('click', loginUser);
-
-  /* ——— Admin auth ——— */
-  async function loginAdmin(){
-    const login = $('adminLogin').value.trim();
-    const code  = $('adminCode').value.trim();
-    if(login.toLowerCase()==='javohir00' && code==='jude857'){
-      SESSION = { role:'admin', login:'ADMIN' };
-      show('authCard',false); show('adminAuthCard',false); show('adminCard',true);
-      await renderAdminLists();
-    } else alert('Admin login yoki kod xato');
-  }
-  $('btnAdminLogin').addEventListener('click', loginAdmin);
-
-  /* ——— Admin: JAVOB PANEL ——— */
-  let ADMIN_KEY = []; // ["A","C","B",...]
-
-  function buildAnswerGrid(){
-    const cnt = Math.max(1, parseInt(($('tCount').value||'1'),10));
-    const wrap = $('answerGrid'); wrap.innerHTML='';
-    ADMIN_KEY = new Array(cnt).fill(null);
-    for(let i=0;i<cnt;i++){
-      const row = document.createElement('div'); row.className='adm-qrow'; row.id = 'adm_q_'+i;
-      row.innerHTML = `<div class="flex"><strong>${i+1}.</strong><div class="space"></div><span class="pill">To‘g‘ri variantni tanlang</span></div>`;
-      const pad = document.createElement('div'); pad.className='answer-pad';
-      ['A','B','C','D'].forEach(ch=>{
-        const b = document.createElement('button'); b.className='opt'; b.dataset.v=ch; b.innerHTML = `<span class="hk">${ch}</span> ${ch}`;
-        b.addEventListener('click', ()=>{
-          [...pad.children].forEach(x=> x.classList.remove('active-admin'));
-          b.classList.add('active-admin');
-          ADMIN_KEY[i] = ch;
-        });
-        pad.appendChild(b);
-      });
-      row.appendChild(pad); wrap.appendChild(row);
+    if (!username || !password) {
+      registerErrorEl.textContent = "Login va parolni kiriting.";
+      return;
     }
-  }
-  $('btnBuildGrid').addEventListener('click', buildAnswerGrid);
-  let __cntTimer=null; $('tCount').addEventListener('input', ()=>{ clearTimeout(__cntTimer); __cntTimer=setTimeout(buildAnswerGrid, 200); });
-
-  async function saveTest(){
-    const name = ($('tName').value||'').trim();
-    const code = ($('tCode').value||'').trim();
-    const count = Math.max(1, parseInt(($('tCount').value||'1'),10));
-    if(!name || !code) return alert('Nom va kodni kiriting');
-    if(!ADMIN_KEY.length || ADMIN_KEY.length!==count || ADMIN_KEY.some(v=>!v)){
-      return alert('Har bir savol uchun A/B/C/D tanlang. Avval "Javob panellari" ni tuzing.');
+    if (password !== password2) {
+      registerErrorEl.textContent = "Parollar mos kelmadi.";
+      return;
     }
-    await DB.saveTest({ name, code, count, key: ADMIN_KEY.slice() });
-    alert('✅ Test saqlandi');
-    $('tName').value=''; $('tCode').value=''; $('tCount').value=5; $('answerGrid').innerHTML=''; ADMIN_KEY=[];
-    await renderAdminLists();
-  }
-  $('btnSaveTest').addEventListener('click', saveTest);
+    if (data.users.some(u => u.username === username)) {
+      registerErrorEl.textContent = "Bu login band. Boshqa login tanlang.";
+      return;
+    }
 
-  /* ——— Admin ro‘yxatlari ——— */
-  async function renderAdminLists(){
-    const tests = await DB.allTests();
-    $('testsCount').textContent = `${tests.length} ta`;
-    await drawTestsListForAdmin();
+    data.users.push({ username, password, role: "user" });
+    data.currentUser = { username, role: "user" };
+    saveData();
+    registerForm.reset();
+    updateUI();
+  });
+
+  // LOGOUT
+  logoutBtn.addEventListener("click", () => {
+    data.currentUser = null;
+    saveData();
+    updateUI();
+  });
+
+  // COURSE MANAGEMENT (ADMIN)
+  const courseForm = document.getElementById("course-form");
+  const courseError = document.getElementById("course-error");
+  const adminCourseList = document.getElementById("admin-course-list");
+  const adminCourseCount = document.getElementById("admin-course-count");
+  const adminEmpty = document.getElementById("admin-empty");
+
+  courseForm.addEventListener("submit", e => {
+    e.preventDefault();
+    if (!data.currentUser || data.currentUser.role !== "admin") return;
+
+    courseError.textContent = "";
+    const title = document.getElementById("course-title").value.trim();
+    const desc = document.getElementById("course-desc").value.trim();
+    const cat = document.getElementById("course-cat").value.trim();
+    const price = document.getElementById("course-price").value.trim();
+
+    if (!title || !desc) {
+      courseError.textContent = "Kurs nomi va tavsifi majburiy.";
+      return;
+    }
+
+    const newCourse = {
+      id: Date.now().toString(),
+      title,
+      description: desc,
+      category: cat,
+      price,
+      lessons: []
+    };
+    data.courses.push(newCourse);
+    saveData();
+    courseForm.reset();
+    renderAdminCourses();
+    renderUserCourses();
+  });
+
+  function formatPrice(price) {
+    const n = Number(price);
+    if (!price || isNaN(n)) return "";
+    if (n === 0) return "Bepul";
+    return n.toLocaleString("uz-UZ") + " so'm";
   }
 
-  async function drawTestsListForAdmin(){
-    const tbox = $('adminTests'); tbox.innerHTML='';
-    const tests = await DB.allTests();
-    if(!tests.length){ tbox.innerHTML = '<div class="muted">Testlar yo‘q</div>'; return; }
-    for(const t of tests){
-      const res = await DB.getResults(t.code);
-      const participants = res.length;
-      const div = document.createElement('div'); div.className='card'; div.style.margin='6px 0';
+  function extractYouTubeId(input) {
+    if (!input) return "";
+    let url = input.trim();
+    // youtu.be/xxxx
+    let m = url.match(/youtu\.be\/([^?&]+)/);
+    if (m) return m[1];
+    // youtube.com/watch?v=xxxx
+    m = url.match(/v=([^&]+)/);
+    if (m) return m[1];
+    // youtube.com/embed/xxxx
+    m = url.match(/embed\/([^?&]+)/);
+    if (m) return m[1];
+    // faqat ID bo’lsa
+    return url;
+  }
+
+  function renderAdminCourses() {
+    const courses = data.courses;
+    adminCourseList.innerHTML = "";
+    adminCourseCount.textContent = courses.length + " ta kurs";
+
+    if (courses.length === 0) {
+      adminEmpty.style.display = "block";
+      return;
+    }
+    adminEmpty.style.display = "none";
+
+    courses.forEach(course => {
+      const div = document.createElement("div");
+      div.className = "course-card";
       div.innerHTML = `
-        <div class="flex">
-          <strong>${escapeHtml(t.name)}</strong>
-          <div class="space"></div>
-          <span class="pill">kod: ${escapeHtml(t.code)} • ${t.count} savol • 👥 ${participants} ta</span>
+        <div class="course-title">${course.title}</div>
+        <div class="course-desc">${course.description}</div>
+        <div class="course-meta">
+          ${course.category ? `<span class="badge">${course.category}</span>` : ""}
+          ${formatPrice(course.price) ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${formatPrice(course.price)}</span>` : ""}
+          <span class="badge">Darslar: ${course.lessons.length}</span>
         </div>
-        <div class="flex" style="margin-top:8px">
-          <button class="btn" data-act="view">Natijalar</button>
-          <button class="btn" data-act="del">O'chirish</button>
-          <button class="btn" data-act="tg">Hisobot nusxasi</button>
-          <div class="space"></div>
-        </div>`;
-      const [btnView, btnDel, btnTg] = div.querySelectorAll('button');
-      btnView.addEventListener('click', ()=> viewResults(t.code));
-      btnDel.addEventListener('click', ()=> adminDeleteTest(t.code, btnDel));
-      btnTg.addEventListener('click', ()=> adminTgReport(t.code));
-      tbox.appendChild(div);
-    }
+        <div class="mini-form">
+          <div class="muted" style="margin-bottom:4px;">Ushbu kursga yangi dars/video qo‘shish:</div>
+          <form class="lesson-form" data-course-id="${course.id}">
+            <div class="form-row">
+              <label>Dars nomi</label>
+              <input name="lessonTitle" required placeholder="Masalan: 1-dars. Kirish" />
+            </div>
+            <div class="form-row">
+              <label>YouTube havolasi yoki ID</label>
+              <input name="lessonUrl" required placeholder="https://youtu.be/... yoki faqat ID" />
+              <div class="hint">Videoni YouTube’da <b>Unlisted (yashirin)</b> qilib yuklash tavsiya etiladi.</div>
+            </div>
+            <button type="submit" class="btn" style="margin-top:4px;">Darsni qo‘shish</button>
+          </form>
+        </div>
+      `;
+      adminCourseList.appendChild(div);
+    });
   }
 
-  async function adminDeleteTest(code, el){
-    if(!confirm(`'${code}' kodli testni VA unga tegishli barcha natija/urinishlarni o‘chiraymi?`)) return;
-    const oldText = el.textContent; el.textContent = 'O‘chirilmoqda…'; el.disabled = true;
-    try{ await DB.deleteTestDeep(code); alert('✅ Test, results va attempts to‘liq o‘chirildi.'); await drawTestsListForAdmin(); }
-    catch(e){ alert('❌ O‘chirishda xatolik: '+e.message); }
-    finally{ el.textContent = oldText; el.disabled = false; }
-  }
+  adminCourseList.addEventListener("submit", e => {
+    if (!e.target.classList.contains("lesson-form")) return;
+    e.preventDefault();
+    if (!data.currentUser || data.currentUser.role !== "admin") return;
 
-  /* ——— Admin: Hisobot (faqat nusxa olish) ——— */
-  async function adminTgReport(code){
-    const all = await DB.allTests();
-    const t = all.find(x=>x.code===code);
-    if(!t){ alert('Test topilmadi'); return; }
-    const res = await DB.getResults(code);
+    const form = e.target;
+    const courseId = form.dataset.courseId;
+    const title = form.lessonTitle.value.trim();
+    const url = form.lessonUrl.value.trim();
+    if (!title || !url) return;
 
-    if(!res.length){
-      clipboardOrPrompt(`🧪 Test: ${t.name} (${t.code})\n👥 Ishtirokchilar: 0 ta\nHali natijalar yo‘q.`);
+    const course = data.courses.find(c => c.id === courseId);
+    if (!course) return;
+
+    const videoId = extractYouTubeId(url);
+    if (!videoId) {
+      alert("YouTube havola/ID noto‘g‘ri bo‘lishi mumkin.");
       return;
     }
 
-    let sumPct = 0; const lines = [];
-    res.forEach((r,i)=>{
-      const pct = Math.round((r.score/r.total)*100);
-      sumPct += pct; const wrong = r.total - r.score;
-      lines.push(`${i+1}) ${r.login} — ${pct}%  ✅ ${r.score} / ❌ ${wrong}`);
+    course.lessons.push({
+      id: Date.now().toString(),
+      title,
+      videoId
     });
-    const avg = Math.round(sumPct / res.length);
-
-    const head = [
-      `🧪 Test: ${t.name} (${t.code})`,
-      `📝 Savollar: ${t.count} ta`,
-      `👥 Ishtirokchilar: ${res.length} ta`,
-      `📊 O‘rtacha: ${avg}%`,
-      `---`
-    ];
-    clipboardOrPrompt(head.concat(lines).join('\n'));
-  }
-
-  /* ——— User: QUICK ACCESS ——— */
-  $('codeInput').addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); startByCode(); } });
-  $('btnStartByCode').addEventListener('click', startByCode);
-  $('nameSearch').addEventListener('input', ()=>{ clearTimeout(__searchTimer); __searchTimer = setTimeout(searchByName, 200); });
-  $('nameSearch').addEventListener('keydown', (e)=>{
-    if(!__searchItems.length) return;
-    if(e.key === 'ArrowDown'){ e.preventDefault(); const next = (__searchIndex + 1) % __searchItems.length; setActiveCard(next); }
-    else if(e.key === 'ArrowUp'){ e.preventDefault(); const prev = (__searchIndex - 1 + __searchItems.length) % __searchItems.length; setActiveCard(prev); }
-    else if(e.key === 'Enter'){ e.preventDefault(); const t = __searchItems[__searchIndex]; if(t) startTest(t.code); }
-  });
-  $('btnClearSearch').addEventListener('click', ()=>{ const i = $('nameSearch'); if(i){ i.value=''; } $('testsList').innerHTML = '<div class="muted">Qidiruv tozalandi. “Barcha testlar” ni bosing yoki kod orqali ishga tushiring.</div>'; });
-  $('btnShowAll').addEventListener('click', showAllTests);
-
-  async function startByCode(){
-    if(!SESSION.login) return alert('Avval ism bilan kiring');
-    const code = ($('codeInput').value||'').trim();
-    if(!code) return alert('Kod kiriting');
-    const tests = await DB.allTests();
-    const t = tests.find(x=> (x.code||'').toLowerCase() === code.toLowerCase());
-    if(!t) return alert('Bunday kod topilmadi');
-    await startTest(t.code);
-  }
-
-  async function searchByName(){
-    if(!SESSION.login) return alert('Avval ism bilan kiring');
-    const q = ($('nameSearch').value||'').trim().toLowerCase();
-    const box = $('testsList'); box.innerHTML='';
-    const tests = await DB.allTests();
-    const filtered = q ? tests.filter(t => (t.name||'').toLowerCase().includes(q)) : [];
-    __searchItems = filtered; __searchIndex = filtered.length ? 0 : -1;
-
-    if(!filtered.length){ box.innerHTML = q ? '<div class="muted">Mos test topilmadi</div>' : '<div class="muted">Qidiruv matnini kiriting yoki “Barcha testlar” ni bosing</div>'; return; }
-
-    const frag = document.createDocumentFragment();
-    filtered.forEach((t,i)=>{
-      const card = document.createElement('div'); card.className='card'; card.id = 'srch_'+i; card.style.margin='6px 0';
-      card.innerHTML = `
-        <div class="flex"><strong>${escapeHtml(t.name)}</strong><div class="space"></div><span class="pill">${t.count} savol</span></div>
-        <div class="flex" style="margin-top:10px">
-          <button class="btn primary">Testni ishlash</button>
-          <button class="btn">Natijalar</button>
-          <div class="space"></div>
-          <span class="tag">kod: ${escapeHtml(t.code)}</span>
-        </div>`;
-      const [btn1, btn2] = card.querySelectorAll('button');
-      btn1.addEventListener('click', ()=> startTest(t.code));
-      btn2.addEventListener('click', ()=> viewResults(t.code));
-      frag.appendChild(card);
-    });
-    box.appendChild(frag); setActiveCard(__searchIndex);
-  }
-
-  async function showAllTests(){
-    if(!SESSION.login) return alert('Avval ism bilan kiring');
-    const tests = await DB.allTests();
-    const box = $('testsList'); box.innerHTML='';
-    if(!tests.length){ box.innerHTML = '<div class="muted">Testlar yoʻq</div>'; return; }
-    __searchItems = tests.slice(); __searchIndex = -1; renderTestsCards(tests);
-  }
-  function renderTestsCards(list){
-    const box = $('testsList'); const frag = document.createDocumentFragment();
-    list.forEach((t,i)=>{
-      const card = document.createElement('div'); card.className='card'; card.id='srch_'+i; card.style.margin='6px 0';
-      card.innerHTML = `
-        <div class="flex"><strong>${escapeHtml(t.name)}</strong><div class="space"></div><span class="pill">${t.count} savol</span></div>
-        <div class="flex" style="margin-top:10px">
-          <button class="btn primary">Testni ishlash</button>
-          <button class="btn">Natijalar</button>
-          <div class="space"></div>
-          <span class="tag">kod: ${escapeHtml(t.code)}</span>
-        </div>`;
-      const [btn1, btn2] = card.querySelectorAll('button');
-      btn1.addEventListener('click', ()=> startTest(t.code));
-      btn2.addEventListener('click', ()=> viewResults(t.code));
-      frag.appendChild(card);
-    });
-    box.appendChild(frag);
-  }
-
-  /* ——— Test o‘ynash ——— */
-  let PLAY = { code:null, key:[], count:0, chosen:[] };
-  let PLAY_FOCUS = 0;
-
-  async function startTest(code){
-    if(!SESSION.login){ alert('Avval ism bilan kiring'); return; }
-    const tests = await DB.allTests();
-    const t = tests.find(x=>x.code===code);
-    if(!t){ alert('Test topilmadi'); return; }
-    const used = await DB.getAttempts(code, SESSION.login);
-    if(used>=3){ alert('Bu testni 3 martadan ko‘p ishlay olmaysiz.'); return; }
-
-    PLAY = { code:code, key: t.key||[], count: t.count||0, chosen: new Array(t.count||0).fill(null) };
-    $('playTitle').textContent = `${t.name} — ${t.count} savol`;
-    renderPlay();
-    show('userCard', false); show('playCard', true);
-  }
-
-  function setFocus(i){
-    if(PLAY.count<=0) return;
-    if(i < 0) i = 0; if(i >= PLAY.count) i = PLAY.count - 1; PLAY_FOCUS = i;
-    document.querySelectorAll('#playBody .card').forEach(el=> el.classList.remove('focus-q'));
-    const row = document.getElementById('qrow_'+i);
-    if(row){ row.classList.add('focus-q'); row.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
-  }
-  function nextIndexFrom(i){ for(let k=i+1;k<PLAY.count;k++){ if(PLAY.chosen[k]==null) return k; } return Math.min(i+1, PLAY.count-1); }
-  function selectOption(i, ch){
-    const row = document.getElementById('qrow_'+i); if(!row) return;
-    const pad = row.querySelector('.answer-pad'); if(!pad) return;
-    [...pad.children].forEach(x=> x.classList.remove('active-user'));
-    const btn = [...pad.children].find(x => (x.dataset.v === ch));
-    if(btn) btn.classList.add('active-user');
-    PLAY.chosen[i] = ch;
-  }
-
-  function renderPlay(){
-    const body = $('playBody'); body.innerHTML='';
-    for(let i=0;i<PLAY.count;i++){
-      const row = document.createElement('div'); row.className='card'; row.style.margin='6px 0'; row.id = 'qrow_'+i;
-      row.innerHTML = `<div class="flex"><strong>${i+1}.</strong><div class="space"></div><span class="pill">Variant tanlang</span></div>`;
-      row.addEventListener('click', ()=> setFocus(i));
-      const pad = document.createElement('div'); pad.className='answer-pad';
-      ['A','B','C','D'].forEach(ch=>{
-        const b = document.createElement('button'); b.className='opt'; b.dataset.v=ch; b.innerHTML = `<span class="hk">${ch}</span> ${ch}`;
-        b.addEventListener('click', ()=>{ [...pad.children].forEach(x=> x.classList.remove('active-user')); b.classList.add('active-user'); PLAY.chosen[i]=ch; setFocus(nextIndexFrom(i)); });
-        pad.appendChild(b);
-      });
-      row.appendChild(pad); body.appendChild(row);
-    }
-    setFocus(0);
-  }
-
-  // Global hotkeys
-  document.addEventListener('keydown', (e)=>{
-    const playOpen = !document.getElementById('playCard').classList.contains('hidden');
-    if(!playOpen) return;
-
-    if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); finishTest(); return; }
-    const key = e.key.toLowerCase();
-    if(key === 'arrowdown'){ e.preventDefault(); setFocus(Math.min(PLAY_FOCUS+1, PLAY.count-1)); return; }
-    if(key === 'arrowup'){ e.preventDefault(); setFocus(Math.max(PLAY_FOCUS-1, 0)); return; }
-    const map = { a:'A', b:'B', c:'C', d:'D' };
-    if(map[key]){ e.preventDefault(); selectOption(PLAY_FOCUS, map[key]); setFocus(nextIndexFrom(PLAY_FOCUS)); }
+    saveData();
+    form.reset();
+    renderAdminCourses();
+    renderUserCourses();
   });
 
-  async function finishTest(){
-    if(!SESSION.login){ alert('Kirish talab qilinadi'); return; }
-    if(PLAY.chosen.some(x=>x===null)){
-      if(!confirm('Baʼzi savollar belgilanmagan. Baribir yakunlaysizmi?')) return;
+  // USER VIEW
+  const userCourseList = document.getElementById("user-course-list");
+  const userCourseCount = document.getElementById("user-course-count");
+  const userEmpty = document.getElementById("user-empty");
+
+  function renderUserCourses() {
+    const courses = data.courses;
+    userCourseList.innerHTML = "";
+    userCourseCount.textContent = courses.length + " ta kurs";
+
+    if (courses.length === 0) {
+      userEmpty.style.display = "block";
+      return;
+    }
+    userEmpty.style.display = "none";
+
+    courses.forEach(course => {
+      const card = document.createElement("div");
+      card.className = "course-card";
+
+      const priceText = formatPrice(course.price);
+
+      let lessonsHtml = "";
+      if (course.lessons.length === 0) {
+        lessonsHtml = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
+      } else {
+        lessonsHtml = `
+          <div class="lesson-list">
+            ${course.lessons.map(lesson => `
+              <div class="lesson-item">
+                <div class="lesson-title">${lesson.title}</div>
+                <div class="video-wrapper">
+                  <iframe src="https://www.youtube.com/embed/${lesson.videoId}" allowfullscreen></iframe>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="course-title">${course.title}</div>
+        <div class="course-desc">${course.description}</div>
+        <div class="course-meta">
+          ${course.category ? `<span class="badge">${course.category}</span>` : ""}
+          ${priceText ? `<span class="badge ${course.price == 0 ? "free" : "price"}">${priceText}</span>` : ""}
+          <span class="badge">Darslar: ${course.lessons.length}</span>
+        </div>
+        <div class="course-footer">
+          <span class="muted">Kurs ID: ${course.id}</span>
+        </div>
+        ${lessonsHtml}
+      `;
+      userCourseList.appendChild(card);
+    });
+  }
+
+  // UI UPDATE
+  function updateUI() {
+    const user = data.currentUser;
+    if (!user) {
+      authSection.classList.remove("hidden");
+      adminSection.classList.add("hidden");
+      userSection.classList.add("hidden");
+      navAdmin.classList.add("hidden");
+      logoutBtn.style.display = "none";
+      currentUserLabel.textContent = "Mehmon";
+      return;
     }
 
-    const details=[]; let score=0;
-    for(let i=0;i<PLAY.count;i++){
-      const correct = PLAY.key[i]; const chosen = PLAY.chosen[i]; const ok = chosen === correct; if(ok) score++;
-      details.push({ q:i+1, chosen: chosen||'-', correct, ok });
-    }
-    await DB.incAttempt(PLAY.code, SESSION.login);
-    const rec = { login: SESSION.login, code: PLAY.code, score, total: PLAY.count, details, date: Date.now() };
-    await DB.upsertBestResult(rec);
-    await viewResults(PLAY.code, rec);
-  }
+    authSection.classList.add("hidden");
+    userSection.classList.remove("hidden");
+    logoutBtn.style.display = "inline-block";
+    currentUserLabel.textContent = user.username;
 
-  /* ——— Natijalar + matn tayyorlash ——— */
-  let __lastTgText = '';
-  function makeTgText(test, rec){
-    const lines = [];
-    const pct = Math.round((rec.score/rec.total)*100);
-    lines.push(`🧪 Test: ${test.name}${test.code ? ' ('+test.code+')':''}`);
-    lines.push(`👤 Ism: ${rec.login}`);
-    lines.push(`📊 Natija: ${rec.score}/${rec.total} — ${pct}%`);
-    lines.push('---');
-    rec.details.forEach(d=>{ lines.push(`${d.q}) tanlandi: ${d.chosen} | to‘g‘ri: ${d.correct} ${d.ok?'✅':'❌'}`); });
-    return lines.join('\n');
-  }
-  function renderDetail(rec){
-    let html = '<div class="card" style="margin:0">';
-    html += `<strong>${escapeHtml(rec.login)}</strong> — <span class="tag">${rec.score}/${rec.total}</span>`;
-    html += '<div style="margin-top:10px"><table><thead><tr><th>#</th><th>Tanlangan</th><th>Toʻgʻri</th><th>Holat</th></tr></thead><tbody>';
-    rec.details.forEach(d=> html += `<tr><td>${d.q}</td><td>${d.chosen}</td><td>${d.correct}</td><td>${d.ok?'<span style="color:#22c55e">to‘g‘ri</span>':'<span style="color:#ef4444">xato</span>'}</td></tr>`);
-    html += '</tbody></table></div></div>';
-    return html;
-  }
-
-  async function viewResults(code, justMade=null){
-    show('userCard', false); show('playCard', false); show('resultsCard', true);
-    const tests = await DB.allTests(); const t = tests.find(x=>x.code===code); if(!t){ alert('Test topilmadi'); return; }
-    $('resTitle').textContent = `${t.name} — Natijalar`;
-
-    const arr = await DB.getResults(code);
-    const lb = $('leaderboardWrap'); lb.innerHTML='';
-    if(!arr.length){ lb.innerHTML = '<div class="muted">Natijalar yoʻq</div>'; }
-    else {
-      let h = '<table><thead><tr><th>#</th><th>Ism</th><th>Ball</th><th>Foiz</th><th>Sana</th></tr></thead><tbody>';
-      arr.forEach((r,i)=>{
-        const mine = (SESSION.login && r.login === SESSION.login);
-        const pct = Math.round((r.score/r.total)*100);
-        h += `<tr class="${mine ? 'my-row' : ''}">
-                <td>${i+1}</td>
-                <td>${escapeHtml(r.login)}</td>
-                <td><strong>${r.score}/${r.total}</strong></td>
-                <td>${pct}%</td>
-                <td>${new Date(r.date).toLocaleString()}</td>
-              </tr>`;
-      });
-      h += '</tbody></table>'; lb.innerHTML = h;
-    }
-
-    const dw = $('detailWrap');
-    const mine = justMade || (SESSION.login ? await DB.bestOfUser(code, SESSION.login) : null);
-    if(mine){ dw.innerHTML = renderDetail(mine); __lastTgText = makeTgText(t, mine); }
-    else { dw.innerHTML = '<div class="muted">O‘zingizning oxirgi urinish tafsilotlari ko‘rinmadi.</div>'; __lastTgText = ''; }
-  }
-
-  /* ——— FAQAT NUSXA OLISH ——— */
-  function clipboardOrPrompt(text){
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text)
-        .then(()=> alert('✅ Nusxa olindi. Istalgan joyga ulashing (Telegramga yopishtiring).'))
-        .catch(()=> prompt('Matnni qo‘lda nusxalang (Ctrl+C):', text));
+    if (user.role === "admin") {
+      adminSection.classList.remove("hidden");
+      navAdmin.classList.remove("hidden");
+      userRolePill.textContent = "Rol: Admin (foydalanuvchi rejimi)";
     } else {
-      prompt('Matnni qo‘lda nusxalang (Ctrl+C):', text);
+      adminSection.classList.add("hidden");
+      navAdmin.classList.add("hidden");
+      userRolePill.textContent = "Rol: Foydalanuvchi";
     }
+
+    renderAdminCourses();
+    renderUserCourses();
   }
 
-  function copyResult(){
-    if(!__lastTgText){
-      alert('Avval o‘zingizning natijangizni oching (yoki testni tugating).');
-      return;
-    }
-    clipboardOrPrompt(__lastTgText);
-  }
-
-  // Qidiruv maydoni bo'sh bo'lganda yordamchi yozuv
-  $('testsList').innerHTML = '<div class="muted">Kodni kiriting yoki “Barcha testlar” ni bosing</div>';
-
-  // Tugma handlerlari
-  $('btnBack1').addEventListener('click', backToList);
-  $('btnBack2').addEventListener('click', backToList);
-  $('btnLogout1').addEventListener('click', logout);
-  $('btnLogout2').addEventListener('click', logout);
-  $('finishBtn').addEventListener('click', finishTest);
-  $('btnCopy').addEventListener('click', copyResult);
-
-  // Boot
-  (function boot(){ try{ const last = localStorage.getItem('tm_last_login_name'); if(last){ $('userName').value = last; } }catch(e){} })();
-
-  // Start holat
-  logout();
+  // Initial render
+  updateUI();
 </script>
 </body>
 </html>
