@@ -153,6 +153,10 @@
       background:#fee2e2;
       color:#b91c1c;
     }
+    .btn-small.primary{
+      background:#6366f1;
+      color:#ffffff;
+    }
     .hint{font-size:11px;color:#6b7280;}
     .error{font-size:12px;color:#b91c1c;margin-top:2px;}
     .pill{
@@ -216,6 +220,12 @@
     }
 
     /* Player + playlist */
+    .video-toolbar{
+      display:flex;
+      justify-content:flex-end;
+      gap:6px;
+      margin-top:4px;
+    }
     .video-wrapper{
       position:relative;
       padding-bottom:56.25%;
@@ -349,9 +359,7 @@
       color:#6b7280;
       margin-bottom:2px;
     }
-    .review-form textarea{
-      font-size:12px;
-    }
+    .review-form textarea{font-size:12px;}
     .review-form{
       margin-top:6px;
       display:flex;
@@ -507,7 +515,7 @@
         <div class="section-header">
           <div>
             <h2>Kurslar paneli</h2>
-            <p class="sub">Ro‘yxatdan o‘tgan barcha, foydalanuvchilar bu yerdagi kurslarni ko‘rishi mumkin.</p>
+            <p class="sub">Ro‘yxatdan o‘tgan barcha foydalanuvchilar bu yerdagi kurslarni ko‘rishi mumkin.</p>
           </div>
           <span class="pill" id="user-role-pill">Rol: Foydalanuvchi</span>
         </div>
@@ -543,7 +551,6 @@
     where
   } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-  // --- Sening FireBase config'ing ---
   const firebaseConfig = {
     apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
     authDomain: "shahboz-5d0a3.firebaseapp.com",
@@ -564,12 +571,12 @@
   const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
 
   let currentUser = loadCurrentUserLocal();
-  let courses = []; // {id,title,description,category,price,lessons,reviews,avgRating}
+  let courses = [];
   let allUsers = [];
-  let userProgress = {}; // { courseId: {completedLessonIds:[],percent,finished} }
+  let userProgress = {};
   let isDataLoaded = false;
   let ytApiReady = false;
-  const players = {}; // { courseId: {player, currentIndex} }
+  const players = {};
 
   const loadStatus = document.getElementById("load-status");
 
@@ -585,7 +592,6 @@
       localStorage.removeItem(CURRENT_USER_KEY);
     }
   }
-
   function ensureLoaded() {
     if (!isDataLoaded) {
       alert("Ma'lumotlar hali yuklanmoqda. Birozdan keyin urinib ko‘ring.");
@@ -622,7 +628,6 @@
   const userCourseCount = document.getElementById("user-course-count");
   const userEmpty = document.getElementById("user-empty");
 
-  // helpers
   function formatPrice(price) {
     const n = Number(price);
     if (!price || isNaN(n)) return "";
@@ -638,7 +643,6 @@
     return url;
   }
 
-  // Admin user borligini ta'minlash
   async function ensureAdminUser() {
     const adminRef = doc(db, USERS_COL, "admin");
     const snap = await getDoc(adminRef);
@@ -739,7 +743,6 @@
       updatedAt: Date.now()
     });
 
-    // UI ni yangilaymiz
     renderUserCourses();
   }
 
@@ -844,7 +847,7 @@
     updateUI();
   });
 
-  // COURSE CREATE (ADMIN)
+  // COURSE CREATE
   courseForm.addEventListener("submit", async e => {
     e.preventDefault();
     if (!ensureLoaded()) return;
@@ -875,7 +878,6 @@
     renderUserCourses();
   });
 
-  // ADMIN: kurslar ro‘yxati
   function renderAdminCourses() {
     const list = courses || [];
     adminCourseList.innerHTML = "";
@@ -985,7 +987,7 @@
     renderUserCourses();
   });
 
-  // ADMIN: dars / kurs o‘chirish
+  // ADMIN: dars/kurs o‘chirish
   adminCourseList.addEventListener("click", async e => {
     const btnLesson = e.target.closest(".btn-small.danger[data-action='delete-lesson']");
     const btnCourse = e.target.closest(".btn-small.danger[data-action='delete-course']");
@@ -1008,17 +1010,14 @@
       const courseId = btnCourse.dataset.courseId;
       if (!confirm("Butun kursni (hamma darslari va izohlari bilan) o‘chirmoqchimisiz?")) return;
 
-      // darslarni o‘chirish
       const lessonsSnap = await getDocs(collection(db, COURSES_COL, courseId, "lessons"));
       for (const d of lessonsSnap.docs) {
         await deleteDoc(doc(db, COURSES_COL, courseId, "lessons", d.id));
       }
-      // izohlarni o‘chirish
       const revSnap = await getDocs(collection(db, COURSES_COL, courseId, "reviews"));
       for (const d of revSnap.docs) {
         await deleteDoc(doc(db, COURSES_COL, courseId, "reviews", d.id));
       }
-      // kursni o‘chirish
       await deleteDoc(doc(db, COURSES_COL, courseId));
 
       await loadCoursesFromFirestore();
@@ -1027,7 +1026,6 @@
     }
   });
 
-  // ADMIN: foydalanuvchilar ro‘yxati
   function renderAdminUsers() {
     const list = allUsers || [];
     adminUserList.innerHTML = "";
@@ -1045,7 +1043,7 @@
     });
   }
 
-  // USER VIEW + Player + playlist
+  // USER VIEW
   function renderUserCourses() {
     const list = courses || [];
     userCourseList.innerHTML = "";
@@ -1063,14 +1061,21 @@
 
       const priceText = formatPrice(course.price);
       const hasLessons = course.lessons && course.lessons.length > 0;
-
       const prog = currentUser ? (userProgress[course.id] || {percent:0, finished:false}) : {percent:0, finished:false};
 
       let playerBlock = "";
       if (hasLessons) {
         playerBlock = `
           <div class="course-player" data-course-id="${course.id}">
-            <div class="video-wrapper">
+            <div class="video-toolbar">
+              <button type="button"
+                      class="btn-small primary"
+                      data-action="fullscreen"
+                      data-course-id="${course.id}">
+                To‘liq ekran
+              </button>
+            </div>
+            <div class="video-wrapper" data-course-id="${course.id}">
               <div id="player-${course.id}"></div>
             </div>
             <div class="lesson-playlist">
@@ -1166,8 +1171,20 @@
     setupAllPlayers();
   }
 
-  // Dars ustiga bosganda o‘sha video yoqilsin
+  // FULLSCREEN + playlist + review handler
   userCourseList.addEventListener("click", e => {
+    const fsBtn = e.target.closest("[data-action='fullscreen']");
+    if (fsBtn) {
+      const courseId = fsBtn.dataset.courseId;
+      const wrapper = document.querySelector(`.video-wrapper[data-course-id="${courseId}"]`);
+      if (wrapper) {
+        if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+        else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+        else if (wrapper.msRequestFullscreen) wrapper.msRequestFullscreen();
+      }
+      return;
+    }
+
     const btn = e.target.closest(".lesson-playlist-item");
     if (!btn) return;
 
@@ -1185,7 +1202,7 @@
     updateActivePlaylistItem(courseId, index);
   });
 
-  // Izoh/baho yuborish
+  // Izoh
   userCourseList.addEventListener("submit", async e => {
     if (!e.target.classList.contains("review-form")) return;
     e.preventDefault();
@@ -1225,7 +1242,6 @@
   function setupAllPlayers() {
     if (!ytApiReady) return;
 
-    // old playersni tozalash
     for (const cid in players) {
       if (players[cid].player && typeof players[cid].player.destroy === "function") {
         try { players[cid].player.destroy(); } catch(e){}
@@ -1276,7 +1292,6 @@
     const currentLesson = course.lessons[currentIndex];
     if (!currentLesson) return;
 
-    // progressni yangilaymiz (shu darsni tugatdi deb hisoblaymiz)
     await markLessonCompleted(courseId, currentLesson.id);
 
     const nextIndex = currentIndex + 1;
@@ -1310,13 +1325,11 @@
     }
   }
 
-  // YouTube API callback global
   window.onYouTubeIframeAPIReady = function() {
     ytApiReady = true;
     setupAllPlayers();
   };
 
-  // UI UPDATE
   function updateUI() {
     const user = currentUser;
     if (!user) {
@@ -1348,7 +1361,6 @@
     renderUserCourses();
   }
 
-  // INIT
   (async function init() {
     if (loadStatus) loadStatus.textContent = "Ma'lumotlar yuklanmoqda...";
     await ensureAdminUser();
@@ -1363,7 +1375,7 @@
   })();
 </script>
 
-<!-- YouTube IFrame API (module emas, oddiy script) -->
+<!-- YouTube API -->
 <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
