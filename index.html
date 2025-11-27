@@ -549,7 +549,7 @@
               <b>yashirin (Unlisted)</b> videolarni qo‘shishi mumkin.<br>
               • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va kurslar ichidagi darslarni tomosha qiladi.<br><br>
               Har bir dars bo‘yicha ko‘rilgan <b>foiz</b> saqlanib boradi. Dars kamida
-              <b>90%</b> ko‘rilganda tugallangan hisoblanadi va oldinga yana
+              <b>50%</b> ko‘rilganda tugallangan hisoblanadi va oldinga yana
               <b>bir nechta darslar</b> ochiladi.
             </p>
           </div>
@@ -659,7 +659,7 @@
                 <div class="progress-bar" id="lesson-progress-bar"></div>
               </div>
               <div class="hint" style="margin-top:4px;">
-                Dars kamida <b>90%</b> ko‘rilganda tugallangan hisoblanadi.
+                Dars kamida <b>50%</b> ko‘rilganda tugallangan hisoblanadi.
                 1-dars tugallansa, oldinda <b>yana 3 ta dars</b> ochiladi.
               </div>
             </div>
@@ -674,7 +674,7 @@
     <div class="footer-inner">
       <small>© Ona tili Pro online o‘quv markazi — bilimlaringiz uchun raqamli hamroh.</small>
       <small>
-        Aloqa: <b>+998 90 000 00 00</b> · Telegram: <b>@onatili_pro</b>
+        Aloqa: <b>+998 00 000 00 00</b> · Telegram: <b>@onatili_pro</b>
       </small>
     </div>
   </footer>
@@ -848,7 +848,7 @@
     if (!d.lessons) d.lessons = {};
     const prev = d.lessons[lessonId] || { percent:0, completed:false };
     const maxPercent = Math.max(prev.percent||0, percent||0);
-    const completed = prev.completed || completedFlag || maxPercent>=90;
+    const completed = prev.completed || completedFlag || maxPercent>=50;
     d.lessons[lessonId] = { percent:maxPercent, completed };
     await ref.set(d);
     return d;
@@ -1124,7 +1124,7 @@
         currentCourseDetail.id,
         currentLessonId,
         percent,
-        percent>=90
+        percent>=50
       )
         .then(updated=>{
           currentCourseProgress = updated;
@@ -1215,7 +1215,7 @@
       // tugallangan darsni qayta ko‘rganda foizni o‘zgartirmaymiz
       if(alreadyCompleted) return;
 
-      if(rounded-lastSavedPercent>=15 || rounded>=90){
+      if(rounded-lastSavedPercent>=15 || rounded>=50){
         lastSavedPercent=rounded;
         try{
           const updated=await saveLessonProgress(
