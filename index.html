@@ -1060,177 +1060,215 @@
     await openUserCourseDetail(courseId);
   });
 
-  /* COURSE DETAIL + PROGRESS */
-  let currentCourseDetail=null;
-  let currentCourseProgress=null;
-  let currentPlayer=null;
-  let currentLessonId=null;
-  let progressInterval=null;
-  let lastSavedPercent=0;
+  /* COURSE DETAIL + PROGRESS (barqaror, ko‘p martalik tomosha) */
+  let currentCourseDetail = null;
+  let currentCourseProgress = null;
+  let currentPlayer = null;
+  let currentLessonId = null;
+  let progressInterval = null;
+  let lastSavedPercent = 0;
+  let pendingLessonToOpen = null;
 
-  function stopCurrentPlayer(){
-    if(progressInterval) {
-      clearInterval(progressInterval);
-      progressInterval=null;
-    }
+  function saveCurrentLessonProgressOnce() {
+    try {
+      if (
+        !currentPlayer ||
+        !currentCourseDetail ||
+        !currentLessonId ||
+        !data.currentUser ||
+        typeof currentPlayer.getDuration !== "function"
+      ) return;
 
-    if(currentPlayer && typeof currentPlayer.getDuration==="function"){
-      try{
-        const dur = currentPlayer.getDuration();
-        const cur = currentPlayer.getCurrentTime();
-        let percent = lastSavedPercent || 0;
-        if(dur && dur>0){
-          percent = Math.min(100,(cur/dur)*100);
-        }
-        percent = Math.round(percent);
+      const dur = currentPlayer.getDuration();
+      if (!dur || dur <= 0) return;
 
-        const user = data.currentUser;
-        const course = currentCourseDetail;
-        const lessonIdToSave = currentLessonId;
-
-        if(user && course && lessonIdToSave && percent>0){
-          saveLessonProgress(
-            user.username,
-            course.id,
-            lessonIdToSave,
-            percent,
-            percent>=90
-          ).then(updated=>{
-            currentCourseProgress = updated;
-            renderCourseLessonsList();
-          }).catch(err=>console.error("final progress save error",err));
-        }
-      }catch(err){
-        console.error("stopCurrentPlayer error",err);
+      const cur = currentPlayer.getCurrentTime();
+      let percent = 0;
+      if (cur && dur > 0) {
+        percent = Math.min(100, (cur / dur) * 100);
       }
-    }
+      percent = Math.round(Math.max(percent, lastSavedPercent || 0));
+      if (percent <= 0) return;
 
-    if(currentPlayer && currentPlayer.destroy){
-      try{ currentPlayer.destroy(); }catch(e){}
+      saveLessonProgress(
+        data.currentUser.username,
+        currentCourseDetail.id,
+        currentLessonId,
+        percent,
+        percent >= 90
+      )
+        .then(updated => {
+          currentCourseProgress = updated;
+          renderCourseLessonsList();
+        })
+        .catch(err => console.error("final progress save error", err));
+    } catch (err) {
+      console.error("saveCurrentLessonProgressOnce error", err);
     }
-    currentPlayer=null;
-    currentLessonId=null;
   }
 
-  function renderCourseLessonsList(){
-    const course=currentCourseDetail;
-    const progress=currentCourseProgress||{lessons:{}};
-    const lessons=course.lessons||[];
-    if(!lessons.length){
-      detailLessons.innerHTML=`<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
+  function stopCurrentPlayer() {
+    if (progressInterval) {
+      clearInterval(progressInterval);
+      progressInterval = null;
+    }
+    if (currentPlayer && typeof currentPlayer.pauseVideo === "function") {
+      try { currentPlayer.pauseVideo(); } catch (e) {}
+    }
+    saveCurrentLessonProgressOnce();
+  }
+
+  function renderCourseLessonsList() {
+    const course = currentCourseDetail;
+    const progress = currentCourseProgress || { lessons: {} };
+    const lessons = course.lessons || [];
+    if (!lessons.length) {
+      detailLessons.innerHTML = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
       return;
     }
 
     const progMap = progress.lessons || {};
     let maxCompletedIndex = -1;
-    lessons.forEach((lesson,idx)=>{
-      const info = progMap[lesson.id] || {percent:0,completed:false};
-      if(info.completed && idx>maxCompletedIndex) maxCompletedIndex = idx;
+    lessons.forEach((lesson, idx) => {
+      const info = progMap[lesson.id] || { percent: 0, completed: false };
+      if (info.completed && idx > maxCompletedIndex) maxCompletedIndex = idx;
     });
 
-    let html=`<div class="lesson-list">`;
-    lessons.forEach((lesson,idx)=>{
-      const info=(progMap)[lesson.id]||{percent:0,completed:false};
-      const percent=Math.round(info.percent||0);
+    let html = `<div class="lesson-list">`;
+    lessons.forEach((lesson, idx) => {
+      const info = progMap[lesson.id] || { percent: 0, completed: false };
+      const percent = Math.round(info.percent || 0);
 
-      let unlocked = (idx===0);
-      if(maxCompletedIndex>=0 && idx <= maxCompletedIndex+3){
-        unlocked = true;
+      let unlocked = (idx === 0);
+      if (maxCompletedIndex >= 0 && idx <= maxCompletedIndex + 3) {
+        unlocked = true; // 1-dars tugasa, oldinda 3 ta dars ochiladi
       }
 
-      const statusText=info.completed
-        ?"Tugallangan ✅"
-        :unlocked?(percent>0?`Boshlangan (${percent}%)`:"Boshlanmagan")
-        :"Yopiq 🔒";
-      html+=`
-        <div class="lesson-item ${unlocked?"":"locked"}" data-lesson-id="${lesson.id}" data-unlocked="${unlocked?"1":"0"}">
+      const statusText = info.completed
+        ? "Tugallangan ✅"
+        : unlocked
+          ? (percent > 0 ? `Boshlangan (${percent}%)` : "Boshlanmagan")
+          : "Yopiq 🔒";
+
+      html += `
+        <div class="lesson-item ${unlocked ? "" : "locked"}"
+             data-lesson-id="${lesson.id}"
+             data-unlocked="${unlocked ? "1" : "0"}">
           <div>
-            <div class="lesson-title">${idx+1}-dars. ${lesson.title}</div>
+            <div class="lesson-title">${idx + 1}-dars. ${lesson.title}</div>
             <div class="muted" style="font-size:11px;">Ko‘rilgan: ${percent}%</div>
           </div>
           <div class="lesson-status">${statusText}</div>
         </div>`;
     });
-    html+=`</div>`;
-    detailLessons.innerHTML=html;
+    html += `</div>`;
+    detailLessons.innerHTML = html;
+  }
+
+  function startProgressInterval() {
+    if (!currentPlayer) return;
+    if (progressInterval) clearInterval(progressInterval);
+
+    progressInterval = setInterval(async () => {
+      if (!currentPlayer || typeof currentPlayer.getDuration !== "function") return;
+      const dur = currentPlayer.getDuration();
+      if (!dur || dur <= 0) return;
+
+      const cur = currentPlayer.getCurrentTime();
+      const percent = Math.min(100, (cur / dur) * 100);
+      const rounded = Math.round(percent);
+      lessonProgressText.textContent = `Ko‘rilgan: ${rounded}%`;
+      lessonProgressBar.style.width = rounded + "%";
+
+      if (!data.currentUser || !currentCourseDetail || !currentLessonId) return;
+
+      const lp = (currentCourseProgress?.lessons || {})[currentLessonId];
+      const alreadyCompleted = lp && lp.completed;
+      if (alreadyCompleted) return; // tugallangan darsni qayta ko‘rishda foiz yozilmaydi
+
+      if (rounded - lastSavedPercent >= 15 || rounded >= 90) {
+        lastSavedPercent = rounded;
+        try {
+          const updated = await saveLessonProgress(
+            data.currentUser.username,
+            currentCourseDetail.id,
+            currentLessonId,
+            rounded,
+            rounded >= 90
+          );
+          currentCourseProgress = updated;
+          renderCourseLessonsList();
+        } catch (err) { console.error("progress error", err); }
+      }
+    }, 5000);
   }
 
   async function openLessonPlayer(lesson){
     if(!currentCourseDetail || !data.currentUser) return;
 
-    // Eski videoni “pauza” qilib, progressni saqlaymiz
+    // eski darsni pauza qilamiz va progressni saqlaymiz
     stopCurrentPlayer();
 
-    currentLessonId=lesson.id;
-    lessonPlayerTitle.textContent=lesson.title;
+    currentLessonId = lesson.id;
+    lessonPlayerTitle.textContent = lesson.title;
     lessonVideoWrapper.classList.remove("hidden");
-    lessonProgressText.textContent="Ko‘rilmoqda: 0%";
-    lessonProgressBar.style.width="0%";
-    lastSavedPercent=0;
+    lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
+    lessonProgressBar.style.width = "0%";
+    lastSavedPercent = 0;
+
+    const info = (currentCourseProgress.lessons || {})[lesson.id] || { percent:0 };
+    const resumePercent = info.percent && info.percent < 95 ? info.percent : 0;
+    lastSavedPercent = resumePercent;
 
     if(!ytApiReady){
-      lessonProgressText.textContent="YouTube API yuklanmoqda...";
-      const check=setInterval(()=>{
+      lessonProgressText.textContent = "YouTube API yuklanmoqda...";
+      pendingLessonToOpen = lesson;
+      const check = setInterval(()=>{
         if(ytApiReady){
           clearInterval(check);
-          openLessonPlayer(lesson);
+          if(pendingLessonToOpen){
+            const l = pendingLessonToOpen;
+            pendingLessonToOpen = null;
+            openLessonPlayer(l);
+          }
         }
       },500);
       return;
     }
-    currentPlayer=new YT.Player("yt-player",{
-      videoId:lesson.videoId,
-      playerVars:{rel:0,modestbranding:1},
-      events:{
-        onReady:()=>{
-          const info=(currentCourseProgress.lessons||{})[lesson.id]||{percent:0};
-          if(info.percent && info.percent<95){
-            const dur=currentPlayer.getDuration();
-            const start=(info.percent/100)*dur;
-            if(start && isFinite(start)) currentPlayer.seekTo(start,true);
+
+    if(!currentPlayer){
+      currentPlayer = new YT.Player("yt-player",{
+        videoId: lesson.videoId,
+        playerVars:{rel:0,modestbranding:1},
+        events:{
+          onReady:()=>{
+            if(resumePercent>0){
+              const dur=currentPlayer.getDuration();
+              const start=(resumePercent/100)*dur;
+              if(start && isFinite(start)) currentPlayer.seekTo(start,true);
+            }
+            currentPlayer.playVideo();
+            startProgressInterval();
           }
-          currentPlayer.playVideo();
-          startProgressInterval();
         }
+      });
+    }else{
+      if(resumePercent>0){
+        currentPlayer.loadVideoById({
+          videoId: lesson.videoId,
+          startSeconds: 0
+        });
+        setTimeout(()=>{
+          const dur=currentPlayer.getDuration();
+          const start=(resumePercent/100)*dur;
+          if(start && isFinite(start)) currentPlayer.seekTo(start,true);
+        },1000);
+      }else{
+        currentPlayer.loadVideoById(lesson.videoId);
       }
-    });
-  }
-
-  function startProgressInterval(){
-    if(!currentPlayer) return;
-    if(progressInterval) clearInterval(progressInterval);
-    progressInterval=setInterval(async ()=>{
-      if(!currentPlayer||typeof currentPlayer.getDuration!=="function") return;
-      const dur=currentPlayer.getDuration();
-      if(!dur||dur<=0) return;
-      const cur=currentPlayer.getCurrentTime();
-      const percent=Math.min(100,(cur/dur)*100);
-      const rounded=Math.round(percent);
-      lessonProgressText.textContent=`Ko‘rilgan: ${rounded}%`;
-      lessonProgressBar.style.width=rounded+"%";
-
-      if(!data.currentUser||!currentCourseDetail||!currentLessonId) return;
-
-      const lp = (currentCourseProgress?.lessons || {})[currentLessonId];
-      const alreadyCompleted = lp && lp.completed;
-      // Agar dars allaqachon tugallangan bo‘lsa, qayta tomosha progressini yozmaymiz
-      if(alreadyCompleted) return;
-
-      if(rounded-lastSavedPercent>=15 || rounded>=90){
-        lastSavedPercent=rounded;
-        try{
-          const updated=await saveLessonProgress(
-            data.currentUser.username,
-            currentCourseDetail.id,
-            currentLessonId,
-            rounded,
-            rounded>=90
-          );
-          currentCourseProgress=updated;
-          renderCourseLessonsList();
-        }catch(err){ console.error("progress error",err); }
-      }
-    },5000);
+      currentPlayer.playVideo();
+      startProgressInterval();
+    }
   }
 
   async function openUserCourseDetail(courseId){
@@ -1422,7 +1460,7 @@
 
   // Tab yopilganda ham progressni oxirgi marta saqlashga urinamiz
   window.addEventListener("beforeunload",()=>{
-    stopCurrentPlayer();
+    saveCurrentLessonProgressOnce();
   });
 
   /* INIT */
