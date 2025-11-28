@@ -894,11 +894,10 @@
   let ytApiReady = false;
   function onYouTubeIframeAPIReady(){ ytApiReady = true; }
 
-    /* GLOBAL THRESHOLDS */
+  /* GLOBAL THRESHOLDS */
   const VIDEO_COMPLETE_PERCENT = 10; // 10% video kifoya
   const QUIZ_PASS_PERCENT = 30;     // 30% quiz natija
   const QUIZ_TOTAL_MINUTES = 20;    // QUIZ uchun umumiy vaqt (daqiqa)
-
 
   /* FIREBASE INIT */
   const firebaseConfig = {
@@ -1377,6 +1376,7 @@
                   <div class="muted" style="font-size:11px;">
                     ID: ${l.id}
                     ${l.quiz && l.quiz.length ? " · Quiz savollar: "+l.quiz.length+" ta" : ""}
+                    ${typeof l.quizTotalMinutes==="number" ? " · Umumiy vaqt: "+l.quizTotalMinutes+" daqiqa" : ""}
                   </div>
                 </div>
                 <div class="lesson-status">
@@ -1427,8 +1427,16 @@
 
             <div class="quiz-builder hidden">
               <div class="muted" style="font-size:11px;margin-bottom:4px;">
-                Har bir savol uchun matn va A/B/C/D variantlarni kiriting, keyin to‘g‘ri javobni va vaqtni (soniya) tanlang.
+                Har bir savol uchun matn va A/B/C/D variantlarni kiriting.
+                Test uchun esa quyida <b>umumiy vaqtni (daqiqa)</b> belgilang.
               </div>
+
+              <!-- 👉 TEST UCHUN UMUMIY VAQT (DAQIQA) -->
+              <div class="form-row">
+                <label>Quiz umumiy vaqti (daqiqa)</label>
+                <input type="number" class="quiz-total-minutes" min="1" value="${QUIZ_TOTAL_MINUTES}" />
+              </div>
+
               <div class="quiz-questions"></div>
               <button type="button" class="btn-xs btn-add-question" style="margin-top:4px;">+ Savol qo‘shish</button>
             </div>
@@ -1496,10 +1504,6 @@
             <option value="3">D</option>
           </select>
         </div>
-        <div class="form-row">
-          <label>Savol vaqti (soniya)</label>
-          <input type="number" class="q-time" min="5" value="30" />
-        </div>
       </div>
       <hr style="margin-top:6px;border:none;border-top:1px dashed #e5e7eb;">
     `;
@@ -1531,22 +1535,26 @@
         const c = block.querySelector(".q-opt-c")?.value.trim() || "";
         const d = block.querySelector(".q-opt-d")?.value.trim() || "";
         const correctRaw = block.querySelector(".q-correct")?.value;
-        const timeRaw = parseInt(block.querySelector(".q-time")?.value,10);
         const correctIndex = correctRaw!==undefined ? parseInt(correctRaw,10) : 0;
-        const timeLimit = (!isNaN(timeRaw) && timeRaw>0) ? timeRaw : 30;
         if(text && a && b && c && d){
           quiz.push({
             id: Date.now().toString()+"_"+idx,
             question:text,
             options:[a,b,c,d],
-            correctIndex:isNaN(correctIndex)?0:correctIndex,
-            timeLimit:timeLimit
+            correctIndex:isNaN(correctIndex)?0:correctIndex
           });
         }
       });
     }
 
     try{
+      // 👉 umumiy vaqtni (daqiqa) formdan olish
+      const totalMinutesInput = form.querySelector(".quiz-total-minutes");
+      let quizTotalMinutes = parseInt(totalMinutesInput?.value, 10);
+      if(isNaN(quizTotalMinutes) || quizTotalMinutes <= 0){
+        quizTotalMinutes = QUIZ_TOTAL_MINUTES;
+      }
+
       const course = data.courses.find(c=>c.id===courseId);
       if(!course) return;
       const lessons = course.lessons || [];
@@ -1554,7 +1562,8 @@
         id: Date.now().toString(),
         title,
         videoId,
-        quiz
+        quiz,
+        quizTotalMinutes   // 👉 shu dars testining umumiy vaqti (daqiqa)
       });
       await updateCourseLessons(courseId,lessons);
       await refreshCourses();
@@ -1710,6 +1719,10 @@
   let quizRemaining = 0;
 
   let quizAutoNextTimerId = null;
+
+  // 👉 test uchun joriy umumiy vaqt (daqiqa)
+  let currentQuizTotalMinutes = QUIZ_TOTAL_MINUTES;
+
   function clearQuizTimer(){
     if(quizTimerId){
       clearInterval(quizTimerId);
@@ -1842,20 +1855,7 @@
     }catch(e){}
   }
 
-    /* QUIZ OVERLAY FUNKSIYALARI – hamma savollar BIR VARAQDA, scroll + UMUMIY VAQT */
-
-  function clearQuizTimer(){
-    if(quizTimerId){
-      clearInterval(quizTimerId);
-      quizTimerId = null;
-    }
-  }
-  function clearQuizAutoNextTimer(){
-    if(quizAutoNextTimerId){
-      clearInterval(quizAutoNextTimerId);
-      quizAutoNextTimerId = null;
-    }
-  }
+  /* QUIZ OVERLAY FUNKSIYALARI – hamma savollar BIR VARAQDA, scroll + UMUMIY VAQT */
 
   function closeQuizOverlay(){
     clearQuizTimer();
@@ -1875,7 +1875,8 @@
         <div class="quiz-overlay-title">Dars yakunlandi!</div>
         <div class="quiz-overlay-sub">
           Endi bilimlaringizni <b>quiz</b> orqali sinab ko‘ring.<br>
-          Barcha savollar <b>bitta sahifada</b> beriladi. Pastga <b>scroll</b> qilib javoblarni belgilang.
+          Barcha savollar <b>bitta sahifada</b> beriladi. Pastga <b>scroll</b> qilib javoblarni belgilang.<br>
+          Test uchun ajratilgan umumiy vaqt: <b>${currentQuizTotalMinutes} daqiqa</b>.
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px;">
           <button type="button" class="btn" id="quiz-overlay-start-btn">Quizni boshlash</button>
@@ -1966,7 +1967,7 @@
       <div>
         <div class="quiz-top-row">
           <div class="quiz-progress-small">
-            Savollar soni: <b>${total}</b> · Umumiy vaqt: <b>${QUIZ_TOTAL_MINUTES} daqiqa</b>
+            Savollar soni: <b>${total}</b> · Umumiy vaqt: <b>${currentQuizTotalMinutes} daqiqa</b>
           </div>
           <div id="quiz-timer"></div>
         </div>
@@ -1998,7 +1999,7 @@
     document.getElementById("quiz-cancel-btn").onclick = closeQuizOverlay;
 
     // UMUMIY VAQT TIMERINI ISHGA TUSHIRAMIZ
-    quizRemaining = QUIZ_TOTAL_MINUTES * 60; // global o‘zgaruvchi (oldin bitta savol uchun ishlatilgan)
+    quizRemaining = currentQuizTotalMinutes * 60; // umumiy test vaqti (sekundlarda)
     updateQuizTimerDisplay();
     clearQuizTimer();
     quizTimerId = setInterval(()=>{
@@ -2060,174 +2061,6 @@
     // Natijani overlay ichida chiqaramiz
     renderQuizResultInOverlay(score,total,quizAnswers);
   }
-
-  async function showQuizRankingInOverlay(){
-    if(!currentCourseDetail || !currentLessonId || !data.currentUser) return;
-    const container = document.getElementById("quiz-ranking-container");
-    if(!container) return;
-    container.innerHTML = `<div class="muted">Reyting yuklanmoqda...</div>`;
-    try{
-      const snap = await db.collection("progress")
-        .where("courseId","==",currentCourseDetail.id)
-        .get();
-      const rows = [];
-      snap.forEach(doc=>{
-        const d = doc.data();
-        const lessons = d.lessons||{};
-        const info = lessons[currentLessonId];
-        if(info && typeof info.quizBestPercent==="number"){
-          const username = d.user || d.username || "Noma'lum";
-          rows.push({ username, best:info.quizBestPercent });
-        }
-      });
-      if(!rows.length){
-        container.innerHTML = `<div class="muted">Hali hech kim bu dars bo‘yicha quiz ishlamagan.</div>`;
-        return;
-      }
-      rows.sort((a,b)=> b.best - a.best);
-      const total = rows.length;
-      const meIndex = rows.findIndex(r=>r.username===data.currentUser.username);
-      const myPlace = meIndex===-1 ? "—" : (meIndex+1);
-      const myBest = meIndex===-1 ? "—" : Math.round(rows[meIndex].best)+"%";
-
-      const topRows = rows.slice(0,10);
-
-      container.innerHTML = `
-        <div style="margin-top:8px;">
-          <div class="quiz-overlay-sub" style="font-size:14px;margin-bottom:6px;">
-            Jami ishtirokchilar: <b>${total}</b><br>
-            Sizning eng yaxshi natijangiz: <b>${myBest}</b>
-            ${myPlace!=="—" ? ` · Reytingingiz: <b>${myPlace}-o‘rin</b>` : ""}
-          </div>
-          <div style="overflow-x:auto;">
-            <table class="user-table">
-              <thead><tr><th>O‘rin</th><th>Foydalanuvchi</th><th>Eng yaxshi natija</th></tr></thead>
-              <tbody>
-                ${topRows.map((r,i)=>`
-                  <tr${(meIndex===i)?' style="font-weight:700;background:#fef3c7;"':''}>
-                    <td>${i+1}</td>
-                    <td>${r.username}</td>
-                    <td>${Math.round(r.best)}%</td>
-                  </tr>
-                `).join("")}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
-    }catch(err){
-      console.error("ranking error",err);
-      container.innerHTML = `<div class="error">Reytingni yuklashda xatolik yuz berdi.</div>`;
-    }
-  }
-
-  function renderQuizResultInOverlay(score,total,answers){
-    const percent = total ? Math.round((score/total)*100) : 0;
-    const motivBase = getMotivationMessage(score,total);
-    const passed = percent>=QUIZ_PASS_PERCENT;
-
-    let infoText;
-    if(!passed){
-      infoText = "Siz bu darsni to‘liq o‘zlashtira olmadingiz. Avval dars videosini qayta ko‘rib, quizdan natijani kamida 30% qilish kerak. Shundagina keyingi darslar ochiladi va davom etishingiz mumkin.";
-    }else{
-      infoText = "Tabriklaymiz! Natijangiz 30% dan yuqori. Bu dars muvaffaqiyatli yakunlandi va keyingi darslar ochildi. Endi kursni davom ettirishingiz mumkin.";
-    }
-
-    let detailsHtml = "";
-    currentLessonQuiz.forEach((q,idx)=>{
-      const userAns = answers[idx];
-      const correctIdx = q.correctIndex||0;
-      const correctLetter = ["A","B","C","D"][correctIdx];
-      const userLetter = userAns!=null ? ["A","B","C","D"][userAns] : null;
-      const isCorrect = userAns===correctIdx;
-
-      detailsHtml += `
-        <div class="quiz-result-item">
-          <div class="quiz-question-title">${idx+1}-savol. ${q.question}</div>
-          <div style="margin-top:4px;">
-            ${
-              userAns==null
-              ? `<span class="quiz-wrong">Javob berilmagan</span>`
-              : isCorrect
-                ? `<span class="quiz-correct">To‘g‘ri javob (${userLetter})</span>`
-                : `<span class="quiz-wrong">Xato javob (${userLetter})</span>`
-            }
-          </div>
-          <div style="margin-top:2px;">
-            To‘g‘ri javob: <span class="quiz-correct">${correctLetter}) ${q.options[correctIdx]}</span>
-          </div>
-        </div>
-      `;
-    });
-
-    clearQuizAutoNextTimer();
-
-    quizOverlayBox.innerHTML = `
-      <div>
-        <div class="quiz-overlay-title">Natijangiz: ${score} / ${total} (${percent}%)</div>
-        <div class="quiz-overlay-sub">${infoText}<br><br>${motivBase}</div>
-        <div style="text-align:center;margin-bottom:6px;">
-          <button type="button" class="btn-xs" id="quiz-download-pdf">
-            Quiz natijasini PDF ko‘rinishida yuklab olish
-          </button>
-        </div>
-        ${detailsHtml}
-        <div style="display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
-          <button type="button" class="btn-xs" id="quiz-review-lesson-btn">Darsni qayta ko‘rish</button>
-          <button type="button" class="btn-xs" id="quiz-ranking-btn">Natijalar (reyting)</button>
-          <button type="button" class="btn" id="quiz-overlay-continue-btn">Kursni davom ettirish</button>
-        </div>
-        <div id="quiz-auto-next-info" class="muted" style="margin-top:6px;text-align:center;"></div>
-        <div id="quiz-ranking-container"></div>
-      </div>
-    `;
-
-    const reviewBtn = document.getElementById("quiz-review-lesson-btn");
-    const contBtn = document.getElementById("quiz-overlay-continue-btn");
-    const rankingBtn = document.getElementById("quiz-ranking-btn");
-    const autoInfo = document.getElementById("quiz-auto-next-info");
-    const pdfBtn = document.getElementById("quiz-download-pdf");
-
-    if(pdfBtn){
-      pdfBtn.onclick = ()=>{
-        const curLesson = getCurrentLesson();
-        generateQuizResultPdf(curLesson ? curLesson.title : "Dars", score, total, answers, currentLessonQuiz);
-      };
-    }
-
-    if(reviewBtn){
-      reviewBtn.onclick = ()=>{
-        clearQuizAutoNextTimer();
-        const lesson = getCurrentLesson();
-        closeQuizOverlay();
-        if(lesson) openLessonPlayer(lesson);
-      };
-    }
-
-    if(rankingBtn){
-      rankingBtn.onclick = showQuizRankingInOverlay;
-    }
-
-    if(contBtn){
-      contBtn.onclick = ()=>{
-        clearQuizAutoNextTimer();
-        const lesson = getCurrentLesson();
-        closeQuizOverlay();
-        if(passed && currentCourseDetail && lesson){
-          const lessons = currentCourseDetail.lessons||[];
-          const idx = lessons.findIndex(l=>l.id===lesson.id);
-          if(idx>=0 && idx<lessons.length-1){
-            openLessonPlayer(lessons[idx+1]);
-          }
-        }
-      };
-    }
-
-    if(autoInfo){
-      autoInfo.textContent = "Keyingi darsga o‘tish uchun pastdagi “Kursni davom ettirish” tugmasini bosing.";
-    }
-  }
-
 
   async function showQuizRankingInOverlay(){
     if(!currentCourseDetail || !currentLessonId || !data.currentUser) return;
@@ -2488,6 +2321,13 @@
     currentLessonQuiz = lesson.quiz || [];
     quizCurrentIndex = 0;
     quizAnswers = {};
+
+    // 👉 darsga tegishli umumiy test vaqti
+    currentQuizTotalMinutes =
+      typeof lesson.quizTotalMinutes === "number" && lesson.quizTotalMinutes > 0
+        ? lesson.quizTotalMinutes
+        : QUIZ_TOTAL_MINUTES;
+
     lessonPlayerTitle.textContent = lesson.title;
     lessonVideoWrapper.classList.remove("hidden");
     lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
