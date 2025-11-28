@@ -143,7 +143,6 @@
       gap:10px;
     }
 
-    /* KO‘ZGA KO‘RINARLI ASOSIY BUTTON */
     .btn{
       align-self:flex-start;
       padding:10px 20px;
@@ -376,7 +375,7 @@
       transition:width .2s ease;
     }
 
-    /* QUIZ OVERLAY (FULL SCREEN) */
+    /* QUIZ OVERLAY */
     .quiz-overlay{
       position:fixed;
       inset:0;
@@ -497,7 +496,7 @@
       color:#92400e;
     }
 
-    /* Kurs tanlash MODAL */
+    /* MODAL */
     .modal{
       position:fixed;
       inset:0;
@@ -564,7 +563,7 @@
     }
     .footer small{opacity:.8;}
 
-    /* QUIZ TUGMASI STILI (QIZIL, KATTA MATN) */
+    /* QUIZ TUGMASI – QIZIL, KATTA MATNLI */
     #lesson-quiz-btn{
       border-radius:999px;
       border:1px solid #fecaca;
@@ -578,7 +577,7 @@
       text-align:left;
     }
 
-    /* ===== MOBIL MOSLASH ===== */
+    /* MOBIL */
     @media(max-width:768px){
       .header{
         flex-direction:column;
@@ -623,12 +622,12 @@
     }
   </style>
 
-  <!-- FIREBASE (compat) -->
+  <!-- FIREBASE -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <!-- YOUTUBE IFRAME API -->
   <script src="https://www.youtube.com/iframe_api"></script>
-  <!-- jsPDF (PDF yaratish uchun) -->
+  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
@@ -645,7 +644,7 @@
   </header>
 
   <main class="container">
-    <!-- AUTH SECTION -->
+    <!-- AUTH -->
     <section id="auth-section" class="section">
       <div class="grid-2">
         <div>
@@ -660,7 +659,6 @@
               <button class="tab-btn" data-tab="register">Ro‘yxatdan o‘tish</button>
             </div>
 
-            <!-- Login form -->
             <form id="login-form" class="form">
               <div class="form-row">
                 <label for="login-username">Login</label>
@@ -674,7 +672,6 @@
               <div id="login-error" class="error"></div>
             </form>
 
-            <!-- Register form -->
             <form id="register-form" class="form hidden">
               <div class="form-row">
                 <label for="reg-username">Login</label>
@@ -711,23 +708,22 @@
               Har bir dars bo‘yicha ko‘rilgan <b>foiz</b> saqlanib boradi. Dars kamida
               <b>10%</b> ko‘rilganda video bo‘yicha tugallangan hisoblanadi va oldinga yana
               <b>3 ta dars</b> ochiladi (agar quizdan kamida 30% olsa).<br>
-              Agar darsga <b>quiz</b> biriktirilgan bo‘lsa, dars tugayotganida
-              ekranni batamom egallagan <b>katta quiz oynasi</b> chiqadi yoki darsdan
-              keyin alohida tugma orqali <b>quizni qayta ishlash</b> mumkin.
+              Agar darsga <b>quiz</b> biriktirilgan bo‘lsa, dars oxirida yoki alohida tugma orqali
+              <b>katta fullscreen quiz oynasi</b> ishlaydi.
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ADMIN SECTION -->
+    <!-- ADMIN -->
     <section id="admin-section" class="section hidden">
       <div class="card">
         <div class="section-header">
           <div>
             <h2>Admin panel</h2>
             <p class="sub">
-              Bu qismga faqat admin kirishi mumkin. Kurslar, darslar va foydalanuvchilar shu yerda boshqariladi.
+              Kurslar, darslar va foydalanuvchilar shu yerda boshqariladi.
             </p>
           </div>
           <span class="pill">Rol: Admin</span>
@@ -776,7 +772,7 @@
       </div>
     </section>
 
-    <!-- USER SECTION -->
+    <!-- USER -->
     <section id="user-section" class="section hidden">
       <div class="card">
         <div class="section-header">
@@ -794,7 +790,6 @@
           <span class="muted" id="user-course-count">0 ta kurs</span>
         </div>
 
-        <!-- Kurslar ro'yxati -->
         <div id="user-courses-view">
           <div id="user-course-list" class="course-grid"></div>
           <div id="user-empty" class="empty">
@@ -802,7 +797,6 @@
           </div>
         </div>
 
-        <!-- Bitta kurs ichiga kirilganda -->
         <div id="user-course-detail" class="hidden">
           <button class="btn" id="user-back-btn" style="margin-bottom:8px;">← Kurslar paneliga qaytish</button>
           <h3 id="detail-title" style="font-size:18px;margin-bottom:4px;"></h3>
@@ -817,7 +811,6 @@
               <div class="video-wrapper hidden" id="lesson-video-wrapper">
                 <div id="yt-player"></div>
               </div>
-              <!-- YANGI: Quiz tugmasi (darsdan keyin ham ishlasin) -->
               <button type="button" class="btn-xs hidden" id="lesson-quiz-btn" style="margin-top:4px;align-self:flex-start;">
                 Quizni ishlash (bu quizni kamida 30% ishlang keyingi dars ochiladi)
               </button>
@@ -838,7 +831,6 @@
     </section>
   </main>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-inner">
       <small>© Ona tili Pro online o‘quv markazi — bilimlaringiz uchun raqamli hamroh.</small>
@@ -849,7 +841,7 @@
   </footer>
 </div>
 
-<!-- Kurs tanlash MODAL -->
+<!-- KURS TANLASH MODAL -->
 <div id="course-modal" class="modal hidden">
   <div class="modal-backdrop"></div>
   <div class="modal-content">
@@ -866,12 +858,12 @@
   </div>
 </div>
 
-<!-- QUIZ FULLSCREEN OVERLAY -->
+<!-- QUIZ OVERLAY -->
 <div id="quiz-overlay" class="quiz-overlay hidden">
   <div class="quiz-overlay-backdrop"></div>
   <div class="quiz-overlay-content">
     <div class="quiz-overlay-box" id="quiz-overlay-box">
-      <!-- JS orqali to‘ldiriladi -->
+      <!-- JS bilan to‘ldiriladi -->
     </div>
   </div>
 </div>
@@ -881,7 +873,7 @@
   let ytApiReady = false;
   function onYouTubeIframeAPIReady(){ ytApiReady = true; }
 
-  /* FIREBASE INIT */
+  /* FIREBASE */
   const firebaseConfig = {
     apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
     authDomain: "shahboz-5d0a3.firebaseapp.com",
@@ -924,13 +916,12 @@
     }catch{ return null; }
   }
 
-  /* PAROLNI HASH QILISH (SHA-256) */
+  /* PAROL HASH (admin uchun) */
   async function hashPassword(str){
     const enc = new TextEncoder().encode(str);
     const buf = await crypto.subtle.digest("SHA-256", enc);
     return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
   }
-
   async function ensureDefaultAdmin(){
     const adminUsername = "Shahbozbek0603";
     const adminPlain = "06032768shahbozqwertyasdf";
@@ -1027,10 +1018,31 @@
     if(percent>=60) return "Yaxshi urinish! Ba’zi joylarni yana bir bor takrorlab chiqsangiz, natija yanada oshadi. 👍";
     return "Hali hammasi oldinda. Yana bir marta darsni ko‘rib, qayta urinish tavsiya qilinadi. Siz albatta uddalaysiz! 🌱";
   }
-
   function getCurrentLesson(){
     if(!data.currentUser || !currentCourseDetail || !currentLessonId) return null;
     return (currentCourseDetail.lessons||[]).find(l=>l.id===currentLessonId) || null;
+  }
+
+  /* ORIENTATSIYA / FULLSCREEN NAZORATI – YANGI */
+  function unlockOrientation(){
+    try{
+      if(screen.orientation && screen.orientation.unlock){
+        screen.orientation.unlock();
+      }
+    }catch(e){}
+  }
+  function exitAnyFullscreen(){
+    if(document.fullscreenElement){
+      try{ document.exitFullscreen(); }catch(e){}
+    }
+    unlockOrientation();
+  }
+  function tryLockLandscape(){
+    try{
+      if(screen.orientation && screen.orientation.lock){
+        screen.orientation.lock('landscape').catch(()=>{});
+      }
+    }catch(e){}
   }
 
   /* PROGRESS (Firestore) */
@@ -1052,7 +1064,7 @@
     const prev = d.lessons[lessonId] || {};
     const safePercent = Math.min(99, Math.max(0, percent||0));
     const maxPercent = Math.max(prev.percent||0, safePercent);
-    const videoCompleted = prev.videoCompleted || completedFlag || maxPercent>=10; // 10% dan boshlab video tugallangan
+    const videoCompleted = prev.videoCompleted || completedFlag || maxPercent>=10;
     d.lessons[lessonId] = { ...prev, percent:maxPercent, videoCompleted };
     await ref.set(d);
     return d;
@@ -1066,7 +1078,7 @@
     const prev = d.lessons[lessonId] || {};
     const attempts = (prev.quizAttempts||0)+1;
     const quizBestPercent = Math.max(prev.quizBestPercent||0, scorePercent||0);
-    const quizPassed = prev.quizPassed || scorePercent>=30; // Quiz uchun 30% shart
+    const quizPassed = prev.quizPassed || scorePercent>=30;
     d.lessons[lessonId] = { ...prev, quizAttempts:attempts, quizBestPercent, quizPassed };
     await ref.set(d);
     return d;
@@ -1120,7 +1132,7 @@
     renderAdminUsers(snap.docs.map(d=>d.data()));
   }
 
-  /* RENDER ADMIN USERS */
+  /* ADMIN USERS */
   function renderAdminUsers(users){
     adminUserCount.textContent = users.length+" ta foydalanuvchi";
     if(!users.length){
@@ -1138,7 +1150,7 @@
       </div>`;
   }
 
-  /* RENDER ADMIN COURSES + QUIZ BUILDER (vaqt bilan) */
+  /* ADMIN COURSES + QUIZ BUILDER */
   function renderAdminCourses(){
     const courses = data.courses||[];
     adminCourseList.innerHTML="";
@@ -1231,7 +1243,7 @@
     });
   }
 
-  /* Quiz builder: on/off */
+  /* QUIZ BUILDER */
   adminCourseList.addEventListener("change",e=>{
     if(!e.target.classList.contains("quiz-toggle")) return;
     const form = e.target.closest("form");
@@ -1240,7 +1252,6 @@
     builder.classList.toggle("hidden", !e.target.checked);
   });
 
-  /* Quiz builder: savol qo‘shish (vaqt bilan) */
   adminCourseList.addEventListener("click",e=>{
     const btn = e.target.closest(".btn-add-question");
     if(!btn) return;
@@ -1294,7 +1305,6 @@
     container.appendChild(block);
   });
 
-  /* Admin: dars qo‘shish (quiz + timeLimit) */
   adminCourseList.addEventListener("submit",async e=>{
     if(!e.target.classList.contains("lesson-form")) return;
     e.preventDefault();
@@ -1353,7 +1363,7 @@
     }
   });
 
-  /* Admin: kurs / dars o‘chirish va tartiblash */
+  /* ADMIN – kurs/dars tartiblash */
   adminCourseList.addEventListener("click",async e=>{
     const courseDel = e.target.closest(".btn-delete-course");
     const lessonDel = e.target.closest(".btn-lesson-delete");
@@ -1436,7 +1446,7 @@
     });
   }
 
-  /* MODAL Kurs tanlash */
+  /* MODAL – kurs tanlash */
   function renderCourseModalList(){
     const courses = data.courses||[];
     courseModalList.innerHTML="";
@@ -1482,7 +1492,7 @@
     await openUserCourseDetail(courseId);
   });
 
-  /* LESSON / PLAYER / QUIZ STATE */
+  /* PLAYER/QUIZ STATE */
   let currentCourseDetail = null;
   let currentCourseProgress = null;
   let currentPlayer = null;
@@ -1498,6 +1508,11 @@
   let quizRemaining = 0;
 
   let quizAutoNextTimerId = null;
+
+  /* YANGI: video boshlanishini nazorat qilish uchun flaglar */
+  let pendingStartPercent = 0;
+  let pendingStartApplied = true;
+
   function clearQuizTimer(){
     if(quizTimerId){
       clearInterval(quizTimerId);
@@ -1511,7 +1526,6 @@
     }
   }
 
-  /* Progressni bir marta majburan saqlash */
   async function saveCurrentLessonProgressOnce(){
     try{
       if(!currentPlayer || !currentCourseDetail || !currentLessonId || !data.currentUser) return;
@@ -1537,6 +1551,7 @@
     }
   }
 
+  /* YANGI: pleyerni faqat to‘xtatamiz, destroy QILMAYMIZ */
   function stopCurrentPlayer(){
     if(progressInterval){
       clearInterval(progressInterval);
@@ -1544,12 +1559,12 @@
     }
     if(currentPlayer){
       try{ currentPlayer.stopVideo(); }catch(e){}
-      try{ currentPlayer.destroy(); }catch(e){}
-      currentPlayer=null;
     }
     lessonVideoWrapper.classList.add("hidden");
+    exitAnyFullscreen();
   }
 
+  /* LESSON LIST RENDER */
   function renderCourseLessonsList(){
     const course = currentCourseDetail;
     const progress = currentCourseProgress || { lessons:{} };
@@ -1613,29 +1628,251 @@
     detailLessons.innerHTML = html;
   }
 
-  /* Fullscreen yordamchi (faqat QUIZ uchun) */
-  function exitAnyFullscreen(){
-    if(document.fullscreenElement){
-      try{
-        document.exitFullscreen();
-      }catch(e){}
-    }
-  }
-  function tryLockLandscape(){
-    try{
-      if(screen.orientation && screen.orientation.lock){
-        screen.orientation.lock('landscape').catch(()=>{});
+  /* PROGRESS INTERVAL (oxirgi 7 soniya) */
+  function startProgressInterval(){
+    if(!currentPlayer) return;
+    if(progressInterval) clearInterval(progressInterval);
+
+    progressInterval = setInterval(async ()=>{
+      if(!currentPlayer || typeof currentPlayer.getDuration!=="function") return;
+      const dur = currentPlayer.getDuration();
+      if(!dur || dur<=0) return;
+      const cur = currentPlayer.getCurrentTime()||0;
+      const remaining = dur - cur;
+
+      if(remaining<=7){
+        const effectiveTime = Math.max(0, dur - 7);
+        let effPercent = dur>0 ? (effectiveTime/dur)*100 : 0;
+        if(effPercent>99) effPercent = 99;
+        const roundedEff = Math.round(effPercent);
+
+        lessonProgressText.textContent = `Ko‘rilgan: ${roundedEff}%`;
+        lessonProgressBar.style.width = roundedEff+"%";
+
+        if(data.currentUser && currentCourseDetail && currentLessonId){
+          lastSavedPercent = Math.max(lastSavedPercent,roundedEff);
+          try{
+            const updated = await saveLessonProgress(
+              data.currentUser.username,
+              currentCourseDetail.id,
+              currentLessonId,
+              roundedEff,
+              roundedEff>=10
+            );
+            currentCourseProgress = updated;
+            renderCourseLessonsList();
+          }catch(err){
+            console.error("progress (last7) error",err);
+          }
+        }
+
+        try{ currentPlayer.pauseVideo(); }catch(e){}
+        stopCurrentPlayer();
+        if(currentLessonQuiz.length){
+          showQuizInviteOverlay();
+        }
+        return;
       }
-    }catch(e){}
+
+      let percent = (cur/dur)*100;
+      if(percent>99) percent = 99;
+      const rounded = Math.round(percent);
+      lessonProgressText.textContent = `Ko‘rilgan: ${rounded}%`;
+      lessonProgressBar.style.width = rounded+"%";
+
+      if(!data.currentUser || !currentCourseDetail || !currentLessonId) return;
+
+      const lp = (currentCourseProgress?.lessons||{})[currentLessonId] || {};
+      const videoCompleted = lp.videoCompleted || (lp.percent>=10);
+      if(videoCompleted) return;
+
+      if(rounded - lastSavedPercent >= 15 || rounded>=10){
+        lastSavedPercent = rounded;
+        try{
+          const updated = await saveLessonProgress(
+            data.currentUser.username,
+            currentCourseDetail.id,
+            currentLessonId,
+            rounded>=10?rounded:rounded
+          , rounded>=10);
+          currentCourseProgress = updated;
+          renderCourseLessonsList();
+        }catch(err){
+          console.error("progress error",err);
+        }
+      }
+    },5000);
   }
 
-  /* QUIZ OVERLAY FUNKSIYALARI */
+  /* YANGI: video boshlanish pozitsiyasini qo‘llash */
+  function applyStartPosition(player){
+    if(pendingStartApplied) return;
+    if(!pendingStartPercent || pendingStartPercent<=0){
+      pendingStartApplied = true;
+      try{ player.playVideo(); }catch(e){}
+      startProgressInterval();
+      return;
+    }
+    const dur = player.getDuration();
+    if(!dur || !isFinite(dur)){
+      // duration hali tayyor emas – PLAYING qayta kelganida yana chaqiriladi
+      return;
+    }
+    const startSec = (pendingStartPercent/100)*dur;
+    try{
+      player.seekTo(startSec,true);
+      player.playVideo();
+    }catch(e){}
+    pendingStartApplied = true;
+    startProgressInterval();
+  }
+
+  /* DARSNI OCHISH – YANGI: BIRTA YT PLAYERNI QAYTA ISHLATISH */
+  async function openLessonPlayer(lesson){
+    if(!currentCourseDetail || !data.currentUser) return;
+
+    stopCurrentPlayer();
+    closeQuizOverlay();
+
+    currentLessonId = lesson.id;
+    currentLessonQuiz = lesson.quiz || [];
+    quizCurrentIndex = 0;
+    quizAnswers = {};
+    lessonPlayerTitle.textContent = lesson.title;
+    lessonVideoWrapper.classList.remove("hidden");
+    lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
+    lessonProgressBar.style.width = "0%";
+    lastSavedPercent = 0;
+
+    if(currentLessonQuiz.length){
+      lessonQuizBtn.classList.remove("hidden");
+    }else{
+      lessonQuizBtn.classList.add("hidden");
+    }
+
+    const info = (currentCourseProgress?.lessons||{})[lesson.id] || { percent:0 };
+    const resumePercent = info.percent && info.percent<95 ? info.percent : 0;
+    lastSavedPercent = resumePercent;
+
+    pendingStartPercent = resumePercent;
+    pendingStartApplied = false;
+
+    if(!ytApiReady){
+      lessonProgressText.textContent="YouTube API yuklanmoqda...";
+      const check = setInterval(()=>{
+        if(ytApiReady){
+          clearInterval(check);
+          openLessonPlayer(lesson);
+        }
+      },500);
+      return;
+    }
+
+    if(!currentPlayer){
+      currentPlayer = new YT.Player("yt-player",{
+        videoId: lesson.videoId,
+        playerVars:{rel:0,modestbranding:1},
+        events:{
+          onReady:(event)=>{
+            applyStartPosition(event.target);
+          },
+          onStateChange:(event)=>{
+            if(event.data === YT.PlayerState.PLAYING){
+              applyStartPosition(event.target);
+            }
+          }
+        }
+      });
+    }else{
+      try{
+        currentPlayer.loadVideoById(lesson.videoId);
+        currentPlayer.playVideo();
+      }catch(e){
+        // agar loadVideoById xato bo‘lsa, fallback sifatida yangi pleyer
+        try{ currentPlayer.destroy(); }catch(_){}
+        currentPlayer = new YT.Player("yt-player",{
+          videoId: lesson.videoId,
+          playerVars:{rel:0,modestbranding:1},
+          events:{
+            onReady:(event)=>{ applyStartPosition(event.target); },
+            onStateChange:(event)=>{
+              if(event.data === YT.PlayerState.PLAYING){
+                applyStartPosition(event.target);
+              }
+            }
+          }
+        });
+      }
+    }
+  }
+
+  /* KURS DETALI */
+  async function openUserCourseDetail(courseId){
+    const course = data.courses.find(c=>c.id===courseId);
+    if(!course || !data.currentUser) return;
+
+    exitAnyFullscreen();
+    await saveCurrentLessonProgressOnce();
+
+    currentCourseDetail = course;
+    currentCourseProgress = await loadProgress(data.currentUser.username,courseId);
+
+    detailTitle.textContent = course.title;
+    detailDesc.textContent = course.description||"";
+    const priceText = formatPrice(course.price);
+    detailMeta.innerHTML = `
+      ${course.category?`<span class="badge">${course.category}</span>`:""}
+      ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
+      <span class="badge">Darslar: ${(course.lessons||[]).length}</span>
+    `;
+    renderCourseLessonsList();
+    lessonPlayerTitle.textContent = "Dars tanlanmagan.";
+    lessonVideoWrapper.classList.add("hidden");
+    lessonProgressText.textContent = "";
+    lessonProgressBar.style.width = "0%";
+    lessonQuizBtn.classList.add("hidden");
+
+    userCoursesView.classList.add("hidden");
+    userCourseDetail.classList.remove("hidden");
+  }
+
+  /* LESSON LIST CLICK */
+  detailLessons.addEventListener("click",async e=>{
+    const item = e.target.closest(".lesson-item");
+    if(!item) return;
+    const unlocked = item.dataset.unlocked==="1";
+    if(!unlocked){
+      alert("Bu dars hozircha yopiq. Avval oldingi darsni video bo‘yicha kamida 10% ko‘rib, quizdan kamida 30% natija oling. Shundagina bu dars ochiladi.");
+      return;
+    }
+    const lessonId = item.dataset.lessonId;
+    const lesson = (currentCourseDetail.lessons||[]).find(l=>l.id===lessonId);
+    if(!lesson) return;
+    await openLessonPlayer(lesson);
+  });
+
+  function showUserCoursesList(){
+    stopCurrentPlayer();
+    closeQuizOverlay();
+    userCoursesView.classList.remove("hidden");
+    userCourseDetail.classList.add("hidden");
+  }
+
+  userCourseList.addEventListener("click",async e=>{
+    const btn = e.target.closest(".btn-open-course");
+    if(!btn) return;
+    const courseId = btn.dataset.courseId;
+    await openUserCourseDetail(courseId);
+  });
+  userBackBtn.addEventListener("click",showUserCoursesList);
+
+  /* QUIZ OVERLAY */
   function closeQuizOverlay(){
     clearQuizTimer();
     clearQuizAutoNextTimer();
     quizOverlay.classList.add("hidden");
     quizOverlayBox.innerHTML = "";
-    exitAnyFullscreen(); // QUIZ tugagach fullscreendan chiqamiz
+    exitAnyFullscreen();
   }
 
   function showQuizInviteOverlay(){
@@ -1757,7 +1994,6 @@
     }
   }
 
-  /* PDF YARATISH: QUIZ NATIJALARI VA JAVOBLAR KALITI */
   function generateQuizResultPdf(score, total, answers){
     if(!(window.jspdf && window.jspdf.jsPDF)) {
       console.warn("jsPDF topilmadi, PDF yaratilmaydi.");
@@ -1818,7 +2054,6 @@
       y += 5;
     });
 
-    /* Oxirida JAVOBLAR KALITI (faqat to‘g‘ri javoblar) */
     if(y > 260){
       doc.addPage();
       y = 10;
@@ -1866,10 +2101,7 @@
       console.error("quiz attempt save error",err);
     }
 
-    // Quiz tugashi bilan PDFni avtomatik yuklash
     generateQuizResultPdf(score, total, quizAnswers);
-
-    // Ekranda natijalar oynasini ko‘rsatish
     renderQuizResultInOverlay(score,total,quizAnswers);
   }
 
@@ -1880,9 +2112,9 @@
 
     let infoText;
     if(!passed){
-      infoText = "Siz bu darsni to‘liq o‘zlashtira olmadingiz. Avval dars videosini kamida 10% ko‘rib, quiz natijasini kamida 30% qilish kerak. Shundagina keyingi darslar ochiladi va davom etishingiz mumkin.";
+      infoText = "Siz bu darsni to‘liq o‘zlashtira olmadingiz. Avval dars videosini kamida 10% ko‘rib, quiz natijasini kamida 30% qilish kerak. Shundagina keyingi darslar ochiladi.";
     }else{
-      infoText = "Tabriklaymiz! Natijangiz 30% dan yuqori. Bu dars muvaffaqiyatli yakunlandi va keyingi 3 ta dars (agar mavjud bo‘lsa) ochildi. Endi kursni davom ettirishingiz mumkin.";
+      infoText = "Tabriklaymiz! Natijangiz 30% dan yuqori. Bu dars muvaffaqiyatli yakunlandi va keyingi 3 ta dars ochildi.";
     }
 
     let detailsHtml = "";
@@ -1926,7 +2158,7 @@
         <div style="display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
           <button type="button" class="btn-xs" id="quiz-review-lesson-btn">Darsni qayta ko‘rish</button>
           <button type="button" class="btn-xs" id="quiz-ranking-btn">Natijalar (reyting)</button>
-          <button type="button" class="btn-xs" id="quiz-pdf-btn">Natijalarni PDF ko‘rinishda yuklab olish</button>
+          <button type="button" class="btn-xs" id="quiz-pdf-btn">Natijalarni PDF yuklash</button>
           <button type="button" class="btn" id="quiz-overlay-continue-btn">Kursni davom ettirish (keyingi dars)</button>
         </div>
         <div id="quiz-ranking-container"></div>
@@ -2030,213 +2262,15 @@
     }
   }
 
-  /* PROGRESS INTERVAL — oxirgi 7 soniya mantiqi */
-  function startProgressInterval(){
-    if(!currentPlayer) return;
-    if(progressInterval) clearInterval(progressInterval);
-
-    progressInterval = setInterval(async ()=>{
-      if(!currentPlayer || typeof currentPlayer.getDuration!=="function") return;
-      const dur = currentPlayer.getDuration();
-      if(!dur || dur<=0) return;
-      const cur = currentPlayer.getCurrentTime()||0;
-      const remaining = dur - cur;
-
-      // Oxirgi 7 soniyadan oldin to‘xtatish
-      if(remaining<=7){
-        const effectiveTime = Math.max(0, dur - 7);
-        let effPercent = dur>0 ? (effectiveTime/dur)*100 : 0;
-        if(effPercent>99) effPercent = 99;
-        const roundedEff = Math.round(effPercent);
-
-        lessonProgressText.textContent = `Ko‘rilgan: ${roundedEff}%`;
-        lessonProgressBar.style.width = roundedEff+"%";
-
-        if(data.currentUser && currentCourseDetail && currentLessonId){
-          lastSavedPercent = Math.max(lastSavedPercent,roundedEff);
-          try{
-            const updated = await saveLessonProgress(
-              data.currentUser.username,
-              currentCourseDetail.id,
-              currentLessonId,
-              roundedEff,
-              roundedEff>=10
-            );
-            currentCourseProgress = updated;
-            renderCourseLessonsList();
-          }catch(err){
-            console.error("progress (last7) error",err);
-          }
-        }
-
-        try{ currentPlayer.pauseVideo(); }catch(e){}
-        stopCurrentPlayer();     // Videoni butunlay yig‘ishtiramiz
-        exitAnyFullscreen();     // Video fullscreendan chiqadi
-
-        if(currentLessonQuiz.length){
-          showQuizInviteOverlay(); // har qanday darsda quiz bo‘lsa, albatta chiqadi
-        }
-
-        return;
-      }
-
-      let percent = (cur/dur)*100;
-      if(percent>99) percent = 99;
-      const rounded = Math.round(percent);
-      lessonProgressText.textContent = `Ko‘rilgan: ${rounded}%`;
-      lessonProgressBar.style.width = rounded+"%";
-
-      if(!data.currentUser || !currentCourseDetail || !currentLessonId) return;
-
-      const lp = (currentCourseProgress?.lessons||{})[currentLessonId] || {};
-      const videoCompleted = lp.videoCompleted || (lp.percent>=10);
-      if(videoCompleted) return;
-
-      if(rounded - lastSavedPercent >= 15 || rounded>=10){
-        lastSavedPercent = rounded;
-        try{
-          const updated = await saveLessonProgress(
-            data.currentUser.username,
-            currentCourseDetail.id,
-            currentLessonId,
-            rounded,
-            rounded>=10
-          );
-          currentCourseProgress = updated;
-          renderCourseLessonsList();
-        }catch(err){
-          console.error("progress error",err);
-        }
-      }
-    },5000);
-  }
-
-  /* Darsni ochish */
-  async function openLessonPlayer(lesson){
-    if(!currentCourseDetail || !data.currentUser) return;
-
-    stopCurrentPlayer();
-    closeQuizOverlay();
-
-    currentLessonId = lesson.id;
-    currentLessonQuiz = lesson.quiz || [];
-    quizCurrentIndex = 0;
-    quizAnswers = {};
-    lessonPlayerTitle.textContent = lesson.title;
-    lessonVideoWrapper.classList.remove("hidden");
-    lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
-    lessonProgressBar.style.width = "0%";
-    lastSavedPercent = 0;
-
-    // Quiz tugmasini ko‘rsatish / yashirish
-    if(currentLessonQuiz.length){
-      lessonQuizBtn.classList.remove("hidden");
-    }else{
-      lessonQuizBtn.classList.add("hidden");
-    }
-
-    const info = (currentCourseProgress?.lessons||{})[lesson.id] || { percent:0 };
-    const resumePercent = info.percent && info.percent<95 ? info.percent : 0;
-    lastSavedPercent = resumePercent;
-
-    if(!ytApiReady){
-      lessonProgressText.textContent="YouTube API yuklanmoqda...";
-      const check = setInterval(()=>{
-        if(ytApiReady){
-          clearInterval(check);
-          openLessonPlayer(lesson);
-        }
-      },500);
-      return;
-    }
-
-    currentPlayer = new YT.Player("yt-player",{
-      videoId: lesson.videoId,
-      playerVars:{rel:0,modestbranding:1},
-      events:{
-        onReady:(event)=>{
-          const player = event.target;
-          if(resumePercent>0){
-            const dur = player.getDuration();
-            const start = (resumePercent/100)*dur;
-            if(start && isFinite(start)) player.seekTo(start,true);
-          }
-          player.playVideo();
-          startProgressInterval();
-        },
-        onStateChange:(event)=>{
-          if(event.data === YT.PlayerState.ENDED){
-            // Oxirgi 7 soniya logikasi interval ichida hal qilinyapti.
-          }
-        }
-      }
-    });
-  }
-
-  /* Kurs detali */
-  async function openUserCourseDetail(courseId){
-    const course = data.courses.find(c=>c.id===courseId);
-    if(!course || !data.currentUser) return;
-
-    currentCourseDetail = course;
-    currentCourseProgress = await loadProgress(data.currentUser.username,courseId);
-
-    detailTitle.textContent = course.title;
-    detailDesc.textContent = course.description||"";
-    const priceText = formatPrice(course.price);
-    detailMeta.innerHTML = `
-      ${course.category?`<span class="badge">${course.category}</span>`:""}
-      ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
-      <span class="badge">Darslar: ${(course.lessons||[]).length}</span>
-    `;
-    renderCourseLessonsList();
-    lessonPlayerTitle.textContent = "Dars tanlanmagan.";
-    lessonVideoWrapper.classList.add("hidden");
-    lessonProgressText.textContent = "";
-    lessonProgressBar.style.width = "0%";
-    lessonQuizBtn.classList.add("hidden");
-
-    userCoursesView.classList.add("hidden");
-    userCourseDetail.classList.remove("hidden");
-  }
-
-  /* Darslar listi click */
-  detailLessons.addEventListener("click",async e=>{
-    const item = e.target.closest(".lesson-item");
-    if(!item) return;
-    const unlocked = item.dataset.unlocked==="1";
-    if(!unlocked){
-      alert("Bu dars hozircha yopiq. Avval oldingi darsni video bo‘yicha kamida 10% ko‘rib, quizdan kamida 30% natija oling. Shundagina bu dars ochiladi.");
-      return;
-    }
-    const lessonId = item.dataset.lessonId;
-    const lesson = (currentCourseDetail.lessons||[]).find(l=>l.id===lessonId);
-    if(!lesson) return;
-    await openLessonPlayer(lesson);
-  });
-
-  function showUserCoursesList(){
-    stopCurrentPlayer();
-    closeQuizOverlay();
-    userCoursesView.classList.remove("hidden");
-    userCourseDetail.classList.add("hidden");
-  }
-
-  userCourseList.addEventListener("click",async e=>{
-    const btn = e.target.closest(".btn-open-course");
-    if(!btn) return;
-    const courseId = btn.dataset.courseId;
-    await openUserCourseDetail(courseId);
-  });
-  userBackBtn.addEventListener("click",showUserCoursesList);
-
-  /* Quiz tugmasi (darsdan keyin ham ishlasin) */
+  /* QUIZ TUGMASI – darsdan keyin ham ishlasin
+     YANGI: video fullscreen bo‘lsa, avval chiqaramiz */
   if(lessonQuizBtn){
     lessonQuizBtn.addEventListener("click",()=>{
       if(!currentLessonQuiz.length){
         alert("Bu darsga quiz biriktirilmagan.");
         return;
       }
+      exitAnyFullscreen();
       showQuizInviteOverlay();
     });
   }
@@ -2356,7 +2390,7 @@
     updateUI();
   });
 
-  /* NAV */
+  /* NAVIGATION */
   navCourses.addEventListener("click",e=>{
     e.preventDefault();
     if(!data.currentUser){
