@@ -2,150 +2,2573 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <title>Ona tili Pro — LMS Platforma</title>
+  <title>Ona tili Pro — Online o‘quv markazi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(180deg,#020617 0%,#0f172a 18%,#111827 28%,#f97316 28.1%,#fef3c7 60%,#f3f4f6 100%);
+      color:#111827;
+    }
+    a{text-decoration:none;color:inherit}
+    .page{min-height:100vh;display:flex;flex-direction:column;}
 
-  <link rel="stylesheet" href="style.css" />
+    /* HEADER */
+    .header{
+      position:sticky;top:0;z-index:10;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 16px;
+      background:linear-gradient(90deg,#020617,#0f172a,#111827,#1f2937);
+      color:#e5e7eb;
+      border-bottom:1px solid rgba(148,163,184,0.4);
+      box-shadow:0 12px 30px rgba(15,23,42,0.7);
+    }
+    .logo{
+      font-weight:900;font-size:22px;letter-spacing:.06em;text-transform:uppercase;
+    }
+    .logo span{
+      color:#f97316;
+      text-shadow:0 0 18px rgba(249,115,22,0.9);
+    }
+    .nav{display:flex;align-items:center;gap:12px;font-size:14px;}
+    .nav a{color:#e5e7eb;opacity:.85;cursor:pointer;position:relative;padding-bottom:2px;}
+    .nav a::after{
+      content:"";position:absolute;left:0;bottom:0;width:0;height:2px;
+      background:linear-gradient(90deg,#f97316,#facc15);
+      transition:width .2s ease;
+    }
+    .nav a:hover{opacity:1;}
+    .nav a:hover::after{width:100%;}
+    .nav .user-label{font-size:13px;opacity:.8;}
+    .btn-outline{
+      border:1px solid rgba(248,250,252,0.7);
+      border-radius:999px;
+      padding:6px 14px;
+      font-size:13px;
+      cursor:pointer;
+      background:rgba(15,23,42,0.7);
+      color:#e5e7eb;
+      box-shadow:0 0 14px rgba(15,23,42,0.8);
+      transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+    }
+    .btn-outline:hover{
+      transform:translateY(-1px) scale(1.02);
+      background:rgba(15,23,42,0.95);
+      box-shadow:0 0 22px rgba(59,130,246,0.8);
+    }
 
-  <!-- FIREBASE -->
+    /* LAYOUT */
+    .container{
+      max-width:1120px;
+      margin:0 auto;
+      padding:18px 12px 32px;
+      flex:1 0 auto;
+    }
+    .section{margin-bottom:18px;}
+    .hidden{display:none;}
+
+    .card{
+      background:rgba(255,255,255,0.98);
+      border-radius:22px;
+      padding:18px 16px 20px;
+      box-shadow:0 22px 55px rgba(15,23,42,0.25);
+      border:1px solid rgba(148,163,184,0.5);
+      backdrop-filter:blur(10px);
+    }
+    .card h2{
+      font-size:19px;
+      margin-bottom:6px;
+    }
+    .card p.sub{
+      font-size:13px;
+      color:#6b7280;
+      margin-bottom:10px;
+    }
+    .hero-text{font-size:14px;color:#4b5563;}
+
+    .grid-2{
+      display:grid;
+      grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);
+      gap:16px;
+    }
+
+    /* FORM */
+    .tabs{
+      display:flex;
+      gap:4px;
+      margin-bottom:10px;
+      background:#e5e7eb;
+      border-radius:999px;
+      padding:4px;
+      width:max-content;
+      box-shadow:0 3px 12px rgba(148,163,184,0.6);
+    }
+    .tab-btn{
+      border:none;
+      border-radius:999px;
+      padding:6px 14px;
+      font-size:13px;
+      cursor:pointer;
+      background:transparent;
+      color:#374151;
+    }
+    .tab-btn.active{
+      background:#ffffff;
+      box-shadow:0 3px 10px rgba(15,23,42,0.26);
+      color:#111827;
+    }
+
+    .form{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:6px;
+    }
+    .form-row{display:flex;flex-direction:column;gap:4px;}
+    label{font-size:13px;color:#4b5563;}
+    input,textarea,select{
+      border-radius:12px;
+      border:1px solid #d1d5db;
+      padding:9px 11px;
+      background:#f9fafb;
+      font-size:15px;
+      color:#111827;
+      box-shadow:0 2px 5px rgba(148,163,184,0.35) inset;
+    }
+    textarea{min-height:70px;resize:vertical;}
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:10px;
+    }
+
+    .btn{
+      align-self:flex-start;
+      padding:10px 20px;
+      border-radius:999px;
+      border:1px solid rgba(249,115,22,0.9);
+      cursor:pointer;
+      background:linear-gradient(135deg,#f97316,#ea580c,#facc15);
+      background-size:220% 220%;
+      color:#ffffff;
+      font-weight:800;
+      font-size:15px;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      box-shadow:0 0 18px rgba(248,113,22,0.85);
+      transition:transform .15s ease,box-shadow .15s ease,filter .15s ease,background-position .4s ease;
+      animation:btnGlow 3s ease-in-out infinite;
+    }
+    .btn:hover{
+      transform:translateY(-2px) scale(1.02);
+      box-shadow:0 0 26px rgba(249,115,22,1);
+      filter:brightness(1.05);
+      background-position:100% 0;
+    }
+    .btn:active{
+      transform:translateY(0) scale(.99);
+      box-shadow:0 0 16px rgba(249,115,22,0.9);
+    }
+
+    @keyframes btnGlow{
+      0%,100%{box-shadow:0 0 16px rgba(249,115,22,0.7);}
+      50%{box-shadow:0 0 30px rgba(249,115,22,1);}
+    }
+
+    .btn-xs{
+      border-radius:999px;
+      border:1px solid #d1d5db;
+      padding:4px 9px;
+      font-size:11px;
+      background:linear-gradient(135deg,#ffffff,#f9fafb);
+      cursor:pointer;
+      box-shadow:0 2px 6px rgba(148,163,184,0.6);
+      transition:transform .12s ease,box-shadow .12s ease,background .12s ease;
+    }
+    .btn-xs:hover{
+      background:#f3f4f6;
+      transform:translateY(-1px);
+      box-shadow:0 4px 10px rgba(148,163,184,0.8);
+    }
+
+    /* Katta qizil QUIZ tugmasi */
+    .btn-quiz-main{
+      border-radius:999px;
+      padding:8px 16px;
+      font-size:14px;
+      font-weight:800;
+      border:1px solid #fecaca;
+      background:#fee2e2;
+      color:#b91c1c;
+      cursor:pointer;
+      box-shadow:0 0 14px rgba(248,113,22,0.7);
+      text-transform:uppercase;
+    }
+    .btn-quiz-main:hover{
+      background:#fecaca;
+      box-shadow:0 0 20px rgba(248,113,22,0.9);
+      transform:translateY(-1px);
+    }
+
+    .hint{font-size:11px;color:#6b7280;}
+    .error{font-size:12px;color:#b91c1c;margin-top:2px;}
+    .pill{
+      font-size:11px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:linear-gradient(135deg,#eff6ff,#dbeafe);
+      color:#1d4ed8;
+      width:max-content;
+      box-shadow:0 2px 8px rgba(59,130,246,0.5);
+      border:1px solid #bfdbfe;
+    }
+
+    /* COURSES */
+    .section-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .muted{font-size:13px;color:#6b7280;}
+
+    .course-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:12px;
+      margin-top:6px;
+    }
+    .course-card{
+      background:linear-gradient(135deg,#ffffff,#f9fafb);
+      border-radius:18px;
+      border:1px solid rgba(209,213,219,0.9);
+      padding:11px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      box-shadow:0 12px 26px rgba(148,163,184,0.4);
+    }
+    .course-title{font-size:15px;font-weight:700;color:#111827;}
+    .course-desc{
+      font-size:13px;
+      color:#4b5563;
+      max-height:60px;
+      overflow:hidden;
+    }
+    .course-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      font-size:11px;
+    }
+    .badge{
+      padding:3px 8px;
+      border-radius:999px;
+      background:#e5e7eb;
+      color:#374151;
+    }
+    .badge.free{background:#dcfce7;color:#166534;}
+    .badge.price{background:#fef9c3;color:#854d0e;}
+
+    .course-footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:12px;
+      color:#6b7280;
+      margin-top:4px;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .lesson-list{
+      margin-top:6px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .lesson-item{
+      background:#ffffff;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      padding:9px 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      transition:background .1s ease,box-shadow .1s ease,transform .05s ease,border-color .1s ease;
+      box-shadow:0 4px 10px rgba(148,163,184,0.45);
+    }
+    .lesson-item:hover{
+      background:#eef2ff;
+      box-shadow:0 7px 16px rgba(79,70,229,0.5);
+      transform:translateY(-1px);
+      border-color:#818cf8;
+    }
+    .lesson-item.locked{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+      background:#f9fafb;
+    }
+    .lesson-title{font-size:13px;font-weight:500;}
+    .lesson-status{font-size:11px;text-align:right;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;}
+
+    .video-wrapper{
+      position:relative;
+      padding-bottom:56.25%;
+      height:0;
+      overflow:hidden;
+      border-radius:16px;
+      background:#000;
+      margin-top:6px;
+      box-shadow:0 18px 40px rgba(15,23,42,0.9);
+    }
+    .video-wrapper iframe{
+      position:absolute;
+      top:0;left:0;width:100%;height:100%;
+      border:0;
+    }
+
+    .mini-form{
+      margin-top:6px;
+      border-top:1px dashed #e5e7eb;
+      padding-top:6px;
+    }
+
+    .empty{font-size:13px;color:#9ca3af;margin-top:6px;}
+
+    table.user-table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+      margin-top:4px;
+    }
+    table.user-table th,
+    table.user-table td{
+      text-align:left;
+      padding:4px 6px;
+      border-bottom:1px solid #f3f4f6;
+    }
+    table.user-table th{
+      border-bottom:1px solid #e5e7eb;
+      font-weight:600;
+      color:#4b5563;
+    }
+
+    /* LESSON PLAYER AREA */
+    .detail-layout{
+      display:grid;
+      grid-template-columns:minmax(0,0.8fr) minmax(0,1.4fr);
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .lesson-player-box{
+      margin-top:0;
+      background:linear-gradient(135deg,#eff6ff,#f9fafb);
+      border-radius:18px;
+      border:1px solid #dbeafe;
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      box-shadow:0 14px 32px rgba(59,130,246,0.4);
+    }
+    .progress-text{font-size:12px;color:#4b5563;margin-top:4px;}
+    .progress-bar-wrap{
+      margin-top:4px;
+      background:#e5e7eb;
+      border-radius:999px;
+      height:7px;
+      overflow:hidden;
+    }
+    .progress-bar{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg,#22c55e,#16a34a);
+      transition:width .2s ease;
+    }
+
+    /* QUIZ OVERLAY (FULL SCREEN) */
+    .quiz-overlay{
+      position:fixed;
+      inset:0;
+      z-index:60;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .quiz-overlay.hidden{display:none;}
+    .quiz-overlay-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(15,23,42,0.9);
+      backdrop-filter:blur(6px);
+    }
+    .quiz-overlay-content{
+      position:relative;
+      z-index:1;
+      width:100%;
+      max-width:960px;
+      max-height:92vh;
+      padding:16px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    .quiz-overlay-box{
+      width:100%;
+      max-height:100%;
+      overflow-y:auto;
+      background:#fffbeb;
+      border-radius:22px;
+      border:1px solid #fde68a;
+      box-shadow:0 26px 70px rgba(15,23,42,0.95);
+      padding:20px 18px 22px;
+    }
+    .quiz-overlay-title{
+      font-size:24px;
+      font-weight:900;
+      text-align:center;
+      margin-bottom:8px;
+      color:#92400e;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    .quiz-overlay-sub{
+      font-size:16px;
+      text-align:center;
+      margin-bottom:14px;
+      color:#78350f;
+    }
+
+    .quiz-question{
+      margin-top:10px;
+      padding:10px;
+      border-radius:16px;
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+      box-shadow:0 8px 20px rgba(148,163,184,0.45);
+    }
+    .quiz-question-title{
+      font-weight:700;
+      margin-bottom:6px;
+      font-size:17px;
+      color:#111827;
+    }
+    .quiz-options{
+      margin-top:6px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .quiz-option label{
+      display:flex;
+      gap:6px;
+      align-items:flex-start;
+      font-size:15px;
+      cursor:pointer;
+    }
+    .quiz-option input{
+      margin-top:3px;
+    }
+    .quiz-result-item{
+      margin-top:8px;
+      padding:8px;
+      border-radius:14px;
+      background:#f9fafb;
+      border:1px solid #e5e7eb;
+    }
+    .quiz-correct{
+      color:#15803d;
+      font-weight:700;
+    }
+    .quiz-wrong{
+      color:#b91c1c;
+      font-weight:700;
+    }
+
+    .quiz-top-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    #quiz-timer{
+      font-size:18px;
+      font-weight:800;
+      color:#b91c1c;
+      padding:4px 12px;
+      border-radius:999px;
+      background:#fee2e2;
+      border:1px solid #fecaca;
+      box-shadow:0 0 12px rgba(248,113,22,0.6);
+    }
+    .quiz-progress-small{
+      font-size:13px;
+      color:#92400e;
+    }
+
+    /* Kurs tanlash MODAL */
+    .modal{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
+    }
+    .modal.hidden{display:none;}
+    .modal-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(15,23,42,0.65);
+      backdrop-filter:blur(6px);
+    }
+    .modal-content{
+      position:relative;
+      z-index:1;
+      width:95%;
+      max-width:900px;
+      max-height:85vh;
+      background:#ffffff;
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 24px 60px rgba(15,23,42,0.75);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .modal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:4px;
+    }
+    .modal-body{overflow-y:auto;}
+    .modal-close{
+      border:none;
+      background:#e5e7eb;
+      border-radius:999px;
+      padding:4px 10px;
+      cursor:pointer;
+      font-size:13px;
+    }
+
+    /* FOOTER */
+    .footer{
+      background:#020617;
+      color:#e5e7eb;
+      padding:12px 20px;
+      font-size:12px;
+      margin-top:auto;
+      border-top:1px solid rgba(31,41,55,0.9);
+    }
+    .footer-inner{
+      max-width:1120px;
+      margin:0 auto;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .footer small{opacity:.8;}
+
+    /* MOBIL */
+    @media(max-width:768px){
+      .header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:6px;
+      }
+      .nav{
+        width:100%;
+        justify-content:space-between;
+      }
+      .container{
+        padding:14px 10px 22px;
+      }
+      .grid-2{
+        grid-template-columns:minmax(0,1fr);
+      }
+      .card{
+        padding:14px 12px 16px;
+        border-radius:18px;
+      }
+      .btn,
+      .btn-outline{
+        width:100%;
+        text-align:center;
+      }
+      .course-grid{
+        grid-template-columns:minmax(0,1fr);
+      }
+      .detail-layout{
+        grid-template-columns:1fr;
+      }
+      .lesson-item{
+        padding:9px 9px;
+      }
+      .quiz-overlay-box{
+        border-radius:0;
+        max-width:100%;
+        height:100%;
+      }
+      .quiz-overlay-title{font-size:22px;}
+      .quiz-overlay-sub{font-size:15px;}
+    }
+  </style>
+
+  <!-- FIREBASE (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
-  <!-- YouTube API -->
+  <!-- YOUTUBE IFRAME API -->
   <script src="https://www.youtube.com/iframe_api"></script>
-
+  <!-- PDF: jsPDF + autoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
 </head>
-
 <body>
-<div id="app">
-
-  <!-- ================= HEADER ================= -->
+<div class="page">
+  <!-- HEADER -->
   <header class="header">
     <div class="logo">Ona tili <span>Pro</span></div>
-
     <nav class="nav">
-      <a id="nav-home">Bosh sahifa</a>
-      <a id="nav-admin" class="hidden">Admin</a>
-
-      <button id="open-auth" class="btn-primary-small">Kirish</button>
-      <button id="logout-btn" class="btn-primary-small hidden">Chiqish</button>
+      <a id="nav-courses">Kurslar</a>
+      <a id="nav-admin" class="hidden">Admin panel</a>
+      <span class="user-label" id="current-user-label">Mehmon</span>
+      <button class="btn-outline hidden" id="logout-btn">Chiqish</button>
     </nav>
   </header>
 
-  <!-- ================= SPLASH LOGIN ================= -->
-  <div id="splash-screen" class="splash hidden">
-    <div class="splash-box">
-      <h1 class="splash-title">Xush kelibsiz!</h1>
-      <p class="splash-sub">Tizimga muvaffaqiyatli kirdingiz</p>
-      <div class="loader"></div>
-      <small>5 soniya ichida asosiy sahifaga yo‘naltirilasiz...</small>
-    </div>
-  </div>
+  <main class="container">
+    <!-- AUTH -->
+    <section id="auth-section" class="section">
+      <div class="grid-2">
+        <div>
+          <div class="card">
+            <h2>Xush kelibsiz, online o‘quv markazimizga!</h2>
+            <p class="sub">
+              Bu yerda siz <b>bilimlaringizni oshirasiz</b> va “Ona tili Pro” kurslari orqali tayyorlana olasiz.
+            </p>
 
-  <!-- ================= AUTH MODAL ================= -->
-  <div id="auth-modal" class="modal hidden">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content">
-      <div class="tabs">
-        <button class="tab active" data-tab="login-box">Kirish</button>
-        <button class="tab" data-tab="register-box">Ro‘yxatdan o‘tish</button>
-      </div>
+            <div class="tabs">
+              <button class="tab-btn active" data-tab="login">Kirish</button>
+              <button class="tab-btn" data-tab="register">Ro‘yxatdan o‘tish</button>
+            </div>
 
-      <!-- LOGIN -->
-      <div id="login-box" class="tab-pane">
-        <h2>Kirish</h2>
-        <div class="form">
-          <input id="login-user" placeholder="Login">
-          <input id="login-pass" type="password" placeholder="Parol">
-          <div id="login-error" class="error"></div>
-          <button id="login-btn" class="btn-primary">Kirish</button>
+            <!-- Login -->
+            <form id="login-form" class="form">
+              <div class="form-row">
+                <label for="login-username">Login</label>
+                <input id="login-username" required placeholder="Masalan: talaba01" />
+              </div>
+              <div class="form-row">
+                <label for="login-password">Parol</label>
+                <input id="login-password" type="password" required />
+              </div>
+              <button type="submit" class="btn">Kirish</button>
+              <div id="login-error" class="error"></div>
+            </form>
+
+            <!-- Register -->
+            <form id="register-form" class="form hidden">
+              <div class="form-row">
+                <label for="reg-username">Login</label>
+                <input id="reg-username" required placeholder="Masalan: talaba01" />
+              </div>
+              <div class="form-row">
+                <label for="reg-password">Parol</label>
+                <input id="reg-password" type="password" required />
+              </div>
+              <div class="form-row">
+                <label for="reg-password2">Parolni takrorlang</label>
+                <input id="reg-password2" type="password" required />
+              </div>
+              <p class="hint">
+                Ro‘yxatdan o‘tgan foydalanuvchilar kurslarni ko‘rishlari mumkin, lekin
+                <b>admin panelga kira olmaydi</b>.
+              </p>
+              <button type="submit" class="btn">Ro‘yxatdan o‘tish</button>
+              <div id="register-error" class="error"></div>
+            </form>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h2>Kurs nomi: “Ona tili Pro” o‘quv markazi</h2>
+            <p class="sub">
+              Ona tili va adabiyot bo‘yicha onlayn kurslar, testlar va video darslar jamlanmasi.
+            </p>
+            <p class="hero-text">
+              • <b>Admin</b> — kurs va darslar yaratadi, YouTube <b>Unlisted</b> videolarni qo‘shadi.<br>
+              • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va darslarni tomosha qiladi, quizlarni ishlaydi.<br><br>
+              Har bir dars bo‘yicha ko‘rilgan <b>foiz</b> saqlanib boradi. Dars kamida
+              <b>10%</b> ko‘rilganda video bo‘yicha dars “ko‘rilgan” hisoblanadi.<br>
+              Keyingi darslar ochilishi uchun shu darsning <b>quizidan kamida 30%</b>
+              natija olish kerak (quiz bo‘lmagan darslarda faqat video 10% yetarli).<br><br>
+              Quizni istasangiz <b>sayt ichida onlayn</b> ishlaysiz, istasangiz
+              <b>PDF test ko‘rinishida yuklab olib</b> ham ishlashingiz mumkin:
+              savollar, variantlar va oxirida <b>javoblar kaliti</b>.
+            </p>
+          </div>
         </div>
       </div>
-
-      <!-- REGISTER -->
-      <div id="register-box" class="tab-pane hidden">
-        <h2>Ro‘yxatdan o‘tish</h2>
-        <div class="form">
-          <input id="reg-user" placeholder="Login">
-          <input id="reg-pass" type="password" placeholder="Parol">
-          <input id="reg-pass2" type="password" placeholder="Parolni takrorlang">
-          <div id="register-error" class="error"></div>
-          <button id="register-btn" class="btn-primary">Ro‘yxatdan o‘tish</button>
-        </div>
-      </div>
-
-      <button id="close-auth" class="modal-close">✕</button>
-    </div>
-  </div>
-
-  <!-- ================= HOME PAGE ================= -->
-  <main id="home-page" class="page">
-    <section class="hero">
-      <h1>Ona tili Pro — Onlayn o‘quv markazi</h1>
-      <p>Yuqori sifatli darslar, testlar va video kurslar — barchasi bitta platformada.</p>
     </section>
 
-    <h2 class="section-title">Mavjud kurslar</h2>
-    <div id="course-list" class="course-grid"></div>
+    <!-- ADMIN -->
+    <section id="admin-section" class="section hidden">
+      <div class="card">
+        <div class="section-header">
+          <div>
+            <h2>Admin panel</h2>
+            <p class="sub">
+              Bu qismga faqat admin kirishi mumkin. Kurslar, darslar va foydalanuvchilar shu yerda boshqariladi.
+            </p>
+          </div>
+          <span class="pill">Rol: Admin</span>
+        </div>
 
-    <div id="home-empty" class="empty">Hozircha kurslar qo‘shilmagan.</div>
-  </main>
+        <h3 style="font-size:15px;margin-bottom:4px;">Yangi kurs qo‘shish</h3>
+        <form id="course-form" class="form">
+          <div class="form-row">
+            <label for="course-title">Kurs nomi</label>
+            <input id="course-title" required placeholder="Masalan: Ona tili Pro — 5-sinf" />
+          </div>
+          <div class="form-row">
+            <label for="course-desc">Tavsif</label>
+            <textarea id="course-desc" required placeholder="Kurs mazmuni, maqsadi, kimlar uchun..."></textarea>
+          </div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="course-cat">Yo'nalish</label>
+              <input id="course-cat" placeholder="Masalan: Ona tili, Adabiyot..." />
+            </div>
+            <div class="form-row">
+              <label for="course-price">Narx (so'm)</label>
+              <input id="course-price" type="number" min="0" placeholder="0 = bepul" />
+            </div>
+          </div>
+          <button type="submit" class="btn">Kursni qo‘shish</button>
+          <div id="course-error" class="error"></div>
+        </form>
 
-  <!-- ================= ADMIN PANEL ================= -->
-  <main id="admin-page" class="page hidden">
-    <h2>Admin panel</h2>
+        <hr style="margin:14px 0;border:none;border-top:1px solid #e5e7eb;">
 
-    <div class="card">
-      <h3>Yangi kurs qo‘shish</h3>
-      <div class="form">
-        <input id="course-title" placeholder="Kurs nomi">
-        <textarea id="course-desc" placeholder="Tavsifi"></textarea>
-        <input id="course-price" type="number" placeholder="Narx (0 = bepul)">
-        <button id="add-course-btn" class="btn-primary">Kurs qo‘shish</button>
-        <div id="course-error" class="error"></div>
+        <div class="section-header">
+          <h3 style="font-size:15px;">Mavjud kurslar</h3>
+          <span class="muted" id="admin-course-count">0 ta kurs</span>
+        </div>
+        <div id="admin-course-list"></div>
+        <div id="admin-empty" class="empty">Hozircha kurs yo‘q. Yuqoridan kurs qo‘shing.</div>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #e5e7eb;">
+
+        <div class="section-header">
+          <h3 style="font-size:15px;">Foydalanuvchilar ro‘yxati</h3>
+          <span class="muted" id="admin-user-count">0 ta foydalanuvchi</span>
+        </div>
+        <div id="admin-user-list" class="empty">Ma'lumotlar yuklanmoqda...</div>
       </div>
+    </section>
+
+    <!-- USER -->
+    <section id="user-section" class="section hidden">
+      <div class="card">
+        <div class="section-header">
+          <div>
+            <h2>Kurslar paneli</h2>
+            <p class="sub">
+              Ro‘yxatdan o‘tgan barcha foydalanuvchilar bu yerdagi kurslarni ko‘rishi mumkin.
+            </p>
+          </div>
+          <span class="pill" id="user-role-pill">Rol: Foydalanuvchi</span>
+        </div>
+
+        <div class="section-header">
+          <button class="btn" id="btn-open-course-modal">Kurs tanlash</button>
+          <span class="muted" id="user-course-count">0 ta kurs</span>
+        </div>
+
+        <!-- Kurslar ro'yxati -->
+        <div id="user-courses-view">
+          <div id="user-course-list" class="course-grid"></div>
+          <div id="user-empty" class="empty">
+            Hozircha kurslar qo‘shilmagan. Admin panel orqali kurs qo‘shilishi kerak.
+          </div>
+        </div>
+
+        <!-- Bitta kurs ichiga kirilganda -->
+        <div id="user-course-detail" class="hidden">
+          <button class="btn" id="user-back-btn" style="margin-bottom:8px;">← Kurslar paneliga qaytish</button>
+          <h3 id="detail-title" style="font-size:18px;margin-bottom:4px;"></h3>
+          <p id="detail-desc" class="muted" style="margin-bottom:8px;"></p>
+          <div class="course-meta" id="detail-meta"></div>
+
+          <div class="detail-layout">
+            <div id="detail-lessons"></div>
+
+            <div class="lesson-player-box">
+              <div class="muted" id="lesson-player-title">Dars tanlanmagan.</div>
+              <div class="video-wrapper hidden" id="lesson-video-wrapper">
+                <div id="yt-player"></div>
+              </div>
+              <!-- Katta qizil quiz tugmasi -->
+              <button type="button" class="btn-quiz-main hidden" id="lesson-quiz-btn" style="margin-top:6px;align-self:flex-start;">
+                QUIZNI ISHLASH
+              </button>
+              <button type="button" class="btn-xs hidden" id="lesson-quiz-pdf-btn" style="margin-top:4px;align-self:flex-start;">
+                Quizni PDF test ko‘rinishida yuklab olish
+              </button>
+              <div class="hint" id="lesson-quiz-hint" style="margin-top:2px;display:none;">
+                <span style="color:#b91c1c;font-weight:600;">
+                  (Bu quizni kamida 30% ishlang — keyingi darslar ochiladi)
+                </span>
+              </div>
+
+              <div class="progress-text" id="lesson-progress-text"></div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar" id="lesson-progress-bar"></div>
+              </div>
+              <div class="hint" style="margin-top:4px;">
+                Dars kamida <b>10%</b> ko‘rilganda video bo‘yicha dars ko‘rilgan hisoblanadi.<br>
+                Quiz biriktirilmagan darslarda faqat shu 10% kifoya.<br>
+                Quizli darslarda esa shu darsning <b>quizidan kamida 30%</b> natija olganda keyingi darslar ochiladi.<br>
+                Istasangiz quizni saytdagi test ko‘rinishida, istasangiz <b>PDF test</b> shaklida ishlashingiz mumkin.
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <small>© Ona tili Pro online o‘quv markazi — bilimlaringiz uchun raqamli hamroh.</small>
+      <small>
+        Aloqa: <b>+998 90 000 00 00</b> · Telegram: <b>@onatili_pro</b>
+      </small>
     </div>
-
-    <h3 class="section-title">Kurslar</h3>
-    <div id="admin-course-list"></div>
-  </main>
-
-  <!-- ================= COURSE DETAIL PAGE ================= -->
-  <main id="course-detail-page" class="page hidden">
-    <button id="back-home" class="btn-secondary-small">← Orqaga</button>
-
-    <h2 id="course-detail-title"></h2>
-    <p id="course-detail-desc"></p>
-
-    <h3>Darslar ro‘yxati</h3>
-    <div id="lesson-list"></div>
-
-    <div class="empty" id="lesson-empty">Hozircha darslar yo‘q.</div>
-  </main>
-
-  <!-- ================= LESSON PAGE ================= -->
-  <main id="lesson-page" class="page hidden">
-    <button id="back-course" class="btn-secondary-small">← Darslarga qaytish</button>
-
-    <h2 id="lesson-title"></h2>
-
-    <div id="video-box" class="video-box">
-      <div id="yt-player"></div>
-    </div>
-
-    <div class="progress-text" id="video-progress-text">0%</div>
-    <div class="progress-bar"><div class="progress" id="video-progress"></div></div>
-
-    <button id="open-quiz-btn" class="btn-primary hidden">Quizni boshlash</button>
-  </main>
-
-  <!-- ================= QUIZ OVERLAY ================= -->
-  <div id="quiz-overlay" class="quiz-overlay hidden">
-    <div class="quiz-box" id="quiz-box"></div>
-  </div>
-
+  </footer>
 </div>
 
-<script src="app.js"></script>
+<!-- Kurs tanlash MODAL -->
+<div id="course-modal" class="modal hidden">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <div>
+        <h3 style="font-size:17px;">Kurs tanlash</h3>
+        <p class="muted">Kerakli kursni tanlang — kurs ichidagi darslar ochiladi.</p>
+      </div>
+      <button class="modal-close" id="course-modal-close">Yopish ✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="course-modal-list" class="course-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ FULLSCREEN OVERLAY -->
+<div id="quiz-overlay" class="quiz-overlay hidden">
+  <div class="quiz-overlay-backdrop"></div>
+  <div class="quiz-overlay-content">
+    <div class="quiz-overlay-box" id="quiz-overlay-box"></div>
+  </div>
+</div>
+
+<script>
+  /* YOUTUBE API HOLATI */
+  let ytApiReady = false;
+  function onYouTubeIframeAPIReady(){ ytApiReady = true; }
+
+  /* GLOBAL THRESHOLDS */
+  const VIDEO_COMPLETE_PERCENT = 10; // 10% video kifoya
+  const QUIZ_PASS_PERCENT = 30;     // 30% quiz natija
+
+  /* FIREBASE INIT */
+  const firebaseConfig = {
+    apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
+    authDomain: "shahboz-5d0a3.firebaseapp.com",
+    projectId: "shahboz-5d0a3",
+    storageBucket: "shahboz-5d0a3.appspot.com",
+    messagingSenderId: "352024095535",
+    appId: "1:352024095535:web:6ca630de2c199a33c54fda",
+    measurementId: "G-YS5RGZ00EB"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  /* LOCAL STATE */
+  let data = { currentUser:null, courses:[] };
+  const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
+  const REMEMBER_CREDENTIALS_KEY = "talimEduRemember_v1";
+
+  function loadCurrentUserFromLocal(){
+    try{
+      const raw = localStorage.getItem(CURRENT_USER_KEY);
+      if(!raw) return null;
+      return JSON.parse(raw);
+    }catch{ return null; }
+  }
+  function saveCurrentUserToLocal(){
+    if(!data.currentUser) localStorage.removeItem(CURRENT_USER_KEY);
+    else localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data.currentUser));
+  }
+  function saveRememberedCredentials(username,password){
+    try{
+      localStorage.setItem(REMEMBER_CREDENTIALS_KEY, JSON.stringify({username,password}));
+    }catch{}
+  }
+  function loadRememberedCredentials(){
+    try{
+      const raw = localStorage.getItem(REMEMBER_CREDENTIALS_KEY);
+      if(!raw) return null;
+      return JSON.parse(raw);
+    }catch{ return null; }
+  }
+
+  /* PAROLNI HASH QILISH (SHA-256) */
+  async function hashPassword(str){
+    const enc = new TextEncoder().encode(str);
+    const buf = await crypto.subtle.digest("SHA-256", enc);
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  }
+
+  async function ensureDefaultAdmin(){
+    const adminUsername = "admin";
+    const adminPlain = "admin321";
+    const ref = db.collection("users").doc(adminUsername);
+    const doc = await ref.get();
+    if(!doc.exists){
+      const passwordHash = await hashPassword(adminPlain);
+      await ref.set({ username:adminUsername, passwordHash, role:"admin" });
+    }
+  }
+
+  /* DOM */
+  const authSection = document.getElementById("auth-section");
+  const adminSection = document.getElementById("admin-section");
+  const userSection = document.getElementById("user-section");
+  const navAdmin = document.getElementById("nav-admin");
+  const navCourses = document.getElementById("nav-courses");
+  const logoutBtn = document.getElementById("logout-btn");
+  const currentUserLabel = document.getElementById("current-user-label");
+  const userRolePill = document.getElementById("user-role-pill");
+
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const loginErrorEl = document.getElementById("login-error");
+  const registerErrorEl = document.getElementById("register-error");
+
+  const loginUsername = document.getElementById("login-username");
+  const loginPassword = document.getElementById("login-password");
+  const regUsername = document.getElementById("reg-username");
+  const regPassword = document.getElementById("reg-password");
+  const regPassword2 = document.getElementById("reg-password2");
+
+  const courseForm = document.getElementById("course-form");
+  const courseError = document.getElementById("course-error");
+  const adminCourseList = document.getElementById("admin-course-list");
+  const adminCourseCount = document.getElementById("admin-course-count");
+  const adminEmpty = document.getElementById("admin-empty");
+
+  const adminUserList = document.getElementById("admin-user-list");
+  const adminUserCount = document.getElementById("admin-user-count");
+
+  const userCoursesView = document.getElementById("user-courses-view");
+  const userCourseDetail = document.getElementById("user-course-detail");
+  const userCourseList = document.getElementById("user-course-list");
+  const userCourseCount = document.getElementById("user-course-count");
+  const userEmpty = document.getElementById("user-empty");
+  const userBackBtn = document.getElementById("user-back-btn");
+
+  const detailTitle = document.getElementById("detail-title");
+  const detailDesc = document.getElementById("detail-desc");
+  const detailMeta = document.getElementById("detail-meta");
+  const detailLessons = document.getElementById("detail-lessons");
+
+  const lessonPlayerTitle = document.getElementById("lesson-player-title");
+  const lessonVideoWrapper = document.getElementById("lesson-video-wrapper");
+  const lessonProgressText = document.getElementById("lesson-progress-text");
+  const lessonProgressBar = document.getElementById("lesson-progress-bar");
+
+  const btnOpenCourseModal = document.getElementById("btn-open-course-modal");
+  const courseModal = document.getElementById("course-modal");
+  const courseModalClose = document.getElementById("course-modal-close");
+  const courseModalList = document.getElementById("course-modal-list");
+
+  const quizOverlay = document.getElementById("quiz-overlay");
+  const quizOverlayBox = document.getElementById("quiz-overlay-box");
+
+  const lessonQuizBtn = document.getElementById("lesson-quiz-btn");
+  const lessonQuizPdfBtn = document.getElementById("lesson-quiz-pdf-btn");
+  const lessonQuizHint = document.getElementById("lesson-quiz-hint");
+
+  /* 👉 YANGI: kurs formidagi inputlar */
+  const courseTitle = document.getElementById("course-title");
+  const courseDesc = document.getElementById("course-desc");
+  const courseCat = document.getElementById("course-cat");
+  const coursePrice = document.getElementById("course-price");
+
+  /* HELPERS */
+  function formatPrice(price){
+    const n = Number(price);
+    if(!price && price!==0) return "";
+    if(isNaN(n)) return "";
+    if(n===0) return "Bepul";
+    return n.toLocaleString("uz-UZ")+" so'm";
+  }
+  function extractYouTubeId(input){
+    if(!input) return "";
+    let url = input.trim();
+    let m = url.match(/youtu\.be\/([^?&]+)/);
+    if(m) return m[1];
+    m = url.match(/v=([^&]+)/);
+    if(m) return m[1];
+    m = url.match(/embed\/([^?&]+)/);
+    if(m) return m[1];
+    return url;
+  }
+  function getMotivationMessage(score,total){
+    if(!total) return "";
+    const percent = Math.round((score/total)*100);
+    if(percent===100) return "Ajoyib! Barcha savollarga to‘g‘ri javob berdingiz — zo‘r natija! 🔥";
+    if(percent>=80) return "Judayam yaxshi! Bir-ikki kichik xato — lekin bilimingiz mustahkam. Davom eting! 💪";
+    if(percent>=60) return "Yaxshi urinish! Ba’zi joylarni yana bir bor takrorlab chiqsangiz, natija yanada oshadi. 👍";
+    return "Hali hammasi oldinda. Yana bir marta darsni ko‘rib, qayta urinish tavsiya qilinadi. Siz albatta uddalaysiz! 🌱";
+  }
+
+  function getCurrentLesson(){
+    if(!data.currentUser || !currentCourseDetail || !currentLessonId) return null;
+    return (currentCourseDetail.lessons||[]).find(l=>l.id===currentLessonId) || null;
+  }
+
+  function slugify(str){
+    return (str||"quiz")
+      .toLowerCase()
+      .replace(/[^\w]+/g,"-")
+      .replace(/-+/g,"-")
+      .replace(/^-|-$/g,"");
+  }
+
+  /* YouTube konteynerini toza qayta yaratish — qotishning asosiy yechimi */
+  function resetPlayerContainer(){
+    if(!lessonVideoWrapper) return;
+    lessonVideoWrapper.innerHTML = "";
+    const div = document.createElement("div");
+    div.id = "yt-player";
+    lessonVideoWrapper.appendChild(div);
+  }
+
+  /* PDF: QUIZ BLANK (FAQAT SAVOL+VARIANT, OXIRIDA KALIT) */
+  function generateQuizBlankPdf(lesson){
+    if(!lesson || !lesson.quiz || !lesson.quiz.length || !window.jspdf) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const title = lesson.title || "Dars";
+
+    let y = 12;
+    doc.setFontSize(14);
+    doc.text(`Quiz: ${title}`, 10, y);
+    y += 4;
+    doc.setFontSize(10);
+    doc.text("(Savollarni quiz shaklida yoki PDF da ishlashingiz mumkin)", 10, y);
+    y += 8;
+
+    doc.setFontSize(11);
+
+    lesson.quiz.forEach((q,idx)=>{
+      if(y>270){
+        doc.addPage();
+        y = 12;
+      }
+      const qNum = `${idx+1}) ${q.question}`;
+      const splitted = doc.splitTextToSize(qNum, 190);
+      doc.text(splitted, 10, y);
+      y += splitted.length*5 + 2;
+
+      const letters = ["A","B","C","D"];
+      q.options.forEach((opt,oi)=>{
+        const line = `${letters[oi]}) ${opt}`;
+        const parts = doc.splitTextToSize(line, 185);
+        doc.text(parts, 14, y);
+        y += parts.length*5;
+      });
+      y += 4;
+    });
+
+    // Javoblar kaliti
+    doc.addPage();
+    y = 12;
+    doc.setFontSize(14);
+    doc.text("Javoblar kaliti", 10, y);
+    y += 8;
+    doc.setFontSize(11);
+
+    const rows = lesson.quiz.map((q,idx)=>{
+      const letters = ["A","B","C","D"];
+      const correctLetter = letters[q.correctIndex||0] || "A";
+      return [String(idx+1), correctLetter];
+    });
+
+    if(doc.autoTable){
+      doc.autoTable({
+        startY:y,
+        head:[["№","To‘g‘ri javob"]],
+        body:rows,
+        styles:{fontSize:10}
+      });
+    }else{
+      rows.forEach(r=>{
+        if(y>270){doc.addPage();y=12;}
+        doc.text(`${r[0]}) ${r[1]}`,10,y);
+        y+=6;
+      });
+    }
+
+    doc.save(slugify(title) + "_quiz_test.pdf");
+  }
+
+  /* PDF: QUIZ NATIJA (FOYDALANUVCHI JAVOBLARI BILAN) */
+  function generateQuizResultPdf(lessonTitle, score, total, answers, questions){
+    if(!questions || !questions.length || !window.jspdf) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const title = lessonTitle || "Dars";
+
+    const percent = total ? Math.round((score/total)*100) : 0;
+    let y = 12;
+    doc.setFontSize(16);
+    doc.text(`Quiz natijasi: ${title}`, 10, y);
+    y += 8;
+    doc.setFontSize(11);
+    doc.text(`Ball: ${score} / ${total} (${percent}%)`, 10, y);
+    y += 6;
+
+    const rows = questions.map((q,idx)=>{
+      const letters = ["A","B","C","D"];
+      const correct = letters[q.correctIndex||0] || "A";
+      const userAnsIndex = answers[idx];
+      const user = (userAnsIndex!=null) ? (letters[userAnsIndex] || "-") : "-";
+      const status = (userAnsIndex==null) ? "—" : (userAnsIndex===q.correctIndex ? "To‘g‘ri" : "Xato");
+      return [
+        String(idx+1),
+        q.question,
+        user,
+        correct,
+        status
+      ];
+    });
+
+    if(doc.autoTable){
+      doc.autoTable({
+        startY:y,
+        head:[["№","Savol","Foyd. javobi","To‘g‘ri javob","Holat"]],
+        body:rows,
+        styles:{fontSize:8,cellWidth:'wrap'},
+        columnStyles:{
+          0:{cellWidth:8},
+          1:{cellWidth:90},
+          2:{cellWidth:18},
+          3:{cellWidth:18},
+          4:{cellWidth:18}
+        }
+      });
+    }else{
+      rows.forEach(r=>{
+        if(y>270){doc.addPage();y=12;}
+        doc.text(`${r[0]}) ${r[1]}`,10,y);
+        y+=6;
+        doc.text(`Foyd.: ${r[2]} | To‘g‘ri: ${r[3]} | Holat: ${r[4]}`,10,y);
+        y+=6;
+      });
+    }
+
+    doc.save(slugify(title) + "_quiz_natija.pdf");
+  }
+
+  /* PROGRESS (Firestore) */
+  async function loadProgress(username,courseId){
+    const id = `${username}_${courseId}`;
+    const ref = db.collection("progress").doc(id);
+    const doc = await ref.get();
+    if(!doc.exists) return { user:username, courseId, lessons:{} };
+    const d = doc.data();
+    if(!d.lessons) d.lessons = {};
+    return d;
+  }
+  async function saveLessonProgress(username,courseId,lessonId,percent,completedFlag){
+    const id = `${username}_${courseId}`;
+    const ref = db.collection("progress").doc(id);
+    const doc = await ref.get();
+    let d = doc.exists ? doc.data() : { user:username, courseId, lessons:{} };
+    if(!d.lessons) d.lessons = {};
+    const prev = d.lessons[lessonId] || {};
+    const safePercent = Math.min(99, Math.max(0, percent||0));
+    const maxPercent = Math.max(prev.percent||0, safePercent);
+    const videoCompleted = prev.videoCompleted || completedFlag || maxPercent>=VIDEO_COMPLETE_PERCENT;
+    d.lessons[lessonId] = { ...prev, percent:maxPercent, videoCompleted };
+    await ref.set(d);
+    return d;
+  }
+  async function saveLessonQuizAttempt(username,courseId,lessonId,scorePercent){
+    const id = `${username}_${courseId}`;
+    const ref = db.collection("progress").doc(id);
+    const doc = await ref.get();
+    let d = doc.exists ? doc.data() : { user:username, courseId, lessons:{} };
+    if(!d.lessons) d.lessons = {};
+    const prev = d.lessons[lessonId] || {};
+    const attempts = (prev.quizAttempts||0)+1;
+    const quizBestPercent = Math.max(prev.quizBestPercent||0, scorePercent||0);
+    const quizPassed = prev.quizPassed || scorePercent>=QUIZ_PASS_PERCENT;
+    d.lessons[lessonId] = { ...prev, quizAttempts:attempts, quizBestPercent, quizPassed };
+    await ref.set(d);
+    return d;
+  }
+
+  /* FIRESTORE HELPERS */
+  async function registerUser(u,p){
+    const ref = db.collection("users").doc(u);
+    const doc = await ref.get();
+    if(doc.exists) throw new Error("exists");
+    await ref.set({ username:u, password:p, role:"user" });
+  }
+  async function loginUser(u,p){
+    const ref = db.collection("users").doc(u);
+    const doc = await ref.get();
+    if(!doc.exists) return null;
+    const user = doc.data();
+
+    if(user.passwordHash){
+      const hash = await hashPassword(p);
+      if(hash===user.passwordHash) return user;
+      return null;
+    }
+
+    if(user.password !== undefined){
+      return user.password===p ? user : null;
+    }
+    return null;
+  }
+  async function addCourseToFirestore(course){
+    await db.collection("courses").doc(course.id).set(course);
+  }
+  async function deleteCourseFromFirestore(courseId){
+    await db.collection("courses").doc(courseId).delete();
+  }
+  async function updateCourseLessons(courseId,lessons){
+    await db.collection("courses").doc(courseId).update({ lessons });
+  }
+  async function loadCoursesFromFirestore(){
+    const snap = await db.collection("courses").get();
+    data.courses = snap.docs.map(d=>d.data());
+  }
+  async function refreshCourses(){
+    await loadCoursesFromFirestore();
+    renderAdminCourses();
+    renderUserCourses();
+    renderCourseModalList();
+  }
+  async function loadUsersFromFirestore(){
+    const snap = await db.collection("users").get();
+    renderAdminUsers(snap.docs.map(d=>d.data()));
+  }
+
+  /* 👉 YANGI: ADMIN YANGI KURS QO‘SHISH HANDLERI */
+  if (courseForm) {
+    courseForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      courseError.textContent = "";
+
+      if (!data.currentUser || data.currentUser.role !== "admin") {
+        courseError.textContent = "Faqat admin kurs qo‘sha oladi.";
+        return;
+      }
+
+      const title = courseTitle.value.trim();
+      const description = courseDesc.value.trim();
+      const category = courseCat.value.trim();
+      const price = Number(coursePrice.value) || 0;
+
+      if (!title || !description) {
+        courseError.textContent = "Kurs nomi va tavsifini kiriting.";
+        return;
+      }
+
+      const course = {
+        id: Date.now().toString(),
+        title,
+        description,
+        category,
+        price,
+        lessons: []
+      };
+
+      try{
+        await addCourseToFirestore(course);
+        await refreshCourses();
+        courseForm.reset();
+      }catch(err){
+        console.error(err);
+        courseError.textContent = "Kursni saqlashda xatolik yuz berdi.";
+      }
+    });
+  }
+
+  /* RENDER ADMIN USERS */
+  function renderAdminUsers(users){
+    adminUserCount.textContent = users.length+" ta foydalanuvchi";
+    if(!users.length){
+      adminUserList.className="empty";
+      adminUserList.textContent="Foydalanuvchilar hali yo‘q.";
+      return;
+    }
+    adminUserList.classList.remove("empty");
+    adminUserList.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="user-table">
+          <thead><tr><th>Login</th><th>Rol</th></tr></thead>
+          <tbody>${users.map(u=>`<tr><td>${u.username}</td><td>${u.role}</td></tr>`).join("")}</tbody>
+        </table>
+      </div>`;
+  }
+
+  /* RENDER ADMIN COURSES + QUIZ BUILDER */
+  function renderAdminCourses(){
+    const courses = data.courses||[];
+    adminCourseList.innerHTML="";
+    adminCourseCount.textContent = courses.length+" ta kurs";
+    if(!courses.length){ adminEmpty.style.display="block"; return; }
+    adminEmpty.style.display="none";
+
+    courses.forEach(course=>{
+      const div = document.createElement("div");
+      div.className = "course-card";
+      const priceText = formatPrice(course.price);
+      const lessons = course.lessons||[];
+
+      let lessonsHtml = "";
+      if(!lessons.length){
+        lessonsHtml = `<div class="empty">Hali dars qo‘shilmagan.</div>`;
+      }else{
+        lessonsHtml = `
+          <div class="lesson-list">
+            ${lessons.map((l,i)=>`
+              <div class="lesson-item">
+                <div>
+                  <div class="lesson-title">${i+1}. ${l.title}</div>
+                  <div class="muted" style="font-size:11px;">
+                    ID: ${l.id}
+                    ${l.quiz && l.quiz.length ? " · Quiz savollar: "+l.quiz.length+" ta" : ""}
+                  </div>
+                </div>
+                <div class="lesson-status">
+                  <button type="button" class="btn-xs btn-lesson-up"
+                          data-course-id="${course.id}" data-lesson-id="${l.id}">↑</button>
+                  <button type="button" class="btn-xs btn-lesson-down"
+                          data-course-id="${course.id}" data-lesson-id="${l.id}">↓</button>
+                  <button type="button" class="btn-xs btn-lesson-delete"
+                          data-course-id="${course.id}" data-lesson-id="${l.id}">O‘chirish</button>
+                </div>
+              </div>
+            `).join("")}
+          </div>`;
+      }
+
+      div.innerHTML = `
+        <div class="course-title">${course.title}</div>
+        <div class="course-desc">${course.description}</div>
+        <div class="course-meta">
+          ${course.category?`<span class="badge">${course.category}</span>`:""}
+          ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
+          <span class="badge">Darslar: ${lessons.length}</span>
+        </div>
+        <div class="course-footer">
+          <span class="muted">Kurs ID: ${course.id}</span>
+          <button type="button" class="btn-xs btn-delete-course" data-course-id="${course.id}">Kursni o‘chirish</button>
+        </div>
+
+        <div class="mini-form">
+          <div class="muted" style="margin-bottom:4px;">Ushbu kursga yangi dars/video qo‘shish:</div>
+          <form class="lesson-form" data-course-id="${course.id}">
+            <div class="form-row">
+              <label>Dars nomi</label>
+              <input name="lessonTitle" required placeholder="Masalan: 1-dars. Kirish" />
+            </div>
+            <div class="form-row">
+              <label>YouTube havolasi yoki ID</label>
+              <input name="lessonUrl" required placeholder="https://youtu.be/... yoki faqat ID" />
+              <div class="hint">Videoni YouTube’da <b>Unlisted</b> qilib yuklash tavsiya etiladi.</div>
+            </div>
+
+            <div class="form-row" style="margin-top:4px;">
+              <label>
+                <input type="checkbox" name="enableQuiz" class="quiz-toggle" />
+                Ushbu darsga <b>quiz savollari</b> qo‘shaman
+              </label>
+            </div>
+
+            <div class="quiz-builder hidden">
+              <div class="muted" style="font-size:11px;margin-bottom:4px;">
+                Har bir savol uchun matn va A/B/C/D variantlarni kiriting, keyin to‘g‘ri javobni va vaqtni (soniya) tanlang.
+              </div>
+              <div class="quiz-questions"></div>
+              <button type="button" class="btn-xs btn-add-question" style="margin-top:4px;">+ Savol qo‘shish</button>
+            </div>
+
+            <button type="submit" class="btn" style="margin-top:6px;">Darsni qo‘shish</button>
+          </form>
+        </div>
+
+        ${lessonsHtml}
+      `;
+      adminCourseList.appendChild(div);
+    });
+  }
+
+  /* Quiz builder: on/off */
+  adminCourseList.addEventListener("change",e=>{
+    if(!e.target.classList.contains("quiz-toggle")) return;
+    const form = e.target.closest("form");
+    const builder = form.querySelector(".quiz-builder");
+    if(!builder) return;
+    builder.classList.toggle("hidden", !e.target.checked);
+  });
+
+  /* Quiz builder: savol qo‘shish */
+  adminCourseList.addEventListener("click",e=>{
+    const btn = e.target.closest(".btn-add-question");
+    if(!btn) return;
+    const form = btn.closest("form");
+    const container = form.querySelector(".quiz-questions");
+    if(!container) return;
+    const index = container.children.length + 1;
+    const block = document.createElement("div");
+    block.className = "quiz-question-block";
+    block.style.marginTop = "6px";
+    block.innerHTML = `
+      <div class="form-row">
+        <label>${index}-savol matni</label>
+        <input class="q-text" required placeholder="Savol matni" />
+      </div>
+      <div class="form-grid" style="margin-top:4px;">
+        <div class="form-row">
+          <label>A)</label>
+          <input class="q-opt-a" required />
+        </div>
+        <div class="form-row">
+          <label>B)</label>
+          <input class="q-opt-b" required />
+        </div>
+        <div class="form-row">
+          <label>C)</label>
+          <input class="q-opt-c" required />
+        </div>
+        <div class="form-row">
+          <label>D)</label>
+          <input class="q-opt-d" required />
+        </div>
+      </div>
+      <div class="form-grid" style="margin-top:4px;">
+        <div class="form-row">
+          <label>To‘g‘ri javob</label>
+          <select class="q-correct">
+            <option value="0">A</option>
+            <option value="1">B</option>
+            <option value="2">C</option>
+            <option value="3">D</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Savol vaqti (soniya)</label>
+          <input type="number" class="q-time" min="5" value="30" />
+        </div>
+      </div>
+      <hr style="margin-top:6px;border:none;border-top:1px dashed #e5e7eb;">
+    `;
+    container.appendChild(block);
+  });
+
+  /* Admin: dars qo‘shish */
+  adminCourseList.addEventListener("submit",async e=>{
+    if(!e.target.classList.contains("lesson-form")) return;
+    e.preventDefault();
+    if(!data.currentUser || data.currentUser.role!=="admin") return;
+
+    const form = e.target;
+    const courseId = form.dataset.courseId;
+    const title = form.lessonTitle.value.trim();
+    const url = form.lessonUrl.value.trim();
+    if(!title || !url) return;
+    const videoId = extractYouTubeId(url);
+    if(!videoId){ alert("YouTube havola/ID noto‘g‘ri."); return; }
+
+    let quiz = [];
+    const quizToggle = form.querySelector(".quiz-toggle");
+    if(quizToggle && quizToggle.checked){
+      const blocks = form.querySelectorAll(".quiz-question-block");
+      blocks.forEach((block,idx)=>{
+        const text = block.querySelector(".q-text")?.value.trim() || "";
+        const a = block.querySelector(".q-opt-a")?.value.trim() || "";
+        const b = block.querySelector(".q-opt-b")?.value.trim() || "";
+        const c = block.querySelector(".q-opt-c")?.value.trim() || "";
+        const d = block.querySelector(".q-opt-d")?.value.trim() || "";
+        const correctRaw = block.querySelector(".q-correct")?.value;
+        const timeRaw = parseInt(block.querySelector(".q-time")?.value,10);
+        const correctIndex = correctRaw!==undefined ? parseInt(correctRaw,10) : 0;
+        const timeLimit = (!isNaN(timeRaw) && timeRaw>0) ? timeRaw : 30;
+        if(text && a && b && c && d){
+          quiz.push({
+            id: Date.now().toString()+"_"+idx,
+            question:text,
+            options:[a,b,c,d],
+            correctIndex:isNaN(correctIndex)?0:correctIndex,
+            timeLimit:timeLimit
+          });
+        }
+      });
+    }
+
+    try{
+      const course = data.courses.find(c=>c.id===courseId);
+      if(!course) return;
+      const lessons = course.lessons || [];
+      lessons.push({
+        id: Date.now().toString(),
+        title,
+        videoId,
+        quiz
+      });
+      await updateCourseLessons(courseId,lessons);
+      await refreshCourses();
+      form.reset();
+    }catch(err){
+      console.error(err);
+      alert("Darsni saqlashda xatolik yuz berdi.");
+    }
+  });
+
+  /* Admin: kurs / dars o‘chirish va tartiblash */
+  adminCourseList.addEventListener("click",async e=>{
+    const courseDel = e.target.closest(".btn-delete-course");
+    const lessonDel = e.target.closest(".btn-lesson-delete");
+    const lessonUp  = e.target.closest(".btn-lesson-up");
+    const lessonDown= e.target.closest(".btn-lesson-down");
+
+    if(courseDel){
+      const courseId = courseDel.dataset.courseId;
+      if(!confirm("Kursni o‘chirishni xohlaysizmi?")) return;
+      try{
+        await deleteCourseFromFirestore(courseId);
+        data.courses = data.courses.filter(c=>c.id!==courseId);
+        renderAdminCourses();
+        renderUserCourses();
+        renderCourseModalList();
+      }catch(err){
+        console.error(err);
+        alert("Kursni o‘chirishda xatolik yuz berdi.");
+      }
+      return;
+    }
+
+    if(!lessonDel && !lessonUp && !lessonDown) return;
+    if(!data.currentUser || data.currentUser.role!=="admin") return;
+
+    const btn = lessonDel || lessonUp || lessonDown;
+    const courseId = btn.dataset.courseId;
+    const lessonId = btn.dataset.lessonId;
+    const course = data.courses.find(c=>c.id===courseId);
+    if(!course) return;
+    const lessons = course.lessons || [];
+    const idx = lessons.findIndex(l=>l.id===lessonId);
+    if(idx===-1) return;
+
+    try{
+      if(lessonDel){
+        if(!confirm("Bu darsni o‘chirishni xohlaysizmi?")) return;
+        lessons.splice(idx,1);
+      }else if(lessonUp){
+        if(idx===0) return;
+        [lessons[idx-1],lessons[idx]] = [lessons[idx],lessons[idx-1]];
+      }else if(lessonDown){
+        if(idx===lessons.length-1) return;
+        [lessons[idx],lessons[idx+1]] = [lessons[idx+1],lessons[idx]];
+      }
+      await updateCourseLessons(courseId,lessons);
+      await refreshCourses();
+    }catch(err){
+      console.error(err);
+      alert("Darsni yangilashda xatolik yuz berdi.");
+    }
+  });
+
+  /* USER COURSES GRID */
+  function renderUserCourses(){
+    const courses = data.courses||[];
+    userCourseList.innerHTML="";
+    userCourseCount.textContent = courses.length+" ta kurs";
+    if(!courses.length){ userEmpty.style.display="block"; return; }
+    userEmpty.style.display="none";
+
+    courses.forEach(course=>{
+      const card = document.createElement("div");
+      card.className="course-card";
+      const priceText = formatPrice(course.price);
+      const lessons = course.lessons||[];
+      card.innerHTML = `
+        <div class="course-title">${course.title}</div>
+        <div class="course-desc">${course.description}</div>
+        <div class="course-meta">
+          ${course.category?`<span class="badge">${course.category}</span>`:""}
+          ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
+          <span class="badge">Darslar: ${lessons.length}</span>
+        </div>
+        <div class="course-footer">
+          <span class="muted">Kurs ID: ${course.id}</span>
+          <button type="button" class="btn btn-open-course" data-course-id="${course.id}">Kursga kirish</button>
+        </div>`;
+      userCourseList.appendChild(card);
+    });
+  }
+
+  /* MODAL Kurs tanlash */
+  function renderCourseModalList(){
+    const courses = data.courses||[];
+    courseModalList.innerHTML="";
+    if(!courses.length){
+      courseModalList.innerHTML=`<div class="empty">Hozircha kurslar yo‘q.</div>`;
+      return;
+    }
+    courses.forEach(course=>{
+      const div = document.createElement("div");
+      div.className="course-card";
+      const priceText = formatPrice(course.price);
+      const lessons = course.lessons||[];
+      div.innerHTML = `
+        <div class="course-title">${course.title}</div>
+        <div class="course-desc">${course.description}</div>
+        <div class="course-meta">
+          ${course.category?`<span class="badge">${course.category}</span>`:""}
+          ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
+          <span class="badge">Darslar: ${lessons.length}</span>
+        </div>
+        <div class="course-footer">
+          <button type="button" class="btn btn-open-course-modal" data-course-id="${course.id}">Tanlash</button>
+        </div>`;
+      courseModalList.appendChild(div);
+    });
+  }
+  function openCourseModal(){ courseModal.classList.remove("hidden"); }
+  function closeCourseModal(){ courseModal.classList.add("hidden"); }
+
+  btnOpenCourseModal.addEventListener("click",()=>{
+    renderCourseModalList();
+    openCourseModal();
+  });
+  courseModalClose.addEventListener("click",closeCourseModal);
+  courseModal.addEventListener("click",e=>{
+    if(e.target.classList.contains("modal-backdrop")) closeCourseModal();
+  });
+  courseModalList.addEventListener("click",async e=>{
+    const btn = e.target.closest(".btn-open-course-modal");
+    if(!btn) return;
+    const courseId = btn.dataset.courseId;
+    closeCourseModal();
+    await openUserCourseDetail(courseId);
+  });
+
+  /* LESSON / PLAYER / QUIZ STATE */
+  let currentCourseDetail = null;
+  let currentCourseProgress = null;
+  let currentPlayer = null;
+  let currentLessonId = null;
+  let progressInterval = null;
+  let lastSavedPercent = 0;
+
+  let currentLessonQuiz = [];
+
+  let quizTimerId = null;
+  let quizCurrentIndex = 0;
+  let quizAnswers = {};
+  let quizRemaining = 0;
+
+  let quizAutoNextTimerId = null;
+  function clearQuizTimer(){
+    if(quizTimerId){
+      clearInterval(quizTimerId);
+      quizTimerId = null;
+    }
+  }
+  function clearQuizAutoNextTimer(){
+    if(quizAutoNextTimerId){
+      clearInterval(quizAutoNextTimerId);
+      quizAutoNextTimerId = null;
+    }
+  }
+
+  /* Progressni bir marta majburan saqlash */
+  async function saveCurrentLessonProgressOnce(){
+    try{
+      if(!currentPlayer || !currentCourseDetail || !currentLessonId || !data.currentUser) return;
+      if(typeof currentPlayer.getDuration!=="function") return;
+      const dur = currentPlayer.getDuration();
+      if(!dur || dur<=0) return;
+      const cur = currentPlayer.getCurrentTime()||0;
+      let percent = (cur/dur)*100;
+      if(percent>99) percent = 99;
+      const rounded = Math.round(Math.max(percent,lastSavedPercent||0));
+      if(rounded<=0) return;
+      const updated = await saveLessonProgress(
+        data.currentUser.username,
+        currentCourseDetail.id,
+        currentLessonId,
+        rounded,
+        rounded>=VIDEO_COMPLETE_PERCENT
+      );
+      currentCourseProgress = updated;
+      renderCourseLessonsList();
+    }catch(err){
+      console.error("saveCurrentLessonProgressOnce error",err);
+    }
+  }
+
+  function stopCurrentPlayer(){
+    if(progressInterval){
+      clearInterval(progressInterval);
+      progressInterval=null;
+    }
+    if(currentPlayer){
+      try{ currentPlayer.stopVideo(); }catch(e){}
+      try{ currentPlayer.destroy(); }catch(e){}
+      currentPlayer=null;
+    }
+    resetPlayerContainer();   // YouTube iframe konteyneri tozalanadi
+    lessonVideoWrapper.classList.add("hidden");
+  }
+
+  function renderCourseLessonsList(){
+    const course = currentCourseDetail;
+    const progress = currentCourseProgress || { lessons:{} };
+    const lessons = course?.lessons || [];
+    if(!lessons.length){
+      detailLessons.innerHTML = `<div class="empty">Bu kursga hali dars qo‘shilmagan.</div>`;
+      return;
+    }
+    const progMap = progress.lessons || {};
+    let maxCompletedIndex = -1;
+
+    lessons.forEach((lesson,idx)=>{
+      const info = progMap[lesson.id] || { percent:0 };
+      const videoCompleted = info.videoCompleted || (info.percent>=VIDEO_COMPLETE_PERCENT);
+      const hasQuiz = lesson.quiz && lesson.quiz.length>0;
+      const quizPassed = hasQuiz ? !!info.quizPassed : true; // QUIZ YO‘Q BO‘LSA — faqat video yetarli
+      const lessonCompleted = videoCompleted && quizPassed;
+      if(lessonCompleted && idx>maxCompletedIndex){
+        maxCompletedIndex = idx;
+      }
+    });
+
+    let html = `<div class="lesson-list">`;
+    lessons.forEach((lesson,idx)=>{
+      const info = progMap[lesson.id] || { percent:0 };
+      const percent = Math.min(99, Math.round(info.percent||0));
+      const attempts = info.quizAttempts || 0;
+
+      const videoCompleted = info.videoCompleted || (info.percent>=VIDEO_COMPLETE_PERCENT);
+      const hasQuiz = lesson.quiz && lesson.quiz.length>0;
+      const quizPassed = hasQuiz ? !!info.quizPassed : true;
+      const lessonCompleted = videoCompleted && quizPassed;
+
+      let unlocked = (idx===0);
+      if(maxCompletedIndex>=0 && idx<=maxCompletedIndex+3){
+        unlocked = true;
+      }
+
+      const statusText = lessonCompleted
+        ? "Tugallangan ✅"
+        : unlocked
+          ? (percent>0 ? `Boshlangan (${percent}%)` : "Boshlanmagan")
+          : "Yopiq 🔒";
+
+      html += `
+        <div class="lesson-item ${unlocked?"":"locked"}"
+             data-lesson-id="${lesson.id}"
+             data-unlocked="${unlocked?"1":"0"}">
+          <div>
+            <div class="lesson-title">${idx+1}-dars. ${lesson.title}</div>
+            <div class="muted" style="font-size:11px;">
+              Ko‘rilgan: ${percent}% 
+              ${hasQuiz ? " · Quiz: "+lesson.quiz.length+" savol" : ""}
+              ${attempts>0 ? " · Quiz ishlangan: "+attempts+" marta" : ""}
+            </div>
+          </div>
+          <div class="lesson-status">${statusText}</div>
+        </div>`;
+    });
+    html += `</div>`;
+    detailLessons.innerHTML = html;
+  }
+
+  /* Fullscreen yordamchi (faqat QUIZ uchun) */
+  function exitAnyFullscreen(){
+    if(document.fullscreenElement){
+      try{
+        document.exitFullscreen();
+      }catch(e){}
+    }
+  }
+  function tryLockLandscape(){
+    try{
+      if(screen.orientation && screen.orientation.lock){
+        screen.orientation.lock('landscape').catch(()=>{});
+      }
+    }catch(e){}
+  }
+
+  /* QUIZ OVERLAY FUNKSIYALARI */
+  function closeQuizOverlay(){
+    clearQuizTimer();
+    clearQuizAutoNextTimer();
+    quizOverlay.classList.add("hidden");
+    quizOverlayBox.innerHTML = "";
+    exitAnyFullscreen();
+  }
+
+  function showQuizInviteOverlay(){
+    if(!currentLessonQuiz.length) return;
+    clearQuizTimer();
+    clearQuizAutoNextTimer();
+    quizOverlayBox.innerHTML = `
+      <div>
+        <div class="quiz-overlay-title">Dars yakunlandi!</div>
+        <div class="quiz-overlay-sub">
+          Endi bilimlaringizni <b>quiz</b> orqali sinab ko‘ring.<br>
+          Har bir savolga alohida <b>vaqt</b> beriladi. Tayyormisiz?
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px;">
+          <button type="button" class="btn" id="quiz-overlay-start-btn">Quizni boshlash</button>
+          <button type="button" class="btn-xs" id="quiz-overlay-close-btn">Keyinroq</button>
+        </div>
+      </div>
+    `;
+    quizOverlay.classList.remove("hidden");
+
+    document.getElementById("quiz-overlay-start-btn").onclick = startQuizFlow;
+    document.getElementById("quiz-overlay-close-btn").onclick = closeQuizOverlay;
+  }
+
+  function openQuizFullscreen(){
+    const elem = document.querySelector(".quiz-overlay-content");
+    if(!elem) return;
+    const req = elem.requestFullscreen
+      || elem.webkitRequestFullscreen
+      || elem.mozRequestFullScreen
+      || elem.msRequestFullscreen;
+    if(!req) return;
+    try{
+      const res = req.call(elem);
+      if(res && typeof res.then==="function"){
+        res.then(()=>{ tryLockLandscape(); }).catch(()=>{});
+      }else{
+        tryLockLandscape();
+      }
+    }catch(e){}
+  }
+
+  function startQuizFlow(){
+    if(!currentLessonQuiz.length) return;
+    openQuizFullscreen();
+    quizCurrentIndex = 0;
+    quizAnswers = {};
+    clearQuizTimer();
+    clearQuizAutoNextTimer();
+    showQuizQuestion();
+  }
+
+  function showQuizQuestion(){
+    const total = currentLessonQuiz.length;
+    if(quizCurrentIndex<0 || quizCurrentIndex>=total) return;
+    const q = currentLessonQuiz[quizCurrentIndex];
+    const timeLimit = (q.timeLimit && q.timeLimit>0) ? q.timeLimit : 30;
+    quizRemaining = timeLimit;
+
+    quizOverlayBox.innerHTML = `
+      <div>
+        <div class="quiz-top-row">
+          <div class="quiz-progress-small">
+            Savol: <b>${quizCurrentIndex+1}</b> / ${total}
+          </div>
+          <div id="quiz-timer">${quizRemaining} s</div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-question-title">${quizCurrentIndex+1}-savol. ${q.question}</div>
+          <div class="quiz-options">
+            ${q.options.map((opt,oi)=>`
+              <div class="quiz-option">
+                <label>
+                  <input type="radio" name="quiz_q_${quizCurrentIndex}" value="${oi}">
+                  <span>${["A","B","C","D"][oi]}) ${opt}</span>
+                </label>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px;gap:8px;">
+          <button type="button" class="btn-xs" id="quiz-next-btn">
+            ${quizCurrentIndex===total-1 ? "Natijani ko‘rish" : "Keyingi savol →"}
+          </button>
+        </div>
+      </div>
+    `;
+
+    const nextBtn = document.getElementById("quiz-next-btn");
+    nextBtn.onclick = ()=>goToNextQuestion(false);
+
+    clearQuizTimer();
+    quizTimerId = setInterval(()=>{
+      quizRemaining--;
+      const timerEl = document.getElementById("quiz-timer");
+      if(timerEl) timerEl.textContent = quizRemaining+" s";
+      if(quizRemaining<=0){
+        goToNextQuestion(true);
+      }
+    },1000);
+  }
+
+  function goToNextQuestion(autoDueTime){
+    clearQuizTimer();
+    const name = `quiz_q_${quizCurrentIndex}`;
+    const radios = quizOverlayBox.querySelectorAll(`input[name="${name}"]`);
+    let chosen = null;
+    radios.forEach(r=>{
+      if(r.checked) chosen = parseInt(r.value,10);
+    });
+    quizAnswers[quizCurrentIndex] = isNaN(chosen)?null:chosen;
+
+    if(quizCurrentIndex < currentLessonQuiz.length-1){
+      quizCurrentIndex++;
+      showQuizQuestion();
+    }else{
+      finishQuizWithTimer();
+    }
+  }
+
+  async function finishQuizWithTimer(){
+    const total = currentLessonQuiz.length;
+    let score = 0;
+    currentLessonQuiz.forEach((q,idx)=>{
+      const ans = quizAnswers[idx];
+      if(ans===q.correctIndex) score++;
+    });
+    const percent = total ? Math.round((score/total)*100) : 0;
+
+    try{
+      if(data.currentUser && currentCourseDetail && currentLessonId){
+        const updated = await saveLessonQuizAttempt(
+          data.currentUser.username,
+          currentCourseDetail.id,
+          currentLessonId,
+          percent
+        );
+        currentCourseProgress = updated;
+        renderCourseLessonsList();
+      }
+    }catch(err){
+      console.error("quiz attempt save error",err);
+    }
+
+    const curLesson = getCurrentLesson();
+    generateQuizResultPdf(curLesson ? curLesson.title : "Dars", score, total, quizAnswers, currentLessonQuiz);
+
+    renderQuizResultInOverlay(score,total,quizAnswers);
+  }
+
+  async function showQuizRankingInOverlay(){
+    if(!currentCourseDetail || !currentLessonId || !data.currentUser) return;
+    const container = document.getElementById("quiz-ranking-container");
+    if(!container) return;
+    container.innerHTML = `<div class="muted">Reyting yuklanmoqda...</div>`;
+    try{
+      const snap = await db.collection("progress")
+        .where("courseId","==",currentCourseDetail.id)
+        .get();
+      const rows = [];
+      snap.forEach(doc=>{
+        const d = doc.data();
+        const lessons = d.lessons||{};
+        const info = lessons[currentLessonId];
+        if(info && typeof info.quizBestPercent==="number"){
+          const username = d.user || d.username || "Noma'lum";
+          rows.push({ username, best:info.quizBestPercent });
+        }
+      });
+      if(!rows.length){
+        container.innerHTML = `<div class="muted">Hali hech kim bu dars bo‘yicha quiz ishlamagan.</div>`;
+        return;
+      }
+      rows.sort((a,b)=> b.best - a.best);
+      const total = rows.length;
+      const meIndex = rows.findIndex(r=>r.username===data.currentUser.username);
+      const myPlace = meIndex===-1 ? "—" : (meIndex+1);
+      const myBest = meIndex===-1 ? "—" : Math.round(rows[meIndex].best)+"%";
+
+      const topRows = rows.slice(0,10);
+
+      container.innerHTML = `
+        <div style="margin-top:8px;">
+          <div class="quiz-overlay-sub" style="font-size:14px;margin-bottom:6px;">
+            Jami ishtirokchilar: <b>${total}</b><br>
+            Sizning eng yaxshi natijangiz: <b>${myBest}</b>
+            ${myPlace!=="—" ? ` · Reytingingiz: <b>${myPlace}-o‘rin</b>` : ""}
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="user-table">
+              <thead><tr><th>O‘rin</th><th>Foydalanuvchi</th><th>Eng yaxshi natija</th></tr></thead>
+              <tbody>
+                ${topRows.map((r,i)=>`
+                  <tr${(meIndex===i)?' style="font-weight:700;background:#fef3c7;"':''}>
+                    <td>${i+1}</td>
+                    <td>${r.username}</td>
+                    <td>${Math.round(r.best)}%</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }catch(err){
+      console.error("ranking error",err);
+      container.innerHTML = `<div class="error">Reytingni yuklashda xatolik yuz berdi.</div>`;
+    }
+  }
+
+  function renderQuizResultInOverlay(score,total,answers){
+    const percent = total ? Math.round((score/total)*100) : 0;
+    const motivBase = getMotivationMessage(score,total);
+    const passed = percent>=QUIZ_PASS_PERCENT;
+
+    let infoText;
+    if(!passed){
+      infoText = "Siz bu darsni to‘liq o‘zlashtira olmadingiz. Avval dars videosini qayta ko‘rib, quizdan natijani kamida 30% qilish kerak. Shundagina keyingi darslar ochiladi va davom etishingiz mumkin.";
+    }else{
+      infoText = "Tabriklaymiz! Natijangiz 30% dan yuqori. Bu dars muvaffaqiyatli yakunlandi va keyingi darslar ochildi. Endi kursni davom ettirishingiz mumkin.";
+    }
+
+    let detailsHtml = "";
+    currentLessonQuiz.forEach((q,idx)=>{
+      const userAns = answers[idx];
+      const correctIdx = q.correctIndex||0;
+      const correctLetter = ["A","B","C","D"][correctIdx];
+      const userLetter = userAns!=null ? ["A","B","C","D"][userAns] : null;
+      const isCorrect = userAns===correctIdx;
+
+      detailsHtml += `
+        <div class="quiz-result-item">
+          <div class="quiz-question-title">${idx+1}-savol. ${q.question}</div>
+          <div style="margin-top:4px;">
+            ${
+              userAns==null
+              ? `<span class="quiz-wrong">Javob berilmagan</span>`
+              : isCorrect
+                ? `<span class="quiz-correct">To‘g‘ri javob (${userLetter})</span>`
+                : `<span class="quiz-wrong">Xato javob (${userLetter})</span>`
+            }
+          </div>
+          <div style="margin-top:2px;">
+            To‘g‘ri javob: <span class="quiz-correct">${correctLetter}) ${q.options[correctIdx]}</span>
+          </div>
+        </div>
+      `;
+    });
+
+    clearQuizAutoNextTimer();
+
+    quizOverlayBox.innerHTML = `
+      <div>
+        <div class="quiz-overlay-title">Natijangiz: ${score} / ${total} (${percent}%)</div>
+        <div class="quiz-overlay-sub">${infoText}<br><br>${motivBase}</div>
+        <div style="text-align:center;margin-bottom:6px;">
+          <button type="button" class="btn-xs" id="quiz-download-pdf">
+            Quiz natijasini PDF ko‘rinishida yuklab olish
+          </button>
+        </div>
+        ${detailsHtml}
+        <div style="display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <button type="button" class="btn-xs" id="quiz-review-lesson-btn">Darsni qayta ko‘rish</button>
+          <button type="button" class="btn-xs" id="quiz-ranking-btn">Natijalar (reyting)</button>
+          <button type="button" class="btn" id="quiz-overlay-continue-btn">Kursni davom ettirish</button>
+        </div>
+        <div id="quiz-auto-next-info" class="muted" style="margin-top:6px;text-align:center;"></div>
+        <div id="quiz-ranking-container"></div>
+      </div>
+    `;
+
+    const reviewBtn = document.getElementById("quiz-review-lesson-btn");
+    const contBtn = document.getElementById("quiz-overlay-continue-btn");
+    const rankingBtn = document.getElementById("quiz-ranking-btn");
+    const autoInfo = document.getElementById("quiz-auto-next-info");
+    const pdfBtn = document.getElementById("quiz-download-pdf");
+
+    if(pdfBtn){
+      pdfBtn.onclick = ()=>{
+        const curLesson = getCurrentLesson();
+        generateQuizResultPdf(curLesson ? curLesson.title : "Dars", score, total, answers, currentLessonQuiz);
+      };
+    }
+
+    if(reviewBtn){
+      reviewBtn.onclick = ()=>{
+        clearQuizAutoNextTimer();
+        const lesson = getCurrentLesson();
+        closeQuizOverlay();
+        if(lesson) openLessonPlayer(lesson);
+      };
+    }
+
+    if(rankingBtn){
+      rankingBtn.onclick = showQuizRankingInOverlay;
+    }
+
+    if(contBtn){
+      contBtn.onclick = ()=>{
+        clearQuizAutoNextTimer();
+        const lesson = getCurrentLesson();
+        closeQuizOverlay();
+        if(passed && currentCourseDetail && lesson){
+          const lessons = currentCourseDetail.lessons||[];
+          const idx = lessons.findIndex(l=>l.id===lesson.id);
+          if(idx>=0 && idx<lessons.length-1){
+            openLessonPlayer(lessons[idx+1]);
+          }
+        }
+      };
+    }
+
+    if(autoInfo){
+      autoInfo.textContent = "Keyingi darsga o‘tish uchun pastdagi “Kursni davom ettirish” tugmasini bosing.";
+    }
+  }
+
+  /* PROGRESS INTERVAL — oxirgi 7 soniya mantiqi */
+  function startProgressInterval(){
+    if(!currentPlayer) return;
+    if(progressInterval) clearInterval(progressInterval);
+
+    progressInterval = setInterval(async ()=>{
+      if(!currentPlayer || typeof currentPlayer.getDuration!=="function") return;
+      const dur = currentPlayer.getDuration();
+      if(!dur || dur<=0) return;
+      const cur = currentPlayer.getCurrentTime()||0;
+      const remaining = dur - cur;
+
+      if(remaining<=7){
+        const effectiveTime = Math.max(0, dur - 7);
+        let effPercent = dur>0 ? (effectiveTime/dur)*100 : 0;
+        if(effPercent>99) effPercent = 99;
+        const roundedEff = Math.round(effPercent);
+
+        lessonProgressText.textContent = `Ko‘rilgan: ${roundedEff}%`;
+        lessonProgressBar.style.width = roundedEff+"%";
+
+        if(data.currentUser && currentCourseDetail && currentLessonId){
+          lastSavedPercent = Math.max(lastSavedPercent,roundedEff);
+          try{
+            const updated = await saveLessonProgress(
+              data.currentUser.username,
+              currentCourseDetail.id,
+              currentLessonId,
+              roundedEff,
+              roundedEff>=VIDEO_COMPLETE_PERCENT
+            );
+            currentCourseProgress = updated;
+            renderCourseLessonsList();
+          }catch(err){
+            console.error("progress (last7) error",err);
+          }
+        }
+
+        try{ currentPlayer.pauseVideo(); }catch(e){}
+        stopCurrentPlayer();
+        exitAnyFullscreen();
+
+        if(currentLessonQuiz.length){
+          showQuizInviteOverlay();
+        }
+
+        return;
+      }
+
+      let percent = (cur/dur)*100;
+      if(percent>99) percent = 99;
+      const rounded = Math.round(percent);
+      lessonProgressText.textContent = `Ko‘rilgan: ${rounded}%`;
+      lessonProgressBar.style.width = rounded+"%";
+
+      if(!data.currentUser || !currentCourseDetail || !currentLessonId) return;
+
+      const lp = (currentCourseProgress?.lessons||{})[currentLessonId] || {};
+      const videoCompleted = lp.videoCompleted || (lp.percent>=VIDEO_COMPLETE_PERCENT);
+      if(videoCompleted) return;
+
+      if(rounded - lastSavedPercent >= 15 || rounded>=VIDEO_COMPLETE_PERCENT){
+        lastSavedPercent = rounded;
+        try{
+          const updated = await saveLessonProgress(
+            data.currentUser.username,
+            currentCourseDetail.id,
+            currentLessonId,
+            rounded,
+            rounded>=VIDEO_COMPLETE_PERCENT
+          );
+          currentCourseProgress = updated;
+          renderCourseLessonsList();
+        }catch(err){
+          console.error("progress error",err);
+        }
+      }
+    },5000);
+  }
+
+  /* Darsni ochish */
+  async function openLessonPlayer(lesson){
+    if(!currentCourseDetail || !data.currentUser) return;
+
+    // Avval eski playerni tozalaymiz (qotishni oldini olish)
+    stopCurrentPlayer();
+    closeQuizOverlay();
+
+    currentLessonId = lesson.id;
+    currentLessonQuiz = lesson.quiz || [];
+    quizCurrentIndex = 0;
+    quizAnswers = {};
+    lessonPlayerTitle.textContent = lesson.title;
+    lessonVideoWrapper.classList.remove("hidden");
+    lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
+    lessonProgressBar.style.width = "0%";
+    lastSavedPercent = 0;
+
+    if(currentLessonQuiz.length){
+      lessonQuizBtn.classList.remove("hidden");
+      lessonQuizPdfBtn.classList.remove("hidden");
+      lessonQuizHint.style.display = "block";
+    }else{
+      lessonQuizBtn.classList.add("hidden");
+      lessonQuizPdfBtn.classList.add("hidden");
+      lessonQuizHint.style.display = "none";
+    }
+
+    const info = (currentCourseProgress?.lessons||{})[lesson.id] || { percent:0 };
+    const resumePercent = info.percent && info.percent<95 ? info.percent : 0;
+    lastSavedPercent = resumePercent;
+
+    if(!ytApiReady){
+      lessonProgressText.textContent="YouTube API yuklanmoqda...";
+      const check = setInterval(()=>{
+        if(ytApiReady){
+          clearInterval(check);
+          openLessonPlayer(lesson);
+        }
+      },500);
+      return;
+    }
+
+    // Har safar yangi container (resetPlayerContainer) allaqachon stopCurrentPlayer ichida chaqirildi
+    currentPlayer = new YT.Player("yt-player",{
+      videoId: lesson.videoId,
+      playerVars:{rel:0,modestbranding:1},
+      events:{
+        onReady:(event)=>{
+          const player = event.target;
+          try{
+            if(resumePercent>0){
+              const dur = player.getDuration();
+              const start = (resumePercent/100)*dur;
+              if(start && isFinite(start)) player.seekTo(start,true);
+            }
+            player.playVideo();
+            startProgressInterval();
+          }catch(e){
+            console.error("onReady error",e);
+          }
+        },
+        onStateChange:(event)=>{
+          if(event.data === YT.PlayerState.ENDED){
+            // Oxirgi 7 soniya logikasi interval ichida hal qilinyapti.
+          }
+        }
+      }
+    });
+  }
+
+  /* Kurs detali */
+  async function openUserCourseDetail(courseId){
+    const course = data.courses.find(c=>c.id===courseId);
+    if(!course || !data.currentUser) return;
+
+    currentCourseDetail = course;
+    currentCourseProgress = await loadProgress(data.currentUser.username,courseId);
+
+    detailTitle.textContent = course.title;
+    detailDesc.textContent = course.description||"";
+    const priceText = formatPrice(course.price);
+    detailMeta.innerHTML = `
+      ${course.category?`<span class="badge">${course.category}</span>`:""}
+      ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
+      <span class="badge">Darslar: ${(course.lessons||[]).length}</span>
+    `;
+    renderCourseLessonsList();
+    lessonPlayerTitle.textContent = "Dars tanlanmagan.";
+    lessonVideoWrapper.classList.add("hidden");
+    lessonProgressText.textContent = "";
+    lessonProgressBar.style.width = "0%";
+    lessonQuizBtn.classList.add("hidden");
+    lessonQuizPdfBtn.classList.add("hidden");
+    lessonQuizHint.style.display = "none";
+
+    userCoursesView.classList.add("hidden");
+    userCourseDetail.classList.remove("hidden");
+  }
+
+  /* Darslar listi click */
+  detailLessons.addEventListener("click",async e=>{
+    const item = e.target.closest(".lesson-item");
+    if(!item) return;
+    const unlocked = item.dataset.unlocked==="1";
+    if(!unlocked){
+      alert("Bu dars hozircha yopiq. Avval oldingi darsni video bo‘yicha kamida 10% ko‘rish va shu dars quizidan kamida 30% natija olish kerak. Quiz bo‘lmagan darslarda faqat video 10% yetarli.");
+      return;
+    }
+    const lessonId = item.dataset.lessonId;
+    const lesson = (currentCourseDetail.lessons||[]).find(l=>l.id===lessonId);
+    if(!lesson) return;
+    await openLessonPlayer(lesson);
+  });
+
+  function showUserCoursesList(){
+    stopCurrentPlayer();
+    closeQuizOverlay();
+    userCoursesView.classList.remove("hidden");
+    userCourseDetail.classList.add("hidden");
+  }
+
+  userCourseList.addEventListener("click",async e=>{
+    const btn = e.target.closest(".btn-open-course");
+    if(!btn) return;
+    const courseId = btn.dataset.courseId;
+    await openUserCourseDetail(courseId);
+  });
+  userBackBtn.addEventListener("click",showUserCoursesList);
+
+  /* Quiz tugmasi (onlayn ishlash) — bosganda video pause + yig‘iladi */
+  if(lessonQuizBtn){
+    lessonQuizBtn.addEventListener("click",async ()=>{
+      const lesson = getCurrentLesson();
+      if(!currentLessonQuiz.length || !lesson){
+        alert("Bu darsga quiz biriktirilmagan.");
+        return;
+      }
+      await saveCurrentLessonProgressOnce();
+      stopCurrentPlayer();    // video to‘liq to‘xtaydi va konteyner tozalanadi
+      showQuizInviteOverlay();
+    });
+  }
+
+  /* Quizni PDF test ko‘rinishida yuklash */
+  if(lessonQuizPdfBtn){
+    lessonQuizPdfBtn.addEventListener("click",()=>{
+      const lesson = getCurrentLesson();
+      if(!lesson || !lesson.quiz || !lesson.quiz.length){
+        alert("Bu darsga quiz savollari biriktirilmagan.");
+        return;
+      }
+      generateQuizBlankPdf(lesson);
+    });
+  }
+
+  /* UI UPDATE */
+  function updateUI(){
+    const user = data.currentUser;
+    if(!user){
+      authSection.classList.remove("hidden");
+      adminSection.classList.add("hidden");
+      userSection.classList.add("hidden");
+      navAdmin.classList.add("hidden");
+      logoutBtn.classList.add("hidden");
+      currentUserLabel.textContent = "Mehmon";
+      userRolePill.textContent = "Rol: Foydalanuvchi";
+      stopCurrentPlayer();
+      closeQuizOverlay();
+      return;
+    }
+    authSection.classList.add("hidden");
+    userSection.classList.remove("hidden");
+    logoutBtn.classList.remove("hidden");
+    currentUserLabel.textContent = user.username;
+    if(user.role==="admin"){
+      navAdmin.classList.remove("hidden");
+      userRolePill.textContent = "Rol: Admin (foydalanuvchi rejimi)";
+    }else{
+      navAdmin.classList.add("hidden");
+      userRolePill.textContent = "Rol: Foydalanuvchi";
+    }
+    showUserCoursesList();
+  }
+
+  /* AUTH TABS */
+  tabButtons.forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      tabButtons.forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      const tab = btn.dataset.tab;
+      if(tab==="login"){
+        loginForm.classList.remove("hidden");
+        registerForm.classList.add("hidden");
+        loginErrorEl.textContent="";
+      }else{
+        loginForm.classList.add("hidden");
+        registerForm.classList.remove("hidden");
+        registerErrorEl.textContent="";
+      }
+    });
+  });
+
+  /* LOGIN */
+  loginForm.addEventListener("submit",async e=>{
+    e.preventDefault();
+    loginErrorEl.textContent="";
+    const u = loginUsername.value.trim();
+    const p = loginPassword.value;
+    if(!u || !p){
+      loginErrorEl.textContent = "Login va parolni kiriting.";
+      return;
+    }
+    try{
+      const user = await loginUser(u,p);
+      if(!user){
+        loginErrorEl.textContent = "Login yoki parol noto‘g‘ri.";
+        return;
+      }
+      data.currentUser = { username:user.username, role:user.role };
+      saveCurrentUserToLocal();
+      saveRememberedCredentials(u,p);
+      loginForm.reset();
+      updateUI();
+      await refreshCourses();
+      await loadUsersFromFirestore();
+    }catch(err){
+      console.error(err);
+      loginErrorEl.textContent="Kirishda xatolik yuz berdi.";
+    }
+  });
+
+  /* REGISTER */
+  registerForm.addEventListener("submit",async e=>{
+    e.preventDefault();
+    registerErrorEl.textContent="";
+    const u = regUsername.value.trim();
+    const p = regPassword.value;
+    const p2 = regPassword2.value;
+    if(!u || !p){
+      registerErrorEl.textContent="Login va parolni kiriting.";
+      return;
+    }
+    if(p!==p2){
+      registerErrorEl.textContent="Parollar mos kelmadi.";
+      return;
+    }
+    try{
+      await registerUser(u,p);
+      data.currentUser = { username:u, role:"user" };
+      saveCurrentUserToLocal();
+      saveRememberedCredentials(u,p);
+      registerForm.reset();
+      updateUI();
+      await refreshCourses();
+      await loadUsersFromFirestore();
+    }catch(err){
+      if(err.message==="exists") registerErrorEl.textContent="Bu login band.";
+      else{
+        console.error(err);
+        registerErrorEl.textContent="Ro‘yxatdan o‘tishda xatolik.";
+      }
+    }
+  });
+
+  logoutBtn.addEventListener("click",()=>{
+    data.currentUser=null;
+    saveCurrentUserToLocal();
+    updateUI();
+  });
+
+  /* NAV */
+  navCourses.addEventListener("click",e=>{
+    e.preventDefault();
+    if(!data.currentUser){
+      authSection.classList.remove("hidden");
+      adminSection.classList.add("hidden");
+      userSection.classList.add("hidden");
+      const loginTabBtn = document.querySelector('.tab-btn[data-tab="login"]');
+      if(loginTabBtn) loginTabBtn.click();
+      return;
+    }
+    adminSection.classList.add("hidden");
+    userSection.classList.remove("hidden");
+    showUserCoursesList();
+  });
+  navAdmin.addEventListener("click",e=>{
+    e.preventDefault();
+    if(!data.currentUser || data.currentUser.role!=="admin") return;
+    userSection.classList.add("hidden");
+    adminSection.classList.remove("hidden");
+  });
+
+  /* Sahifadan chiqib ketsa (tabni yopsa / boshqa tabga o'tsa) video pause bo‘lsin */
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden && currentPlayer){
+      try{ currentPlayer.pauseVideo(); }catch(e){}
+      saveCurrentLessonProgressOnce();
+    }
+  });
+
+  window.addEventListener("beforeunload",()=>{
+    saveCurrentLessonProgressOnce();
+  });
+
+  /* INIT */
+  (async function initApp(){
+    try{
+      await ensureDefaultAdmin();
+
+      const remembered = loadRememberedCredentials();
+      if(remembered){
+        if(remembered.username) loginUsername.value = remembered.username;
+        if(remembered.password) loginPassword.value = remembered.password;
+      }
+
+      data.currentUser = loadCurrentUserFromLocal();
+      updateUI();
+      await refreshCourses();
+      await loadUsersFromFirestore();
+    }catch(err){
+      console.error("init error",err);
+    }
+  })();
+</script>
 </body>
 </html>
