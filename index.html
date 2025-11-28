@@ -696,7 +696,8 @@
               <b>90%</b> ko‘rilganda tugallangan hisoblanadi va oldinga yana
               <b>3 ta dars</b> ochiladi.<br>
               Agar darsga <b>quiz</b> biriktirilgan bo‘lsa, dars tugayotganida
-              ekranni batamom egallagan <b>katta quiz oynasi</b> chiqadi.
+              ekranni batamom egallagan <b>katta quiz oynasi</b> chiqadi yoki darsdan
+              keyin alohida tugma orqali <b>quizni qayta ishlash</b> mumkin.
             </p>
           </div>
         </div>
@@ -800,9 +801,9 @@
               <div class="video-wrapper hidden" id="lesson-video-wrapper">
                 <div id="yt-player"></div>
               </div>
-              <!-- Fullscreen (landshaft) tugmasi -->
-              <button type="button" class="btn-xs hidden" id="lesson-fullscreen-btn" style="margin-top:4px;align-self:flex-start;">
-                To‘liq ekran (landshaft)
+              <!-- YANGI: Quiz tugmasi (darsdan keyin ham ishlasin) -->
+              <button type="button" class="btn-xs hidden" id="lesson-quiz-btn" style="margin-top:4px;align-self:flex-start;">
+                Quizni ishlash
               </button>
               <div class="progress-text" id="lesson-progress-text"></div>
               <div class="progress-bar-wrap">
@@ -812,7 +813,8 @@
                 Dars kamida <b>90%</b> ko‘rilganda tugallangan hisoblanadi.
                 1-dars tugallansa, oldinda <b>yana 3 ta dars</b> ochiladi.
                 Agar darsga quiz biriktirilgan bo‘lsa, dars tugayotganida
-                ekranni egallagan <b>quiz oynasi</b> chiqadi.
+                ekranni egallagan <b>quiz oynasi</b> chiqadi yoki yuqoridagi
+                <b>“Quizni ishlash”</b> tugmasini bosib qayta ishlash mumkin.
               </div>
             </div>
 
@@ -982,7 +984,7 @@
   const quizOverlay = document.getElementById("quiz-overlay");
   const quizOverlayBox = document.getElementById("quiz-overlay-box");
 
-  const lessonFullscreenBtn = document.getElementById("lesson-fullscreen-btn");
+  const lessonQuizBtn = document.getElementById("lesson-quiz-btn");
 
   /* HELPERS */
   function formatPrice(price){
@@ -1532,7 +1534,6 @@
       currentPlayer=null;
     }
     lessonVideoWrapper.classList.add("hidden");
-    lessonFullscreenBtn.classList.add("hidden");
   }
 
   function renderCourseLessonsList(){
@@ -1598,12 +1599,29 @@
     detailLessons.innerHTML = html;
   }
 
+  /* Fullscreen yordamchi (faqat QUIZ uchun) */
+  function exitAnyFullscreen(){
+    if(document.fullscreenElement){
+      try{
+        document.exitFullscreen();
+      }catch(e){}
+    }
+  }
+  function tryLockLandscape(){
+    try{
+      if(screen.orientation && screen.orientation.lock){
+        screen.orientation.lock('landscape').catch(()=>{});
+      }
+    }catch(e){}
+  }
+
   /* QUIZ OVERLAY FUNKSIYALARI */
   function closeQuizOverlay(){
     clearQuizTimer();
     clearQuizAutoNextTimer();
     quizOverlay.classList.add("hidden");
     quizOverlayBox.innerHTML = "";
+    exitAnyFullscreen(); // QUIZ tugagach fullscreendan chiqamiz
   }
 
   function showQuizInviteOverlay(){
@@ -1627,14 +1645,6 @@
 
     document.getElementById("quiz-overlay-start-btn").onclick = startQuizFlow;
     document.getElementById("quiz-overlay-close-btn").onclick = closeQuizOverlay;
-  }
-
-  function tryLockLandscape(){
-    try{
-      if(screen.orientation && screen.orientation.lock){
-        screen.orientation.lock('landscape').catch(()=>{});
-      }
-    }catch(e){}
   }
 
   function openQuizFullscreen(){
@@ -1933,38 +1943,6 @@
     }
   }
 
-  /* Fullscreen + landshaft */
-  function exitAnyFullscreen(){
-    if(document.fullscreenElement){
-      try{
-        document.exitFullscreen();
-      }catch(e){}
-    }
-  }
-
-  function openVideoFullscreen(){
-    if(!lessonVideoWrapper || lessonVideoWrapper.classList.contains("hidden")) return;
-    const elem = lessonVideoWrapper;
-    const req = elem.requestFullscreen
-      || elem.webkitRequestFullscreen
-      || elem.mozRequestFullScreen
-      || elem.msRequestFullscreen;
-    if(!req) return;
-    try{
-      const result = req.call(elem);
-      if(result && typeof result.then==="function"){
-        result.then(()=>{ tryLockLandscape(); }).catch(()=>{});
-      }else{
-        tryLockLandscape();
-      }
-    }catch(e){
-      console.error("Fullscreen error",e);
-    }
-  }
-  if(lessonFullscreenBtn){
-    lessonFullscreenBtn.addEventListener("click",openVideoFullscreen);
-  }
-
   /* PROGRESS INTERVAL — oxirgi 7 soniya mantiqi */
   function startProgressInterval(){
     if(!currentPlayer) return;
@@ -2005,8 +1983,8 @@
         }
 
         try{ currentPlayer.pauseVideo(); }catch(e){}
-        exitAnyFullscreen();
-        stopCurrentPlayer();
+        stopCurrentPlayer();     // Videoni butunlay yig‘ishtiramiz
+        exitAnyFullscreen();     // Video fullscreendan chiqadi
 
         if(currentLessonQuiz.length){
           showQuizInviteOverlay(); // 1-dars bo‘lsa ham, boshqa dars bo‘lsa ham albatta chiqadi
@@ -2059,10 +2037,16 @@
     quizAnswers = {};
     lessonPlayerTitle.textContent = lesson.title;
     lessonVideoWrapper.classList.remove("hidden");
-    lessonFullscreenBtn.classList.remove("hidden");
     lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
     lessonProgressBar.style.width = "0%";
     lastSavedPercent = 0;
+
+    // Quiz tugmasini ko‘rsatish / yashirish
+    if(currentLessonQuiz.length){
+      lessonQuizBtn.classList.remove("hidden");
+    }else{
+      lessonQuizBtn.classList.add("hidden");
+    }
 
     const info = (currentCourseProgress?.lessons||{})[lesson.id] || { percent:0 };
     const resumePercent = info.percent && info.percent<95 ? info.percent : 0;
@@ -2095,8 +2079,7 @@
         },
         onStateChange:(event)=>{
           if(event.data === YT.PlayerState.ENDED){
-            // Biz progress intervalida oxirgi 7 soniyadan avval pauza qilib bo‘ldik,
-            // shu sababli bu yerda alohida ish qilmadik.
+            // Oxirgi 7 soniya logikasi interval ichida hal qilinyapti.
           }
         }
       }
@@ -2122,9 +2105,9 @@
     renderCourseLessonsList();
     lessonPlayerTitle.textContent = "Dars tanlanmagan.";
     lessonVideoWrapper.classList.add("hidden");
-    lessonFullscreenBtn.classList.add("hidden");
     lessonProgressText.textContent = "";
     lessonProgressBar.style.width = "0%";
+    lessonQuizBtn.classList.add("hidden");
 
     userCoursesView.classList.add("hidden");
     userCourseDetail.classList.remove("hidden");
@@ -2160,6 +2143,17 @@
   });
   userBackBtn.addEventListener("click",showUserCoursesList);
 
+  /* Quiz tugmasi (darsdan keyin ham ishlasin) */
+  if(lessonQuizBtn){
+    lessonQuizBtn.addEventListener("click",()=>{
+      if(!currentLessonQuiz.length){
+        alert("Bu darsga quiz biriktirilmagan.");
+        return;
+      }
+      showQuizInviteOverlay();
+    });
+  }
+
   /* UI UPDATE */
   function updateUI(){
     const user = data.currentUser;
@@ -2172,6 +2166,7 @@
       currentUserLabel.textContent = "Mehmon";
       userRolePill.textContent = "Rol: Foydalanuvchi";
       stopCurrentPlayer();
+      closeQuizOverlay();
       return;
     }
     authSection.classList.add("hidden");
