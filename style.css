@@ -1,0 +1,450 @@
+/* =========================
+   GLOBAL STYLES
+   ========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  background: #f5f6fa;
+  color: #1f2937;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.page {
+  max-width: 980px;
+  margin: auto;
+  padding: 25px 15px;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+.header {
+  width: 100%;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.logo span {
+  color: #f97316;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav a {
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.nav a:hover::after {
+  width: 100%;
+}
+
+.nav a::after {
+  content: "";
+  height: 2px;
+  width: 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: #f97316;
+  transition: .25s;
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+.btn-primary {
+  background: #f97316;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background: #fb7b24;
+}
+
+.btn-primary-small {
+  background: #f97316;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-secondary-small {
+  background: #e5e7eb;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-secondary-small:hover {
+  background: #d1d5db;
+}
+
+/* =========================
+   MODAL
+   ========================= */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  position: relative;
+  z-index: 2;
+  background: #ffffff;
+  width: 90%;
+  max-width: 420px;
+  border-radius: 14px;
+  padding: 25px 22px;
+  animation: fadeIn .25s ease;
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: #f3f4f6;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from {opacity:0; transform:scale(.93);}
+  to   {opacity:1; transform:scale(1);}
+}
+
+/* =========================
+   AUTH TABS
+   ========================= */
+.tabs {
+  display: flex;
+  gap: 5px;
+  background: #e5e7eb;
+  padding: 4px;
+  border-radius: 999px;
+  margin-bottom: 15px;
+}
+
+.tab {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tab.active {
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.tab-pane {
+  animation: fade .3s ease;
+}
+
+@keyframes fade {
+  from {opacity:0;}
+  to {opacity:1;}
+}
+
+/* =========================
+   FORM
+   ========================= */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.form input,
+.form textarea {
+  padding: 10px 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.error {
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+/* =========================
+   HERO (HOME PAGE)
+   ========================= */
+.hero {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 25px;
+}
+
+.hero h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.hero p {
+  margin-top: 5px;
+  color: #4b5563;
+}
+
+/* =========================
+   COURSE CARDS
+   ========================= */
+.section-title {
+  margin: 10px 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.course-card {
+  background: white;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: .2s;
+}
+
+.course-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.course-card h3 {
+  font-size: 17px;
+  margin-bottom: 5px;
+}
+
+.course-card p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* =========================
+   CARD WRAPPER (ADMIN)
+   ========================= */
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.06);
+  margin-top: 15px;
+}
+
+/* =========================
+   LESSONS PAGE
+   ========================= */
+.lesson-item {
+  padding: 14px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: .2s;
+}
+
+.lesson-item:hover {
+  transform: translateY(-2px);
+}
+
+.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================
+   VIDEO PLAYER
+   ========================= */
+.video-box {
+  background: black;
+  aspect-ratio: 16/9;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+/* =========================
+   PROGRESS BAR
+   ========================= */
+.progress-bar {
+  background: #e5e7eb;
+  height: 8px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg,#22c55e,#16a34a);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* =========================
+   QUIZ FULLSCREEN
+   ========================= */
+.quiz-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+}
+
+.quiz-box {
+  background: #fffbe5;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  padding: 20px;
+  overflow-y: auto;
+  border-radius: 14px;
+  border: 2px solid #facc15;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.quiz-question {
+  margin-top: 15px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.07);
+}
+
+/* =========================
+   SPLASH SCREEN
+   ========================= */
+.splash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.splash-box {
+  text-align: center;
+}
+
+.splash-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #f97316;
+}
+
+.splash-sub {
+  margin-top: 5px;
+  color: #374151;
+  font-size: 16px;
+}
+
+.loader {
+  width: 55px;
+  height: 55px;
+  border: 6px solid #fde7d5;
+  border-top-color: #f97316;
+  border-radius: 50%;
+  margin: 15px auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* =========================
+   EMPTY TEXT
+   ========================= */
+.empty {
+  text-align: center;
+  color: #9ca3af;
+  margin-top: 20px;
+}
