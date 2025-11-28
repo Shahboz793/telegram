@@ -718,7 +718,9 @@
               natija olish kerak (quiz bo‘lmagan darslarda faqat video 10% yetarli).<br><br>
               Quizni istasangiz <b>sayt ichida onlayn</b> ishlaysiz, istasangiz
               <b>PDF test ko‘rinishida yuklab olib</b> ham ishlashingiz mumkin:
-              savollar, variantlar va oxirida <b>javoblar kaliti</b>.
+              savollar, variantlar va oxirida <b>javoblar kaliti</b>.<br><br>
+              Pullik kurslar uchun to‘lov <b>Telegram orqali admin bilan kelishiladi</b>.
+              Admin tasdiqlaganidan so‘ng kurs siz uchun ochiladi.
             </p>
           </div>
         </div>
@@ -778,6 +780,17 @@
           <span class="muted" id="admin-user-count">0 ta foydalanuvchi</span>
         </div>
         <div id="admin-user-list" class="empty">Ma'lumotlar yuklanmoqda...</div>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid #e5e7eb;">
+
+        <!-- SOTUV BO'LIMI -->
+        <div class="section-header">
+          <h3 style="font-size:15px;">Sotuv bo‘limi (kurs xaridlari)</h3>
+          <span class="muted" id="admin-sales-count">0 ta so‘rov</span>
+        </div>
+        <div id="admin-sales-list" class="empty">
+          To‘lov bo‘yicha so‘rovlar hali yo‘q.
+        </div>
       </div>
     </section>
 
@@ -792,6 +805,20 @@
             </p>
           </div>
           <span class="pill" id="user-role-pill">Rol: Foydalanuvchi</span>
+        </div>
+
+        <!-- Mening kurslarim (to‘lov qilingan) -->
+        <div id="my-courses-container" style="margin-bottom:10px;">
+          <div class="section-header" style="margin-bottom:4px;">
+            <h3 style="font-size:15px;">Mening kurslarim</h3>
+            <span class="muted" style="font-size:12px;">
+              To‘lov qilingan kurslar bu yerda <b>(To‘lov qilingan)</b> deb ko‘rinadi.
+            </span>
+          </div>
+          <div id="my-courses-list" class="course-grid"></div>
+          <div id="my-courses-empty" class="empty">
+            Hozircha to‘lov qilingan kurslaringiz yo‘q.
+          </div>
         </div>
 
         <div class="section-header">
@@ -813,6 +840,9 @@
           <h3 id="detail-title" style="font-size:18px;margin-bottom:4px;"></h3>
           <p id="detail-desc" class="muted" style="margin-bottom:8px;"></p>
           <div class="course-meta" id="detail-meta"></div>
+
+          <!-- To‘lov / kirish holati -->
+          <div id="detail-payment" style="margin-top:6px;"></div>
 
           <div class="detail-layout">
             <div id="detail-lessons"></div>
@@ -913,7 +943,7 @@
   const db = firebase.firestore();
 
   /* LOCAL STATE */
-  let data = { currentUser:null, courses:[] };
+  let data = { currentUser:null, courses:[], userPurchases:{} };
   const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
   const REMEMBER_CREDENTIALS_KEY = "talimEduRemember_v1";
 
@@ -990,6 +1020,9 @@
   const adminUserList = document.getElementById("admin-user-list");
   const adminUserCount = document.getElementById("admin-user-count");
 
+  const adminSalesList = document.getElementById("admin-sales-list");
+  const adminSalesCount = document.getElementById("admin-sales-count");
+
   const userCoursesView = document.getElementById("user-courses-view");
   const userCourseDetail = document.getElementById("user-course-detail");
   const userCourseList = document.getElementById("user-course-list");
@@ -997,10 +1030,15 @@
   const userEmpty = document.getElementById("user-empty");
   const userBackBtn = document.getElementById("user-back-btn");
 
+  const myCoursesList = document.getElementById("my-courses-list");
+  const myCoursesEmpty = document.getElementById("my-courses-empty");
+
   const detailTitle = document.getElementById("detail-title");
   const detailDesc = document.getElementById("detail-desc");
   const detailMeta = document.getElementById("detail-meta");
   const detailLessons = document.getElementById("detail-lessons");
+  const detailPayment = document.getElementById("detail-payment");
+  const detailLayout = document.querySelector(".detail-layout");
 
   const lessonPlayerTitle = document.getElementById("lesson-player-title");
   const lessonVideoWrapper = document.getElementById("lesson-video-wrapper");
@@ -1022,10 +1060,14 @@
   /* HELPERS */
   function formatPrice(price){
     const n = Number(price);
-    if(!price && price!==0) return "";
+    if(price === undefined || price === null || price === "") return "";
     if(isNaN(n)) return "";
     if(n===0) return "Bepul";
     return n.toLocaleString("uz-UZ")+" so'm";
+  }
+  function isCourseFree(course){
+    const n = Number(course.price);
+    return !n || n===0;
   }
   function extractYouTubeId(input){
     if(!input) return "";
@@ -1123,7 +1165,7 @@
     if(doc.autoTable){
       doc.autoTable({
         startY:y,
-        head:[["№","To‘g‘ri javob"]], 
+        head:[["№","To‘g‘ri javob"]],
         body:rows,
         styles:{fontSize:10}
       });
@@ -1277,10 +1319,40 @@
     renderAdminCourses();
     renderUserCourses();
     renderCourseModalList();
+    renderMyCourses();
   }
   async function loadUsersFromFirestore(){
     const snap = await db.collection("users").get();
     renderAdminUsers(snap.docs.map(d=>d.data()));
+  }
+
+  async function loadUserPurchases(username){
+    if(!username){
+      data.userPurchases = {};
+      renderMyCourses();
+      return;
+    }
+    const snap = await db.collection("purchases").where("user","==",username).get();
+    const map = {};
+    snap.forEach(doc=>{
+      const d = doc.data();
+      if(!d.courseId) return;
+      map[d.courseId] = { id:doc.id, status:d.status || "pending" };
+    });
+    data.userPurchases = map;
+    renderMyCourses();
+  }
+
+  async function loadAllPurchasesForAdmin(){
+    const snap = await db.collection("purchases").get();
+    const list = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderAdminSales(list);
+  }
+
+  function getCoursePurchaseStatus(courseId){
+    if(!data.userPurchases) return null;
+    const rec = data.userPurchases[courseId];
+    return rec ? rec.status : null;
   }
 
   /* RENDER ADMIN USERS */
@@ -1300,6 +1372,68 @@
         </table>
       </div>`;
   }
+
+  /* RENDER ADMIN SOTUV BO'LIMI */
+  function renderAdminSales(items){
+    adminSalesCount.textContent = items.length+" ta so‘rov";
+    if(!items.length){
+      adminSalesList.className = "empty";
+      adminSalesList.textContent = "To‘lov bo‘yicha so‘rovlar hali yo‘q.";
+      return;
+    }
+    adminSalesList.classList.remove("empty");
+    adminSalesList.innerHTML = items.map(p=>{
+      const course = (data.courses||[]).find(c=>c.id===p.courseId);
+      const courseTitle = course ? course.title : ("Kurs ID: "+p.courseId);
+      const status = p.status || "pending";
+      let statusLabel = "";
+      if(status==="approved"){
+        statusLabel = '<span style="color:#16a34a;font-weight:600;">Tasdiqlangan</span>';
+      }else if(status==="rejected"){
+        statusLabel = '<span style="color:#b91c1c;font-weight:600;">Rad etilgan</span>';
+      }else{
+        statusLabel = '<span style="color:#92400e;font-weight:600;">Kutilmoqda</span>';
+      }
+      const buttons = status==="pending"
+        ? `<div style="display:flex;gap:6px;margin-top:4px;">
+             <button type="button" class="btn-xs btn-sale-approve" data-id="${p.id}">Tasdiqlash</button>
+             <button type="button" class="btn-xs btn-sale-reject" data-id="${p.id}">Rad etish</button>
+           </div>`
+        : "";
+
+      return `
+        <div class="lesson-item" style="cursor:default;">
+          <div>
+            <div class="lesson-title">${courseTitle}</div>
+            <div class="muted" style="font-size:11px;">
+              Foydalanuvchi: <b>${p.user}</b> · Holat: ${statusLabel}
+            </div>
+          </div>
+          <div class="lesson-status">
+            ${buttons || statusLabel}
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  adminSalesList.addEventListener("click", async e=>{
+    const approveBtn = e.target.closest(".btn-sale-approve");
+    const rejectBtn = e.target.closest(".btn-sale-reject");
+    if(!approveBtn && !rejectBtn) return;
+    const id = (approveBtn || rejectBtn).dataset.id;
+    const status = approveBtn ? "approved" : "rejected";
+    const msg = status==="approved"
+      ? "Ushbu foydalanuvchi uchun kursga kirishni tasdiqlaysizmi?"
+      : "Ushbu so‘rovni rad etishni xohlaysizmi?";
+    if(!confirm(msg)) return;
+    try{
+      await db.collection("purchases").doc(id).update({ status });
+      await loadAllPurchasesForAdmin();
+    }catch(err){
+      console.error("update purchase error",err);
+      alert("Holatni yangilashda xatolik.");
+    }
+  });
 
   /* RENDER ADMIN COURSES + QUIZ BUILDER */
   function renderAdminCourses(){
@@ -1532,6 +1666,7 @@
         renderAdminCourses();
         renderUserCourses();
         renderCourseModalList();
+        renderMyCourses();
       }catch(err){
         console.error(err);
         alert("Kursni o‘chirishda xatolik yuz berdi.");
@@ -1583,8 +1718,11 @@
       card.className="course-card";
       const priceText = formatPrice(course.price);
       const lessons = course.lessons||[];
+      const isFree = isCourseFree(course);
       card.innerHTML = `
-        <div class="course-title">${course.title}</div>
+        <div class="course-title">
+          ${course.title}${!isFree ? "" : " <span style='font-size:12px;color:#16a34a;'>(Bepul)</span>"}
+        </div>
         <div class="course-desc">${course.description}</div>
         <div class="course-meta">
           ${course.category?`<span class="badge">${course.category}</span>`:""}
@@ -1596,6 +1734,56 @@
           <button type="button" class="btn btn-open-course" data-course-id="${course.id}">Kursga kirish</button>
         </div>`;
       userCourseList.appendChild(card);
+    });
+  }
+
+  /* Mening kurslarim (To‘lov qilingan) */
+  function renderMyCourses(){
+    if(!myCoursesList || !myCoursesEmpty) return;
+    myCoursesList.innerHTML = "";
+    const courses = data.courses||[];
+    const purchases = data.userPurchases || {};
+
+    const approvedCourseIds = Object.keys(purchases).filter(cid=>purchases[cid].status==="approved");
+
+    const myCourses = courses.filter(c=>{
+      if(isCourseFree(c)) return false; // bepul kurslar umumiy ro'yxatda
+      return approvedCourseIds.includes(c.id);
+    });
+
+    if(!data.currentUser){
+      myCoursesEmpty.classList.remove("hidden");
+      myCoursesEmpty.textContent = "Tizimga kirganingizdan so‘ng to‘lov qilingan kurslar bu yerda ko‘rinadi.";
+      return;
+    }
+
+    if(!myCourses.length){
+      myCoursesEmpty.classList.remove("hidden");
+      myCoursesEmpty.textContent = "Hozircha to‘lov qilingan kurslaringiz yo‘q.";
+      return;
+    }
+
+    myCoursesEmpty.classList.add("hidden");
+    myCourses.forEach(course=>{
+      const priceText = formatPrice(course.price);
+      const lessons = course.lessons||[];
+      const card = document.createElement("div");
+      card.className="course-card";
+      card.innerHTML = `
+        <div class="course-title">
+          ${course.title} <span style="font-size:12px;color:#16a34a;">(To‘lov qilingan)</span>
+        </div>
+        <div class="course-desc">${course.description||""}</div>
+        <div class="course-meta">
+          ${course.category?`<span class="badge">${course.category}</span>`:""}
+          ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
+          <span class="badge">Darslar: ${lessons.length}</span>
+        </div>
+        <div class="course-footer">
+          <span class="muted">Kurs ID: ${course.id}</span>
+          <button type="button" class="btn btn-open-course" data-course-id="${course.id}">Kursga kirish</button>
+        </div>`;
+      myCoursesList.appendChild(card);
     });
   }
 
@@ -2198,6 +2386,129 @@
     },5000);
   }
 
+  /* KURS TO‘LOV LOGIKASI */
+  async function handlePayForCurrentCourse(){
+    if(!data.currentUser){
+      alert("Avval tizimga kiring.");
+      return;
+    }
+    if(!currentCourseDetail){
+      alert("Avval kursni tanlang.");
+      return;
+    }
+    const course = currentCourseDetail;
+    if(isCourseFree(course)){
+      alert("Bu kurs bepul. To‘lov qilish shart emas.");
+      return;
+    }
+    const status = getCoursePurchaseStatus(course.id);
+    if(status==="approved"){
+      alert("Bu kurs uchun to‘lov allaqachon tasdiqlangan.");
+    }else if(status==="pending"){
+      alert("Bu kurs bo‘yicha to‘lov so‘rovi allaqachon yuborilgan. Admin tasdiqlashini kuting.");
+    }else{
+      try{
+        await db.collection("purchases").add({
+          user:data.currentUser.username,
+          courseId:course.id,
+          status:"pending",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }catch(err){
+        console.error("purchase add error",err);
+        alert("To‘lov so‘rovini saqlashda xatolik yuz berdi.");
+      }
+    }
+
+    const msg = `Assalomu alaykum. Men "${course.title}" kursini sotib olmoqchiman. Mening loginim: ${data.currentUser.username}.`;
+    const url = "https://t.me/onatili_premium?text=" + encodeURIComponent(msg);
+    window.open(url,"_blank");
+
+    await loadUserPurchases(data.currentUser.username);
+    updateCourseAccessUI();
+
+    alert("To‘lov bo‘yicha so‘rov yuborildi. Admin bilan Telegram orqali to‘lovni kelishib olishingiz mumkin.");
+  }
+
+  function updateCourseAccessUI(){
+    if(!detailPayment) return;
+    if(!currentCourseDetail || !data.currentUser){
+      detailPayment.innerHTML = "";
+      if(detailLayout) detailLayout.classList.add("hidden");
+      return;
+    }
+    const course = currentCourseDetail;
+    const isAdmin = data.currentUser.role==="admin";
+    const isFree = isCourseFree(course);
+    const status = getCoursePurchaseStatus(course.id);
+    const canAccessLessons = isAdmin || isFree || status==="approved";
+
+    let html = "";
+
+    if(isAdmin){
+      html = `
+        <div class="pill" style="margin-top:4px;">
+          Siz admin sifatida ushbu kursning barcha darslariga to‘liq kira olasiz.
+        </div>`;
+    }else if(isFree){
+      html = `
+        <div class="pill" style="margin-top:4px;background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#166534;border-color:#86efac;">
+          Bu kurs <b>bepul (0 so‘m)</b>. Hamma foydalanuvchilar uchun ochiq.
+        </div>`;
+    }else if(!status){
+      html = `
+        <div class="card" style="margin-top:6px;padding:10px 12px;border-radius:16px;border:1px solid #fed7aa;background:#fff7ed;">
+          <div style="font-size:14px;margin-bottom:4px;"><b>Bu kurs pullik.</b></div>
+          <div class="muted" style="font-size:12px;margin-bottom:6px;">
+            Kursga to‘liq kirish uchun avval to‘lovni amalga oshirishingiz kerak.
+            “Kursga to‘lov qilish” tugmasini bossangiz, siz <b>Telegramdagi admin</b>ga yozasiz.
+            Admin bilan to‘lov summasi va usulini kelishib oling.
+          </div>
+          <button type="button" class="btn" id="btn-pay-course">Kursga to‘lov qilish</button>
+        </div>`;
+    }else if(status==="pending"){
+      html = `
+        <div class="card" style="margin-top:6px;padding:10px 12px;border-radius:16px;border:1px solid #facc15;background:#fefce8;">
+          <div style="font-size:14px;margin-bottom:4px;"><b>To‘lovni admin tasdiqlashi kutilmoqda.</b></div>
+          <div class="muted" style="font-size:12px;">
+            Siz kursga to‘lov qilish haqida so‘rov yuborgansiz.
+            Admin bilan Telegram orqali bog‘lanib, to‘lovni yakunlang.
+            Admin tasdiqlaganidan so‘ng, bu yerda darslar avtomatik ochiladi.
+          </div>
+          <button type="button" class="btn-xs" id="btn-pay-course-again">Adminga qayta yozish</button>
+        </div>`;
+    }else if(status==="approved"){
+      html = `
+        <div class="card" style="margin-top:6px;padding:10px 12px;border-radius:16px;border:1px solid #bbf7d0;background:#f0fdf4;">
+        <div style="font-size:14px;margin-bottom:4px;color:#166534;">
+          <b>Siz bu kursga to‘lov qildingiz — endi bemalol foydalanishingiz mumkin.</b>
+        </div>
+        <div class="muted" style="font-size:12px;">
+          “Mening kurslarim” bo‘limida bu kurs nomi yonida <b>(To‘lov qilingan)</b> deb ko‘rinadi.
+        </div>
+      </div>`;
+    }
+
+    detailPayment.innerHTML = html;
+
+    if(detailLayout){
+      if(canAccessLessons){
+        detailLayout.classList.remove("hidden");
+      }else{
+        detailLayout.classList.add("hidden");
+      }
+    }
+
+    const payBtn = detailPayment.querySelector("#btn-pay-course");
+    const payAgainBtn = detailPayment.querySelector("#btn-pay-course-again");
+    if(payBtn){
+      payBtn.addEventListener("click",handlePayForCurrentCourse);
+    }
+    if(payAgainBtn){
+      payAgainBtn.addEventListener("click",handlePayForCurrentCourse);
+    }
+  }
+
   /* Darsni ochish */
   async function openLessonPlayer(lesson){
     if(!currentCourseDetail || !data.currentUser) return;
@@ -2241,10 +2552,9 @@
       return;
     }
 
-    // Har safar yangi container (resetPlayerContainer) allaqachon stopCurrentPlayer ichida chaqirildi
     currentPlayer = new YT.Player("yt-player",{
       videoId: lesson.videoId,
-      playerVars:{rel:0,modestbranding:1},
+      playerVars:{rel:0,modestbranding:1,playsinline:1,fs:1,controls:1},
       events:{
         onReady:(event)=>{
           const player = event.target;
@@ -2274,6 +2584,8 @@
     const course = data.courses.find(c=>c.id===courseId);
     if(!course || !data.currentUser) return;
 
+    await loadUserPurchases(data.currentUser.username);
+
     currentCourseDetail = course;
     currentCourseProgress = await loadProgress(data.currentUser.username,courseId);
 
@@ -2294,6 +2606,8 @@
     lessonQuizPdfBtn.classList.add("hidden");
     lessonQuizHint.style.display = "none";
 
+    updateCourseAccessUI();
+
     userCoursesView.classList.add("hidden");
     userCourseDetail.classList.remove("hidden");
   }
@@ -2302,6 +2616,16 @@
   detailLessons.addEventListener("click",async e=>{
     const item = e.target.closest(".lesson-item");
     if(!item) return;
+
+    // Agar to‘lov tasdiqlanmagan bo‘lsa va kurs pullik bo‘lsa, darsga kiritmaymiz
+    if(currentCourseDetail && !isCourseFree(currentCourseDetail) && data.currentUser && data.currentUser.role!=="admin"){
+      const status = getCoursePurchaseStatus(currentCourseDetail.id);
+      if(status!=="approved"){
+        alert("Bu kurs pullik. Avval “Kursga to‘lov qilish” tugmasi orqali admin bilan bog‘lanib, to‘lovni tasdiqlating.");
+        return;
+      }
+    }
+
     const unlocked = item.dataset.unlocked==="1";
     if(!unlocked){
       alert("Bu dars hozircha yopiq. Avval oldingi darsni video bo‘yicha kamida 10% ko‘rish va shu dars quizidan kamida 30% natija olish kerak. Quiz bo‘lmagan darslarda faqat video 10% yetarli.");
@@ -2326,6 +2650,14 @@
     const courseId = btn.dataset.courseId;
     await openUserCourseDetail(courseId);
   });
+  if(myCoursesList){
+    myCoursesList.addEventListener("click",async e=>{
+      const btn = e.target.closest(".btn-open-course");
+      if(!btn) return;
+      const courseId = btn.dataset.courseId;
+      await openUserCourseDetail(courseId);
+    });
+  }
   userBackBtn.addEventListener("click",showUserCoursesList);
 
   /* Quiz tugmasi (onlayn ishlash) — bosganda video pause + yig‘iladi */
@@ -2424,6 +2756,10 @@
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
+      await loadUserPurchases(data.currentUser.username);
+      if(data.currentUser.role==="admin"){
+        await loadAllPurchasesForAdmin();
+      }
     }catch(err){
       console.error(err);
       loginErrorEl.textContent="Kirishda xatolik yuz berdi.";
@@ -2454,6 +2790,7 @@
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
+      await loadUserPurchases(data.currentUser.username);
     }catch(err){
       if(err.message==="exists") registerErrorEl.textContent="Bu login band.";
       else{
@@ -2466,6 +2803,8 @@
   logoutBtn.addEventListener("click",()=>{
     data.currentUser=null;
     saveCurrentUserToLocal();
+    data.userPurchases = {};
+    renderMyCourses();
     updateUI();
   });
 
@@ -2518,6 +2857,12 @@
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
+      if(data.currentUser){
+        await loadUserPurchases(data.currentUser.username);
+        if(data.currentUser.role==="admin"){
+          await loadAllPurchasesForAdmin();
+        }
+      }
     }catch(err){
       console.error("init error",err);
     }
