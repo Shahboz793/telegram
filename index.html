@@ -41,14 +41,15 @@
       background:radial-gradient(circle at top,#1e1b4b 0,var(--bg) 45%,var(--bg) 100%);
       color:var(--text);
       min-height:100vh;
-      padding-bottom:110px;
+      /* TEPA QISMIDA BO'SH JOY – telefondagi navigatsiya ostidan boshlansin */
+      padding:40px 0 110px;
     }
     a{text-decoration:none;color:inherit}
     .hidden{display:none!important;}
 
-    /* HEADER */
+    /* HEADER – endi sticky emas, faqat scroll bo'ladi */
     .header{
-      position:sticky;top:0;z-index:30;
+      z-index:30;
       backdrop-filter:blur(18px);
       background:linear-gradient(90deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
       border-bottom:1px solid var(--border-soft);
@@ -433,12 +434,12 @@
     }
     .btn-add:active{transform:scale(.96);}
 
-    /* BOTTOM ORDER BAR – PREMIUM STYLE, WEBAPP UCHUN BIROZ YUQORIDA */
+    /* BOTTOM ORDER BAR – WebApp uchun biroz yuqorida */
     .cart-bar{
       position:fixed;
       left:10px;
       right:10px;
-      bottom:24px; /* WebApp pastki panelidan yuqoriroqda */
+      bottom:24px;
       background:linear-gradient(
         135deg,
         rgba(15,23,42,0.96),
@@ -477,7 +478,6 @@
       font-size:11px;
     }
 
-    /* ASOSIY BUYURTMA TUGMASI – BRAND */
     .cart-main-btn{
       width:100%;
       border:none;
@@ -965,7 +965,8 @@
       color:#e5e7eb;
       width:32px;height:32px;
       border-radius:999px;
-      display:flex;align-items:center;justify-content:center;
+      display:flex;
+      align-items:center;justify-content:center;
       cursor:pointer;
       font-size:18px;
     }
@@ -1813,7 +1814,6 @@
 
   function askAdminCode(){
     if(isAdmin){
-      // allaqachon admin: admin tabga o‘tkazamiz
       document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
       adminTabBtn.classList.add("active");
       document.getElementById("shopPage").classList.add("hidden");
@@ -1966,7 +1966,6 @@
     updateImageViewer();
   }
 
-  // overlayga bosilganda ham yopilsin
   imageViewerEl.addEventListener("click", function(){
     closeImageViewer();
   });
