@@ -45,20 +45,24 @@
     }
     a{text-decoration:none;color:inherit}
 
+    .hidden{display:none!important;}
+
     /* HEADER */
     .header{
-      position:sticky;top:0;z-index:20;
+      position:sticky;top:0;z-index:30;
       backdrop-filter:blur(18px);
       background:linear-gradient(90deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
       border-bottom:1px solid var(--border-soft);
-      padding:8px 10px;
+      padding:8px 10px 4px;
+    }
+    body.theme-light .header{
+      background:linear-gradient(90deg,rgba(249,250,251,0.96),rgba(229,231,235,0.96));
+    }
+    .header-row{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:8px;
-    }
-    body.theme-light .header{
-      background:linear-gradient(90deg,rgba(249,250,251,0.96),rgba(229,231,235,0.96));
     }
     .logo-wrap{
       display:flex;align-items:center;gap:8px;
@@ -137,7 +141,37 @@
       opacity:.9;
     }
 
-    /* HERO */
+    /* TABS */
+    .tabs{
+      display:flex;
+      gap:6px;
+      margin-top:6px;
+      font-size:11px;
+    }
+    .tab-btn{
+      flex:1;
+      border:none;
+      border-radius:999px;
+      padding:5px 0;
+      cursor:pointer;
+      background:rgba(15,23,42,0.85);
+      color:#e5e7eb;
+      border:1px solid rgba(148,163,184,0.5);
+    }
+    body.theme-light .tab-btn{
+      background:#e5e7eb;
+      color:#111827;
+      border-color:rgba(148,163,184,0.8);
+    }
+    .tab-btn.active{
+      background:linear-gradient(120deg,#f97316,#ec4899);
+      color:#020617;
+      border-color:transparent;
+      font-weight:600;
+      box-shadow:0 0 14px rgba(248,113,113,0.5);
+    }
+
+    /* HERO (shop) */
     .hero{
       padding:10px 12px 4px;
     }
@@ -255,19 +289,34 @@
     .product-top{
       position:relative;
       border-radius:12px;
-      padding:8px;
+      padding:6px;
       background:radial-gradient(circle at top,#1d4ed8,#020617 55%);
       overflow:hidden;
+      display:flex;
+      align-items:center;
+      gap:6px;
     }
     body.theme-light .product-top{
       background:radial-gradient(circle at top,#bfdbfe,#e5e7eb 55%);
     }
+    .product-photo{
+      width:40px;height:40px;
+      border-radius:12px;
+      overflow:hidden;
+      flex-shrink:0;
+      border:1px solid rgba(148,163,184,0.7);
+    }
+    .product-photo img{
+      width:100%;height:100%;object-fit:cover;
+      display:block;
+    }
     .product-emoji{
       font-size:24px;
+      margin-left:auto;
     }
     .product-img-tag{
       position:absolute;
-      right:6px;top:6px;
+      left:6px;top:6px;
       font-size:8px;
       padding:2px 6px;
       border-radius:999px;
@@ -282,11 +331,11 @@
     }
     .product-sale{
       position:absolute;
-      left:-22px;
+      right:-22px;
       bottom:6px;
       background:linear-gradient(120deg,#f97316,#ec4899);
       padding:2px 24px;
-      transform:rotate(-14deg);
+      transform:rotate(14deg);
       font-size:9px;
       font-weight:700;
       color:#111827;
@@ -361,7 +410,7 @@
       background:radial-gradient(circle at top,#1d2538,#020617 55%);
       border-top:1px solid var(--border-soft);
       padding:8px 10px 10px;
-      z-index:30;
+      z-index:25;
       box-shadow:0 -10px 22px rgba(0,0,0,0.75);
     }
     body.theme-light .cart-bar{
@@ -438,9 +487,6 @@
     }
     .cart-sheet-header h3{
       font-size:13px;
-      display:flex;
-      align-items:center;
-      gap:4px;
     }
     .cart-sheet-header button{
       border:none;
@@ -584,6 +630,153 @@
       transform:translate(-50%, -2px);
       pointer-events:auto;
     }
+
+    /* HISTORY PAGE */
+    .page{
+      padding:10px 12px 80px;
+    }
+    .page-title{
+      font-size:15px;
+      font-weight:600;
+      margin-bottom:4px;
+    }
+    .page-sub{
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
+    .history-empty{
+      font-size:11px;
+      color:var(--muted);
+      padding:16px 0;
+      text-align:center;
+    }
+    .order-card{
+      background:var(--card);
+      border-radius:12px;
+      border:1px solid var(--border-soft);
+      padding:8px 10px;
+      margin-bottom:8px;
+      font-size:11px;
+      box-shadow:0 6px 16px rgba(0,0,0,0.5);
+    }
+    body.theme-light .order-card{
+      background:#ffffff;
+      box-shadow:0 6px 14px rgba(148,163,184,0.6);
+    }
+    .order-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:4px;
+    }
+    .order-head strong{
+      font-size:12px;
+    }
+    .order-meta{
+      font-size:10px;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .order-items{
+      margin-top:4px;
+      padding-left:10px;
+    }
+    .order-items li{
+      margin-bottom:2px;
+    }
+
+    .clear-history-btn{
+      border:none;
+      background:transparent;
+      color:var(--danger);
+      font-size:11px;
+      text-decoration:underline;
+      cursor:pointer;
+      margin-bottom:6px;
+    }
+
+    /* ADMIN PAGE */
+    .admin-form{
+      background:var(--card);
+      border-radius:12px;
+      border:1px solid var(--border-soft);
+      padding:8px 10px;
+      font-size:11px;
+      margin-bottom:10px;
+    }
+    body.theme-light .admin-form{
+      background:#ffffff;
+      box-shadow:0 6px 14px rgba(148,163,184,0.4);
+    }
+    .admin-form h3{
+      font-size:13px;
+      margin-bottom:6px;
+    }
+    .form-row{
+      margin-bottom:6px;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .form-row label{
+      font-size:10px;
+      color:var(--muted);
+    }
+    .form-row input,
+    .form-row select{
+      border-radius:8px;
+      border:1px solid rgba(148,163,184,0.7);
+      padding:5px 7px;
+      font-size:11px;
+      background:rgba(15,23,42,0.7);
+      color:#f9fafb;
+    }
+    body.theme-light .form-row input,
+    body.theme-light .form-row select{
+      background:#f9fafb;
+      color:#111827;
+    }
+    .admin-btn{
+      border:none;
+      border-radius:999px;
+      padding:7px 9px;
+      background:linear-gradient(120deg,#22c55e,#16a34a);
+      color:#022c22;
+      font-size:11px;
+      font-weight:600;
+      cursor:pointer;
+      margin-top:4px;
+    }
+    .admin-info{
+      font-size:10px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    .admin-list-title{
+      font-size:12px;
+      margin:6px 0 4px;
+      font-weight:600;
+    }
+    .admin-product-row{
+      font-size:11px;
+      padding:5px 0;
+      border-bottom:1px dashed rgba(75,85,99,0.6);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:6px;
+    }
+    .admin-product-row span{
+      flex:1;
+    }
+    .admin-delete-btn{
+      border:none;
+      background:transparent;
+      color:var(--danger);
+      cursor:pointer;
+      font-size:16px;
+    }
   </style>
 </head>
 
@@ -591,66 +784,145 @@
 
   <!-- HEADER -->
   <header class="header">
-    <div class="logo-wrap">
-      <div class="logo-circle">
-        <span>B</span>
+    <div class="header-row">
+      <div class="logo-wrap">
+        <div class="logo-circle">
+          <span>B</span>
+        </div>
+        <div class="logo-text">
+          <strong>Beauty Store</strong>
+          <small>Premium kosmetika do‘koni</small>
+        </div>
       </div>
-      <div class="logo-text">
-        <strong>Beauty Store</strong>
-        <small>Premium kosmetika do‘koni</small>
+      <div class="header-right">
+        <button class="theme-toggle" id="themeToggleBtn" type="button">🌙</button>
+
+        <!-- Savat tepada o'ng burchakda -->
+        <button class="cart-icon-btn" type="button" onclick="toggleCartSheet(true)">
+          <span class="cart-icon-left">🛒</span>
+          <div class="cart-icon-info">
+            <strong><span id="cartCountTop">0</span> ta</strong>
+            <small id="cartTotalTop">0 so‘m</small>
+          </div>
+        </button>
       </div>
     </div>
-    <div class="header-right">
-      <button class="theme-toggle" id="themeToggleBtn" type="button">🌙</button>
 
-      <!-- Savat tepada o'ng burchakda -->
-      <button class="cart-icon-btn" type="button" onclick="toggleCartSheet(true)">
-        <span class="cart-icon-left">🛒</span>
-        <div class="cart-icon-info">
-          <strong><span id="cartCountTop">0</span> ta</strong>
-          <small id="cartTotalTop">0 so‘m</small>
-        </div>
-      </button>
+    <!-- TABS -->
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" data-page="shopPage">Do‘kon</button>
+      <button class="tab-btn" data-page="historyPage">Buyurtmalar tarixi</button>
+      <button class="tab-btn" data-page="adminPage">Admin</button>
     </div>
   </header>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-title">
-      Har kuni <span>go‘zallik</span> kayfiyati 💫
-    </div>
-    <p class="hero-sub">
-      Pomada, krem, parfyum, niqob va yana ko‘plab mahsulotlar — hammasi bitta joyda.
-    </p>
-    <div class="hero-badges">
-      <div class="badge">⭐ Original sifat</div>
-      <div class="badge">🔥 Eng ko‘p sotilganlar</div>
-      <div class="badge">💌 Telegram orqali buyurtma</div>
-    </div>
-    <div class="hero-tag">
-      ✨ Buyurtmalar <strong>@onatili_premium</strong> ga yuboriladi
-    </div>
-    <div class="hero-note">
-      Buyurtma yuborilgandan keyin faqat telefon raqamingizni yozib qoldiring —
-      admin sizga tez orada qo‘ng‘iroq qiladi.
-    </div>
-  </section>
+  <!-- SHOP PAGE -->
+  <div id="shopPage">
+    <section class="hero">
+      <div class="hero-title">
+        Har kuni <span>go‘zallik</span> kayfiyati 💫
+      </div>
+      <p class="hero-sub">
+        Pomada, krem, parfyum, niqob va yana ko‘plab mahsulotlar — hammasi bitta joyda.
+      </p>
+      <div class="hero-badges">
+        <div class="badge">⭐ Original sifat</div>
+        <div class="badge">🔥 Eng ko‘p sotilganlar</div>
+        <div class="badge">💌 Telegram orqali buyurtma</div>
+      </div>
+      <div class="hero-tag">
+        ✨ Buyurtmalar <strong>@onatili_premium</strong> ga chiroyli formatda boradi
+      </div>
+      <div class="hero-note">
+        Buyurtma yuborilgandan keyin faqat telefon raqamingizni yozib qoldiring —
+        admin sizga tez orada qo‘ng‘iroq qiladi.
+      </div>
+    </section>
 
-  <!-- FILTERS -->
-  <div class="filters" id="filterBar">
-    <button class="chip active" data-category="all">⭐ Barchasi</button>
-    <button class="chip" data-category="pomada">💄 Pomada</button>
-    <button class="chip" data-category="krem">🧴 Kremlar</button>
-    <button class="chip" data-category="parfyum">🌸 Parfyum</button>
-    <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
-    <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
-    <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
+    <!-- FILTERS -->
+    <div class="filters" id="filterBar">
+      <button class="chip active" data-category="all">⭐ Barchasi</button>
+      <button class="chip" data-category="pomada">💄 Pomada</button>
+      <button class="chip" data-category="krem">🧴 Kremlar</button>
+      <button class="chip" data-category="parfyum">🌸 Parfyum</button>
+      <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
+      <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
+      <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
+    </div>
+
+    <!-- PRODUCTS -->
+    <main class="products-wrap">
+      <div class="products-grid" id="productsGrid"></div>
+    </main>
   </div>
 
-  <!-- PRODUCTS -->
-  <main class="products-wrap">
-    <div class="products-grid" id="productsGrid"></div>
-  </main>
+  <!-- HISTORY PAGE -->
+  <div id="historyPage" class="page hidden">
+    <div class="page-title">📜 Buyurtmalar tarixi</div>
+    <p class="page-sub">
+      Bu yerda shu qurilmadan yuborilgan buyurtmalaringiz ro‘yxati saqlanadi
+      (faqat shu brauzer / telefon uchun).
+    </p>
+    <button class="clear-history-btn" type="button" onclick="clearHistory()">
+      Tarixni tozalash
+    </button>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- ADMIN PAGE -->
+  <div id="adminPage" class="page hidden">
+    <div class="page-title">🛠 Admin panel</div>
+    <p class="page-sub">
+      Bu sahifa faqat o‘zingiz foydalanish uchun. Qo‘shgan mahsulotlaringiz localStorage’da saqlanadi.
+    </p>
+
+    <div class="admin-form">
+      <h3>Yangi mahsulot qo‘shish</h3>
+      <div class="form-row">
+        <label>Mahsulot nomi</label>
+        <input id="adminName" placeholder="Masalan: Luxury Lipstick Pink" />
+      </div>
+      <div class="form-row">
+        <label>Kategoriya</label>
+        <select id="adminCategory">
+          <option value="pomada">Pomada / lab uchun</option>
+          <option value="krem">Krem / yuz uchun</option>
+          <option value="parfyum">Parfyum</option>
+          <option value="niqob">Niqob / mask</option>
+          <option value="ko‘z">Ko‘z uchun</option>
+          <option value="tana">Tana / soch parvarishi</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Narx (so‘m)</label>
+        <input id="adminPrice" type="number" min="0" placeholder="Masalan: 99000" />
+      </div>
+      <div class="form-row">
+        <label>Eski narx (ixtiyoriy)</label>
+        <input id="adminOldPrice" type="number" min="0" placeholder="Masalan: 119000" />
+      </div>
+      <div class="form-row">
+        <label>Qisqa tavsiya / tag (ixtiyoriy)</label>
+        <input id="adminTag" placeholder="Masalan: Kundalik foydalanish uchun" />
+      </div>
+      <div class="form-row">
+        <label>Rasm URL manzili (har bir mahsulot uchun alohida)</label>
+        <input id="adminImage" placeholder="https:// ... kosmetika rasmi" />
+      </div>
+      <button class="admin-btn" type="button" onclick="addCustomProduct()">
+        ➕ Mahsulotni qo‘shish
+      </button>
+      <p class="admin-info">
+        Eslatma: qo‘shilgan mahsulotlar faqat shu qurilmada saqlanadi.
+      </p>
+    </div>
+
+    <div class="admin-info">
+      🔴 O‘chirish faqat o‘zingiz qo‘shgan mahsulotlar uchun ishlaydi.
+    </div>
+    <div class="admin-list-title">Siz qo‘shgan mahsulotlar:</div>
+    <div id="adminCustomList"></div>
+  </div>
 
   <!-- BOTTOM ORDER BAR -->
   <div class="cart-bar">
@@ -661,7 +933,7 @@
       <div>
         <div>📩 Buyurtmani Telegramga yuborish</div>
         <span class="small">
-          Istalgancha marta yuborish mumkin. Faqat Telegramda telefon raqamingizni yozib qoldiring.
+          Istalgancha marta yuborish mumkin. Telegramda telefon raqamingizni yozib qoldiring.
         </span>
       </div>
       <div><span style="font-size:18px;">›</span></div>
@@ -679,7 +951,7 @@
     <div class="cart-sheet-body" id="cartItems"></div>
     <div class="cart-sheet-footer">
       <div class="cart-edit-label">
-        🔧 Buyurtmani tahrirlash / o‘chirish (qizil tugma orqali)
+        🔧 Buyurtmani tahrirlash / o‘chirish (qizil ✕ tugmalar orqali)
       </div>
       <div class="cart-sheet-footer-top">
         <span>Umumiy summa:</span>
@@ -697,46 +969,355 @@
   </div>
 
 <script>
-  // Mahsulotlar ro‘yxati
-  const products = [
-    {name:"Mat pomada Nude Lux", price:89000, oldPrice:109000, category:"pomada", emoji:"💄", tag:"Yangi"},
-    {name:"Qizil mat pomada Classic Red", price:99000, oldPrice:119000, category:"pomada", emoji:"💋", tag:"Best seller"},
-    {name:"Lip gloss Shimmer Rose", price:76000, oldPrice:null, category:"pomada", emoji:"✨", tag:"Yaltirroq effekt"},
-    {name:"Gialuronli yuz kremi", price:129000, oldPrice:149000, category:"krem", emoji:"🧴", tag:"Namlik 24 soat"},
-    {name:"Kunduzgi SPF 50 krem", price:139000, oldPrice:159000, category:"krem", emoji:"🌞", tag:"SPF qo‘riqlovchi"},
-    {name:"Tungi regeneratsion krem", price:155000, oldPrice:179000, category:"krem", emoji:"🌙", tag:"Tungi parvarish"},
-    {name:"Gul hidli ayollar parfyumi", price:199000, oldPrice:229000, category:"parfyum", emoji:"🌸", tag:"Eng ko‘p yoqadigan"},
-    {name:"Erkaklar uchun Fresh parfyum", price:189000, oldPrice:219000, category:"parfyum", emoji:"🕺", tag:"Uzoq saqlanadi"},
-    {name:"Unisex Citrus parfyum", price:215000, oldPrice:249000, category:"parfyum", emoji:"🍋", tag:"Citrus hidi"},
-    {name:"Ko‘z soyasi palitrasi 16 rang", price:175000, oldPrice:199000, category:"ko‘z", emoji:"👁", tag:"Professional"},
-    {name:"Qalam tusuvchi ko‘z layner", price:59000, oldPrice:null, category:"ko‘z", emoji:"✏️", tag:"Qora klassik"},
-    {name:"Hajm beruvchi maskara Volume+", price:97000, oldPrice:119000, category:"ko‘z", emoji:"🎯", tag:"Juda mashhur"},
-    {name:"Qora maska (poralarni tozalovchi)", price:69000, oldPrice:84000, category:"niqob", emoji:"😷", tag:"Terlashga qarshi"},
-    {name:"Matlashtiruvchi loy niqob", price:73000, oldPrice:null, category:"niqob", emoji:"🧪", tag:"Yog‘li teri uchun"},
-    {name:"Namlik beruvchi mato niqob", price:39000, oldPrice:49000, category:"niqob", emoji:"💧", tag:"1 dona"},
-    {name:"Tana uchun shokolad skrab", price:99000, oldPrice:115000, category:"tana", emoji:"🍫", tag:"Yumshoq teri"},
-    {name:"Dush geli Coconut Dream", price:67000, oldPrice:null, category:"tana", emoji:"🛁", tag:"Kokos hidi"},
-    {name:"Qo‘l kremi Almond Care", price:49000, oldPrice:null, category:"tana", emoji:"🤲", tag:"Quruq teri uchun"},
-    {name:"Sochlar uchun argan yog‘i", price:129000, oldPrice:145000, category:"tana", emoji:"💆‍♀️", tag:"Sochni tiklaydi"},
-    {name:"Soch spreyi Heat Protection", price:88000, oldPrice:null, category:"tana", emoji:"🔥", tag:"Fyon uchun"},
-    {name:"Brow gel — qosh uchun gel", price:64000, oldPrice:null, category:"ko‘z", emoji:"🪞", tag:"Tartibli qosh"},
-    {name:"Make-up bazasi (primer)", price:99000, oldPrice:119000, category:"krem", emoji:"🎨", tag:"Makiyaj uchun baza"},
-    {name:"BB krem Natural Finish", price:115000, oldPrice:135000, category:"krem", emoji:"🧴", tag:"Yengil qoplama"},
-    {name:"Ton krem Full Cover", price:159000, oldPrice:179000, category:"krem", emoji:"🧱", tag:"To‘liq qoplama"},
-    {name:"Highlighter Glow Stick", price:89000, oldPrice:null, category:"pomada", emoji:"🌟", tag:"Yaltiraydigan"},
-    {name:"Blush Peach Cheeks", price:83000, oldPrice:95000, category:"pomada", emoji:"🍑", tag:"Tabiiy rang"},
-    {name:"Setting spray 16h", price:99000, oldPrice:119000, category:"krem", emoji:"💦", tag:"Makiyajni ushlab turadi"},
-    {name:"Mitsellyar suv 400ml", price:69000, oldPrice:null, category:"tana", emoji:"💧", tag:"Yuzni tozalash"},
-    {name:"Yuz uchun peeling kislota", price:119000, oldPrice:139000, category:"krem", emoji:"🧪", tag:"Yangi hujayralar"},
-    {name:"Lab balzami Cocoa Care", price:39000, oldPrice:45000, category:"pomada", emoji:"🍫", tag:"Quruq lablar uchun"},
-    {name:"Ko‘z atrofidagi krem", price:129000, oldPrice:149000, category:"ko‘z", emoji:"🌙", tag:"Qorong‘i halqalarga"},
-    {name:"Antiperspirant roll-on", price:54000, oldPrice:null, category:"tana", emoji:"🧼", tag:"24 soat himoya"},
-    {name:"Tana yog‘i Vanilla Kiss", price:99000, oldPrice:115000, category:"tana", emoji:"🧴", tag:"Vanil hidi"},
-    {name:"Keng taroqli soch shетка", price:45000, oldPrice:null, category:"tana", emoji:"🪮", tag:"Sochni uzmaydi"},
-    {name:"Make-up cho‘tkalar seti 7 dona", price:139000, oldPrice:159000, category:"tana", emoji:"🖌", tag:"To‘liq to‘plam"},
-    {name:"Maskara Waterproof", price:93000, oldPrice:109000, category:"ko‘z", emoji:"💧", tag:"Suvga chidamli"}
+  // --- MA'LUMOTLAR ---
+
+  const defaultProducts = [
+    {
+      name:"Mat pomada Nude Lux",
+      price:89000,
+      oldPrice:109000,
+      category:"pomada",
+      emoji:"💄",
+      tag:"Yangi",
+      image:"https://images.pexels.com/photos/3373744/pexels-photo-3373744.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Qizil mat pomada Classic Red",
+      price:99000,
+      oldPrice:119000,
+      category:"pomada",
+      emoji:"💋",
+      tag:"Best seller",
+      image:"https://images.pexels.com/photos/947301/pexels-photo-947301.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Lip gloss Shimmer Rose",
+      price:76000,
+      oldPrice:null,
+      category:"pomada",
+      emoji:"✨",
+      tag:"Yaltirroq effekt",
+      image:"https://images.pexels.com/photos/3373749/pexels-photo-3373749.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Gialuronli yuz kremi",
+      price:129000,
+      oldPrice:149000,
+      category:"krem",
+      emoji:"🧴",
+      tag:"Namlik 24 soat",
+      image:"https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Kunduzgi SPF 50 krem",
+      price:139000,
+      oldPrice:159000,
+      category:"krem",
+      emoji:"🌞",
+      tag:"SPF qo‘riqlovchi",
+      image:"https://images.pexels.com/photos/3738342/pexels-photo-3738342.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Tungi regeneratsion krem",
+      price:155000,
+      oldPrice:179000,
+      category:"krem",
+      emoji:"🌙",
+      tag:"Tungi parvarish",
+      image:"https://images.pexels.com/photos/3738364/pexels-photo-3738364.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Gul hidli ayollar parfyumi",
+      price:199000,
+      oldPrice:229000,
+      category:"parfyum",
+      emoji:"🌸",
+      tag:"Eng ko‘p yoqadigan",
+      image:"https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Erkaklar uchun Fresh parfyum",
+      price:189000,
+      oldPrice:219000,
+      category:"parfyum",
+      emoji:"🕺",
+      tag:"Uzoq saqlanadi",
+      image:"https://images.pexels.com/photos/965992/pexels-photo-965992.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Unisex Citrus parfyum",
+      price:215000,
+      oldPrice:249000,
+      category:"parfyum",
+      emoji:"🍋",
+      tag:"Citrus hidi",
+      image:"https://images.pexels.com/photos/965990/pexels-photo-965990.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Ko‘z soyasi palitrasi 16 rang",
+      price:175000,
+      oldPrice:199000,
+      category:"ko‘z",
+      emoji:"👁",
+      tag:"Professional",
+      image:"https://images.pexels.com/photos/3373735/pexels-photo-3373735.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Qalam tusuvchi ko‘z layner",
+      price:59000,
+      oldPrice:null,
+      category:"ko‘z",
+      emoji:"✏️",
+      tag:"Qora klassik",
+      image:"https://images.pexels.com/photos/3738345/pexels-photo-3738345.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Hajm beruvchi maskara Volume+",
+      price:97000,
+      oldPrice:119000,
+      category:"ko‘z",
+      emoji:"🎯",
+      tag:"Juda mashhur",
+      image:"https://images.pexels.com/photos/3373737/pexels-photo-3373737.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Qora maska (poralarni tozalovchi)",
+      price:69000,
+      oldPrice:84000,
+      category:"niqob",
+      emoji:"😷",
+      tag:"Terlashga qarshi",
+      image:"https://images.pexels.com/photos/3738346/pexels-photo-3738346.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Matlashtiruvchi loy niqob",
+      price:73000,
+      oldPrice:null,
+      category:"niqob",
+      emoji:"🧪",
+      tag:"Yog‘li teri uchun",
+      image:"https://images.pexels.com/photos/3738361/pexels-photo-3738361.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Namlik beruvchi mato niqob",
+      price:39000,
+      oldPrice:49000,
+      category:"niqob",
+      emoji:"💧",
+      tag:"1 dona",
+      image:"https://images.pexels.com/photos/3738355/pexels-photo-3738355.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Tana uchun shokolad skrab",
+      price:99000,
+      oldPrice:115000,
+      category:"tana",
+      emoji:"🍫",
+      tag:"Yumshoq teri",
+      image:"https://images.pexels.com/photos/3738370/pexels-photo-3738370.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Dush geli Coconut Dream",
+      price:67000,
+      oldPrice:null,
+      category:"tana",
+      emoji:"🛁",
+      tag:"Kokos hidi",
+      image:"https://images.pexels.com/photos/3738373/pexels-photo-3738373.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Qo‘l kremi Almond Care",
+      price:49000,
+      oldPrice:null,
+      category:"tana",
+      emoji:"🤲",
+      tag:"Quruq teri uchun",
+      image:"https://images.pexels.com/photos/3738375/pexels-photo-3738375.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Sochlar uchun argan yog‘i",
+      price:129000,
+      oldPrice:145000,
+      category:"tana",
+      emoji:"💆‍♀️",
+      tag:"Sochni tiklaydi",
+      image:"https://images.pexels.com/photos/3738371/pexels-photo-3738371.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Soch spreyi Heat Protection",
+      price:88000,
+      oldPrice:null,
+      category:"tana",
+      emoji:"🔥",
+      tag:"Fyon uchun",
+      image:"https://images.pexels.com/photos/3738374/pexels-photo-3738374.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Brow gel — qosh uchun gel",
+      price:64000,
+      oldPrice:null,
+      category:"ko‘z",
+      emoji:"🪞",
+      tag:"Tartibli qosh",
+      image:"https://images.pexels.com/photos/3738344/pexels-photo-3738344.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Make-up bazasi (primer)",
+      price:99000,
+      oldPrice:119000,
+      category:"krem",
+      emoji:"🎨",
+      tag:"Makiyaj uchun baza",
+      image:"https://images.pexels.com/photos/3738365/pexels-photo-3738365.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"BB krem Natural Finish",
+      price:115000,
+      oldPrice:135000,
+      category:"krem",
+      emoji:"🧴",
+      tag:"Yengil qoplama",
+      image:"https://images.pexels.com/photos/3738362/pexels-photo-3738362.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Ton krem Full Cover",
+      price:159000,
+      oldPrice:179000,
+      category:"krem",
+      emoji:"🧱",
+      tag:"To‘liq qoplama",
+      image:"https://images.pexels.com/photos/3738348/pexels-photo-3738348.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Highlighter Glow Stick",
+      price:89000,
+      oldPrice:null,
+      category:"pomada",
+      emoji:"🌟",
+      tag:"Yaltiraydigan",
+      image:"https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Blush Peach Cheeks",
+      price:83000,
+      oldPrice:95000,
+      category:"pomada",
+      emoji:"🍑",
+      tag:"Tabiiy rang",
+      image:"https://images.pexels.com/photos/3738360/pexels-photo-3738360.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Setting spray 16h",
+      price:99000,
+      oldPrice:119000,
+      category:"krem",
+      emoji:"💦",
+      tag:"Makiyajni ushlab turadi",
+      image:"https://images.pexels.com/photos/3738363/pexels-photo-3738363.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Mitsellyar suv 400ml",
+      price:69000,
+      oldPrice:null,
+      category:"tana",
+      emoji:"💧",
+      tag:"Yuzni tozalash",
+      image:"https://images.pexels.com/photos/3738347/pexels-photo-3738347.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Yuz uchun peeling kislota",
+      price:119000,
+      oldPrice:139000,
+      category:"krem",
+      emoji:"🧪",
+      tag:"Yangi hujayralar",
+      image:"https://images.pexels.com/photos/3738354/pexels-photo-3738354.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Lab balzami Cocoa Care",
+      price:39000,
+      oldPrice:45000,
+      category:"pomada",
+      emoji:"🍫",
+      tag:"Quruq lablar uchun",
+      image:"https://images.pexels.com/photos/3738343/pexels-photo-3738343.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Ko‘z atrofidagi krem",
+      price:129000,
+      oldPrice:149000,
+      category:"ko‘z",
+      emoji:"🌙",
+      tag:"Qorong‘i halqalarga",
+      image:"https://images.pexels.com/photos/3738366/pexels-photo-3738366.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Antiperspirant roll-on",
+      price:54000,
+      oldPrice:null,
+      category:"tana",
+      emoji:"🧼",
+      tag:"24 soat himoya",
+      image:"https://images.pexels.com/photos/3738372/pexels-photo-3738372.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Tana yog‘i Vanilla Kiss",
+      price:99000,
+      oldPrice:115000,
+      category:"tana",
+      emoji:"🧴",
+      tag:"Vanil hidi",
+      image:"https://images.pexels.com/photos/3738369/pexels-photo-3738369.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Keng taroqli soch shетка",
+      price:45000,
+      oldPrice:null,
+      category:"tana",
+      emoji:"🪮",
+      tag:"Sochni uzmaydi",
+      image:"https://images.pexels.com/photos/3738368/pexels-photo-3738368.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Make-up cho‘tkalar seti 7 dona",
+      price:139000,
+      oldPrice:159000,
+      category:"tana",
+      emoji:"🖌",
+      tag:"To‘liq to‘plam",
+      image:"https://images.pexels.com/photos/3738385/pexels-photo-3738385.jpeg?auto=compress&cs=tinysrgb&w=400"
+    },
+    {
+      name:"Maskara Waterproof",
+      price:93000,
+      oldPrice:109000,
+      category:"ko‘z",
+      emoji:"💧",
+      tag:"Suvga chidamli",
+      image:"https://images.pexels.com/photos/3738367/pexels-photo-3738367.jpeg?auto=compress&cs=tinysrgb&w=400"
+    }
   ];
 
+  const STORAGE_PRODUCTS = "beauty_custom_products";
+  const STORAGE_HISTORY = "beauty_order_history";
+  const THEME_KEY = "beauty_theme";
+
+  let customProducts = [];
+  let products = [];
+  let cart = [];
+  let activeCategory = "all";
+
+  const categoryEmoji = {
+    "pomada":"💄",
+    "krem":"🧴",
+    "parfyum":"🌸",
+    "niqob":"😷",
+    "ko‘z":"👁",
+    "tana":"🛁",
+    "default":"💅"
+  };
+
+  // --- DOM elementlar ---
   const productsGrid = document.getElementById("productsGrid");
   const filterBar = document.getElementById("filterBar");
   const cartCountTopEl = document.getElementById("cartCountTop");
@@ -747,45 +1328,57 @@
   const cartItemsEl = document.getElementById("cartItems");
   const cartSheetTotalEl = document.getElementById("cartSheetTotal");
   const themeToggleBtn = document.getElementById("themeToggleBtn");
+  const tabsEl = document.getElementById("tabs");
+  const historyListEl = document.getElementById("historyList");
+  const adminCustomListEl = document.getElementById("adminCustomList");
 
-  let activeCategory = "all";
-  let cart = [];
-
+  // --- Yordamchi funksiyalar ---
   function formatPrice(v){
     return v.toLocaleString("uz-UZ");
   }
 
+  function showToast(message){
+    toastEl.textContent = message;
+    toastEl.classList.add("show");
+    setTimeout(()=> toastEl.classList.remove("show"), 1100);
+  }
+
+  // --- Mahsulotlarni render qilish ---
   function renderProducts(){
     productsGrid.innerHTML = "";
     const filtered = products.filter(p =>
       activeCategory === "all" ? true : p.category === activeCategory
     );
     filtered.forEach(p=>{
-      const globalIndex = products.indexOf(p);
+      const index = products.indexOf(p);
       const discount = p.oldPrice ? (100 - Math.round(p.price*100/p.oldPrice)) : null;
+      const tag = p.tag || "Ommabop mahsulot";
       productsGrid.innerHTML += `
         <article class="product-card">
           <div class="product-top">
-            <div class="product-emoji">${p.emoji}</div>
             <div class="product-img-tag">
               <span>Beauty</span> <span>Pro</span>
             </div>
+            <div class="product-photo">
+              <img src="${p.image}" alt="${p.name}">
+            </div>
+            <div class="product-emoji">${p.emoji || categoryEmoji[p.category] || "💅"}</div>
             ${discount ? `<div class="product-sale">- ${discount}%</div>` : ``}
           </div>
           <div class="product-body">
             <div class="product-name">${p.name}</div>
             <div class="product-meta">
-              ${p.category.toUpperCase()} • ${p.tag || "Ommabop mahsulot"}
+              ${p.category.toUpperCase()} • ${tag}
             </div>
             <div class="tag-mini">
-              💡 Tavsiya: ${p.tag || "Har kungi parvarish"}
+              💡 Tavsiya: ${tag}
             </div>
             <div class="price-row">
               <div>
                 <div class="price-main">${formatPrice(p.price)} so‘m</div>
                 ${p.oldPrice ? `<div class="price-old">${formatPrice(p.oldPrice)} so‘m</div>` : ``}
               </div>
-              <button class="btn-add" onclick="addToCart(${globalIndex})">
+              <button class="btn-add" onclick="addToCart(${index})">
                 ➕ Savatga
               </button>
             </div>
@@ -795,7 +1388,7 @@
     });
   }
 
-  // Filter tugmalari
+  // --- Filter tugmalari ---
   filterBar.addEventListener("click", (e)=>{
     const btn = e.target.closest(".chip");
     if(!btn) return;
@@ -805,7 +1398,7 @@
     renderProducts();
   });
 
-  // Savatga qo‘shish
+  // --- Savat funksiyalari ---
   function addToCart(index){
     const found = cart.find(c => c.index === index);
     if(found){
@@ -833,13 +1426,6 @@
     }
   }
 
-  function showToast(message){
-    toastEl.textContent = message;
-    toastEl.classList.add("show");
-    setTimeout(()=> toastEl.classList.remove("show"), 1100);
-  }
-
-  // Savat oynasi
   function toggleCartSheet(force){
     const isOpen = cartSheet.classList.contains("open");
     const next = typeof force === "boolean" ? force : !isOpen;
@@ -903,44 +1489,125 @@
     renderCartItems();
   }
 
-  // Telegramga ochish (WebApp uchun mos / brauzer uchun alohida)
+  // --- Telegram WebApp link ochish ---
   function openTelegramLink(url){
     const tg = window.Telegram && window.Telegram.WebApp;
     if(tg){
-      tg.openTelegramLink(url); // WebApp ichida
+      tg.openTelegramLink(url);  // WebApp ichida
     }else{
       window.open(url, "_blank"); // brauzerda yangi tab, sayt yopilmaydi
     }
   }
 
-  // Telegramga yuborish — istalgancha marta mumkin
+  // --- Buyurtma tarixini saqlash ---
+  function saveOrderHistory(order){
+    let list = [];
+    try{
+      list = JSON.parse(localStorage.getItem(STORAGE_HISTORY) || "[]");
+    }catch(e){}
+    list.unshift(order); // eng oxirgi tepada turadi
+    localStorage.setItem(STORAGE_HISTORY, JSON.stringify(list));
+    renderHistory();
+  }
+
+  function renderHistory(){
+    let list = [];
+    try{
+      list = JSON.parse(localStorage.getItem(STORAGE_HISTORY) || "[]");
+    }catch(e){}
+    if(!list.length){
+      historyListEl.innerHTML = "<p class='history-empty'>Hozircha buyurtmalar tarixi bo‘sh.</p>";
+      return;
+    }
+    historyListEl.innerHTML = "";
+    list.forEach((order, idx)=>{
+      const date = new Date(order.date);
+      const dateStr = date.toLocaleString("uz-UZ");
+      let itemsHtml = "";
+      order.items.forEach(it=>{
+        itemsHtml += `<li>${it.line}</li>`;
+      });
+      historyListEl.innerHTML += `
+        <div class="order-card">
+          <div class="order-head">
+            <strong>Buyurtma #${list.length - idx}</strong>
+            <span>${order.totalFormatted}</span>
+          </div>
+          <div class="order-meta">
+            📅 ${dateStr} • 🧺 ${order.totalItems} ta mahsulot
+          </div>
+          <div>Mahsulotlar:</div>
+          <ul class="order-items">
+            ${itemsHtml}
+          </ul>
+        </div>
+      `;
+    });
+  }
+
+  function clearHistory(){
+    if(confirm("Buyurtmalar tarixini tozalashni xohlaysizmi?")){
+      localStorage.removeItem(STORAGE_HISTORY);
+      renderHistory();
+    }
+  }
+
+  // --- Telegramga yuborish (chiroyli matn bilan) ---
   function sendOrder(){
     if(cart.length === 0){
       showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
       return;
     }
-    let text = "Assalomu alaykum. Men quyidagi kosmetika mahsulotlarini buyurtma qilmoqchiman:\n\n";
+
     let totalPrice = 0;
+    let totalItems = 0;
+    let lines = [];
+
     cart.forEach((c, i)=>{
       const p = products[c.index];
       const lineTotal = p.price * c.qty;
       totalPrice += lineTotal;
-      text += (i+1) + ") " + p.name + " — " + c.qty + " dona — " + formatPrice(lineTotal) + " so‘m\n";
+      totalItems += c.qty;
+      const catEmoji = categoryEmoji[p.category] || p.emoji || categoryEmoji.default;
+      const lineText =
+        `${i+1}) ${catEmoji} ${p.name} — ${c.qty} dona × ${formatPrice(p.price)} so‘m = ${formatPrice(lineTotal)} so‘m`;
+      lines.push({line: lineText, product: p});
     });
-    text += "\nUmumiy summa: " + formatPrice(totalPrice) + " so‘m\n";
-    text += "\nFaqat telefon raqamimni yozib qoldiraman, admin menga tez orada qo‘ng‘iroq qiladi.";
+
+    const totalStr = formatPrice(totalPrice);
+
+    let text = "";
+    text += "💖 BEAUTY STORE — Onlayn buyurtma\n";
+    text += "━━━━━━━━━━━━━━━━━━━━\n";
+    text += "🧺 Savatimdagi mahsulotlar:\n\n";
+    lines.forEach(l=>{
+      text += "• " + l.line + "\n";
+    });
+    text += "\n💰 Umumiy summa: " + totalStr + " so‘m\n";
+    text += "📦 Buyurtma turi: Kosmetika mahsulotlari\n";
+    text += "━━━━━━━━━━━━━━━━━━━━\n";
+    text += "📱 Faqat telefon raqamimni yozib qoldiraman,\n";
+    text += "admin menga tez orada qo‘ng‘iroq qiladi.\n";
+    text += "📍 Manzilim: _______\n";
 
     const encoded = encodeURIComponent(text);
-    // Har safar URL oxiriga unique parametr qo‘shamiz — qayta-qayta yuborilaversin
     const url = "https://t.me/onatili_premium?text=" + encoded + "&t=" + Date.now();
 
+    // Tarixga saqlash
+    const order = {
+      date: new Date().toISOString(),
+      totalPrice: totalPrice,
+      totalFormatted: totalStr + " so‘m",
+      totalItems: totalItems,
+      items: lines
+    };
+    saveOrderHistory(order);
+
     openTelegramLink(url);
-    showToast("✅ Buyurtma yuborildi. Telefon raqamingizni yozib qoldiring.");
+    showToast("✅ Buyurtma yuborildi. Telegramda telefon raqamingizni yozib qoldiring.");
   }
 
-  // Tema (dark / light)
-  const THEME_KEY = "beauty_theme";
-
+  // --- Tema (dark / light) ---
   function applyTheme(theme){
     document.body.classList.toggle("theme-light", theme === "light");
     themeToggleBtn.textContent = theme === "light" ? "🌙" : "☀️";
@@ -955,19 +1622,137 @@
 
   themeToggleBtn.addEventListener("click", toggleTheme);
 
-  // Dastlabki init
+  // --- TABS: sahifalar o‘rtasida almashish ---
+  tabsEl.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".tab-btn");
+    if(!btn) return;
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const pageId = btn.dataset.page;
+    document.getElementById("shopPage").classList.add("hidden");
+    document.getElementById("historyPage").classList.add("hidden");
+    document.getElementById("adminPage").classList.add("hidden");
+    document.getElementById(pageId).classList.remove("hidden");
+
+    if(pageId === "historyPage"){
+      renderHistory();
+    }else if(pageId === "adminPage"){
+      renderAdminCustomList();
+    }
+  });
+
+  // --- Custom (admin qo‘shgan) mahsulotlar ---
+  function loadCustomProducts(){
+    try{
+      customProducts = JSON.parse(localStorage.getItem(STORAGE_PRODUCTS) || "[]");
+    }catch(e){
+      customProducts = [];
+    }
+  }
+
+  function saveCustomProducts(){
+    localStorage.setItem(STORAGE_PRODUCTS, JSON.stringify(customProducts));
+  }
+
+  function rebuildProducts(){
+    products = [...defaultProducts, ...customProducts];
+    renderProducts();
+  }
+
+  function addCustomProduct(){
+    const nameEl = document.getElementById("adminName");
+    const catEl = document.getElementById("adminCategory");
+    const priceEl = document.getElementById("adminPrice");
+    const oldPriceEl = document.getElementById("adminOldPrice");
+    const tagEl = document.getElementById("adminTag");
+    const imgEl = document.getElementById("adminImage");
+
+    const name = nameEl.value.trim();
+    const category = catEl.value;
+    const price = parseInt(priceEl.value, 10);
+    const oldPrice = oldPriceEl.value ? parseInt(oldPriceEl.value, 10) : null;
+    const tag = tagEl.value.trim();
+    const image = imgEl.value.trim() || "https://via.placeholder.com/400x400.png?text=Beauty";
+
+    if(!name || !price || price <= 0){
+      alert("Mahsulot nomi va narxini to‘g‘ri kiriting.");
+      return;
+    }
+
+    const emoji = categoryEmoji[category] || "💅";
+
+    const product = {
+      name,
+      price,
+      oldPrice,
+      category,
+      emoji,
+      tag,
+      image,
+      custom:true,
+      id: Date.now()
+    };
+
+    customProducts.push(product);
+    saveCustomProducts();
+    rebuildProducts();
+    renderAdminCustomList();
+
+    nameEl.value = "";
+    priceEl.value = "";
+    oldPriceEl.value = "";
+    tagEl.value = "";
+    imgEl.value = "";
+
+    showToast("✅ Mahsulot qo‘shildi");
+  }
+
+  function renderAdminCustomList(){
+    if(!customProducts.length){
+      adminCustomListEl.innerHTML = "<p class='history-empty'>Hali qo‘shilgan mahsulot yo‘q.</p>";
+      return;
+    }
+    adminCustomListEl.innerHTML = "";
+    customProducts.forEach(p=>{
+      adminCustomListEl.innerHTML += `
+        <div class="admin-product-row">
+          <span>${p.name}</span>
+          <span>${formatPrice(p.price)} so‘m</span>
+          <button class="admin-delete-btn" onclick="deleteCustomProduct(${p.id})">✕</button>
+        </div>
+      `;
+    });
+  }
+
+  function deleteCustomProduct(id){
+    if(!confirm("Bu mahsulotni o‘chirishni xohlaysizmi?")) return;
+    customProducts = customProducts.filter(p => p.id !== id);
+    saveCustomProducts();
+    rebuildProducts();
+    renderAdminCustomList();
+    showToast("🗑 Mahsulot o‘chirildi");
+  }
+
+  // --- INIT ---
   (function init(){
     const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
     applyTheme(savedTheme);
-    renderProducts();
+
+    loadCustomProducts();
+    rebuildProducts();
+    renderHistory();
   })();
 
-  // Global funksiyalar
+  // globalga funksiyalar
   window.addToCart = addToCart;
   window.toggleCartSheet = toggleCartSheet;
   window.changeQty = changeQty;
   window.removeFromCart = removeFromCart;
   window.sendOrder = sendOrder;
+  window.addCustomProduct = addCustomProduct;
+  window.deleteCustomProduct = deleteCustomProduct;
+  window.clearHistory = clearHistory;
 </script>
 
 </body>
