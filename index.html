@@ -31,20 +31,8 @@
       color:#f97316;
       text-shadow:0 0 18px rgba(249,115,22,0.9);
     }
-    .nav{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-size:14px;
-    }
-    .nav a{
-      color:#e5e7eb;
-      opacity:.85;
-      cursor:pointer;
-      position:relative;
-      padding-bottom:2px;
-      white-space:nowrap;
-    }
+    .nav{display:flex;align-items:center;gap:12px;font-size:14px;}
+    .nav a{color:#e5e7eb;opacity:.85;cursor:pointer;position:relative;padding-bottom:2px;}
     .nav a::after{
       content:"";position:absolute;left:0;bottom:0;width:0;height:2px;
       background:linear-gradient(90deg,#f97316,#facc15);
@@ -52,8 +40,7 @@
     }
     .nav a:hover{opacity:1;}
     .nav a:hover::after{width:100%;}
-    .nav .user-label{font-size:13px;opacity:.8;white-space:nowrap;}
-
+    .nav .user-label{font-size:13px;opacity:.8;}
     .btn-outline{
       border:1px solid rgba(248,250,252,0.7);
       border-radius:999px;
@@ -64,7 +51,6 @@
       color:#e5e7eb;
       box-shadow:0 0 14px rgba(15,23,42,0.8);
       transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
-      white-space:nowrap;
     }
     .btn-outline:hover{
       transform:translateY(-1px) scale(1.02);
@@ -245,7 +231,6 @@
       align-items:center;
       gap:8px;
       margin-bottom:8px;
-      flex-wrap:wrap;
     }
     .muted{font-size:13px;color:#6b7280;}
 
@@ -597,54 +582,6 @@
     }
     .footer small{opacity:.8;}
 
-    /* AUTH PANEL – TEPADA O‘NGDA SUZUVCHI */
-    #auth-section{
-      position:fixed;
-      top:72px;
-      right:16px;
-      max-width:420px;
-      width:calc(100% - 32px);
-      z-index:40;
-    }
-    #auth-section .grid-2{
-      grid-template-columns:minmax(0,1fr);
-    }
-    #auth-section .card{
-      padding:14px 12px 16px;
-      border-radius:18px;
-    }
-
-    /* Xush kelibsiz toast */
-    .welcome-toast{
-      position:fixed;
-      top:80px;
-      left:50%;
-      transform:translateX(-50%);
-      background:linear-gradient(135deg,#22c55e,#16a34a,#a3e635);
-      color:#ffffff;
-      padding:10px 18px;
-      border-radius:999px;
-      box-shadow:0 18px 40px rgba(22,163,74,0.7);
-      font-size:14px;
-      font-weight:600;
-      z-index:70;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      opacity:0;
-      pointer-events:none;
-      animation:toastIn .4s ease-out forwards;
-    }
-    .welcome-toast.hidden{
-      display:none;
-      opacity:0;
-      animation:none;
-    }
-    @keyframes toastIn{
-      from{opacity:0;transform:translate(-50%,-10px);}
-      to{opacity:1;transform:translate(-50%,0);}
-    }
-
     /* MOBIL */
     @media(max-width:768px){
       .header{
@@ -654,8 +591,7 @@
       }
       .nav{
         width:100%;
-        justify-content:flex-end;
-        flex-wrap:wrap;
+        justify-content:space-between;
       }
       .container{
         padding:14px 10px 22px;
@@ -688,11 +624,6 @@
       }
       .quiz-overlay-title{font-size:22px;}
       .quiz-overlay-sub{font-size:15px;}
-      #auth-section{
-        top:60px;
-        right:8px;
-        width:calc(100% - 16px);
-      }
     }
   </style>
 
@@ -712,25 +643,21 @@
     <div class="logo">Ona tili <span>Pro</span></div>
     <nav class="nav">
       <a id="nav-courses">Kurslar</a>
-      <a id="nav-my-courses" class="hidden">Mening kurslarim</a>
       <a id="nav-admin" class="hidden">Admin panel</a>
-      <button class="btn-outline" id="open-login-btn">Kirish</button>
-      <button class="btn-outline" id="open-register-btn">Ro‘yxatdan o‘tish</button>
       <span class="user-label" id="current-user-label">Mehmon</span>
       <button class="btn-outline hidden" id="logout-btn">Chiqish</button>
     </nav>
   </header>
 
   <main class="container">
-    <!-- AUTH PANEL (TEPADA O‘NGDA) -->
+    <!-- AUTH -->
     <section id="auth-section" class="section">
       <div class="grid-2">
         <div>
           <div class="card">
-            <h2>Xush kelibsiz!</h2>
+            <h2>Xush kelibsiz, online o‘quv markazimizga!</h2>
             <p class="sub">
-              “Ona tili Pro” platformasida darslar, video va quizlardan foydalanish uchun
-              <b>kirish</b> yoki <b>ro‘yxatdan o‘tish</b>ni unutmang.
+              Bu yerda siz <b>bilimlaringizni oshirasiz</b> va “Ona tili Pro” kurslari orqali tayyorlana olasiz.
             </p>
 
             <div class="tabs">
@@ -767,12 +694,32 @@
                 <input id="reg-password2" type="password" required />
               </div>
               <p class="hint">
-                Ro‘yxatdan o‘tgan foydalanuvchilar kurslarga obuna bo‘lib,
-                darslarni to‘liq ko‘rishlari mumkin. <b>Admin panel</b> faqat adminlar uchun.
+                Ro‘yxatdan o‘tgan foydalanuvchilar kurslarni ko‘rishlari mumkin, lekin
+                <b>admin panelga kira olmaydi</b>.
               </p>
               <button type="submit" class="btn">Ro‘yxatdan o‘tish</button>
               <div id="register-error" class="error"></div>
             </form>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h2>Kurs nomi: “Ona tili Pro” o‘quv markazi</h2>
+            <p class="sub">
+              Ona tili va adabiyot bo‘yicha onlayn kurslar, testlar va video darslar jamlanmasi.
+            </p>
+            <p class="hero-text">
+              • <b>Admin</b> — kurs va darslar yaratadi, YouTube <b>Unlisted</b> videolarni qo‘shadi.<br>
+              • <b>Foydalanuvchi</b> — ro‘yxatdan o‘tadi va darslarni tomosha qiladi, quizlarni ishlaydi.<br><br>
+              Har bir dars bo‘yicha ko‘rilgan <b>foiz</b> saqlanib boradi. Dars kamida
+              <b>10%</b> ko‘rilganda video bo‘yicha dars “ko‘rilgan” hisoblanadi.<br>
+              Keyingi darslar ochilishi uchun shu darsning <b>quizidan kamida 30%</b>
+              natija olish kerak (quiz bo‘lmagan darslarda faqat video 10% yetarli).<br><br>
+              Quizni istasangiz <b>sayt ichida onlayn</b> ishlaysiz, istasangiz
+              <b>PDF test ko‘rinishida yuklab olib</b> ham ishlashingiz mumkin:
+              savollar, variantlar va oxirida <b>javoblar kaliti</b>.
+            </p>
           </div>
         </div>
       </div>
@@ -834,25 +781,21 @@
       </div>
     </section>
 
-    <!-- USER / KURSLAR PANELI (Bosh sahifa ham shu) -->
-    <section id="user-section" class="section">
+    <!-- USER -->
+    <section id="user-section" class="section hidden">
       <div class="card">
         <div class="section-header">
           <div>
             <h2>Kurslar paneli</h2>
-            <p class="sub" id="courses-subtitle">
-              Barcha saqlangan kurslar. Mehmon sifatida ko‘rishingiz mumkin, lekin darslarga kirish uchun
-              kirish / ro‘yxatdan o‘tish talab etiladi.
+            <p class="sub">
+              Ro‘yxatdan o‘tgan barcha foydalanuvchilar bu yerdagi kurslarni ko‘rishi mumkin.
             </p>
           </div>
-          <span class="pill" id="user-role-pill">Rol: Mehmon</span>
+          <span class="pill" id="user-role-pill">Rol: Foydalanuvchi</span>
         </div>
 
         <div class="section-header">
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="btn-xs" id="filter-all-courses">Barcha kurslar</button>
-            <button class="btn-xs" id="filter-my-courses">Mening kurslarim</button>
-          </div>
+          <button class="btn" id="btn-open-course-modal">Kurs tanlash</button>
           <span class="muted" id="user-course-count">0 ta kurs</span>
         </div>
 
@@ -871,11 +814,6 @@
           <p id="detail-desc" class="muted" style="margin-bottom:8px;"></p>
           <div class="course-meta" id="detail-meta"></div>
 
-          <div class="section-header" style="margin-top:6px;">
-            <button class="btn-xs" id="subscribe-btn">Kursga obuna bo‘lish</button>
-            <span class="muted" id="subscribe-status"></span>
-          </div>
-
           <div class="detail-layout">
             <div id="detail-lessons"></div>
 
@@ -884,17 +822,6 @@
               <div class="video-wrapper hidden" id="lesson-video-wrapper">
                 <div id="yt-player"></div>
               </div>
-
-              <!-- Yangi: to‘liq ekran tugmalari -->
-              <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
-                <button type="button" class="btn-xs" id="video-fullscreen-btn">
-                  To‘liq ekran (landscape)
-                </button>
-                <button type="button" class="btn-xs hidden" id="video-exit-fullscreen-btn">
-                  Ekrandan chiqish
-                </button>
-              </div>
-
               <!-- Katta qizil quiz tugmasi -->
               <button type="button" class="btn-quiz-main hidden" id="lesson-quiz-btn" style="margin-top:6px;align-self:flex-start;">
                 QUIZNI ISHLASH
@@ -962,11 +889,6 @@
   </div>
 </div>
 
-<!-- Xush kelibsiz toast -->
-<div id="welcome-toast" class="welcome-toast hidden">
-  Xush kelibsiz!
-</div>
-
 <script>
   /* YOUTUBE API HOLATI */
   let ytApiReady = false;
@@ -975,6 +897,7 @@
   /* GLOBAL THRESHOLDS */
   const VIDEO_COMPLETE_PERCENT = 10; // 10% video kifoya
   const QUIZ_PASS_PERCENT = 30;     // 30% quiz natija
+  const QUIZ_TOTAL_MINUTES = 20;    // QUIZ uchun umumiy vaqt (daqiqa)
 
   /* FIREBASE INIT */
   const firebaseConfig = {
@@ -994,8 +917,6 @@
   let data = { currentUser:null, courses:[] };
   const CURRENT_USER_KEY = "talimEduCurrentUser_v1";
   const REMEMBER_CREDENTIALS_KEY = "talimEduRemember_v1";
-  let userSubscriptions = {}; // courseId => true
-  let currentCoursesFilter = "all"; // "all" | "my"
 
   function loadCurrentUserFromLocal(){
     try{
@@ -1039,44 +960,15 @@
     }
   }
 
-  /* SUBSCRIPTIONS */
-  async function loadUserSubscriptions(username){
-    userSubscriptions = {};
-    if(!username) return;
-    const snap = await db.collection("subscriptions")
-      .where("user","==",username)
-      .get();
-    snap.forEach(doc=>{
-      const d = doc.data();
-      if(d.courseId) userSubscriptions[d.courseId] = true;
-    });
-  }
-
-  async function subscribeToCourse(username,courseId){
-    if(!username || !courseId) return;
-    const id = `${username}_${courseId}`;
-    await db.collection("subscriptions").doc(id).set({
-      user:username,
-      courseId,
-      subscribedAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
-    userSubscriptions[courseId] = true;
-  }
-
   /* DOM */
   const authSection = document.getElementById("auth-section");
   const adminSection = document.getElementById("admin-section");
   const userSection = document.getElementById("user-section");
   const navAdmin = document.getElementById("nav-admin");
   const navCourses = document.getElementById("nav-courses");
-  const navMyCourses = document.getElementById("nav-my-courses");
   const logoutBtn = document.getElementById("logout-btn");
   const currentUserLabel = document.getElementById("current-user-label");
   const userRolePill = document.getElementById("user-role-pill");
-  const openLoginBtn = document.getElementById("open-login-btn");
-  const openRegisterBtn = document.getElementById("open-register-btn");
-  const coursesSubtitle = document.getElementById("courses-subtitle");
-  const welcomeToast = document.getElementById("welcome-toast");
 
   const tabButtons = document.querySelectorAll(".tab-btn");
   const loginForm = document.getElementById("login-form");
@@ -1106,9 +998,6 @@
   const userEmpty = document.getElementById("user-empty");
   const userBackBtn = document.getElementById("user-back-btn");
 
-  const filterAllBtn = document.getElementById("filter-all-courses");
-  const filterMyBtn = document.getElementById("filter-my-courses");
-
   const detailTitle = document.getElementById("detail-title");
   const detailDesc = document.getElementById("detail-desc");
   const detailMeta = document.getElementById("detail-meta");
@@ -1119,8 +1008,7 @@
   const lessonProgressText = document.getElementById("lesson-progress-text");
   const lessonProgressBar = document.getElementById("lesson-progress-bar");
 
-  const btnOpenCourseModal = document.getElementById("btn-open-course-modal"); // optional
-
+  const btnOpenCourseModal = document.getElementById("btn-open-course-modal");
   const courseModal = document.getElementById("course-modal");
   const courseModalClose = document.getElementById("course-modal-close");
   const courseModalList = document.getElementById("course-modal-list");
@@ -1132,17 +1020,11 @@
   const lessonQuizPdfBtn = document.getElementById("lesson-quiz-pdf-btn");
   const lessonQuizHint = document.getElementById("lesson-quiz-hint");
 
-  const subscribeBtn = document.getElementById("subscribe-btn");
-  const subscribeStatus = document.getElementById("subscribe-status");
-
+  /* 👉 YANGI: kurs formidagi inputlar */
   const courseTitle = document.getElementById("course-title");
   const courseDesc = document.getElementById("course-desc");
   const courseCat = document.getElementById("course-cat");
   const coursePrice = document.getElementById("course-price");
-
-  /* Yangi: fullscreen tugmalar */
-  const videoFullscreenBtn = document.getElementById("video-fullscreen-btn");
-  const videoExitFullscreenBtn = document.getElementById("video-exit-fullscreen-btn");
 
   /* HELPERS */
   function formatPrice(price){
@@ -1185,6 +1067,7 @@
       .replace(/^-|-$/g,"");
   }
 
+  /* YouTube konteynerini toza qayta yaratish — qotishning asosiy yechimi */
   function resetPlayerContainer(){
     if(!lessonVideoWrapper) return;
     lessonVideoWrapper.innerHTML = "";
@@ -1407,36 +1290,7 @@
     renderAdminUsers(snap.docs.map(d=>d.data()));
   }
 
-  /* AUTH PANEL TABLARNI OCHISH FUNKSIYASI */
-  function showAuthPanel(tab){
-    authSection.classList.remove("hidden");
-    if(tab==="register"){
-      tabButtons.forEach(b=>b.classList.remove("active"));
-      const rb = document.querySelector('.tab-btn[data-tab="register"]');
-      if(rb) rb.classList.add("active");
-      loginForm.classList.add("hidden");
-      registerForm.classList.remove("hidden");
-      registerErrorEl.textContent="";
-    }else{
-      tabButtons.forEach(b=>b.classList.remove("active"));
-      const lb = document.querySelector('.tab-btn[data-tab="login"]');
-      if(lb) lb.classList.add("active");
-      registerForm.classList.add("hidden");
-      loginForm.classList.remove("hidden");
-      loginErrorEl.textContent="";
-    }
-    window.scrollTo({top:0,behavior:"smooth"});
-  }
-
-  /* Xush kelibsiz toast */
-  function showWelcomeToast(username){
-    if(!welcomeToast) return;
-    welcomeToast.textContent = `Xush kelibsiz, ${username}! Ona tili Pro siz bilan 😊`;
-    welcomeToast.classList.remove("hidden");
-    setTimeout(()=>{ welcomeToast.classList.add("hidden"); }, 5000);
-  }
-
-  /* YANGI: ADMIN YANGI KURS QO‘SHISH HANDLERI */
+  /* 👉 YANGI: ADMIN YANGI KURS QO‘SHISH HANDLERI */
   if (courseForm) {
     courseForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -1522,6 +1376,7 @@
                   <div class="muted" style="font-size:11px;">
                     ID: ${l.id}
                     ${l.quiz && l.quiz.length ? " · Quiz savollar: "+l.quiz.length+" ta" : ""}
+                    ${typeof l.quizTotalMinutes==="number" ? " · Umumiy vaqt: "+l.quizTotalMinutes+" daqiqa" : ""}
                   </div>
                 </div>
                 <div class="lesson-status">
@@ -1572,8 +1427,16 @@
 
             <div class="quiz-builder hidden">
               <div class="muted" style="font-size:11px;margin-bottom:4px;">
-                Har bir savol uchun matn va A/B/C/D variantlarni kiriting, keyin to‘g‘ri javobni va vaqtni (soniya) tanlang.
+                Har bir savol uchun matn va A/B/C/D variantlarni kiriting.
+                Test uchun esa quyida <b>umumiy vaqtni (daqiqa)</b> belgilang.
               </div>
+
+              <!-- 👉 TEST UCHUN UMUMIY VAQT (DAQIQA) -->
+              <div class="form-row">
+                <label>Quiz umumiy vaqti (daqiqa)</label>
+                <input type="number" class="quiz-total-minutes" min="1" value="${QUIZ_TOTAL_MINUTES}" />
+              </div>
+
               <div class="quiz-questions"></div>
               <button type="button" class="btn-xs btn-add-question" style="margin-top:4px;">+ Savol qo‘shish</button>
             </div>
@@ -1641,10 +1504,6 @@
             <option value="3">D</option>
           </select>
         </div>
-        <div class="form-row">
-          <label>Savol vaqti (soniya)</label>
-          <input type="number" class="q-time" min="5" value="30" />
-        </div>
       </div>
       <hr style="margin-top:6px;border:none;border-top:1px dashed #e5e7eb;">
     `;
@@ -1676,22 +1535,26 @@
         const c = block.querySelector(".q-opt-c")?.value.trim() || "";
         const d = block.querySelector(".q-opt-d")?.value.trim() || "";
         const correctRaw = block.querySelector(".q-correct")?.value;
-        const timeRaw = parseInt(block.querySelector(".q-time")?.value,10);
         const correctIndex = correctRaw!==undefined ? parseInt(correctRaw,10) : 0;
-        const timeLimit = (!isNaN(timeRaw) && timeRaw>0) ? timeRaw : 30;
         if(text && a && b && c && d){
           quiz.push({
             id: Date.now().toString()+"_"+idx,
             question:text,
             options:[a,b,c,d],
-            correctIndex:isNaN(correctIndex)?0:correctIndex,
-            timeLimit:timeLimit
+            correctIndex:isNaN(correctIndex)?0:correctIndex
           });
         }
       });
     }
 
     try{
+      // 👉 umumiy vaqtni (daqiqa) formdan olish
+      const totalMinutesInput = form.querySelector(".quiz-total-minutes");
+      let quizTotalMinutes = parseInt(totalMinutesInput?.value, 10);
+      if(isNaN(quizTotalMinutes) || quizTotalMinutes <= 0){
+        quizTotalMinutes = QUIZ_TOTAL_MINUTES;
+      }
+
       const course = data.courses.find(c=>c.id===courseId);
       if(!course) return;
       const lessons = course.lessons || [];
@@ -1699,7 +1562,8 @@
         id: Date.now().toString(),
         title,
         videoId,
-        quiz
+        quiz,
+        quizTotalMinutes   // 👉 shu dars testining umumiy vaqti (daqiqa)
       });
       await updateCourseLessons(courseId,lessons);
       await refreshCourses();
@@ -1766,21 +1630,10 @@
 
   /* USER COURSES GRID */
   function renderUserCourses(){
-    let courses = data.courses||[];
-    if(currentCoursesFilter==="my" && data.currentUser){
-      courses = courses.filter(c=> userSubscriptions[c.id] );
-    }
-
+    const courses = data.courses||[];
     userCourseList.innerHTML="";
     userCourseCount.textContent = courses.length+" ta kurs";
-
-    if(!courses.length){
-      userEmpty.style.display="block";
-      userEmpty.textContent = currentCoursesFilter==="my"
-        ? "Siz hali hech bir kursga obuna bo‘lmagansiz."
-        : "Hozircha kurslar qo‘shilmagan. Admin panel orqali kurs qo‘shilishi kerak.";
-      return;
-    }
+    if(!courses.length){ userEmpty.style.display="block"; return; }
     userEmpty.style.display="none";
 
     courses.forEach(course=>{
@@ -1788,8 +1641,6 @@
       card.className="course-card";
       const priceText = formatPrice(course.price);
       const lessons = course.lessons||[];
-      const isSubscribed = data.currentUser && userSubscriptions[course.id];
-
       card.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
@@ -1797,16 +1648,10 @@
           ${course.category?`<span class="badge">${course.category}</span>`:""}
           ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
           <span class="badge">Darslar: ${lessons.length}</span>
-          ${data.currentUser && isSubscribed ? `<span class="badge free">Obuna bo‘lingan</span>`:""}
         </div>
         <div class="course-footer">
           <span class="muted">Kurs ID: ${course.id}</span>
-          <button type="button" class="btn btn-open-course" data-course-id="${course.id}">
-            ${data.currentUser
-              ? (isSubscribed || course.price===0 ? "Kursga kirish" : "Obuna bo‘lib kirish")
-              : "Kursni ko‘rish (kirish kerak)"
-            }
-          </button>
+          <button type="button" class="btn btn-open-course" data-course-id="${course.id}">Kursga kirish</button>
         </div>`;
       userCourseList.appendChild(card);
     });
@@ -1825,7 +1670,6 @@
       div.className="course-card";
       const priceText = formatPrice(course.price);
       const lessons = course.lessons||[];
-      const isSubscribed = data.currentUser && userSubscriptions[course.id];
       div.innerHTML = `
         <div class="course-title">${course.title}</div>
         <div class="course-desc">${course.description}</div>
@@ -1833,15 +1677,9 @@
           ${course.category?`<span class="badge">${course.category}</span>`:""}
           ${priceText?`<span class="badge ${course.price==0?"free":"price"}">${priceText}</span>`:""}
           <span class="badge">Darslar: ${lessons.length}</span>
-          ${data.currentUser && isSubscribed ? `<span class="badge free">Obuna bo‘lingan</span>`:""}
         </div>
         <div class="course-footer">
-          <button type="button" class="btn btn-open-course-modal" data-course-id="${course.id}">
-            ${data.currentUser
-              ? (isSubscribed || course.price===0 ? "Kursga kirish" : "Obuna bo‘lib kirish")
-              : "Kursni ko‘rish (kirish kerak)"
-            }
-          </button>
+          <button type="button" class="btn btn-open-course-modal" data-course-id="${course.id}">Tanlash</button>
         </div>`;
       courseModalList.appendChild(div);
     });
@@ -1849,15 +1687,11 @@
   function openCourseModal(){ courseModal.classList.remove("hidden"); }
   function closeCourseModal(){ courseModal.classList.add("hidden"); }
 
-  if(btnOpenCourseModal){
-    btnOpenCourseModal.addEventListener("click",()=>{
-      renderCourseModalList();
-      openCourseModal();
-    });
-  }
-  if(courseModalClose){
-    courseModalClose.addEventListener("click",closeCourseModal);
-  }
+  btnOpenCourseModal.addEventListener("click",()=>{
+    renderCourseModalList();
+    openCourseModal();
+  });
+  courseModalClose.addEventListener("click",closeCourseModal);
   courseModal.addEventListener("click",e=>{
     if(e.target.classList.contains("modal-backdrop")) closeCourseModal();
   });
@@ -1865,11 +1699,6 @@
     const btn = e.target.closest(".btn-open-course-modal");
     if(!btn) return;
     const courseId = btn.dataset.courseId;
-    if(!data.currentUser){
-      closeCourseModal();
-      showAuthPanel("login");
-      return;
-    }
     closeCourseModal();
     await openUserCourseDetail(courseId);
   });
@@ -1890,6 +1719,10 @@
   let quizRemaining = 0;
 
   let quizAutoNextTimerId = null;
+
+  // 👉 test uchun joriy umumiy vaqt (daqiqa)
+  let currentQuizTotalMinutes = QUIZ_TOTAL_MINUTES;
+
   function clearQuizTimer(){
     if(quizTimerId){
       clearInterval(quizTimerId);
@@ -1903,9 +1736,7 @@
     }
   }
 
-  /* Yangi: dars 1-marta tugaganini belgilash */
-  let lessonCompletionHandled = {}; // "courseId_lessonId" => true/false
-
+  /* Progressni bir marta majburan saqlash */
   async function saveCurrentLessonProgressOnce(){
     try{
       if(!currentPlayer || !currentCourseDetail || !currentLessonId || !data.currentUser) return;
@@ -1941,7 +1772,7 @@
       try{ currentPlayer.destroy(); }catch(e){}
       currentPlayer=null;
     }
-    resetPlayerContainer();
+    resetPlayerContainer();   // YouTube iframe konteyneri tozalanadi
     lessonVideoWrapper.classList.add("hidden");
   }
 
@@ -1960,7 +1791,7 @@
       const info = progMap[lesson.id] || { percent:0 };
       const videoCompleted = info.videoCompleted || (info.percent>=VIDEO_COMPLETE_PERCENT);
       const hasQuiz = lesson.quiz && lesson.quiz.length>0;
-      const quizPassed = hasQuiz ? !!info.quizPassed : true;
+      const quizPassed = hasQuiz ? !!info.quizPassed : true; // QUIZ YO‘Q BO‘LSA — faqat video yetarli
       const lessonCompleted = videoCompleted && quizPassed;
       if(lessonCompleted && idx>maxCompletedIndex){
         maxCompletedIndex = idx;
@@ -2008,17 +1839,13 @@
     detailLessons.innerHTML = html;
   }
 
+  /* Fullscreen yordamchi (faqat QUIZ uchun) */
   function exitAnyFullscreen(){
     if(document.fullscreenElement){
       try{
         document.exitFullscreen();
       }catch(e){}
     }
-    try{
-      if (screen.orientation && screen.orientation.unlock) {
-        screen.orientation.unlock();
-      }
-    }catch(e){}
   }
   function tryLockLandscape(){
     try{
@@ -2028,40 +1855,7 @@
     }catch(e){}
   }
 
-  /* Yangi: video uchun fullscreen funksiyalar */
-  function enterVideoFullscreen(){
-    const container = lessonVideoWrapper;
-    if (!container) return;
-
-    const req =
-      container.requestFullscreen ||
-      container.webkitRequestFullscreen ||
-      container.mozRequestFullScreen ||
-      container.msRequestFullscreen;
-
-    if (!req) return;
-
-    try{
-      const res = req.call(container);
-      if (res && typeof res.then === "function") {
-        res.then(()=>{
-          tryLockLandscape();
-          if (videoFullscreenBtn) videoFullscreenBtn.classList.add("hidden");
-          if (videoExitFullscreenBtn) videoExitFullscreenBtn.classList.remove("hidden");
-        }).catch(()=>{});
-      } else {
-        tryLockLandscape();
-        if (videoFullscreenBtn) videoFullscreenBtn.classList.add("hidden");
-        if (videoExitFullscreenBtn) videoExitFullscreenBtn.classList.remove("hidden");
-      }
-    }catch(e){}
-  }
-
-  function exitVideoFullscreen(){
-    exitAnyFullscreen();
-    if (videoFullscreenBtn) videoFullscreenBtn.classList.remove("hidden");
-    if (videoExitFullscreenBtn) videoExitFullscreenBtn.classList.add("hidden");
-  }
+  /* QUIZ OVERLAY FUNKSIYALARI – hamma savollar BIR VARAQDA, scroll + UMUMIY VAQT */
 
   function closeQuizOverlay(){
     clearQuizTimer();
@@ -2071,6 +1865,7 @@
     exitAnyFullscreen();
   }
 
+  // Dars tugaganda / “Quizni ishlash” tugmasi bosilganda – birinchi taklif oynasi
   function showQuizInviteOverlay(){
     if(!currentLessonQuiz.length) return;
     clearQuizTimer();
@@ -2080,7 +1875,8 @@
         <div class="quiz-overlay-title">Dars yakunlandi!</div>
         <div class="quiz-overlay-sub">
           Endi bilimlaringizni <b>quiz</b> orqali sinab ko‘ring.<br>
-          Har bir savolga alohida <b>vaqt</b> beriladi. Tayyormisiz?
+          Barcha savollar <b>bitta sahifada</b> beriladi. Pastga <b>scroll</b> qilib javoblarni belgilang.<br>
+          Test uchun ajratilgan umumiy vaqt: <b>${currentQuizTotalMinutes} daqiqa</b>.
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px;">
           <button type="button" class="btn" id="quiz-overlay-start-btn">Quizni boshlash</button>
@@ -2112,93 +1908,137 @@
     }catch(e){}
   }
 
+  // Umumiy vaqtni timer ko‘rinishida yangilash
+  function updateQuizTimerDisplay(){
+    const timerEl = document.getElementById("quiz-timer");
+    if(!timerEl) return;
+    const totalSec = Math.max(0, quizRemaining || 0); // quizRemaining ni umumiy vaqt soniyalarda sifatida ishlatyapmiz
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    timerEl.textContent = `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+  }
+
+  // Start bosilganda – barcha savollarni bitta sahifada chiqaramiz + UMUMIY TIMER
   function startQuizFlow(){
     if(!currentLessonQuiz.length) return;
     openQuizFullscreen();
-    quizCurrentIndex = 0;
     quizAnswers = {};
     clearQuizTimer();
     clearQuizAutoNextTimer();
-    showQuizQuestion();
+    showQuizAllQuestions();
   }
 
-  function showQuizQuestion(){
+  function showQuizAllQuestions(){
     const total = currentLessonQuiz.length;
-    if(quizCurrentIndex<0 || quizCurrentIndex>=total) return;
-    const q = currentLessonQuiz[quizCurrentIndex];
-    const timeLimit = (q.timeLimit && q.timeLimit>0) ? q.timeLimit : 30;
-    quizRemaining = timeLimit;
+    if(!total) return;
+
+    // Barcha savollarni ID bilan chiqaramiz (scroll uchun)
+    const questionsHtml = currentLessonQuiz.map((q,idx)=>`
+      <div class="quiz-question" id="quiz-q-${idx}" style="margin-bottom:10px;">
+        <div class="quiz-question-title">${idx+1}-savol. ${q.question}</div>
+        <div class="quiz-options">
+          ${q.options.map((opt,oi)=>`
+            <div class="quiz-option">
+              <label>
+                <input type="radio" name="quiz_q_${idx}" value="${oi}">
+                <span>${["A","B","C","D"][oi]}) ${opt}</span>
+              </label>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `).join("");
+
+    // “Oldinga-orqaga” uchun yuqorida savol raqamli navigatsiya
+    const navHtml = `
+      <div class="muted" style="font-size:11px;margin-top:4px;">
+        Savol raqamlariga bosib tez o‘tishingiz mumkin:
+      </div>
+      <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px;">
+        ${Array.from({length: total}, (_,i)=>`
+          <button type="button" class="btn-xs quiz-nav-btn" data-q-index="${i}">
+            ${i+1}
+          </button>
+        `).join("")}
+      </div>
+    `;
 
     quizOverlayBox.innerHTML = `
       <div>
         <div class="quiz-top-row">
           <div class="quiz-progress-small">
-            Savol: <b>${quizCurrentIndex+1}</b> / ${total}
+            Savollar soni: <b>${total}</b> · Umumiy vaqt: <b>${currentQuizTotalMinutes} daqiqa</b>
           </div>
-          <div id="quiz-timer">${quizRemaining} s</div>
+          <div id="quiz-timer"></div>
         </div>
-        <div class="quiz-question">
-          <div class="quiz-question-title">${quizCurrentIndex+1}-savol. ${q.question}</div>
-          <div class="quiz-options">
-            ${q.options.map((opt,oi)=>`
-              <div class="quiz-option">
-                <label>
-                  <input type="radio" name="quiz_q_${quizCurrentIndex}" value="${oi}">
-                  <span>${["A","B","C","D"][oi]}) ${opt}</span>
-                </label>
-              </div>
-            `).join("")}
-          </div>
+        ${navHtml}
+        <div id="quiz-question-scroll" style="max-height:60vh;overflow-y:auto;padding-right:4px;margin-top:6px;">
+          ${questionsHtml}
         </div>
-        <div style="display:flex;justify-content:flex-end;margin-top:10px;gap:8px;">
-          <button type="button" class="btn-xs" id="quiz-next-btn">
-            ${quizCurrentIndex===total-1 ? "Natijani ko‘rish" : "Keyingi savol →"}
-          </button>
+        <div style="display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <button type="button" class="btn" id="quiz-submit-btn">Testni topshirish</button>
+          <button type="button" class="btn-xs" id="quiz-cancel-btn">Bekor qilish</button>
         </div>
       </div>
     `;
 
-    const nextBtn = document.getElementById("quiz-next-btn");
-    nextBtn.onclick = ()=>goToNextQuestion(false);
+    // Navigatsiya tugmalari – ma'lum savolga scroll
+    const navBtns = quizOverlayBox.querySelectorAll(".quiz-nav-btn");
+    navBtns.forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const idx = parseInt(btn.dataset.qIndex,10);
+        const target = document.getElementById(`quiz-q-${idx}`);
+        if(target){
+          target.scrollIntoView({behavior:"smooth",block:"start"});
+        }
+      });
+    });
 
+    // Tugmalar
+    document.getElementById("quiz-submit-btn").onclick = ()=>finishQuizAllAtOnce();
+    document.getElementById("quiz-cancel-btn").onclick = closeQuizOverlay;
+
+    // UMUMIY VAQT TIMERINI ISHGA TUSHIRAMIZ
+    quizRemaining = currentQuizTotalMinutes * 60; // umumiy test vaqti (sekundlarda)
+    updateQuizTimerDisplay();
     clearQuizTimer();
     quizTimerId = setInterval(()=>{
       quizRemaining--;
-      const timerEl = document.getElementById("quiz-timer");
-      if(timerEl) timerEl.textContent = quizRemaining+" s";
-      if(quizRemaining<=0){
-        goToNextQuestion(true);
+      if(quizRemaining < 0) quizRemaining = 0;
+      updateQuizTimerDisplay();
+      if(quizRemaining <= 0){
+        clearQuizTimer();
+        alert("Vaqt tugadi! Test avtomatik tekshirildi.");
+        finishQuizAllAtOnce();
       }
     },1000);
   }
 
-  function goToNextQuestion(autoDueTime){
+  // Barcha savollarga bir marta baho berish
+  async function finishQuizAllAtOnce(){
     clearQuizTimer();
-    const name = `quiz_q_${quizCurrentIndex}`;
-    const radios = quizOverlayBox.querySelectorAll(`input[name="${name}"]`);
-    let chosen = null;
-    radios.forEach(r=>{
-      if(r.checked) chosen = parseInt(r.value,10);
-    });
-    quizAnswers[quizCurrentIndex] = isNaN(chosen)?null:chosen;
 
-    if(quizCurrentIndex < currentLessonQuiz.length-1){
-      quizCurrentIndex++;
-      showQuizQuestion();
-    }else{
-      finishQuizWithTimer();
-    }
-  }
-
-  async function finishQuizWithTimer(){
     const total = currentLessonQuiz.length;
+    quizAnswers = {};
+
+    currentLessonQuiz.forEach((q,idx)=>{
+      const name = `quiz_q_${idx}`;
+      const radios = quizOverlayBox.querySelectorAll(`input[name="${name}"]`);
+      let chosen = null;
+      radios.forEach(r=>{
+        if(r.checked) chosen = parseInt(r.value,10);
+      });
+      quizAnswers[idx] = isNaN(chosen) ? null : chosen;
+    });
+
     let score = 0;
     currentLessonQuiz.forEach((q,idx)=>{
       const ans = quizAnswers[idx];
-      if(ans===q.correctIndex) score++;
+      if(ans === q.correctIndex) score++;
     });
     const percent = total ? Math.round((score/total)*100) : 0;
 
+    // Firestore ga saqlash
     try{
       if(data.currentUser && currentCourseDetail && currentLessonId){
         const updated = await saveLessonQuizAttempt(
@@ -2214,9 +2054,11 @@
       console.error("quiz attempt save error",err);
     }
 
+    // Natija PDF (foydalanuvchi javoblari bilan)
     const curLesson = getCurrentLesson();
     generateQuizResultPdf(curLesson ? curLesson.title : "Dars", score, total, quizAnswers, currentLessonQuiz);
 
+    // Natijani overlay ichida chiqaramiz
     renderQuizResultInOverlay(score,total,quizAnswers);
   }
 
@@ -2387,6 +2229,7 @@
     }
   }
 
+  /* PROGRESS INTERVAL — oxirgi 7 soniya mantiqi */
   function startProgressInterval(){
     if(!currentPlayer) return;
     if(progressInterval) clearInterval(progressInterval);
@@ -2398,60 +2241,39 @@
       const cur = currentPlayer.getCurrentTime()||0;
       const remaining = dur - cur;
 
-      if (remaining <= 7) {
-        const key = currentCourseDetail && currentLessonId
-          ? currentCourseDetail.id + "_" + currentLessonId
-          : null;
+      if(remaining<=7){
+        const effectiveTime = Math.max(0, dur - 7);
+        let effPercent = dur>0 ? (effectiveTime/dur)*100 : 0;
+        if(effPercent>99) effPercent = 99;
+        const roundedEff = Math.round(effPercent);
 
-        // 1-marta: dars yakunlandi deb hisoblash + quiz
-        if (key && !lessonCompletionHandled[key]) {
-          lessonCompletionHandled[key] = true;
+        lessonProgressText.textContent = `Ko‘rilgan: ${roundedEff}%`;
+        lessonProgressBar.style.width = roundedEff+"%";
 
-          const effectiveTime = Math.max(0, dur - 7);
-          let effPercent = dur>0 ? (effectiveTime/dur)*100 : 0;
-          if(effPercent>99) effPercent = 99;
-          const roundedEff = Math.round(effPercent);
-
-          lessonProgressText.textContent = `Ko‘rilgan: ${roundedEff}%`;
-          lessonProgressBar.style.width = roundedEff+"%";
-
-          if(data.currentUser && currentCourseDetail && currentLessonId){
-            lastSavedPercent = Math.max(lastSavedPercent,roundedEff);
-            try{
-              const updated = await saveLessonProgress(
-                data.currentUser.username,
-                currentCourseDetail.id,
-                currentLessonId,
-                roundedEff,
-                roundedEff>=VIDEO_COMPLETE_PERCENT
-              );
-              currentCourseProgress = updated;
-              renderCourseLessonsList();
-            }catch(err){
-              console.error("progress (last7) error",err);
-            }
+        if(data.currentUser && currentCourseDetail && currentLessonId){
+          lastSavedPercent = Math.max(lastSavedPercent,roundedEff);
+          try{
+            const updated = await saveLessonProgress(
+              data.currentUser.username,
+              currentCourseDetail.id,
+              currentLessonId,
+              roundedEff,
+              roundedEff>=VIDEO_COMPLETE_PERCENT
+            );
+            currentCourseProgress = updated;
+            renderCourseLessonsList();
+          }catch(err){
+            console.error("progress (last7) error",err);
           }
-
-          try{ currentPlayer.pauseVideo(); }catch(e){}
-          stopCurrentPlayer();
-          exitAnyFullscreen();
-
-          if(currentLessonQuiz.length){
-            showQuizInviteOverlay();
-          }
-
-          return;
         }
 
-        // 2-marta va keyin: video boshiga qaytarish
-        try{
-          currentPlayer.pauseVideo();
-          currentPlayer.seekTo(0,true);
-        }catch(e){}
+        try{ currentPlayer.pauseVideo(); }catch(e){}
+        stopCurrentPlayer();
+        exitAnyFullscreen();
 
-        lessonProgressText.textContent = "Dars qayta boshiga qaytarildi";
-        lessonProgressBar.style.width = "0%";
-        lastSavedPercent = 0;
+        if(currentLessonQuiz.length){
+          showQuizInviteOverlay();
+        }
 
         return;
       }
@@ -2487,9 +2309,11 @@
     },5000);
   }
 
+  /* Darsni ochish */
   async function openLessonPlayer(lesson){
     if(!currentCourseDetail || !data.currentUser) return;
 
+    // Avval eski playerni tozalaymiz (qotishni oldini olish)
     stopCurrentPlayer();
     closeQuizOverlay();
 
@@ -2497,17 +2321,18 @@
     currentLessonQuiz = lesson.quiz || [];
     quizCurrentIndex = 0;
     quizAnswers = {};
+
+    // 👉 darsga tegishli umumiy test vaqti
+    currentQuizTotalMinutes =
+      typeof lesson.quizTotalMinutes === "number" && lesson.quizTotalMinutes > 0
+        ? lesson.quizTotalMinutes
+        : QUIZ_TOTAL_MINUTES;
+
     lessonPlayerTitle.textContent = lesson.title;
     lessonVideoWrapper.classList.remove("hidden");
     lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
     lessonProgressBar.style.width = "0%";
     lastSavedPercent = 0;
-
-    // Yangi: bu dars uchun 1-marta tugash flagini init
-    const key = currentCourseDetail.id + "_" + lesson.id;
-    if (lessonCompletionHandled[key] === undefined) {
-      lessonCompletionHandled[key] = false;
-    }
 
     if(currentLessonQuiz.length){
       lessonQuizBtn.classList.remove("hidden");
@@ -2534,6 +2359,7 @@
       return;
     }
 
+    // Har safar yangi container (resetPlayerContainer) allaqachon stopCurrentPlayer ichida chaqirildi
     currentPlayer = new YT.Player("yt-player",{
       videoId: lesson.videoId,
       playerVars:{rel:0,modestbranding:1},
@@ -2554,13 +2380,14 @@
         },
         onStateChange:(event)=>{
           if(event.data === YT.PlayerState.ENDED){
-            // end logic already handled in interval
+            // Oxirgi 7 soniya logikasi interval ichida hal qilinyapti.
           }
         }
       }
     });
   }
 
+  /* Kurs detali */
   async function openUserCourseDetail(courseId){
     const course = data.courses.find(c=>c.id===courseId);
     if(!course || !data.currentUser) return;
@@ -2585,39 +2412,17 @@
     lessonQuizPdfBtn.classList.add("hidden");
     lessonQuizHint.style.display = "none";
 
-    updateSubscribeUI();
-
     userCoursesView.classList.add("hidden");
     userCourseDetail.classList.remove("hidden");
   }
 
-  function updateSubscribeUI(){
-    if(!subscribeBtn || !subscribeStatus) return;
-    if(!data.currentUser || !currentCourseDetail){
-      subscribeBtn.classList.add("hidden");
-      subscribeStatus.textContent = "";
-      return;
-    }
-    const isSubscribed = !!userSubscriptions[currentCourseDetail.id];
-    if(currentCourseDetail.price===0){
-      subscribeBtn.classList.add("hidden");
-      subscribeStatus.textContent = "Bu kurs bepul. Barcha foydalanuvchilar uchun ochiq.";
-    }else{
-      subscribeBtn.classList.remove("hidden");
-      subscribeBtn.disabled = isSubscribed;
-      subscribeBtn.textContent = isSubscribed ? "Obuna bo‘lgan" : "Kursga obuna bo‘lish";
-      subscribeStatus.textContent = isSubscribed
-        ? "Siz bu kursga obuna bo‘lgansiz. “Mening kurslarim” bo‘limida ko‘rasiz."
-        : "Kursga obuna bo‘ling — darslar “Mening kurslarim” menyusiga qo‘shiladi.";
-    }
-  }
-
+  /* Darslar listi click */
   detailLessons.addEventListener("click",async e=>{
     const item = e.target.closest(".lesson-item");
     if(!item) return;
     const unlocked = item.dataset.unlocked==="1";
     if(!unlocked){
-      alert("Bu dars hozircha yopiq. Avval oldingi darsni video bo‘yicha kamida 10% ko‘rish va agar quiz bo‘lsa, kamida 30% natija olish kerak.");
+      alert("Bu dars hozircha yopiq. Avval oldingi darsni video bo‘yicha kamida 10% ko‘rish va shu dars quizidan kamida 30% natija olish kerak. Quiz bo‘lmagan darslarda faqat video 10% yetarli.");
       return;
     }
     const lessonId = item.dataset.lessonId;
@@ -2637,14 +2442,11 @@
     const btn = e.target.closest(".btn-open-course");
     if(!btn) return;
     const courseId = btn.dataset.courseId;
-    if(!data.currentUser){
-      showAuthPanel("login");
-      return;
-    }
     await openUserCourseDetail(courseId);
   });
   userBackBtn.addEventListener("click",showUserCoursesList);
 
+  /* Quiz tugmasi (onlayn ishlash) — bosganda video pause + yig‘iladi */
   if(lessonQuizBtn){
     lessonQuizBtn.addEventListener("click",async ()=>{
       const lesson = getCurrentLesson();
@@ -2653,11 +2455,12 @@
         return;
       }
       await saveCurrentLessonProgressOnce();
-      stopCurrentPlayer();
+      stopCurrentPlayer();    // video to‘liq to‘xtaydi va konteyner tozalanadi
       showQuizInviteOverlay();
     });
   }
 
+  /* Quizni PDF test ko‘rinishida yuklash */
   if(lessonQuizPdfBtn){
     lessonQuizPdfBtn.addEventListener("click",()=>{
       const lesson = getCurrentLesson();
@@ -2669,32 +2472,17 @@
     });
   }
 
-  function updateCoursesSubtitle(){
-    if(!data.currentUser){
-      coursesSubtitle.textContent = "Barcha saqlangan kurslar. Mehmon sifatida ko‘rishingiz mumkin, lekin darslarga kirish uchun kirish / ro‘yxatdan o‘tish talab etiladi.";
-    }else if(currentCoursesFilter==="my"){
-      coursesSubtitle.textContent = "Mening kurslarim — siz obuna bo‘lgan kurslar shu yerda jamlangan.";
-    }else{
-      coursesSubtitle.textContent = "Barcha mavjud kurslar. Obuna bo‘lgan kurslaringizni “Mening kurslarim” bo‘limidan ko‘rishingiz mumkin.";
-    }
-  }
-
+  /* UI UPDATE */
   function updateUI(){
     const user = data.currentUser;
     if(!user){
       authSection.classList.remove("hidden");
       adminSection.classList.add("hidden");
-      userSection.classList.remove("hidden");
+      userSection.classList.add("hidden");
       navAdmin.classList.add("hidden");
       logoutBtn.classList.add("hidden");
       currentUserLabel.textContent = "Mehmon";
-      userRolePill.textContent = "Rol: Mehmon";
-      navMyCourses.classList.add("hidden");
-      openLoginBtn.classList.remove("hidden");
-      openRegisterBtn.classList.remove("hidden");
-      currentCoursesFilter = "all";
-      updateCoursesSubtitle();
-      showUserCoursesList();
+      userRolePill.textContent = "Rol: Foydalanuvchi";
       stopCurrentPlayer();
       closeQuizOverlay();
       return;
@@ -2703,9 +2491,6 @@
     userSection.classList.remove("hidden");
     logoutBtn.classList.remove("hidden");
     currentUserLabel.textContent = user.username;
-    openLoginBtn.classList.add("hidden");
-    openRegisterBtn.classList.add("hidden");
-    navMyCourses.classList.remove("hidden");
     if(user.role==="admin"){
       navAdmin.classList.remove("hidden");
       userRolePill.textContent = "Rol: Admin (foydalanuvchi rejimi)";
@@ -2713,7 +2498,6 @@
       navAdmin.classList.add("hidden");
       userRolePill.textContent = "Rol: Foydalanuvchi";
     }
-    updateCoursesSubtitle();
     showUserCoursesList();
   }
 
@@ -2755,11 +2539,9 @@
       saveCurrentUserToLocal();
       saveRememberedCredentials(u,p);
       loginForm.reset();
-      await loadUserSubscriptions(user.username);
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
-      showWelcomeToast(user.username);
     }catch(err){
       console.error(err);
       loginErrorEl.textContent="Kirishda xatolik yuz berdi.";
@@ -2786,14 +2568,10 @@
       data.currentUser = { username:u, role:"user" };
       saveCurrentUserToLocal();
       saveRememberedCredentials(u,p);
-      regUsername.value="";
-      regPassword.value="";
-      regPassword2.value="";
-      userSubscriptions = {};
+      registerForm.reset();
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
-      showWelcomeToast(u);
     }catch(err){
       if(err.message==="exists") registerErrorEl.textContent="Bu login band.";
       else{
@@ -2805,46 +2583,25 @@
 
   logoutBtn.addEventListener("click",()=>{
     data.currentUser=null;
-    userSubscriptions = {};
     saveCurrentUserToLocal();
     updateUI();
-    renderUserCourses();
   });
 
   /* NAV */
   navCourses.addEventListener("click",e=>{
     e.preventDefault();
     if(!data.currentUser){
-      currentCoursesFilter = "all";
-      renderUserCourses();
-      updateCoursesSubtitle();
-      userSection.classList.remove("hidden");
+      authSection.classList.remove("hidden");
       adminSection.classList.add("hidden");
-      showAuthPanel("login");
+      userSection.classList.add("hidden");
+      const loginTabBtn = document.querySelector('.tab-btn[data-tab="login"]');
+      if(loginTabBtn) loginTabBtn.click();
       return;
     }
-    currentCoursesFilter = "all";
-    renderUserCourses();
-    updateCoursesSubtitle();
     adminSection.classList.add("hidden");
     userSection.classList.remove("hidden");
     showUserCoursesList();
   });
-
-  navMyCourses.addEventListener("click",e=>{
-    e.preventDefault();
-    if(!data.currentUser){
-      showAuthPanel("login");
-      return;
-    }
-    currentCoursesFilter = "my";
-    renderUserCourses();
-    updateCoursesSubtitle();
-    adminSection.classList.add("hidden");
-    userSection.classList.remove("hidden");
-    showUserCoursesList();
-  });
-
   navAdmin.addEventListener("click",e=>{
     e.preventDefault();
     if(!data.currentUser || data.currentUser.role!=="admin") return;
@@ -2852,69 +2609,7 @@
     adminSection.classList.remove("hidden");
   });
 
-  /* OBUNA TUGMASI */
-  if(subscribeBtn){
-    subscribeBtn.addEventListener("click",async ()=>{
-      if(!data.currentUser || !currentCourseDetail) return;
-      if(userSubscriptions[currentCourseDetail.id]) return;
-      try{
-        await subscribeToCourse(data.currentUser.username,currentCourseDetail.id);
-        updateSubscribeUI();
-        renderUserCourses();
-        alert("Kursga muvaffaqiyatli obuna bo‘ldingiz! Endi bu kurs ‘Mening kurslarim’ bo‘limida ham ko‘rinadi.");
-      }catch(err){
-        console.error(err);
-        alert("Obuna bo‘lishda xatolik yuz berdi.");
-      }
-    });
-  }
-
-  /* FILTER BUTTONLAR */
-  filterAllBtn.addEventListener("click",()=>{
-    currentCoursesFilter = "all";
-    renderUserCourses();
-    updateCoursesSubtitle();
-  });
-  filterMyBtn.addEventListener("click",()=>{
-    if(!data.currentUser){
-      showAuthPanel("login");
-      return;
-    }
-    currentCoursesFilter = "my";
-    renderUserCourses();
-    updateCoursesSubtitle();
-  });
-
-  /* HEADER KIRISH / RO‘YXATDAN O‘TISH TUGMALARI */
-  openLoginBtn.addEventListener("click",()=>{
-    showAuthPanel("login");
-  });
-  openRegisterBtn.addEventListener("click",()=>{
-    showAuthPanel("register");
-  });
-
-  /* Yangi: fullscreen tugmalari eventlari */
-  if (videoFullscreenBtn) {
-    videoFullscreenBtn.addEventListener("click", () => {
-      if (!currentPlayer) return;
-      enterVideoFullscreen();
-    });
-  }
-
-  if (videoExitFullscreenBtn) {
-    videoExitFullscreenBtn.addEventListener("click", () => {
-      exitVideoFullscreen();
-    });
-  }
-
-  document.addEventListener("fullscreenchange", () => {
-    if (!document.fullscreenElement) {
-      if (videoFullscreenBtn) videoFullscreenBtn.classList.remove("hidden");
-      if (videoExitFullscreenBtn) videoExitFullscreenBtn.classList.add("hidden");
-    }
-  });
-
-  /* Sahifadan chiqsa video pauza + progress saqlash */
+  /* Sahifadan chiqib ketsa (tabni yopsa / boshqa tabga o'tsa) video pause bo‘lsin */
   document.addEventListener("visibilitychange",()=>{
     if(document.hidden && currentPlayer){
       try{ currentPlayer.pauseVideo(); }catch(e){}
@@ -2938,9 +2633,6 @@
       }
 
       data.currentUser = loadCurrentUserFromLocal();
-      if(data.currentUser){
-        await loadUserSubscriptions(data.currentUser.username);
-      }
       updateUI();
       await refreshCourses();
       await loadUsersFromFirestore();
