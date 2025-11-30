@@ -433,10 +433,24 @@
     }
     .btn-add:active{transform:scale(.96);}
 
+    /* PASTKI RANGLI STRIP (WEB APP TAGI) */
+    .safe-bottom-strip{
+      position:fixed;
+      left:0;right:0;bottom:0;
+      height:22px;
+      background:linear-gradient(90deg,#f97316,#ec4899,#8b5cf6);
+      box-shadow:0 -6px 18px rgba(0,0,0,0.75);
+      z-index:20;
+    }
+    body.theme-light .safe-bottom-strip{
+      box-shadow:0 -6px 18px rgba(148,163,184,0.8);
+    }
+
     /* BOTTOM ORDER BAR */
     .cart-bar{
       position:fixed;
-      bottom:0;left:0;right:0;
+      left:0;right:0;
+      bottom:24px;           /* ⬅ savatni biroz tepaga ko‘tardik */
       background:radial-gradient(circle at top,#1d2538,#020617 55%);
       border-top:1px solid var(--border-soft);
       padding:8px 10px 10px;
@@ -1042,6 +1056,9 @@
     <div class="admin-list-title">Siz qo‘shgan mahsulotlar:</div>
     <div id="adminCustomList"></div>
   </div>
+
+  <!-- PASTKI RANGLI STRIP -->
+  <div class="safe-bottom-strip"></div>
 
   <!-- BOTTOM ORDER BAR -->
   <div class="cart-bar">
