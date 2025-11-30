@@ -285,12 +285,12 @@
       grid-template-columns:repeat(2,minmax(0,1fr));
       gap:12px;
     }
-    @media(max-width:480px){
+    @media(max-width:640px){
       .products-grid{
         grid-template-columns:1fr;
       }
     }
-    @media(min-width:768px){
+    @media(min-width:900px){
       .products-grid{
         grid-template-columns:repeat(3,minmax(0,1fr));
       }
@@ -313,11 +313,11 @@
     .product-top{
       position:relative;
       border-radius:16px;
-      padding:6px;
+      padding:8px;
       background:radial-gradient(circle at top,#1d4ed8,#020617 55%);
       overflow:hidden;
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       gap:10px;
       cursor:pointer;
     }
@@ -325,7 +325,7 @@
       background:radial-gradient(circle at top,#bfdbfe,#e5e7eb 55%);
     }
     .product-photo{
-      width:110px;height:110px;
+      width:150px;height:150px;
       border-radius:14px;
       overflow:hidden;
       flex-shrink:0;
@@ -333,7 +333,7 @@
     }
     @media(max-width:480px){
       .product-photo{
-        width:130px;height:130px;
+        width:180px;height:180px;
       }
     }
     .product-photo img{
@@ -343,12 +343,13 @@
     .product-emoji{
       font-size:28px;
       margin-left:auto;
+      margin-top:4px;
     }
     .product-img-tag{
       position:absolute;
-      left:6px;top:6px;
-      font-size:8px;
-      padding:2px 6px;
+      left:8px;top:8px;
+      font-size:9px;
+      padding:3px 7px;
       border-radius:999px;
       background:rgba(15,23,42,0.9);
       border:1px solid rgba(148,163,184,0.7);
@@ -362,11 +363,11 @@
     .product-sale{
       position:absolute;
       right:-22px;
-      bottom:6px;
+      bottom:8px;
       background:linear-gradient(120deg,#f97316,#ec4899);
-      padding:2px 24px;
+      padding:3px 24px;
       transform:rotate(14deg);
-      font-size:9px;
+      font-size:10px;
       font-weight:700;
       color:#111827;
     }
@@ -381,15 +382,15 @@
     .product-meta{
       font-size:10px;
       color:var(--muted);
-      margin-top:1px;
+      margin-top:2px;
     }
     .tag-mini{
       font-size:9px;
-      padding:2px 6px;
+      padding:3px 7px;
       border-radius:999px;
       background:rgba(15,23,42,0.9);
       border:1px solid rgba(55,65,81,0.9);
-      margin-top:4px;
+      margin-top:5px;
       display:inline-flex;
       align-items:center;
       gap:4px;
@@ -405,7 +406,7 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:6px;
+      gap:8px;
       font-size:11px;
     }
     .price-main{
@@ -413,14 +414,19 @@
       font-size:13px;
     }
     .price-old{
-      font-size:9px;
+      font-size:10px;
       color:var(--muted);
       text-decoration:line-through;
+    }
+    .discount-badge{
+      font-size:9px;
+      margin-top:2px;
+      color:#fbbf24;
     }
     .btn-add{
       border:none;
       border-radius:999px;
-      padding:7px 10px;
+      padding:7px 11px;
       font-size:11px;
       font-weight:600;
       background:linear-gradient(120deg,#22c55e,#16a34a);
@@ -469,13 +475,6 @@
       font-size:10px;
       color:var(--muted);
       margin-bottom:5px;
-      display:flex;
-      align-items:center;
-      gap:4px;
-    }
-    .cart-bar-note::before{
-      content:"💡";
-      font-size:11px;
     }
 
     .cart-main-btn{
@@ -515,9 +514,6 @@
       font-weight:500;
       opacity:.9;
     }
-    .cart-main-btn > div:last-child span{
-      font-size:20px;
-    }
 
     /* CART SHEET */
     .sheet-overlay{
@@ -539,7 +535,7 @@
       left:0;right:0;bottom:0;
       background:radial-gradient(circle at top,#020617,var(--bg-soft));
       border-radius:22px 22px 0 0;
-      border-top:1px solid rgba(148,163,184,0.7);
+      border-top:1px solid var(--border-soft);
       max-height:75vh;
       transform:translateY(100%);
       transition:transform .25s ease;
@@ -624,25 +620,9 @@
       font-size:14px;
     }
     .cart-edit-label{
-      color:var(--danger);
+      color:var(--muted);
       font-size:10px;
-      font-weight:600;
-      display:flex;
-      align-items:center;
-      gap:4px;
       margin-bottom:4px;
-    }
-    .cart-explain{
-      font-size:10px;
-      line-height:1.35;
-      margin:4px 0 6px;
-    }
-    .cart-auto-row{
-      font-size:10px;
-      margin-bottom:6px;
-    }
-    .cart-auto-row input{
-      margin-right:4px;
     }
     .cart-sheet-btn{
       width:100%;
@@ -1131,27 +1111,30 @@
         ➕ Mahsulotni qo‘shish
       </button>
       <p class="admin-info">
-        Eslatma: qo‘shilgan mahsulotlar va admin holati faqat shu qurilmada eslab qolinadi.
+        Eslatma: mahsulotlar va admin holati faqat shu qurilmada eslab qolinadi.
       </p>
     </div>
 
     <div class="admin-info">
-      🔴 O‘chirish butun do‘kondan oladi (default mahsulotlar ham yashiriladi).
+      🔴 Diqqat: bu yerda o‘chirgan mahsulotingiz do‘kondan ham o‘chadi. Kerak bo‘lsa qayta qo‘shasiz.
     </div>
-    <div class="admin-list-title">Hamma mahsulotlar:</div>
+    <div class="admin-list-title">Do‘kondagi mahsulotlar ro‘yxati:</div>
     <div id="adminCustomList"></div>
   </div>
 
   <!-- BOTTOM ORDER BAR -->
   <div class="cart-bar">
     <div class="cart-bar-note">
-      Savatdagi buyurtmani tahrirlash / o‘chirish uchun tepadagi 🛒 savat tugmasini bosing.
+      “🛒 Savat” tugmasi orqali mahsulot sonini o‘zgartirishingiz yoki o‘chirishingiz mumkin.
+      “Buyurtma berish” tugmasini bossangiz, tanlagan mahsulotlaringiz Telegramdan sotuvchiga yuborish
+      uchun tayyor bo‘ladi. Telegram oynasida xabarni ko‘rib, “Yuborish” tugmasini o‘zingiz bosasiz.
     </div>
     <button class="cart-main-btn" type="button" onclick="toggleCartSheet(true)">
       <div>
-        <div>🧾 Buyurtma berish</div>
+        <div>🛍 Buyurtma berish</div>
         <span class="small">
-          Tanlagan mahsulotlaringizni Telegram orqali sotuvchiga yuboramiz.
+          Hozirgi savatni tekshirib, Telegram orqali sotuvchiga jo‘natamiz.
+          Sotuvchi sizga qo‘ng‘iroq qilib, yetkazib berish va to‘lovni kelishib oladi.
         </span>
       </div>
       <div><span>›</span></div>
@@ -1169,25 +1152,16 @@
     <div class="cart-sheet-body" id="cartItems"></div>
     <div class="cart-sheet-footer">
       <div class="cart-edit-label">
-        🔧 Buyurtmani tahrirlash / o‘chirish (qizil ✕ tugmalar orqali)
-      </div>
-      <p class="cart-explain">
-        ✨ “Buyurtmani yuborish” tugmasini bossangiz, hozir tanlagan mahsulotlaringiz
-        Telegram’da sotuvchiga yuboriladi. Sotuvchi sizga qo‘ng‘iroq qilib, yetkazib berish
-        va to‘lovni siz bilan kelishib oladi.
-      </p>
-      <div class="cart-auto-row">
-        <label>
-          <input id="autoSendCheckbox" type="checkbox" />
-          🔁 Har safar tasdiqsiz avtomatik yuborish
-        </label>
+        Siz tanlagan mahsulotlarni Telegram orqali sotuvchiga yuboramiz.
+        Telegramda xabar ochilgach, faqat “Yuborish” tugmasini bosishingiz kifoya —
+        keyin sotuvchi siz bilan telefon orqali bog‘lanadi.
       </div>
       <div class="cart-sheet-footer-top">
         <span>Umumiy summa:</span>
         <strong id="cartSheetTotal">0 so‘m</strong>
       </div>
       <button class="cart-sheet-btn" type="button" onclick="sendOrder()">
-        📩 Buyurtmani yuborish
+        🛍 Buyurtma berish (@onatili_premium)
       </button>
     </div>
   </div>
@@ -1214,12 +1188,10 @@
 <script>
   // --- KONSTANTALAR ---
   const ADMIN_CODE = "12345678";
-  const STORAGE_PRODUCTS = "beauty_custom_products";
+  const STORAGE_PRODUCTS = "beauty_all_products";
   const STORAGE_HISTORY = "beauty_order_history";
   const STORAGE_ADMIN = "beauty_admin";
-  const STORAGE_DELETED = "beauty_deleted_products";
   const THEME_KEY = "beauty_theme";
-  const STORAGE_AUTOSEND = "beauty_auto_send";
 
   const categoryEmoji = {
     "pomada":"💄",
@@ -1241,8 +1213,8 @@
       emoji:"💄",
       tag:"Yangi kolleksiya",
       images:[
-        "https://images.pexels.com/photos/3373744/pexels-photo-3373744.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3373744/pexels-photo-3373744.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1253,8 +1225,8 @@
       emoji:"💋",
       tag:"Best seller",
       images:[
-        "https://images.pexels.com/photos/947301/pexels-photo-947301.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/3738360/pexels-photo-3738360.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/947301/pexels-photo-947301.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/3738360/pexels-photo-3738360.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1265,7 +1237,7 @@
       emoji:"✨",
       tag:"Yaltirroq effekt",
       images:[
-        "https://images.pexels.com/photos/3373749/pexels-photo-3373749.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3373749/pexels-photo-3373749.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1276,8 +1248,8 @@
       emoji:"🧴",
       tag:"Namlik 24 soat",
       images:[
-        "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/3738364/pexels-photo-3738364.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/3738364/pexels-photo-3738364.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1288,7 +1260,7 @@
       emoji:"🌞",
       tag:"SPF qo‘riqlovchi",
       images:[
-        "https://images.pexels.com/photos/3738342/pexels-photo-3738342.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738342/pexels-photo-3738342.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1299,7 +1271,7 @@
       emoji:"🌙",
       tag:"Tungi parvarish",
       images:[
-        "https://images.pexels.com/photos/3738364/pexels-photo-3738364.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738364/pexels-photo-3738364.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1310,8 +1282,8 @@
       emoji:"🌸",
       tag:"Eng ko‘p yoqadigan",
       images:[
-        "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/965991/pexels-photo-965991.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/965991/pexels-photo-965991.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1322,7 +1294,7 @@
       emoji:"🕺",
       tag:"Uzoq saqlanadi",
       images:[
-        "https://images.pexels.com/photos/965992/pexels-photo-965992.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/965992/pexels-photo-965992.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1333,7 +1305,7 @@
       emoji:"🍋",
       tag:"Citrus hidi",
       images:[
-        "https://images.pexels.com/photos/965990/pexels-photo-965990.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/965990/pexels-photo-965990.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1344,8 +1316,8 @@
       emoji:"👁",
       tag:"Professional",
       images:[
-        "https://images.pexels.com/photos/3373735/pexels-photo-3373735.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/3738360/pexels-photo-3738360.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3373735/pexels-photo-3373735.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/3738360/pexels-photo-3738360.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1356,7 +1328,7 @@
       emoji:"✏️",
       tag:"Qora klassik",
       images:[
-        "https://images.pexels.com/photos/3738345/pexels-photo-3738345.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738345/pexels-photo-3738345.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1367,7 +1339,7 @@
       emoji:"🎯",
       tag:"Juda mashhur",
       images:[
-        "https://images.pexels.com/photos/3373737/pexels-photo-3373737.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3373737/pexels-photo-3373737.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1378,7 +1350,7 @@
       emoji:"😷",
       tag:"Terlashga qarshi",
       images:[
-        "https://images.pexels.com/photos/3738346/pexels-photo-3738346.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738346/pexels-photo-3738346.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1389,7 +1361,7 @@
       emoji:"💧",
       tag:"1 dona",
       images:[
-        "https://images.pexels.com/photos/3738355/pexels-photo-3738355.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738355/pexels-photo-3738355.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1400,7 +1372,7 @@
       emoji:"🍫",
       tag:"Yumshoq teri",
       images:[
-        "https://images.pexels.com/photos/3738370/pexels-photo-3738370.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738370/pexels-photo-3738370.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1411,7 +1383,7 @@
       emoji:"🛁",
       tag:"Kokos hidi",
       images:[
-        "https://images.pexels.com/photos/3738373/pexels-photo-3738373.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738373/pexels-photo-3738373.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1422,7 +1394,7 @@
       emoji:"🤲",
       tag:"Quruq teri uchun",
       images:[
-        "https://images.pexels.com/photos/3738375/pexels-photo-3738375.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738375/pexels-photo-3738375.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1433,7 +1405,7 @@
       emoji:"💆‍♀️",
       tag:"Sochni tiklaydi",
       images:[
-        "https://images.pexels.com/photos/3738371/pexels-photo-3738371.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738371/pexels-photo-3738371.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1444,8 +1416,8 @@
       emoji:"🖌",
       tag:"To‘liq to‘plam",
       images:[
-        "https://images.pexels.com/photos/3738385/pexels-photo-3738385.jpeg?auto=compress&cs=tinysrgb&w=400",
-        "https://images.pexels.com/photos/3738365/pexels-photo-3738365.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738385/pexels-photo-3738385.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/3738365/pexels-photo-3738365.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     },
     {
@@ -1456,25 +1428,22 @@
       emoji:"💧",
       tag:"Suvga chidamli",
       images:[
-        "https://images.pexels.com/photos/3738367/pexels-photo-3738367.jpeg?auto=compress&cs=tinysrgb&w=400"
+        "https://images.pexels.com/photos/3738367/pexels-photo-3738367.jpeg?auto=compress&cs=tinysrgb&w=600"
       ]
     }
   ];
 
-  // --- HOLAT ---
-  let customProducts = [];
+  // HOLAT
   let products = [];
   let cart = [];
   let activeCategory = "all";
   let isAdmin = false;
-  let deletedProductIds = [];
-  let autoSend = false;
 
-  // Fullscreen image viewer state
+  // Fullscreen image viewer
   let viewerProductIndex = null;
   let viewerImageIndex = 0;
 
-  // --- DOM ELEMENTLAR ---
+  // DOM
   const productsGrid = document.getElementById("productsGrid");
   const filterBar = document.getElementById("filterBar");
   const cartCountTopEl = document.getElementById("cartCountTop");
@@ -1494,9 +1463,8 @@
   const imageViewerTitleEl = document.getElementById("imageViewerTitle");
   const imageViewerImgEl = document.getElementById("imageViewerImg");
   const imageViewerCounterEl = document.getElementById("imageViewerCounter");
-  const autoSendCheckboxEl = document.getElementById("autoSendCheckbox");
 
-  // --- YORDAMCHI FUNKSIYALAR ---
+  // YORDAMCHI
   function formatPrice(v){
     return v.toLocaleString("uz-UZ");
   }
@@ -1507,43 +1475,25 @@
     setTimeout(()=> toastEl.classList.remove("show"), 1100);
   }
 
-  // --- CUSTOM / DELETE MAHSULOTLAR ---
-  function loadCustomProducts(){
+  // MAHSULOTLARNI YUKLASH/SAQLASH
+  function loadProducts(){
     try{
-      customProducts = JSON.parse(localStorage.getItem(STORAGE_PRODUCTS) || "[]");
-    }catch(e){
-      customProducts = [];
-    }
-    // eski mahsulotlarda id bo‘lmasa, qo‘yib yuboramiz
-    customProducts.forEach(p=>{
-      if(!p.id){
-        p.id = "c_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+      const saved = localStorage.getItem(STORAGE_PRODUCTS);
+      if(saved){
+        products = JSON.parse(saved);
+      }else{
+        products = defaultProducts.slice();
+        saveProducts();
       }
-    });
-  }
-  function saveCustomProducts(){
-    localStorage.setItem(STORAGE_PRODUCTS, JSON.stringify(customProducts));
-  }
-
-  function loadDeletedProducts(){
-    try{
-      deletedProductIds = JSON.parse(localStorage.getItem(STORAGE_DELETED) || "[]");
     }catch(e){
-      deletedProductIds = [];
+      products = defaultProducts.slice();
+      saveProducts();
     }
   }
-  function saveDeletedProducts(){
-    localStorage.setItem(STORAGE_DELETED, JSON.stringify(deletedProductIds));
+  function saveProducts(){
+    localStorage.setItem(STORAGE_PRODUCTS, JSON.stringify(products));
   }
 
-  function rebuildProducts(){
-    products = [...defaultProducts, ...customProducts].filter(
-      p => !deletedProductIds.includes(p.id)
-    );
-    renderProducts();
-  }
-
-  // --- MAHSULOTLARNI CHIZISH ---
   function renderProducts(){
     productsGrid.innerHTML = "";
     const filtered = products.filter(p =>
@@ -1551,9 +1501,14 @@
     );
     filtered.forEach(p=>{
       const index = products.indexOf(p);
-      const discount = p.oldPrice ? (100 - Math.round(p.price*100/p.oldPrice)) : null;
+      const discount = (p.oldPrice && p.oldPrice > p.price)
+        ? (100 - Math.round(p.price*100/p.oldPrice))
+        : null;
       const tag = p.tag || "Ommabop mahsulot";
-      const img = (p.images && p.images.length) ? p.images[0] : "https://via.placeholder.com/400x400.png?text=Beauty";
+      const img = (p.images && p.images.length)
+        ? p.images[0]
+        : "https://via.placeholder.com/600x600.png?text=Beauty";
+
       productsGrid.innerHTML += `
         <article class="product-card">
           <div class="product-top" onclick="openImageViewer(${index},0)">
@@ -1564,7 +1519,7 @@
               <img src="${img}" alt="${p.name}">
             </div>
             <div class="product-emoji">${p.emoji || categoryEmoji[p.category] || categoryEmoji.default}</div>
-            ${discount ? `<div class="product-sale">- ${discount}%</div>` : ``}
+            ${discount ? `<div class="product-sale">-${discount}%</div>` : ``}
           </div>
           <div class="product-body">
             <div class="product-name">${p.name}</div>
@@ -1578,6 +1533,7 @@
               <div>
                 <div class="price-main">${formatPrice(p.price)} so‘m</div>
                 ${p.oldPrice ? `<div class="price-old">${formatPrice(p.oldPrice)} so‘m</div>` : ``}
+                ${discount ? `<div class="discount-badge">💥 Chegirma: ${discount}%</div>` : ``}
               </div>
               <button class="btn-add" onclick="addToCart(${index})">
                 ➕ Savatga
@@ -1589,7 +1545,7 @@
     });
   }
 
-  // --- FILTER ---
+  // FILTER
   filterBar.addEventListener("click", (e)=>{
     const btn = e.target.closest(".chip");
     if(!btn) return;
@@ -1599,7 +1555,7 @@
     renderProducts();
   });
 
-  // --- SAVAT FUNKSIYALARI ---
+  // SAVAT
   function addToCart(index){
     const found = cart.find(c => c.index === index);
     if(found){
@@ -1616,6 +1572,7 @@
     let totalPrice = 0;
     cart.forEach(c=>{
       const p = products[c.index];
+      if(!p) return;
       totalCount += c.qty;
       totalPrice += p.price * c.qty;
     });
@@ -1647,6 +1604,7 @@
     let total = 0;
     cart.forEach(c=>{
       const p = products[c.index];
+      if(!p) return;
       const lineTotal = p.price * c.qty;
       total += lineTotal;
       html += `
@@ -1690,17 +1648,22 @@
     renderCartItems();
   }
 
-  // --- TELEGRAM WEBAPP LINK ---
+  // TELEGRAM LINK
   function openTelegramLink(url){
     const tg = window.Telegram && window.Telegram.WebApp;
-    if(tg){
-      tg.openTelegramLink(url);
-    }else{
-      window.open(url, "_blank");
+
+    try {
+      if (tg && typeof tg.openTelegramLink === "function") {
+        tg.openTelegramLink(url);
+      } else {
+        window.location.href = url;
+      }
+    } catch (e) {
+      window.location.href = url;
     }
   }
 
-  // --- BUYURTMA TARIXI ---
+  // BUYURTMA TARIXI
   function saveOrderHistory(order){
     let list = [];
     try{
@@ -1753,20 +1716,11 @@
     }
   }
 
-  // --- TELEGRAMGA BUYURTMA JO'NATISH ---
+  // TELEGRAMGA BUYURTMA JO'NATISH
   function sendOrder(){
     if(cart.length === 0){
       showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
       return;
-    }
-
-    if(!autoSend){
-      const ok = confirm(
-        "Siz hozir tanlagan mahsulotlaringiz Telegram orqali sotuvchiga yuboriladi.\n" +
-        "Sotuvchi sizga qo‘ng‘iroq qiladi, yetkazib berish va to‘lovni kelishib olasiz.\n\n" +
-        "Buyurtmani yuborishni tasdiqlaysizmi?"
-      );
-      if(!ok) return;
     }
 
     let totalPrice = 0;
@@ -1775,6 +1729,7 @@
 
     cart.forEach((c, i)=>{
       const p = products[c.index];
+      if(!p) return;
       const lineTotal = p.price * c.qty;
       totalPrice += lineTotal;
       totalItems += c.qty;
@@ -1798,7 +1753,7 @@
     text += "━━━━━━━━━━━━━━━━━━━━\n";
     text += "📱 Telefon raqamim: _______\n";
     text += "📍 Manzilim: _______\n";
-    text += "ℹ️ Sotuvchi menga qo‘ng‘iroq qilib, yetkazib berish va to‘lovni kelishib oladi.\n";
+    text += "ℹ️ Sotuvchi menga qo‘ng‘iroq qilib, mahsulotni yetkazib berish va to‘lovni kelishib oladi.\n";
 
     const encoded = encodeURIComponent(text);
     const url = "https://t.me/onatili_premium?text=" + encoded + "&t=" + Date.now();
@@ -1812,18 +1767,19 @@
     };
     saveOrderHistory(order);
 
+    // Telegramni ochamiz
     openTelegramLink(url);
 
-    // Savatni tozalaymiz, UI ni yangilaymiz
+    // Savatni tozalaymiz
     cart = [];
     updateCartUI();
     renderCartItems();
     toggleCartSheet(false);
 
-    showToast("✅ Buyurtma yuborildi. Telegramda telefon raqamingizni yozib qoldiring.");
+    showToast("✅ Buyurtma tayyor. Telegram oynasida 'Yuborish' tugmasini bosib jo‘nating.");
   }
 
-  // --- TEMA (DARK / LIGHT) ---
+  // TEMA
   function applyTheme(theme){
     document.body.classList.toggle("theme-light", theme === "light");
     themeToggleBtn.textContent = theme === "light" ? "🌙" : "☀️";
@@ -1836,7 +1792,7 @@
   }
   themeToggleBtn.addEventListener("click", toggleTheme);
 
-  // --- TABS ---
+  // TABS
   tabsEl.addEventListener("click", (e)=>{
     const btn = e.target.closest(".tab-btn");
     if(!btn) return;
@@ -1862,7 +1818,7 @@
     }
   });
 
-  // --- ADMIN LOGIN ---
+  // ADMIN LOGIN
   function updateAdminUI(){
     if(isAdmin){
       adminTabBtn.classList.remove("hidden");
@@ -1899,7 +1855,7 @@
 
   adminAccessBtn.addEventListener("click", askAdminCode);
 
-  // --- ADMIN CUSTOM MAHSULOTLAR ---
+  // ADMIN MAHSULOTLAR
   function addCustomProduct(){
     const nameEl = document.getElementById("adminName");
     const catEl = document.getElementById("adminCategory");
@@ -1934,7 +1890,7 @@
       images = raw.split(",").map(s=>s.trim()).filter(Boolean);
     }
     if(!images.length){
-      images = ["https://via.placeholder.com/400x400.png?text=Beauty"];
+      images = ["https://via.placeholder.com/600x600.png?text=Beauty"];
     }
 
     const emoji = categoryEmoji[category] || categoryEmoji.default;
@@ -1946,14 +1902,12 @@
       category,
       emoji,
       tag,
-      images,
-      custom:true,
-      id: "c_" + Date.now() + "_" + Math.random().toString(16).slice(2)
+      images
     };
 
-    customProducts.push(product);
-    saveCustomProducts();
-    rebuildProducts();
+    products.push(product);
+    saveProducts();
+    renderProducts();
     renderAdminProductList();
 
     nameEl.value = "";
@@ -1972,31 +1926,30 @@
       return;
     }
     adminCustomListEl.innerHTML = "";
-    products.forEach(p=>{
+    products.forEach((p, idx)=>{
       adminCustomListEl.innerHTML += `
         <div class="admin-product-row">
           <span>${p.name}</span>
           <span>${formatPrice(p.price)} so‘m</span>
-          <button class="admin-delete-btn" onclick="deleteProduct('${p.id}')">✕</button>
+          <button class="admin-delete-btn" onclick="deleteProduct(${idx})">✕</button>
         </div>
       `;
     });
   }
 
-  function deleteProduct(id){
-    if(!confirm("Bu mahsulotni butun do‘kondan o‘chirishni xohlaysizmi?")) return;
-    if(!deletedProductIds.includes(id)){
-      deletedProductIds.push(id);
-      saveDeletedProducts();
-    }
-    customProducts = customProducts.filter(p => p.id !== id);
-    saveCustomProducts();
-    rebuildProducts();
+  function deleteProduct(index){
+    if(!confirm("Bu mahsulotni o‘chirishni xohlaysizmi?")) return;
+    products.splice(index,1);
+    saveProducts();
+    cart = [];
+    updateCartUI();
+    renderCartItems();
+    renderProducts();
     renderAdminProductList();
     showToast("🗑 Mahsulot o‘chirildi");
   }
 
-  // --- FULLSCREEN IMAGE VIEWER ---
+  // FULLSCREEN IMAGE VIEWER
   function openImageViewer(productIndex, imageIndex){
     const p = products[productIndex];
     if(!p || !p.images || !p.images.length) return;
@@ -2045,51 +1998,32 @@
     }
   });
 
-  // --- INIT ---
+  // INIT
   (function init(){
     const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
     applyTheme(savedTheme);
 
-    // default mahsulotlarga id beramiz
-    defaultProducts.forEach((p, i)=>{
-      if(!p.id){
-        p.id = "d_" + i;
-      }
-    });
-
-    // admin holatini yuklash
     isAdmin = localStorage.getItem(STORAGE_ADMIN) === "true";
     updateAdminUI();
 
-    // auto send holati
-    autoSend = localStorage.getItem(STORAGE_AUTOSEND) === "1";
-    if(autoSendCheckboxEl){
-      autoSendCheckboxEl.checked = autoSend;
-      autoSendCheckboxEl.addEventListener("change", ()=>{
-        autoSend = !!autoSendCheckboxEl.checked;
-        localStorage.setItem(STORAGE_AUTOSEND, autoSend ? "1" : "0");
-      });
-    }
-
-    loadDeletedProducts();
-    loadCustomProducts();
-    rebuildProducts();
+    loadProducts();
+    renderProducts();
     renderHistory();
   })();
 
-  // global funksiyalar
+  // global
   window.addToCart = addToCart;
   window.toggleCartSheet = toggleCartSheet;
   window.changeQty = changeQty;
   window.removeFromCart = removeFromCart;
   window.sendOrder = sendOrder;
   window.addCustomProduct = addCustomProduct;
+  window.deleteProduct = deleteProduct;
   window.clearHistory = clearHistory;
   window.openImageViewer = openImageViewer;
   window.closeImageViewer = closeImageViewer;
   window.nextImage = nextImage;
   window.prevImage = prevImage;
-  window.deleteProduct = deleteProduct;
 </script>
 
 </body>
