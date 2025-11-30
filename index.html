@@ -41,7 +41,7 @@
       background:radial-gradient(circle at top,#1e1b4b 0,var(--bg) 45%,var(--bg) 100%);
       color:var(--text);
       min-height:100vh;
-      padding-bottom:110px;
+      padding-bottom:120px;
     }
     a{text-decoration:none;color:inherit}
     .hidden{display:none!important;}
@@ -67,18 +67,17 @@
       display:flex;align-items:center;gap:8px;
     }
     .logo-circle{
-      width:32px;height:32px;border-radius:999px;
+      width:36px;height:36px;border-radius:999px;
       background:conic-gradient(from 140deg,#fb7185,#f97316,#ede9fe,#38bdf8,#fb7185);
       display:flex;align-items:center;justify-content:center;
       box-shadow:0 0 18px rgba(248,113,113,0.6);
-      font-size:18px;
     }
     .logo-circle span{
       background:#020617;
-      padding:2px 7px;
+      padding:3px 9px;
       border-radius:999px;
       font-weight:700;
-      font-size:13px;
+      font-size:14px;
       color:#f9fafb;
     }
     body.theme-light .logo-circle span{
@@ -89,8 +88,8 @@
       display:flex;flex-direction:column;
       line-height:1.1;
     }
-    .logo-text strong{font-size:14px;}
-    .logo-text small{font-size:10px;color:var(--muted);}
+    .logo-text strong{font-size:16px;}
+    .logo-text small{font-size:11px;color:var(--muted);}
     .header-right{
       display:flex;align-items:center;gap:6px;
     }
@@ -98,8 +97,8 @@
     .theme-toggle{
       border:none;
       border-radius:999px;
-      padding:5px 8px;
-      font-size:14px;
+      padding:5px 9px;
+      font-size:16px;
       cursor:pointer;
       background:rgba(15,23,42,0.9);
       color:#e5e7eb;
@@ -113,7 +112,7 @@
     .cart-icon-btn{
       border:none;
       border-radius:999px;
-      padding:5px 8px;
+      padding:6px 10px;
       display:flex;
       align-items:center;
       gap:6px;
@@ -121,10 +120,10 @@
       background:radial-gradient(circle at top,#22c55e,#16a34a 50%,#14532d);
       color:#022c22;
       box-shadow:0 6px 16px rgba(34,197,94,0.55);
-      font-size:12px;
+      font-size:13px;
     }
     .cart-icon-left{
-      font-size:18px;
+      font-size:20px;
     }
     .cart-icon-info{
       display:flex;
@@ -133,10 +132,10 @@
       line-height:1.1;
     }
     .cart-icon-info strong{
-      font-size:12px;
+      font-size:13px;
     }
     .cart-icon-info small{
-      font-size:10px;
+      font-size:11px;
       opacity:.9;
     }
 
@@ -145,8 +144,8 @@
       border:1px solid rgba(148,163,184,0.7);
       background:rgba(15,23,42,0.85);
       color:#e5e7eb;
-      font-size:10px;
-      padding:5px 8px;
+      font-size:11px;
+      padding:6px 9px;
       cursor:pointer;
     }
     body.theme-light .admin-access{
@@ -162,18 +161,19 @@
     .tabs{
       display:flex;
       gap:6px;
-      margin-top:6px;
-      font-size:11px;
+      margin-top:8px;
+      font-size:12px;
     }
     .tab-btn{
       flex:1;
       border:none;
       border-radius:999px;
-      padding:5px 0;
+      padding:6px 0;
       cursor:pointer;
       background:rgba(15,23,42,0.85);
       color:#e5e7eb;
       border:1px solid rgba(148,163,184,0.5);
+      font-size:12px;
     }
     body.theme-light .tab-btn{
       background:#e5e7eb;
@@ -190,10 +190,10 @@
 
     /* HERO (shop) */
     .hero{
-      padding:10px 12px 4px;
+      padding:12px 14px 6px;
     }
     .hero-title{
-      font-size:19px;
+      font-size:22px;
       font-weight:700;
     }
     .hero-title span{
@@ -202,19 +202,19 @@
       color:transparent;
     }
     .hero-sub{
-      margin-top:4px;
-      font-size:11px;
+      margin-top:6px;
+      font-size:12px;
       color:var(--muted);
     }
     .hero-badges{
-      margin-top:8px;
+      margin-top:10px;
       display:flex;
       flex-wrap:wrap;
       gap:6px;
     }
     .badge{
-      font-size:9px;
-      padding:3px 7px;
+      font-size:11px;
+      padding:4px 8px;
       border-radius:999px;
       border:1px solid rgba(148,163,184,0.45);
       background:rgba(15,23,42,0.9);
@@ -226,25 +226,25 @@
       color:#111827;
     }
     .hero-tag{
-      font-size:10px;
-      margin-top:8px;
+      font-size:11px;
+      margin-top:10px;
       display:inline-flex;
       align-items:center;
       gap:6px;
-      padding:4px 8px;
+      padding:5px 10px;
       border-radius:999px;
       background:linear-gradient(90deg,rgba(56,189,248,0.25),rgba(129,140,248,0.15));
       border:1px solid rgba(59,130,246,0.55);
     }
     .hero-note{
-      margin-top:6px;
-      font-size:10px;
+      margin-top:8px;
+      font-size:11px;
       color:var(--muted);
     }
 
-    /* FILTERS */
+    /* FILTERS / KATALOGLAR */
     .filters{
-      padding:8px 12px 4px;
+      padding:10px 12px 6px;
       display:flex;
       gap:8px;
       overflow-x:auto;
@@ -253,13 +253,13 @@
     .filters::-webkit-scrollbar{display:none;}
     .chip{
       flex:0 0 auto;
-      font-size:10px;
-      padding:5px 10px;
+      font-size:13px;
+      padding:7px 13px;
       border-radius:999px;
       border:1px solid rgba(148,163,184,0.5);
       background:rgba(15,23,42,0.9);
       color:#e5e7eb;
-      display:flex;align-items:center;gap:5px;
+      display:flex;align-items:center;gap:6px;
       cursor:pointer;
       transition:0.18s ease;
       white-space:nowrap;
@@ -278,29 +278,29 @@
 
     /* PRODUCT GRID */
     .products-wrap{
-      padding:6px 8px 80px;
+      padding:8px 10px 90px;
     }
     .products-grid{
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:12px;
+      grid-template-columns:1fr;
+      gap:14px;
     }
-    @media(max-width:640px){
+    @media(min-width:640px){
       .products-grid{
-        grid-template-columns:1fr;
+        grid-template-columns:repeat(2,minmax(0,1fr));
       }
     }
     @media(min-width:900px){
       .products-grid{
         grid-template-columns:repeat(3,minmax(0,1fr));
       }
-      body{padding-bottom:110px;}
+      body{padding-bottom:120px;}
     }
     .product-card{
       background:linear-gradient(145deg,#020617,var(--card));
-      border-radius:18px;
+      border-radius:20px;
       border:1px solid rgba(31,41,55,0.9);
-      padding:10px;
+      padding:12px;
       position:relative;
       overflow:hidden;
       box-shadow:0 10px 22px rgba(0,0,0,0.55);
@@ -312,7 +312,7 @@
     }
     .product-top{
       position:relative;
-      border-radius:16px;
+      border-radius:18px;
       padding:8px;
       background:radial-gradient(circle at top,#1d4ed8,#020617 55%);
       overflow:hidden;
@@ -325,15 +325,15 @@
       background:radial-gradient(circle at top,#bfdbfe,#e5e7eb 55%);
     }
     .product-photo{
-      width:150px;height:150px;
-      border-radius:14px;
+      width:170px;height:170px;
+      border-radius:16px;
       overflow:hidden;
       flex-shrink:0;
       border:1px solid rgba(148,163,184,0.7);
     }
     @media(max-width:480px){
       .product-photo{
-        width:180px;height:180px;
+        width:190px;height:190px;
       }
     }
     .product-photo img{
@@ -341,15 +341,15 @@
       display:block;
     }
     .product-emoji{
-      font-size:28px;
+      font-size:30px;
       margin-left:auto;
       margin-top:4px;
     }
     .product-img-tag{
       position:absolute;
       left:8px;top:8px;
-      font-size:9px;
-      padding:3px 7px;
+      font-size:10px;
+      padding:3px 8px;
       border-radius:999px;
       background:rgba(15,23,42,0.9);
       border:1px solid rgba(148,163,184,0.7);
@@ -365,32 +365,32 @@
       right:-22px;
       bottom:8px;
       background:linear-gradient(120deg,#f97316,#ec4899);
-      padding:3px 24px;
+      padding:4px 26px;
       transform:rotate(14deg);
-      font-size:10px;
+      font-size:11px;
       font-weight:700;
       color:#111827;
     }
     .product-body{
-      margin-top:8px;
+      margin-top:10px;
     }
     .product-name{
-      font-size:13px;
-      font-weight:600;
+      font-size:16px;
+      font-weight:700;
       min-height:32px;
     }
     .product-meta{
-      font-size:10px;
+      font-size:12px;
       color:var(--muted);
-      margin-top:2px;
+      margin-top:4px;
     }
     .tag-mini{
-      font-size:9px;
-      padding:3px 7px;
+      font-size:11px;
+      padding:4px 8px;
       border-radius:999px;
       background:rgba(15,23,42,0.9);
       border:1px solid rgba(55,65,81,0.9);
-      margin-top:5px;
+      margin-top:6px;
       display:inline-flex;
       align-items:center;
       gap:4px;
@@ -402,39 +402,39 @@
       color:#111827;
     }
     .price-row{
-      margin-top:8px;
+      margin-top:10px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:8px;
-      font-size:11px;
+      gap:10px;
+      font-size:13px;
     }
     .price-main{
       font-weight:700;
-      font-size:13px;
+      font-size:16px;
     }
     .price-old{
-      font-size:10px;
+      font-size:12px;
       color:var(--muted);
       text-decoration:line-through;
     }
     .discount-badge{
-      font-size:9px;
+      font-size:11px;
       margin-top:2px;
       color:#fbbf24;
     }
     .btn-add{
       border:none;
       border-radius:999px;
-      padding:7px 11px;
-      font-size:11px;
+      padding:8px 13px;
+      font-size:13px;
       font-weight:600;
       background:linear-gradient(120deg,#22c55e,#16a34a);
       color:#022c22;
       cursor:pointer;
       display:flex;
       align-items:center;
-      gap:4px;
+      gap:6px;
       box-shadow:0 6px 12px rgba(34,197,94,0.35);
       flex-shrink:0;
     }
@@ -451,9 +451,9 @@
         rgba(15,23,42,0.96),
         rgba(24,24,27,0.9)
       );
-      border-radius:18px;
+      border-radius:20px;
       border:1px solid rgba(148,163,184,0.65);
-      padding:8px 12px 10px;
+      padding:10px 13px 11px;
       z-index:25;
       box-shadow:
         0 18px 40px rgba(0,0,0,0.8),
@@ -472,19 +472,19 @@
     }
 
     .cart-bar-note{
-      font-size:10px;
+      font-size:11px;
       color:var(--muted);
-      margin-bottom:5px;
+      margin-bottom:6px;
     }
 
     .cart-main-btn{
       width:100%;
       border:none;
-      padding:11px 12px;
+      padding:12px 13px;
       border-radius:999px;
       background:linear-gradient(120deg,#f97316,#ec4899,#8b5cf6);
       color:#020617;
-      font-size:13px;
+      font-size:14px;
       font-weight:700;
       display:flex;
       align-items:center;
@@ -505,12 +505,12 @@
       line-height:1.1;
     }
     .cart-main-btn > div:first-child div{
-      font-size:13px;
+      font-size:14px;
       letter-spacing:0.02em;
       text-transform:uppercase;
     }
     .cart-main-btn span.small{
-      font-size:10px;
+      font-size:11px;
       font-weight:500;
       opacity:.9;
     }
@@ -557,10 +557,10 @@
       display:flex;
       justify-content:space-between;
       align-items:center;
-      font-size:12px;
+      font-size:13px;
     }
     .cart-sheet-header h3{
-      font-size:13px;
+      font-size:14px;
       font-weight:600;
       letter-spacing:0.04em;
       text-transform:uppercase;
@@ -569,10 +569,10 @@
       border:none;
       background:rgba(15,23,42,0.85);
       color:#e5e7eb;
-      width:26px;height:26px;
+      width:28px;height:28px;
       border-radius:999px;
       cursor:pointer;
-      font-size:14px;
+      font-size:16px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -582,7 +582,7 @@
       color:#111827;
     }
     .cart-sheet-body{
-      padding:6px 14px 4px;
+      padding:8px 14px 6px;
       overflow-y:auto;
       max-height:48vh;
     }
@@ -613,25 +613,25 @@
       margin-bottom:6px;
     }
     .cart-sheet-footer-top span{
-      font-size:11px;
+      font-size:12px;
       opacity:.9;
     }
     .cart-sheet-footer-top strong{
-      font-size:14px;
+      font-size:16px;
     }
     .cart-edit-label{
       color:var(--muted);
-      font-size:10px;
+      font-size:11px;
       margin-bottom:4px;
     }
     .cart-sheet-btn{
       width:100%;
       border:none;
       border-radius:999px;
-      padding:10px 10px;
+      padding:11px 11px;
       background:linear-gradient(120deg,#22c55e,#16a34a);
       color:#022c22;
-      font-size:13px;
+      font-size:14px;
       font-weight:700;
       cursor:pointer;
       box-shadow:
@@ -645,30 +645,31 @@
     }
 
     .cart-empty{
-      font-size:11px;
+      font-size:12px;
       color:var(--muted);
       text-align:center;
-      padding:12px 0;
+      padding:14px 0;
     }
 
     .cart-item-row{
-      padding:7px 0;
+      padding:8px 0;
       border-bottom:1px dashed rgba(75,85,99,0.6);
       display:flex;
       flex-direction:column;
-      gap:5px;
-      font-size:11px;
+      gap:6px;
+      font-size:12px;
     }
     .cart-item-main{
       display:flex;
       flex-direction:column;
-      gap:1px;
+      gap:2px;
     }
     .cart-item-name{
       font-weight:600;
+      font-size:13px;
     }
     .cart-item-meta{
-      font-size:10px;
+      font-size:11px;
       color:var(--muted);
     }
     .cart-item-actions{
@@ -676,7 +677,7 @@
       align-items:center;
       justify-content:space-between;
       gap:6px;
-      font-size:10px;
+      font-size:12px;
     }
     .qty-control{
       display:flex;
@@ -689,29 +690,30 @@
       border:none;
       background:rgba(15,23,42,0.95);
       color:#e5e7eb;
-      width:22px;height:20px;
+      width:26px;height:22px;
       cursor:pointer;
-      font-size:13px;
+      font-size:15px;
     }
     body.theme-light .qty-control button{
       background:#e5e7eb;
       color:#111827;
     }
     .qty-control span{
-      padding:0 7px;
-      min-width:20px;
+      padding:0 8px;
+      min-width:24px;
       text-align:center;
-      font-size:11px;
+      font-size:12px;
     }
     .cart-item-total{
-      font-weight:600;
+      font-weight:700;
+      font-size:13px;
     }
     .cart-remove{
       border:none;
       background:transparent;
       color:var(--danger);
       cursor:pointer;
-      font-size:16px;
+      font-size:18px;
     }
 
     /* TOAST */
@@ -719,14 +721,14 @@
       position:fixed;
       left:50%;
       transform:translateX(-50%);
-      bottom:95px;
+      bottom:105px;
       background:rgba(15,23,42,0.98);
       border-radius:999px;
-      padding:6px 12px;
+      padding:7px 13px;
       display:flex;
       align-items:center;
       gap:6px;
-      font-size:11px;
+      font-size:12px;
       border:1px solid rgba(52,211,153,0.7);
       box-shadow:0 8px 20px rgba(22,163,74,0.75);
       opacity:0;
@@ -742,31 +744,31 @@
 
     /* HISTORY PAGE */
     .page{
-      padding:10px 12px 80px;
+      padding:12px 14px 90px;
     }
     .page-title{
-      font-size:15px;
+      font-size:18px;
       font-weight:600;
-      margin-bottom:4px;
+      margin-bottom:6px;
     }
     .page-sub{
-      font-size:11px;
+      font-size:12px;
       color:var(--muted);
       margin-bottom:10px;
     }
     .history-empty{
-      font-size:11px;
+      font-size:12px;
       color:var(--muted);
-      padding:16px 0;
+      padding:18px 0;
       text-align:center;
     }
     .order-card{
       background:var(--card);
-      border-radius:12px;
+      border-radius:14px;
       border:1px solid var(--border-soft);
-      padding:8px 10px;
-      margin-bottom:8px;
-      font-size:11px;
+      padding:9px 11px;
+      margin-bottom:9px;
+      font-size:12px;
       box-shadow:0 6px 16px rgba(0,0,0,0.5);
     }
     body.theme-light .order-card{
@@ -780,16 +782,16 @@
       margin-bottom:4px;
     }
     .order-head strong{
-      font-size:12px;
+      font-size:13px;
     }
     .order-meta{
-      font-size:10px;
+      font-size:11px;
       color:var(--muted);
       margin-bottom:4px;
     }
     .order-items{
       margin-top:4px;
-      padding-left:10px;
+      padding-left:13px;
     }
     .order-items li{
       margin-bottom:2px;
@@ -799,19 +801,19 @@
       border:none;
       background:transparent;
       color:var(--danger);
-      font-size:11px;
+      font-size:12px;
       text-decoration:underline;
       cursor:pointer;
-      margin-bottom:6px;
+      margin-bottom:8px;
     }
 
     /* ADMIN PAGE */
     .admin-form{
       background:var(--card);
-      border-radius:12px;
+      border-radius:14px;
       border:1px solid var(--border-soft);
-      padding:8px 10px;
-      font-size:11px;
+      padding:9px 11px;
+      font-size:12px;
       margin-bottom:10px;
     }
     body.theme-light .admin-form{
@@ -819,25 +821,25 @@
       box-shadow:0 6px 14px rgba(148,163,184,0.4);
     }
     .admin-form h3{
-      font-size:13px;
-      margin-bottom:6px;
+      font-size:15px;
+      margin-bottom:8px;
     }
     .form-row{
-      margin-bottom:6px;
+      margin-bottom:7px;
       display:flex;
       flex-direction:column;
-      gap:2px;
+      gap:3px;
     }
     .form-row label{
-      font-size:10px;
+      font-size:11px;
       color:var(--muted);
     }
     .form-row input,
     .form-row select{
       border-radius:8px;
       border:1px solid rgba(148,163,184,0.7);
-      padding:5px 7px;
-      font-size:11px;
+      padding:6px 8px;
+      font-size:13px;
       background:rgba(15,23,42,0.7);
       color:#f9fafb;
     }
@@ -850,34 +852,35 @@
       display:flex;
       align-items:center;
       gap:6px;
-      font-size:10px;
+      font-size:11px;
       margin:4px 0 2px;
       color:var(--muted);
     }
     .admin-btn{
       border:none;
       border-radius:999px;
-      padding:7px 9px;
+      padding:8px 10px;
       background:linear-gradient(120deg,#22c55e,#16a34a);
       color:#022c22;
-      font-size:11px;
+      font-size:13px;
       font-weight:600;
       cursor:pointer;
       margin-top:4px;
     }
     .admin-info{
-      font-size:10px;
+      font-size:11px;
       color:var(--muted);
-      margin-bottom:6px;
+      margin-top:6px;
+      margin-bottom:2px;
     }
     .admin-list-title{
-      font-size:12px;
-      margin:6px 0 4px;
+      font-size:14px;
+      margin:8px 0 4px;
       font-weight:600;
     }
     .admin-product-row{
-      font-size:11px;
-      padding:5px 0;
+      font-size:12px;
+      padding:6px 0;
       border-bottom:1px dashed rgba(75,85,99,0.6);
       display:flex;
       justify-content:space-between;
@@ -892,7 +895,45 @@
       background:transparent;
       color:var(--danger);
       cursor:pointer;
-      font-size:16px;
+      font-size:18px;
+    }
+
+    /* CATEGORY LIST (admin) */
+    .category-row{
+      font-size:13px;
+      padding:6px 0;
+      border-bottom:1px dashed rgba(75,85,99,0.6);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .category-main{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .category-pill{
+      padding:4px 9px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.7);
+      font-size:13px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .category-actions button{
+      border:none;
+      background:transparent;
+      cursor:pointer;
+      font-size:17px;
+      margin-left:4px;
+    }
+    .category-actions button.edit{
+      color:#fbbf24;
+    }
+    .category-actions button.del{
+      color:var(--danger);
     }
 
     /* IMAGE VIEWER (full screen gallery) */
@@ -916,7 +957,7 @@
       gap:10px;
     }
     .image-viewer-title{
-      font-size:12px;
+      font-size:14px;
       text-align:center;
       max-width:90%;
     }
@@ -946,7 +987,7 @@
       width:32px;height:32px;
       display:flex;align-items:center;justify-content:center;
       cursor:pointer;
-      font-size:16px;
+      font-size:18px;
     }
     .image-viewer-arrow{
       position:absolute;
@@ -959,12 +1000,12 @@
       border-radius:999px;
       display:flex;align-items:center;justify-content:center;
       cursor:pointer;
-      font-size:18px;
+      font-size:20px;
     }
     .image-viewer-arrow.left{left:10px;}
     .image-viewer-arrow.right{right:10px;}
     .image-viewer-counter{
-      font-size:11px;
+      font-size:12px;
       color:#9ca3af;
     }
   </style>
@@ -1029,20 +1070,12 @@
       </div>
       <div class="hero-note">
         Buyurtma yuborilgandan keyin faqat telefon raqamingizni yozib qoldiring —
-        admin sizga tez orada qo‘ng‘iroq qiladi.
+        sotuvchi sizga tez orada qo‘ng‘iroq qiladi.
       </div>
     </section>
 
-    <!-- FILTERS -->
-    <div class="filters" id="filterBar">
-      <button class="chip active" data-category="all">⭐ Barchasi</button>
-      <button class="chip" data-category="pomada">💄 Pomada</button>
-      <button class="chip" data-category="krem">🧴 Kremlar</button>
-      <button class="chip" data-category="parfyum">🌸 Parfyum</button>
-      <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
-      <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
-      <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
-    </div>
+    <!-- FILTERS / KATALOGLAR -->
+    <div class="filters" id="filterBar"></div>
 
     <!-- PRODUCTS -->
     <main class="products-wrap">
@@ -1067,9 +1100,10 @@
   <div id="adminPage" class="page hidden">
     <div class="page-title">🛠 Admin panel</div>
     <p class="page-sub">
-      Bu sahifa faqat admin uchun. Mahsulotlar localStorage’da saqlanadi (shu qurilmada).
+      Bu sahifa faqat admin uchun. Mahsulotlar va kataloglar localStorage’da saqlanadi (shu qurilmada).
     </p>
 
+    <!-- PRODUCT FORM -->
     <div class="admin-form">
       <h3>Yangi mahsulot qo‘shish</h3>
       <div class="form-row">
@@ -1077,15 +1111,8 @@
         <input id="adminName" placeholder="Masalan: Luxury Lipstick Pink" />
       </div>
       <div class="form-row">
-        <label>Kategoriya</label>
-        <select id="adminCategory">
-          <option value="pomada">Pomada / lab uchun</option>
-          <option value="krem">Krem / yuz uchun</option>
-          <option value="parfyum">Parfyum</option>
-          <option value="niqob">Niqob / mask</option>
-          <option value="ko‘z">Ko‘z uchun</option>
-          <option value="tana">Tana / soch parvarishi</option>
-        </select>
+        <label>Katalog (kategoriya)</label>
+        <select id="adminCategory"></select>
       </div>
       <div class="form-row">
         <label>Asosiy narx (chegirmadan oldin), so‘m</label>
@@ -1104,28 +1131,54 @@
         <input id="adminTag" placeholder="Masalan: Kundalik foydalanish uchun" />
       </div>
       <div class="form-row">
-        <label>Rasm URL manzillari (vergul bilan ajratib yozing)</label>
+        <label>Rasm URL manzillari (vergul bilan ajratib yozing, ixtiyoriy)</label>
         <input id="adminImages" placeholder="https://..., https://..., https://..." />
+      </div>
+      <div class="form-row">
+        <label>Yoki fayldan rasm yuklash (ixtiyoriy)</label>
+        <input id="adminImageFile" type="file" accept="image/*" multiple />
       </div>
       <button class="admin-btn" type="button" onclick="addCustomProduct()">
         ➕ Mahsulotni qo‘shish
       </button>
       <p class="admin-info">
-        Eslatma: mahsulotlar va admin holati faqat shu qurilmada eslab qolinadi.
+        Eslatma: hatto rasm bermasangiz ham mahsulot saqlanadi (default rasm bilan).
       </p>
     </div>
 
-    <div class="admin-info">
-      🔴 Diqqat: bu yerda o‘chirgan mahsulotingiz do‘kondan ham o‘chadi. Kerak bo‘lsa qayta qo‘shasiz.
+    <!-- CATEGORY MANAGER -->
+    <div class="admin-list-title">📂 Kataloglar (bo‘limlar)</div>
+    <div class="admin-form">
+      <h3>Katalogni qo‘shish / tahrirlash</h3>
+      <div class="form-row">
+        <label>Katalog nomi</label>
+        <input id="newCategoryLabel" placeholder="Masalan: Lab bo‘yoqlari" />
+      </div>
+      <div class="form-row">
+        <label>Emoji (ixtiyoriy)</label>
+        <input id="newCategoryIcon" placeholder="Masalan: 💄" />
+      </div>
+      <button class="admin-btn" type="button" onclick="addCategory()">
+        ➕ Katalog qo‘shish
+      </button>
+      <p class="admin-info">
+        “Do‘kon” sahifasidagi yuqoridagi kataloglar shu ro‘yxatdan olinadi. WebAppda katta-katta ko‘rinadi.
+      </p>
     </div>
-    <div class="admin-list-title">Do‘kondagi mahsulotlar ro‘yxati:</div>
+    <div id="categoryList"></div>
+
+    <!-- PRODUCT LIST (ALL) -->
+    <div class="admin-list-title">🧺 Do‘kondagi mahsulotlar ro‘yxati</div>
     <div id="adminCustomList"></div>
+    <p class="admin-info">
+      🔴 Diqqat: bu yerda o‘chirgan mahsulotingiz do‘kondan ham o‘chadi. Kerak bo‘lsa qayta qo‘shasiz.
+    </p>
   </div>
 
   <!-- BOTTOM ORDER BAR -->
   <div class="cart-bar">
     <div class="cart-bar-note">
-      “🛒 Savat” tugmasi orqali mahsulot sonini o‘zgartirishingiz yoki o‘chirishingiz mumkin.
+      “🛒 Savat” tugmasi orqali mahsulot sonini o‘zgartirasiz yoki o‘chirasiz.
       “Buyurtma berish” tugmasini bossangiz, tanlagan mahsulotlaringiz Telegramdan sotuvchiga yuborish
       uchun tayyor bo‘ladi. Telegram oynasida xabarni ko‘rib, “Yuborish” tugmasini o‘zingiz bosasiz.
     </div>
@@ -1153,7 +1206,7 @@
     <div class="cart-sheet-footer">
       <div class="cart-edit-label">
         Siz tanlagan mahsulotlarni Telegram orqali sotuvchiga yuboramiz.
-        Telegramda xabar ochilgach, faqat “Yuborish” tugmasini bosishingiz kifoya —
+        Telegramda xabar ochilgach, faqat “Yuborish” tugmasini bosasangiz kifoya —
         keyin sotuvchi siz bilan telefon orqali bog‘lanadi.
       </div>
       <div class="cart-sheet-footer-top">
@@ -1188,12 +1241,13 @@
 <script>
   // --- KONSTANTALAR ---
   const ADMIN_CODE = "12345678";
-  const STORAGE_PRODUCTS = "beauty_all_products";
+  const STORAGE_PRODUCTS = "beauty_all_products_v2";
   const STORAGE_HISTORY = "beauty_order_history";
   const STORAGE_ADMIN = "beauty_admin";
+  const STORAGE_CATEGORIES = "beauty_categories";
   const THEME_KEY = "beauty_theme";
 
-  const categoryEmoji = {
+  const categoryEmojiFallback = {
     "pomada":"💄",
     "krem":"🧴",
     "parfyum":"🌸",
@@ -1203,7 +1257,17 @@
     "default":"💅"
   };
 
-  // --- DASTLABKI MAHSULOTLAR ---
+  // DEFAULT KATALOGLAR
+  const defaultCategoryList = [
+    {id:"pomada", label:"Pomada", icon:"💄"},
+    {id:"krem", label:"Kremlar", icon:"🧴"},
+    {id:"parfyum", label:"Parfyum", icon:"🌸"},
+    {id:"niqob", label:"Niqob / Mask", icon:"😷"},
+    {id:"ko‘z", label:"Ko‘z uchun", icon:"👁"},
+    {id:"tana", label:"Tana parvarishi", icon:"🛁"}
+  ];
+
+  // DASTLABKI MAHSULOTLAR
   const defaultProducts = [
     {
       name:"Mat pomada Nude Lux",
@@ -1438,6 +1502,7 @@
   let cart = [];
   let activeCategory = "all";
   let isAdmin = false;
+  let categories = [];
 
   // Fullscreen image viewer
   let viewerProductIndex = null;
@@ -1463,6 +1528,7 @@
   const imageViewerTitleEl = document.getElementById("imageViewerTitle");
   const imageViewerImgEl = document.getElementById("imageViewerImg");
   const imageViewerCounterEl = document.getElementById("imageViewerCounter");
+  const categoryListEl = document.getElementById("categoryList");
 
   // YORDAMCHI
   function formatPrice(v){
@@ -1472,7 +1538,151 @@
   function showToast(message){
     toastEl.textContent = message;
     toastEl.classList.add("show");
-    setTimeout(()=> toastEl.classList.remove("show"), 1100);
+    setTimeout(()=> toastEl.classList.remove("show"), 1200);
+  }
+
+  function getCategoryLabel(id){
+    const c = categories.find(cat=>cat.id === id);
+    return c ? c.label : (id || "Katalog");
+  }
+
+  function getCategoryIcon(id){
+    const c = categories.find(cat=>cat.id === id);
+    if(c && c.icon) return c.icon;
+    return categoryEmojiFallback[id] || categoryEmojiFallback.default;
+  }
+
+  // KATALOGLARNI YUKLASH/SAQLASH
+  function loadCategories(){
+    try{
+      const saved = localStorage.getItem(STORAGE_CATEGORIES);
+      if(saved){
+        categories = JSON.parse(saved);
+      }else{
+        categories = defaultCategoryList.slice();
+        saveCategories();
+      }
+    }catch(e){
+      categories = defaultCategoryList.slice();
+      saveCategories();
+    }
+  }
+  function saveCategories(){
+    localStorage.setItem(STORAGE_CATEGORIES, JSON.stringify(categories));
+  }
+
+  function renderCategories(){
+    filterBar.innerHTML = "";
+    // All chip
+    const allBtn = document.createElement("button");
+    allBtn.className = "chip" + (activeCategory === "all" ? " active" : "");
+    allBtn.dataset.category = "all";
+    allBtn.innerHTML = "⭐ Barchasi";
+    filterBar.appendChild(allBtn);
+
+    categories.forEach(cat=>{
+      const btn = document.createElement("button");
+      btn.className = "chip" + (activeCategory === cat.id ? " active" : "");
+      btn.dataset.category = cat.id;
+      btn.innerHTML = `${cat.icon || "📂"} ${cat.label}`;
+      filterBar.appendChild(btn);
+    });
+  }
+
+  function renderCategorySelect(){
+    const select = document.getElementById("adminCategory");
+    select.innerHTML = "";
+    categories.forEach(cat=>{
+      const opt = document.createElement("option");
+      opt.value = cat.id;
+      opt.textContent = cat.label;
+      select.appendChild(opt);
+    });
+  }
+
+  function renderCategoryList(){
+    if(!categories.length){
+      categoryListEl.innerHTML = "<p class='history-empty'>Kataloglar yo‘q.</p>";
+      return;
+    }
+    categoryListEl.innerHTML = "";
+    categories.forEach(cat=>{
+      const row = document.createElement("div");
+      row.className = "category-row";
+      row.innerHTML = `
+        <div class="category-main">
+          <div class="category-pill">
+            <span>${cat.icon || "📂"}</span>
+            <span>${cat.label}</span>
+          </div>
+          <small style="opacity:.7;font-size:11px;">ID: ${cat.id}</small>
+        </div>
+        <div class="category-actions">
+          <button class="edit" title="Tahrirlash" onclick="editCategory('${cat.id}')">✏️</button>
+          <button class="del" title="O‘chirish" onclick="deleteCategory('${cat.id}')">🗑</button>
+        </div>
+      `;
+      categoryListEl.appendChild(row);
+    });
+  }
+
+  function slugifyLabel(label){
+    return "cat_" + label.toLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu,"_")
+      .replace(/^_+|_+$/g,"") +
+      "_" + Date.now().toString(36);
+  }
+
+  function addCategory(){
+    const labelEl = document.getElementById("newCategoryLabel");
+    const iconEl = document.getElementById("newCategoryIcon");
+    const label = labelEl.value.trim();
+    const icon = iconEl.value.trim();
+    if(!label){
+      alert("Katalog nomini kiriting.");
+      return;
+    }
+    const id = slugifyLabel(label);
+    categories.push({id, label, icon});
+    saveCategories();
+    renderCategories();
+    renderCategorySelect();
+    renderCategoryList();
+    labelEl.value = "";
+    iconEl.value = "";
+    showToast("📂 Yangi katalog qo‘shildi");
+  }
+
+  function editCategory(id){
+    const cat = categories.find(c=>c.id === id);
+    if(!cat) return;
+    const newLabel = prompt("Yangi katalog nomi:", cat.label);
+    if(newLabel === null) return;
+    const trimmed = newLabel.trim();
+    if(!trimmed){
+      alert("Katalog nomi bo‘sh bo‘lishi mumkin emas.");
+      return;
+    }
+    const newIcon = prompt("Yangi emoji (ixtiyoriy):", cat.icon || "");
+    cat.label = trimmed;
+    cat.icon = (newIcon === null ? cat.icon : newIcon.trim());
+    saveCategories();
+    renderCategories();
+    renderCategorySelect();
+    renderCategoryList();
+    showToast("✏️ Katalog tahrirlandi");
+  }
+
+  function deleteCategory(id){
+    if(!confirm("Bu katalogni o‘chirishni xohlaysizmi?")) return;
+    categories = categories.filter(c=>c.id !== id);
+    saveCategories();
+    // Bu katalogga tegishli mahsulotlar qoladi, lekin kategoriyasi nomida eski ID ko‘rinishi mumkin
+    renderCategories();
+    renderCategorySelect();
+    renderCategoryList();
+    renderProducts();
+    showToast("🗑 Katalog o‘chirildi");
   }
 
   // MAHSULOTLARNI YUKLASH/SAQLASH
@@ -1499,6 +1709,10 @@
     const filtered = products.filter(p =>
       activeCategory === "all" ? true : p.category === activeCategory
     );
+    if(!filtered.length){
+      productsGrid.innerHTML = "<p class='history-empty'>Bu katalogda hozircha mahsulot yo‘q.</p>";
+      return;
+    }
     filtered.forEach(p=>{
       const index = products.indexOf(p);
       const discount = (p.oldPrice && p.oldPrice > p.price)
@@ -1508,6 +1722,7 @@
       const img = (p.images && p.images.length)
         ? p.images[0]
         : "https://via.placeholder.com/600x600.png?text=Beauty";
+      const catLabel = getCategoryLabel(p.category);
 
       productsGrid.innerHTML += `
         <article class="product-card">
@@ -1518,13 +1733,13 @@
             <div class="product-photo">
               <img src="${img}" alt="${p.name}">
             </div>
-            <div class="product-emoji">${p.emoji || categoryEmoji[p.category] || categoryEmoji.default}</div>
+            <div class="product-emoji">${p.emoji || getCategoryIcon(p.category)}</div>
             ${discount ? `<div class="product-sale">-${discount}%</div>` : ``}
           </div>
           <div class="product-body">
             <div class="product-name">${p.name}</div>
             <div class="product-meta">
-              ${p.category.toUpperCase()} • ${tag}
+              ${catLabel} • ${tag}
             </div>
             <div class="tag-mini">
               💡 Tavsiya: ${tag}
@@ -1545,7 +1760,7 @@
     });
   }
 
-  // FILTER
+  // FILTER KLIK
   filterBar.addEventListener("click", (e)=>{
     const btn = e.target.closest(".chip");
     if(!btn) return;
@@ -1612,7 +1827,7 @@
           <div class="cart-item-main">
             <div class="cart-item-name">${p.name}</div>
             <div class="cart-item-meta">
-              ${formatPrice(p.price)} so‘m • ${p.category.toUpperCase()}
+              ${formatPrice(p.price)} so‘m • ${getCategoryLabel(p.category)}
             </div>
           </div>
           <div class="cart-item-actions">
@@ -1651,7 +1866,6 @@
   // TELEGRAM LINK
   function openTelegramLink(url){
     const tg = window.Telegram && window.Telegram.WebApp;
-
     try {
       if (tg && typeof tg.openTelegramLink === "function") {
         tg.openTelegramLink(url);
@@ -1733,7 +1947,7 @@
       const lineTotal = p.price * c.qty;
       totalPrice += lineTotal;
       totalItems += c.qty;
-      const catEmoji = categoryEmoji[p.category] || p.emoji || categoryEmoji.default;
+      const catEmoji = getCategoryIcon(p.category);
       const lineText =
         `${i+1}) ${catEmoji} ${p.name} — ${c.qty} dona × ${formatPrice(p.price)} so‘m = ${formatPrice(lineTotal)} so‘m`;
       lines.push({line: lineText, product: p});
@@ -1815,6 +2029,7 @@
       renderHistory();
     }else if(pageId === "adminPage"){
       renderAdminProductList();
+      renderCategoryList();
     }
   });
 
@@ -1839,6 +2054,7 @@
       document.getElementById("historyPage").classList.add("hidden");
       document.getElementById("adminPage").classList.remove("hidden");
       renderAdminProductList();
+      renderCategoryList();
       return;
     }
     const code = prompt("Admin uchun kirish kodi:");
@@ -1855,8 +2071,18 @@
 
   adminAccessBtn.addEventListener("click", askAdminCode);
 
+  // FAYLDAN DATA URL
+  function fileToDataUrl(file){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   // ADMIN MAHSULOTLAR
-  function addCustomProduct(){
+  async function addCustomProduct(){
     const nameEl = document.getElementById("adminName");
     const catEl = document.getElementById("adminCategory");
     const baseEl = document.getElementById("adminPriceBase");
@@ -1864,6 +2090,7 @@
     const discEl = document.getElementById("adminPriceDiscount");
     const tagEl = document.getElementById("adminTag");
     const imgsEl = document.getElementById("adminImages");
+    const fileEl = document.getElementById("adminImageFile");
 
     const name = nameEl.value.trim();
     const category = catEl.value;
@@ -1885,15 +2112,26 @@
     }
 
     let images = [];
-    const raw = imgsEl.value.trim();
-    if(raw){
-      images = raw.split(",").map(s=>s.trim()).filter(Boolean);
-    }
-    if(!images.length){
-      images = ["https://via.placeholder.com/600x600.png?text=Beauty"];
+    const rawUrls = imgsEl.value.trim();
+    if(rawUrls){
+      images = rawUrls.split(",").map(s=>s.trim()).filter(Boolean);
     }
 
-    const emoji = categoryEmoji[category] || categoryEmoji.default;
+    const files = Array.from(fileEl.files || []);
+    if(files.length){
+      try{
+        const dataUrls = await Promise.all(files.map(fileToDataUrl));
+        images = images.concat(dataUrls);
+      }catch(e){
+        console.error("File read error", e);
+      }
+    }
+
+    if(!images.length){
+      images = []; // rasm yo‘q bo‘lsa ham saqlaymiz, renderda placeholder chiqadi
+    }
+
+    const emoji = getCategoryIcon(category);
 
     const product = {
       name,
@@ -1916,6 +2154,7 @@
     hasDiscountEl.checked = false;
     tagEl.value = "";
     imgsEl.value = "";
+    fileEl.value = "";
 
     showToast("✅ Mahsulot qo‘shildi");
   }
@@ -2006,6 +2245,11 @@
     isAdmin = localStorage.getItem(STORAGE_ADMIN) === "true";
     updateAdminUI();
 
+    loadCategories();
+    renderCategories();
+    renderCategorySelect();
+    renderCategoryList();
+
     loadProducts();
     renderProducts();
     renderHistory();
@@ -2024,6 +2268,9 @@
   window.closeImageViewer = closeImageViewer;
   window.nextImage = nextImage;
   window.prevImage = prevImage;
+  window.addCategory = addCategory;
+  window.editCategory = editCategory;
+  window.deleteCategory = deleteCategory;
 </script>
 
 </body>
