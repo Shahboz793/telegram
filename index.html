@@ -433,59 +433,90 @@
     }
     .btn-add:active{transform:scale(.96);}
 
-    /* PASTKI RANGLI STRIP (WEB APP TAGI) */
-    .safe-bottom-strip{
-      position:fixed;
-      left:0;right:0;bottom:0;
-      height:22px;
-      background:linear-gradient(90deg,#f97316,#ec4899,#8b5cf6);
-      box-shadow:0 -6px 18px rgba(0,0,0,0.75);
-      z-index:20;
-    }
-    body.theme-light .safe-bottom-strip{
-      box-shadow:0 -6px 18px rgba(148,163,184,0.8);
-    }
-
-    /* BOTTOM ORDER BAR */
+    /* BOTTOM ORDER BAR – PREMIUM STYLE, WEBAPP UCHUN BIROZ YUQORIDA */
     .cart-bar{
       position:fixed;
-      left:0;right:0;
-      bottom:24px;           /* ⬅ savatni biroz tepaga ko‘tardik */
-      background:radial-gradient(circle at top,#1d2538,#020617 55%);
-      border-top:1px solid var(--border-soft);
-      padding:8px 10px 10px;
+      left:10px;
+      right:10px;
+      bottom:24px; /* WebApp pastki panelidan yuqoriroqda */
+      background:linear-gradient(
+        135deg,
+        rgba(15,23,42,0.96),
+        rgba(24,24,27,0.9)
+      );
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,0.65);
+      padding:8px 12px 10px;
       z-index:25;
-      box-shadow:0 -10px 22px rgba(0,0,0,0.75);
+      box-shadow:
+        0 18px 40px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(15,23,42,0.8);
+      backdrop-filter:blur(18px);
     }
     body.theme-light .cart-bar{
-      background:radial-gradient(circle at top,#e5e7eb,#f9fafb 55%);
-      box-shadow:0 -10px 20px rgba(148,163,184,0.7);
+      background:linear-gradient(
+        135deg,
+        rgba(249,250,251,0.98),
+        rgba(229,231,235,0.98)
+      );
+      box-shadow:
+        0 16px 32px rgba(148,163,184,0.7),
+        0 0 0 1px rgba(209,213,219,0.8);
     }
+
     .cart-bar-note{
       font-size:10px;
       color:var(--muted);
-      margin-bottom:4px;
+      margin-bottom:5px;
+      display:flex;
+      align-items:center;
+      gap:4px;
     }
+    .cart-bar-note::before{
+      content:"✨";
+      font-size:11px;
+    }
+
+    /* ASOSIY BUYURTMA TUGMASI – BRAND */
     .cart-main-btn{
       width:100%;
       border:none;
-      padding:11px 10px;
+      padding:11px 12px;
       border-radius:999px;
       background:linear-gradient(120deg,#f97316,#ec4899,#8b5cf6);
       color:#020617;
-      font-size:14px;
+      font-size:13px;
       font-weight:700;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:8px;
+      gap:10px;
       cursor:pointer;
-      box-shadow:0 9px 24px rgba(236,72,153,0.75);
+      box-shadow:
+        0 14px 32px rgba(236,72,153,0.85),
+        0 0 0 1px rgba(248,250,252,0.6);
+    }
+    .cart-main-btn:active{
+      transform:scale(.97);
+    }
+    .cart-main-btn > div:first-child{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      line-height:1.1;
+    }
+    .cart-main-btn > div:first-child div{
+      font-size:13px;
+      letter-spacing:0.02em;
+      text-transform:uppercase;
     }
     .cart-main-btn span.small{
       font-size:10px;
       font-weight:500;
       opacity:.9;
+    }
+    .cart-main-btn > div:last-child span{
+      font-size:20px;
     }
 
     /* CART SHEET */
@@ -502,27 +533,30 @@
       opacity:1;
       pointer-events:auto;
     }
+
     .cart-sheet{
       position:fixed;
       left:0;right:0;bottom:0;
-      background:var(--bg-soft);
-      border-radius:16px 16px 0 0;
-      border-top:1px solid var(--border-soft);
-      max-height:72vh;
+      background:radial-gradient(circle at top,#020617,var(--bg-soft));
+      border-radius:22px 22px 0 0;
+      border-top:1px solid rgba(148,163,184,0.7);
+      max-height:75vh;
       transform:translateY(100%);
       transition:transform .25s ease;
       z-index:40;
       display:flex;
       flex-direction:column;
+      box-shadow:0 -24px 36px rgba(0,0,0,0.9);
     }
     body.theme-light .cart-sheet{
-      background:#f9fafb;
+      background:radial-gradient(circle at top,#f9fafb,#e5e7eb);
+      box-shadow:0 -18px 30px rgba(148,163,184,0.8);
     }
     .cart-sheet.open{
       transform:translateY(0);
     }
     .cart-sheet-header{
-      padding:8px 12px;
+      padding:10px 14px 8px;
       border-bottom:1px solid var(--border-soft);
       display:flex;
       justify-content:space-between;
@@ -531,23 +565,50 @@
     }
     .cart-sheet-header h3{
       font-size:13px;
+      font-weight:600;
+      letter-spacing:0.04em;
+      text-transform:uppercase;
     }
     .cart-sheet-header button{
       border:none;
-      background:transparent;
-      font-size:18px;
+      background:rgba(15,23,42,0.85);
+      color:#e5e7eb;
+      width:26px;height:26px;
+      border-radius:999px;
       cursor:pointer;
-      color:var(--muted);
+      font-size:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    body.theme-light .cart-sheet-header button{
+      background:#e5e7eb;
+      color:#111827;
     }
     .cart-sheet-body{
-      padding:6px 12px 4px;
+      padding:6px 14px 4px;
       overflow-y:auto;
-      max-height:46vh;
+      max-height:48vh;
     }
     .cart-sheet-footer{
-      padding:8px 12px 10px;
+      padding:8px 14px 12px;
       border-top:1px solid var(--border-soft);
       font-size:12px;
+      background:linear-gradient(
+        135deg,
+        rgba(15,23,42,0.96),
+        rgba(30,64,175,0.9)
+      );
+      color:#e5e7eb;
+      border-radius:0 0 22px 22px;
+    }
+    body.theme-light .cart-sheet-footer{
+      background:linear-gradient(
+        135deg,
+        rgba(249,250,251,0.98),
+        rgba(219,234,254,0.98)
+      );
+      color:#111827;
     }
     .cart-sheet-footer-top{
       display:flex;
@@ -555,8 +616,21 @@
       align-items:center;
       margin-bottom:6px;
     }
+    .cart-sheet-footer-top span{
+      font-size:11px;
+      opacity:.9;
+    }
     .cart-sheet-footer-top strong{
-      font-size:13px;
+      font-size:14px;
+    }
+    .cart-edit-label{
+      color:var(--danger);
+      font-size:10px;
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      gap:4px;
+      margin-bottom:4px;
     }
     .cart-sheet-btn{
       width:100%;
@@ -568,8 +642,16 @@
       font-size:13px;
       font-weight:700;
       cursor:pointer;
-      box-shadow:0 9px 20px rgba(34,197,94,0.5);
+      box-shadow:
+        0 12px 28px rgba(34,197,94,0.65),
+        0 0 0 1px rgba(240,253,250,0.8);
+      letter-spacing:0.02em;
+      text-transform:uppercase;
     }
+    .cart-sheet-btn:active{
+      transform:scale(.97);
+    }
+
     .cart-empty{
       font-size:11px;
       color:var(--muted);
@@ -638,15 +720,6 @@
       color:var(--danger);
       cursor:pointer;
       font-size:16px;
-    }
-    .cart-edit-label{
-      color:var(--danger);
-      font-size:10px;
-      font-weight:600;
-      display:flex;
-      align-items:center;
-      gap:4px;
-      margin-bottom:2px;
     }
 
     /* TOAST */
@@ -1057,9 +1130,6 @@
     <div id="adminCustomList"></div>
   </div>
 
-  <!-- PASTKI RANGLI STRIP -->
-  <div class="safe-bottom-strip"></div>
-
   <!-- BOTTOM ORDER BAR -->
   <div class="cart-bar">
     <div class="cart-bar-note">
@@ -1072,7 +1142,7 @@
           Istalgancha marta yuborish mumkin. Telegramda telefon raqamingizni yozib qoldiring.
         </span>
       </div>
-      <div><span style="font-size:18px;">›</span></div>
+      <div><span>›</span></div>
     </button>
   </div>
 
