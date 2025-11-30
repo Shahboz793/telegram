@@ -323,7 +323,7 @@
       height:0;
       overflow:hidden;
       border-radius:16px;
-      background:#000;
+      background:#0b1220; /* qorayib qolmasin – yumshoq fon */
       margin-top:6px;
       box-shadow:0 18px 40px rgba(15,23,42,0.9);
     }
@@ -635,6 +635,8 @@
   <!-- PDF: jsPDF + autoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
+  <!-- TELEGRAM MINI APP JS -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 <div class="page">
@@ -898,6 +900,23 @@
   const VIDEO_COMPLETE_PERCENT = 10; // 10% video kifoya
   const QUIZ_PASS_PERCENT = 30;     // 30% quiz natija
   const QUIZ_TOTAL_MINUTES = 20;    // QUIZ uchun umumiy vaqt (daqiqa)
+
+  /* TELEGRAM MINI APP HOLATI */
+  let tgWebApp = null;
+  let isTelegramMiniApp = false;
+
+  function initTelegram(){
+    try{
+      if(window.Telegram && Telegram.WebApp){
+        tgWebApp = Telegram.WebApp;
+        isTelegramMiniApp = true;
+        tgWebApp.ready();
+        try{ tgWebApp.expand(); }catch(e){}
+      }
+    }catch(e){
+      console.log("Telegram WebApp topilmadi yoki ishlamadi",e);
+    }
+  }
 
   /* FIREBASE INIT */
   const firebaseConfig = {
@@ -1893,6 +1912,14 @@
   function openQuizFullscreen(){
     const elem = document.querySelector(".quiz-overlay-content");
     if(!elem) return;
+
+    // TELEGRAM MINI APP ichida brauzer fullscreen ko‘p hollarda bloklanadi.
+    // Shuning uchun WebApp.expand() ni ishlatamiz – butun oynani egallaydi.
+    if(isTelegramMiniApp && tgWebApp){
+      try{ tgWebApp.expand(); }catch(e){}
+      return;
+    }
+
     const req = elem.requestFullscreen
       || elem.webkitRequestFullscreen
       || elem.mozRequestFullScreen
@@ -1912,7 +1939,7 @@
   function updateQuizTimerDisplay(){
     const timerEl = document.getElementById("quiz-timer");
     if(!timerEl) return;
-    const totalSec = Math.max(0, quizRemaining || 0); // quizRemaining ni umumiy vaqt soniyalarda sifatida ishlatyapmiz
+    const totalSec = Math.max(0, quizRemaining || 0);
     const m = Math.floor(totalSec / 60);
     const s = totalSec % 60;
     timerEl.textContent = `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
@@ -1932,7 +1959,6 @@
     const total = currentLessonQuiz.length;
     if(!total) return;
 
-    // Barcha savollarni ID bilan chiqaramiz (scroll uchun)
     const questionsHtml = currentLessonQuiz.map((q,idx)=>`
       <div class="quiz-question" id="quiz-q-${idx}" style="margin-bottom:10px;">
         <div class="quiz-question-title">${idx+1}-savol. ${q.question}</div>
@@ -1949,7 +1975,6 @@
       </div>
     `).join("");
 
-    // “Oldinga-orqaga” uchun yuqorida savol raqamli navigatsiya
     const navHtml = `
       <div class="muted" style="font-size:11px;margin-top:4px;">
         Savol raqamlariga bosib tez o‘tishingiz mumkin:
@@ -1982,7 +2007,6 @@
       </div>
     `;
 
-    // Navigatsiya tugmalari – ma'lum savolga scroll
     const navBtns = quizOverlayBox.querySelectorAll(".quiz-nav-btn");
     navBtns.forEach(btn=>{
       btn.addEventListener("click",()=>{
@@ -1994,12 +2018,10 @@
       });
     });
 
-    // Tugmalar
     document.getElementById("quiz-submit-btn").onclick = ()=>finishQuizAllAtOnce();
     document.getElementById("quiz-cancel-btn").onclick = closeQuizOverlay;
 
-    // UMUMIY VAQT TIMERINI ISHGA TUSHIRAMIZ
-    quizRemaining = currentQuizTotalMinutes * 60; // umumiy test vaqti (sekundlarda)
+    quizRemaining = currentQuizTotalMinutes * 60;
     updateQuizTimerDisplay();
     clearQuizTimer();
     quizTimerId = setInterval(()=>{
@@ -2038,7 +2060,6 @@
     });
     const percent = total ? Math.round((score/total)*100) : 0;
 
-    // Firestore ga saqlash
     try{
       if(data.currentUser && currentCourseDetail && currentLessonId){
         const updated = await saveLessonQuizAttempt(
@@ -2054,11 +2075,9 @@
       console.error("quiz attempt save error",err);
     }
 
-    // Natija PDF (foydalanuvchi javoblari bilan)
     const curLesson = getCurrentLesson();
     generateQuizResultPdf(curLesson ? curLesson.title : "Dars", score, total, quizAnswers, currentLessonQuiz);
 
-    // Natijani overlay ichida chiqaramiz
     renderQuizResultInOverlay(score,total,quizAnswers);
   }
 
@@ -2229,7 +2248,20 @@
     }
   }
 
-  /* PROGRESS INTERVAL — oxirgi 7 soniya mantiqi */
+  /* KEYINGI DARSGA AVTOMATIK O‘TISH (1-video tugaganda, quiz allaqachon ishlangan bo‘lsa) */
+  function goToNextLessonAuto(){
+    if(!currentCourseDetail || !currentLessonId) return;
+    const lessons = currentCourseDetail.lessons || [];
+    const idx = lessons.findIndex(l=>l.id===currentLessonId);
+    if(idx>=0 && idx<lessons.length-1){
+      const nextLesson = lessons[idx+1];
+      openLessonPlayer(nextLesson);
+    }else{
+      alert("Bu kursning darslari tugadi.");
+    }
+  }
+
+  /* PROGRESS INTERVAL — oxirgi 7 soniya mantiqi + quiz faqat 1-marta chiqsin */
   function startProgressInterval(){
     if(!currentPlayer) return;
     if(progressInterval) clearInterval(progressInterval);
@@ -2240,6 +2272,32 @@
       if(!dur || dur<=0) return;
       const cur = currentPlayer.getCurrentTime()||0;
       const remaining = dur - cur;
+
+      const percentNow = Math.min(99, Math.round((cur/dur)*100));
+      lessonProgressText.textContent = `Ko‘rilgan: ${percentNow}%`;
+      lessonProgressBar.style.width = percentNow+"%";
+
+      if(!data.currentUser || !currentCourseDetail || !currentLessonId) return;
+
+      const lp = (currentCourseProgress?.lessons||{})[currentLessonId] || {};
+      const videoCompleted = lp.videoCompleted || (lp.percent>=VIDEO_COMPLETE_PERCENT);
+
+      if(!videoCompleted && (percentNow - (lastSavedPercent||0) >= 15 || percentNow>=VIDEO_COMPLETE_PERCENT)){
+        lastSavedPercent = percentNow;
+        try{
+          const updatedMid = await saveLessonProgress(
+            data.currentUser.username,
+            currentCourseDetail.id,
+            currentLessonId,
+            percentNow,
+            percentNow>=VIDEO_COMPLETE_PERCENT
+          );
+          currentCourseProgress = updatedMid;
+          renderCourseLessonsList();
+        }catch(err){
+          console.error("progress mid error",err);
+        }
+      }
 
       if(remaining<=7){
         const effectiveTime = Math.max(0, dur - 7);
@@ -2267,44 +2325,31 @@
           }
         }
 
-        try{ currentPlayer.pauseVideo(); }catch(e){}
+        try{
+          currentPlayer.pauseVideo();
+          currentPlayer.seekTo(0,true); // 🔁 0 ga qaytarib qo‘yamiz
+        }catch(e){}
+
         stopCurrentPlayer();
         exitAnyFullscreen();
 
+        const info = (currentCourseProgress?.lessons||{})[currentLessonId] || {};
+        const attempts = info.quizAttempts || 0;
+
         if(currentLessonQuiz.length){
-          showQuizInviteOverlay();
+          if(attempts>0){
+            // Quiz allaqachon kamida 1 marta ishlangan – endi video tugaganda avtomatik keyingi dars
+            goToNextLessonAuto();
+          }else{
+            // 1-marta – faqat hozir chiqadi
+            showQuizInviteOverlay();
+          }
+        }else{
+          // Quiz yo‘q bo‘lsa, bevosita keyingi dars
+          goToNextLessonAuto();
         }
 
         return;
-      }
-
-      let percent = (cur/dur)*100;
-      if(percent>99) percent = 99;
-      const rounded = Math.round(percent);
-      lessonProgressText.textContent = `Ko‘rilgan: ${rounded}%`;
-      lessonProgressBar.style.width = rounded+"%";
-
-      if(!data.currentUser || !currentCourseDetail || !currentLessonId) return;
-
-      const lp = (currentCourseProgress?.lessons||{})[currentLessonId] || {};
-      const videoCompleted = lp.videoCompleted || (lp.percent>=VIDEO_COMPLETE_PERCENT);
-      if(videoCompleted) return;
-
-      if(rounded - lastSavedPercent >= 15 || rounded>=VIDEO_COMPLETE_PERCENT){
-        lastSavedPercent = rounded;
-        try{
-          const updated = await saveLessonProgress(
-            data.currentUser.username,
-            currentCourseDetail.id,
-            currentLessonId,
-            rounded,
-            rounded>=VIDEO_COMPLETE_PERCENT
-          );
-          currentCourseProgress = updated;
-          renderCourseLessonsList();
-        }catch(err){
-          console.error("progress error",err);
-        }
       }
     },5000);
   }
@@ -2313,7 +2358,6 @@
   async function openLessonPlayer(lesson){
     if(!currentCourseDetail || !data.currentUser) return;
 
-    // Avval eski playerni tozalaymiz (qotishni oldini olish)
     stopCurrentPlayer();
     closeQuizOverlay();
 
@@ -2322,7 +2366,6 @@
     quizCurrentIndex = 0;
     quizAnswers = {};
 
-    // 👉 darsga tegishli umumiy test vaqti
     currentQuizTotalMinutes =
       typeof lesson.quizTotalMinutes === "number" && lesson.quizTotalMinutes > 0
         ? lesson.quizTotalMinutes
@@ -2359,7 +2402,6 @@
       return;
     }
 
-    // Har safar yangi container (resetPlayerContainer) allaqachon stopCurrentPlayer ichida chaqirildi
     currentPlayer = new YT.Player("yt-player",{
       videoId: lesson.videoId,
       playerVars:{rel:0,modestbranding:1},
@@ -2380,7 +2422,11 @@
         },
         onStateChange:(event)=>{
           if(event.data === YT.PlayerState.ENDED){
-            // Oxirgi 7 soniya logikasi interval ichida hal qilinyapti.
+            // xavfsizlik uchun: tugaganda 0 ga qaytarib pauza
+            try{
+              event.target.pauseVideo();
+              event.target.seekTo(0,true);
+            }catch(e){}
           }
         }
       }
@@ -2446,7 +2492,7 @@
   });
   userBackBtn.addEventListener("click",showUserCoursesList);
 
-  /* Quiz tugmasi (onlayn ishlash) — bosganda video pause + yig‘iladi */
+  /* Quiz tugmasi (onlayn ishlash) */
   if(lessonQuizBtn){
     lessonQuizBtn.addEventListener("click",async ()=>{
       const lesson = getCurrentLesson();
@@ -2455,7 +2501,7 @@
         return;
       }
       await saveCurrentLessonProgressOnce();
-      stopCurrentPlayer();    // video to‘liq to‘xtaydi va konteyner tozalanadi
+      stopCurrentPlayer();
       showQuizInviteOverlay();
     });
   }
@@ -2624,6 +2670,7 @@
   /* INIT */
   (async function initApp(){
     try{
+      initTelegram();           // 👉 TELEGRAM MINI APP bilan bog‘lash
       await ensureDefaultAdmin();
 
       const remembered = loadRememberedCredentials();
