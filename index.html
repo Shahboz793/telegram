@@ -21,6 +21,7 @@
       --muted:#9ca3af;
       --card:#111827;
       --border-soft:rgba(148,163,184,0.4);
+      --danger:#ef4444;
     }
     body.theme-light{
       --bg:#f3f4f6;
@@ -32,6 +33,7 @@
       --muted:#4b5563;
       --card:#ffffff;
       --border-soft:rgba(148,163,184,0.8);
+      --danger:#dc2626;
     }
 
     body{
@@ -39,17 +41,17 @@
       background:radial-gradient(circle at top,#1e1b4b 0,var(--bg) 45%,var(--bg) 100%);
       color:var(--text);
       min-height:100vh;
-      padding-bottom:130px;
+      padding-bottom:110px;
     }
     a{text-decoration:none;color:inherit}
 
-    /* HEADER / HERO */
+    /* HEADER */
     .header{
       position:sticky;top:0;z-index:20;
       backdrop-filter:blur(18px);
-      background:linear-gradient(90deg,rgba(15,23,42,0.96),rgba(24,24,27,0.85));
+      background:linear-gradient(90deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
       border-bottom:1px solid var(--border-soft);
-      padding:10px 12px;
+      padding:8px 10px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -62,10 +64,10 @@
       display:flex;align-items:center;gap:8px;
     }
     .logo-circle{
-      width:34px;height:34px;border-radius:999px;
+      width:32px;height:32px;border-radius:999px;
       background:conic-gradient(from 140deg,#fb7185,#f97316,#ede9fe,#38bdf8,#fb7185);
       display:flex;align-items:center;justify-content:center;
-      box-shadow:0 0 20px rgba(248,113,113,0.65);
+      box-shadow:0 0 18px rgba(248,113,113,0.6);
       font-size:18px;
     }
     .logo-circle span{
@@ -73,7 +75,7 @@
       padding:2px 7px;
       border-radius:999px;
       font-weight:700;
-      font-size:14px;
+      font-size:13px;
       color:#f9fafb;
     }
     body.theme-light .logo-circle span{
@@ -84,32 +86,16 @@
       display:flex;flex-direction:column;
       line-height:1.1;
     }
-    .logo-text strong{font-size:15px;}
-    .logo-text small{font-size:11px;color:var(--muted);}
+    .logo-text strong{font-size:14px;}
+    .logo-text small{font-size:10px;color:var(--muted);}
     .header-right{
       display:flex;align-items:center;gap:6px;
-    }
-    .header-pill{
-      padding:6px 9px;
-      border-radius:999px;
-      border:1px solid rgba(248,250,252,0.18);
-      font-size:10px;
-      display:flex;
-      align-items:center;
-      gap:6px;
-      background:linear-gradient(90deg,rgba(15,23,42,0.9),rgba(30,64,175,0.9));
-      color:#e5e7eb;
-    }
-    body.theme-light .header-pill{
-      background:linear-gradient(90deg,rgba(255,255,255,0.96),rgba(239,246,255,0.96));
-      border-color:rgba(148,163,184,0.6);
-      color:#111827;
     }
 
     .theme-toggle{
       border:none;
       border-radius:999px;
-      padding:6px 9px;
+      padding:5px 8px;
       font-size:14px;
       cursor:pointer;
       background:rgba(15,23,42,0.9);
@@ -121,17 +107,42 @@
       color:#111827;
     }
 
-    .hero{
-      padding:14px 16px 4px;
-    }
-    .hero-top{
+    .cart-icon-btn{
+      border:none;
+      border-radius:999px;
+      padding:5px 8px;
       display:flex;
-      justify-content:space-between;
+      align-items:center;
+      gap:6px;
+      cursor:pointer;
+      background:radial-gradient(circle at top,#22c55e,#16a34a 50%,#14532d);
+      color:#022c22;
+      box-shadow:0 6px 16px rgba(34,197,94,0.55);
+      font-size:12px;
+    }
+    .cart-icon-left{
+      font-size:18px;
+    }
+    .cart-icon-info{
+      display:flex;
+      flex-direction:column;
       align-items:flex-start;
-      gap:10px;
+      line-height:1.1;
+    }
+    .cart-icon-info strong{
+      font-size:12px;
+    }
+    .cart-icon-info small{
+      font-size:10px;
+      opacity:.9;
+    }
+
+    /* HERO */
+    .hero{
+      padding:10px 12px 4px;
     }
     .hero-title{
-      font-size:21px;
+      font-size:19px;
       font-weight:700;
     }
     .hero-title span{
@@ -141,7 +152,7 @@
     }
     .hero-sub{
       margin-top:4px;
-      font-size:12px;
+      font-size:11px;
       color:var(--muted);
     }
     .hero-badges{
@@ -151,8 +162,8 @@
       gap:6px;
     }
     .badge{
-      font-size:10px;
-      padding:3px 8px;
+      font-size:9px;
+      padding:3px 7px;
       border-radius:999px;
       border:1px solid rgba(148,163,184,0.45);
       background:rgba(15,23,42,0.9);
@@ -164,45 +175,25 @@
       color:#111827;
     }
     .hero-tag{
-      font-size:11px;
-      margin-top:10px;
+      font-size:10px;
+      margin-top:8px;
       display:inline-flex;
       align-items:center;
       gap:6px;
-      padding:5px 9px;
+      padding:4px 8px;
       border-radius:999px;
       background:linear-gradient(90deg,rgba(56,189,248,0.25),rgba(129,140,248,0.15));
       border:1px solid rgba(59,130,246,0.55);
     }
-    .hero-tag span{font-weight:600;font-size:11px;}
-
-    .hero-card{
-      min-width:140px;
-      border-radius:18px;
-      padding:8px;
-      background:radial-gradient(circle at top,#ff80b5,#312e81 45%,#020617 100%);
-      box-shadow:0 8px 20px rgba(0,0,0,0.55);
-      text-align:right;
-      font-size:11px;
-    }
-    body.theme-light .hero-card{
-      background:radial-gradient(circle at top,#fecaca,#bfdbfe 45%,#eef2ff 100%);
-      color:#111827;
-    }
-    .hero-card h3{
-      font-size:14px;margin-bottom:4px;
-    }
-    .hero-card p{margin:0;color:#e5e7eb;}
-    body.theme-light .hero-card p{color:#111827;}
-    .hero-card .price{
+    .hero-note{
       margin-top:6px;
-      font-size:13px;
-      font-weight:600;
+      font-size:10px;
+      color:var(--muted);
     }
 
     /* FILTERS */
     .filters{
-      padding:10px 16px 4px;
+      padding:8px 12px 4px;
       display:flex;
       gap:8px;
       overflow-x:auto;
@@ -211,8 +202,8 @@
     .filters::-webkit-scrollbar{display:none;}
     .chip{
       flex:0 0 auto;
-      font-size:11px;
-      padding:6px 12px;
+      font-size:10px;
+      padding:5px 10px;
       border-radius:999px;
       border:1px solid rgba(148,163,184,0.5);
       background:rgba(15,23,42,0.9);
@@ -231,40 +222,40 @@
       border-color:transparent;
       color:#0f172a;
       font-weight:600;
-      box-shadow:0 0 20px rgba(248,113,113,0.4);
+      box-shadow:0 0 14px rgba(248,113,113,0.4);
     }
 
     /* PRODUCT GRID */
     .products-wrap{
-      padding:8px 10px 100px;
+      padding:6px 8px 80px;
     }
     .products-grid{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:10px;
+      gap:8px;
     }
     @media(min-width:768px){
       .products-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
-      body{padding-bottom:130px;}
+      body{padding-bottom:110px;}
     }
     .product-card{
       background:linear-gradient(145deg,#020617,var(--card));
       border-radius:14px;
       border:1px solid rgba(31,41,55,0.9);
-      padding:8px;
+      padding:7px;
       position:relative;
       overflow:hidden;
-      box-shadow:0 10px 25px rgba(0,0,0,0.55);
+      box-shadow:0 10px 22px rgba(0,0,0,0.55);
     }
     body.theme-light .product-card{
       background:#ffffff;
       border-color:rgba(209,213,219,0.9);
-      box-shadow:0 12px 28px rgba(148,163,184,0.6);
+      box-shadow:0 10px 24px rgba(148,163,184,0.65);
     }
     .product-top{
       position:relative;
-      border-radius:14px;
-      padding:10px;
+      border-radius:12px;
+      padding:8px;
       background:radial-gradient(circle at top,#1d4ed8,#020617 55%);
       overflow:hidden;
     }
@@ -272,13 +263,13 @@
       background:radial-gradient(circle at top,#bfdbfe,#e5e7eb 55%);
     }
     .product-emoji{
-      font-size:26px;
+      font-size:24px;
     }
     .product-img-tag{
       position:absolute;
-      right:8px;top:8px;
-      font-size:9px;
-      padding:2px 7px;
+      right:6px;top:6px;
+      font-size:8px;
+      padding:2px 6px;
       border-radius:999px;
       background:rgba(15,23,42,0.9);
       border:1px solid rgba(148,163,184,0.7);
@@ -292,66 +283,34 @@
     .product-sale{
       position:absolute;
       left:-22px;
-      bottom:8px;
+      bottom:6px;
       background:linear-gradient(120deg,#f97316,#ec4899);
-      padding:3px 28px;
+      padding:2px 24px;
       transform:rotate(-14deg);
-      font-size:10px;
+      font-size:9px;
       font-weight:700;
       color:#111827;
     }
     .product-body{
-      margin-top:6px;
+      margin-top:5px;
     }
     .product-name{
-      font-size:12px;
+      font-size:11px;
       font-weight:600;
-      min-height:32px;
+      min-height:28px;
     }
     .product-meta{
-      font-size:10px;
-      color:var(--muted);
-      margin-top:2px;
-    }
-    .price-row{
-      margin-top:6px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:6px;
-      font-size:12px;
-    }
-    .price-main{
-      font-weight:700;
-    }
-    .price-old{
-      font-size:10px;
-      color:var(--muted);
-      text-decoration:line-through;
-    }
-    .btn-add{
-      border:none;
-      border-radius:999px;
-      padding:6px 8px;
-      font-size:10px;
-      font-weight:600;
-      background:linear-gradient(120deg,#22c55e,#16a34a);
-      color:#022c22;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      gap:4px;
-      box-shadow:0 6px 14px rgba(34,197,94,0.35);
-      flex-shrink:0;
-    }
-    .btn-add:active{transform:scale(.96);}
-    .tag-mini{
       font-size:9px;
+      color:var(--muted);
+      margin-top:1px;
+    }
+    .tag-mini{
+      font-size:8px;
       padding:2px 6px;
       border-radius:999px;
       background:rgba(15,23,42,0.9);
       border:1px solid rgba(55,65,81,0.9);
-      margin-top:4px;
+      margin-top:3px;
       display:inline-flex;
       align-items:center;
       gap:4px;
@@ -362,76 +321,78 @@
       border-color:rgba(209,213,219,0.9);
       color:#111827;
     }
+    .price-row{
+      margin-top:5px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+      font-size:11px;
+    }
+    .price-main{
+      font-weight:700;
+    }
+    .price-old{
+      font-size:9px;
+      color:var(--muted);
+      text-decoration:line-through;
+    }
+    .btn-add{
+      border:none;
+      border-radius:999px;
+      padding:5px 7px;
+      font-size:9px;
+      font-weight:600;
+      background:linear-gradient(120deg,#22c55e,#16a34a);
+      color:#022c22;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:4px;
+      box-shadow:0 6px 12px rgba(34,197,94,0.35);
+      flex-shrink:0;
+    }
+    .btn-add:active{transform:scale(.96);}
 
-    /* CART BAR */
+    /* BOTTOM ORDER BAR */
     .cart-bar{
       position:fixed;
       bottom:0;left:0;right:0;
       background:radial-gradient(circle at top,#1d2538,#020617 55%);
       border-top:1px solid var(--border-soft);
-      padding:10px 12px 14px;
+      padding:8px 10px 10px;
       z-index:30;
-      box-shadow:0 -10px 25px rgba(0,0,0,0.75);
+      box-shadow:0 -10px 22px rgba(0,0,0,0.75);
     }
     body.theme-light .cart-bar{
       background:radial-gradient(circle at top,#e5e7eb,#f9fafb 55%);
-      box-shadow:0 -10px 25px rgba(148,163,184,0.8);
+      box-shadow:0 -10px 20px rgba(148,163,184,0.7);
     }
-    .cart-top-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      font-size:12px;
+    .cart-bar-note{
+      font-size:10px;
       color:var(--muted);
-      margin-bottom:6px;
-    }
-    .cart-pill{
-      padding:3px 9px;
-      border-radius:999px;
-      background:rgba(15,23,42,0.9);
-      border:1px solid rgba(55,65,81,0.9);
-      display:flex;align-items:center;gap:6px;
-      font-size:11px;
-      color:#e5e7eb;
-    }
-    body.theme-light .cart-pill{
-      background:#ffffff;
-      border-color:rgba(209,213,219,0.9);
-      color:#111827;
+      margin-bottom:4px;
     }
     .cart-main-btn{
-      margin-top:2px;
       width:100%;
       border:none;
-      padding:12px 10px;
+      padding:11px 10px;
       border-radius:999px;
       background:linear-gradient(120deg,#f97316,#ec4899,#8b5cf6);
       color:#020617;
-      font-size:15px;
+      font-size:14px;
       font-weight:700;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
+      gap:8px;
       cursor:pointer;
-      box-shadow:0 10px 30px rgba(236,72,153,0.75);
+      box-shadow:0 9px 24px rgba(236,72,153,0.75);
     }
     .cart-main-btn span.small{
-      font-size:11px;
+      font-size:10px;
       font-weight:500;
       opacity:.9;
-    }
-    .cart-view-link{
-      margin-top:6px;
-      width:100%;
-      border:none;
-      background:transparent;
-      color:var(--muted);
-      font-size:11px;
-      text-align:center;
-      cursor:pointer;
-      text-decoration:underline;
-      text-decoration-style:dotted;
     }
 
     /* CART SHEET */
@@ -452,9 +413,9 @@
       position:fixed;
       left:0;right:0;bottom:0;
       background:var(--bg-soft);
-      border-radius:18px 18px 0 0;
+      border-radius:16px 16px 0 0;
       border-top:1px solid var(--border-soft);
-      max-height:70vh;
+      max-height:72vh;
       transform:translateY(100%);
       transition:transform .25s ease;
       z-index:40;
@@ -468,15 +429,18 @@
       transform:translateY(0);
     }
     .cart-sheet-header{
-      padding:10px 14px;
+      padding:8px 12px;
       border-bottom:1px solid var(--border-soft);
       display:flex;
       justify-content:space-between;
       align-items:center;
-      font-size:13px;
+      font-size:12px;
     }
     .cart-sheet-header h3{
-      font-size:14px;
+      font-size:13px;
+      display:flex;
+      align-items:center;
+      gap:4px;
     }
     .cart-sheet-header button{
       border:none;
@@ -486,61 +450,61 @@
       color:var(--muted);
     }
     .cart-sheet-body{
-      padding:8px 14px 4px;
+      padding:6px 12px 4px;
       overflow-y:auto;
       max-height:46vh;
     }
     .cart-sheet-footer{
-      padding:10px 14px 14px;
+      padding:8px 12px 10px;
       border-top:1px solid var(--border-soft);
+      font-size:12px;
     }
     .cart-sheet-footer-top{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      font-size:13px;
-      margin-bottom:8px;
+      margin-bottom:6px;
     }
     .cart-sheet-footer-top strong{
-      font-size:14px;
+      font-size:13px;
     }
     .cart-sheet-btn{
       width:100%;
       border:none;
       border-radius:999px;
-      padding:11px 10px;
+      padding:10px 10px;
       background:linear-gradient(120deg,#22c55e,#16a34a);
       color:#022c22;
-      font-size:14px;
+      font-size:13px;
       font-weight:700;
       cursor:pointer;
-      box-shadow:0 10px 25px rgba(34,197,94,0.5);
+      box-shadow:0 9px 20px rgba(34,197,94,0.5);
     }
     .cart-empty{
-      font-size:12px;
+      font-size:11px;
       color:var(--muted);
       text-align:center;
-      padding:16px 0;
+      padding:12px 0;
     }
 
     .cart-item-row{
-      padding:8px 0;
+      padding:7px 0;
       border-bottom:1px dashed rgba(75,85,99,0.6);
       display:flex;
       flex-direction:column;
-      gap:6px;
-      font-size:12px;
+      gap:5px;
+      font-size:11px;
     }
     .cart-item-main{
       display:flex;
       flex-direction:column;
-      gap:2px;
+      gap:1px;
     }
     .cart-item-name{
       font-weight:600;
     }
     .cart-item-meta{
-      font-size:11px;
+      font-size:10px;
       color:var(--muted);
     }
     .cart-item-actions{
@@ -548,31 +512,32 @@
       align-items:center;
       justify-content:space-between;
       gap:6px;
-      font-size:11px;
+      font-size:10px;
     }
     .qty-control{
       display:flex;
       align-items:center;
       border-radius:999px;
-      border:1px solid rgba(75,85,99,0.8);
+      border:1px solid rgba(75,85,99,0.9);
       overflow:hidden;
     }
     .qty-control button{
       border:none;
       background:rgba(15,23,42,0.95);
       color:#e5e7eb;
-      width:24px;height:22px;
+      width:22px;height:20px;
       cursor:pointer;
-      font-size:14px;
+      font-size:13px;
     }
     body.theme-light .qty-control button{
       background:#e5e7eb;
       color:#111827;
     }
     .qty-control span{
-      padding:0 8px;
-      min-width:22px;
+      padding:0 7px;
+      min-width:20px;
       text-align:center;
+      font-size:11px;
     }
     .cart-item-total{
       font-weight:600;
@@ -580,9 +545,18 @@
     .cart-remove{
       border:none;
       background:transparent;
-      color:var(--muted);
+      color:var(--danger);
       cursor:pointer;
-      font-size:14px;
+      font-size:16px;
+    }
+    .cart-edit-label{
+      color:var(--danger);
+      font-size:10px;
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      gap:4px;
+      margin-bottom:2px;
     }
 
     /* TOAST */
@@ -590,7 +564,7 @@
       position:fixed;
       left:50%;
       transform:translateX(-50%);
-      bottom:110px;
+      bottom:95px;
       background:rgba(15,23,42,0.98);
       border-radius:999px;
       padding:6px 12px;
@@ -627,43 +601,38 @@
       </div>
     </div>
     <div class="header-right">
-      <div class="header-pill">
-        <span>🚚</span>
-        <span>150 000 so‘mdan bepul yetkazib berish</span>
-      </div>
-      <button class="theme-toggle" id="themeToggleBtn" type="button">
-        🌙
+      <button class="theme-toggle" id="themeToggleBtn" type="button">🌙</button>
+
+      <!-- Savat tepada o'ng burchakda -->
+      <button class="cart-icon-btn" type="button" onclick="toggleCartSheet(true)">
+        <span class="cart-icon-left">🛒</span>
+        <div class="cart-icon-info">
+          <strong><span id="cartCountTop">0</span> ta</strong>
+          <small id="cartTotalTop">0 so‘m</small>
+        </div>
       </button>
     </div>
   </header>
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-top">
-      <div>
-        <div class="hero-title">
-          Har kuni <span>go‘zallik</span> kayfiyati 💫
-        </div>
-        <p class="hero-sub">
-          Pomada, krem, parfyum, niqob va yana ko‘plab mahsulotlar —
-          hammasi bitta joyda.
-        </p>
-        <div class="hero-badges">
-          <div class="badge">⭐ Original sifat</div>
-          <div class="badge">🔥 Eng ko‘p sotilganlar</div>
-          <div class="badge">💌 Telegram orqali buyurtma</div>
-        </div>
-        <div class="hero-tag">
-          <span>✨ @onatili_premium orqali buyurtma</span>
-        </div>
-      </div>
-      <div class="hero-card">
-        <h3>Bugungi mega-aksiya</h3>
-        <p>3 ta mahsulot olsangiz, 4-si sovg‘a sifatida qo‘shib beriladi.</p>
-        <div class="price">
-          <span class="price-main">-25% gacha chegirma</span>
-        </div>
-      </div>
+    <div class="hero-title">
+      Har kuni <span>go‘zallik</span> kayfiyati 💫
+    </div>
+    <p class="hero-sub">
+      Pomada, krem, parfyum, niqob va yana ko‘plab mahsulotlar — hammasi bitta joyda.
+    </p>
+    <div class="hero-badges">
+      <div class="badge">⭐ Original sifat</div>
+      <div class="badge">🔥 Eng ko‘p sotilganlar</div>
+      <div class="badge">💌 Telegram orqali buyurtma</div>
+    </div>
+    <div class="hero-tag">
+      ✨ Buyurtmalar <strong>@onatili_premium</strong> ga yuboriladi
+    </div>
+    <div class="hero-note">
+      Buyurtma yuborilgandan keyin faqat telefon raqamingizni yozib qoldiring —
+      admin sizga tez orada qo‘ng‘iroq qiladi.
     </div>
   </section>
 
@@ -683,27 +652,19 @@
     <div class="products-grid" id="productsGrid"></div>
   </main>
 
-  <!-- CART BAR -->
+  <!-- BOTTOM ORDER BAR -->
   <div class="cart-bar">
-    <div class="cart-top-row">
-      <div class="cart-pill">
-        🛒 Savatda: <strong id="cartCount">0</strong> ta
-      </div>
-      <div class="cart-pill">
-        Jami: <strong id="cartTotal">0</strong> so‘m
-      </div>
+    <div class="cart-bar-note">
+      Savatdagi buyurtmani tahrirlash / o‘chirish uchun tepadagi 🛒 savat tugmasini bosing.
     </div>
     <button class="cart-main-btn" type="button" onclick="toggleCartSheet(true)">
       <div>
-        <div>🧾 Savatni ko‘rish va buyurtma berish</div>
+        <div>📩 Buyurtmani Telegramga yuborish</div>
         <span class="small">
-          Tanlangan mahsulotlar ro‘yxatini tekshirib, Telegramga yuboring
+          Istalgancha marta yuborish mumkin. Faqat Telegramda telefon raqamingizni yozib qoldiring.
         </span>
       </div>
       <div><span style="font-size:18px;">›</span></div>
-    </button>
-    <button class="cart-view-link" type="button" onclick="toggleCartSheet(true)">
-      Savatni ochish / tahrirlash
     </button>
   </div>
 
@@ -717,9 +678,12 @@
     </div>
     <div class="cart-sheet-body" id="cartItems"></div>
     <div class="cart-sheet-footer">
+      <div class="cart-edit-label">
+        🔧 Buyurtmani tahrirlash / o‘chirish (qizil tugma orqali)
+      </div>
       <div class="cart-sheet-footer-top">
         <span>Umumiy summa:</span>
-        <strong id="cartSheetTotal">0</strong>
+        <strong id="cartSheetTotal">0 so‘m</strong>
       </div>
       <button class="cart-sheet-btn" type="button" onclick="sendOrder()">
         📩 Telegramga yuborish (@onatili_premium)
@@ -733,7 +697,7 @@
   </div>
 
 <script>
-  // Mahsulotlar ro‘yxati (turli kategoriyalar bilan)
+  // Mahsulotlar ro‘yxati
   const products = [
     {name:"Mat pomada Nude Lux", price:89000, oldPrice:109000, category:"pomada", emoji:"💄", tag:"Yangi"},
     {name:"Qizil mat pomada Classic Red", price:99000, oldPrice:119000, category:"pomada", emoji:"💋", tag:"Best seller"},
@@ -775,8 +739,8 @@
 
   const productsGrid = document.getElementById("productsGrid");
   const filterBar = document.getElementById("filterBar");
-  const cartCountEl = document.getElementById("cartCount");
-  const cartTotalEl = document.getElementById("cartTotal");
+  const cartCountTopEl = document.getElementById("cartCountTop");
+  const cartTotalTopEl = document.getElementById("cartTotalTop");
   const toastEl = document.getElementById("toast");
   const cartSheet = document.getElementById("cartSheet");
   const cartSheetOverlay = document.getElementById("cartSheetOverlay");
@@ -850,7 +814,7 @@
       cart.push({index, qty:1});
     }
     updateCartUI();
-    showToast();
+    showToast("✅ Savatga qo‘shildi");
   }
 
   function updateCartUI(){
@@ -861,18 +825,18 @@
       totalCount += c.qty;
       totalPrice += p.price * c.qty;
     });
-    cartCountEl.textContent = totalCount;
-    cartTotalEl.textContent = formatPrice(totalPrice);
+    cartCountTopEl.textContent = totalCount;
+    cartTotalTopEl.textContent = formatPrice(totalPrice) + " so‘m";
 
-    // Agar savat oynasi ochiq bo'lsa, ichini ham yangilaymiz
     if(cartSheet.classList.contains("open")){
       renderCartItems();
     }
   }
 
-  function showToast(){
+  function showToast(message){
+    toastEl.textContent = message;
     toastEl.classList.add("show");
-    setTimeout(()=> toastEl.classList.remove("show"), 900);
+    setTimeout(()=> toastEl.classList.remove("show"), 1100);
   }
 
   // Savat oynasi
@@ -939,25 +903,39 @@
     renderCartItems();
   }
 
-  // Telegramga yuborish
+  // Telegramga ochish (WebApp uchun mos / brauzer uchun alohida)
+  function openTelegramLink(url){
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if(tg){
+      tg.openTelegramLink(url); // WebApp ichida
+    }else{
+      window.open(url, "_blank"); // brauzerda yangi tab, sayt yopilmaydi
+    }
+  }
+
+  // Telegramga yuborish — istalgancha marta mumkin
   function sendOrder(){
     if(cart.length === 0){
-      alert("Savat bo‘sh. Avval mahsulot tanlang 🙂");
+      showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
       return;
     }
-    let text = "Assalomu alaykum. Men quyidagi kosmetika mahsulotlarini buyurtma qilmoqchiman:%0A%0A";
+    let text = "Assalomu alaykum. Men quyidagi kosmetika mahsulotlarini buyurtma qilmoqchiman:\n\n";
     let totalPrice = 0;
     cart.forEach((c, i)=>{
       const p = products[c.index];
       const lineTotal = p.price * c.qty;
       totalPrice += lineTotal;
-      text += (i+1) + ") " + p.name + " — " + c.qty + " dona — " + formatPrice(lineTotal) + " so‘m%0A";
+      text += (i+1) + ") " + p.name + " — " + c.qty + " dona — " + formatPrice(lineTotal) + " so‘m\n";
     });
-    text += "%0AUmumiy summa: " + formatPrice(totalPrice) + " so‘m%0A";
-    text += "%0ATelefon raqamim: _______%0AManzil: _______";
+    text += "\nUmumiy summa: " + formatPrice(totalPrice) + " so‘m\n";
+    text += "\nFaqat telefon raqamimni yozib qoldiraman, admin menga tez orada qo‘ng‘iroq qiladi.";
 
-    const url = "https://t.me/onatili_premium?text=" + text;
-    window.location.href = url;
+    const encoded = encodeURIComponent(text);
+    // Har safar URL oxiriga unique parametr qo‘shamiz — qayta-qayta yuborilaversin
+    const url = "https://t.me/onatili_premium?text=" + encoded + "&t=" + Date.now();
+
+    openTelegramLink(url);
+    showToast("✅ Buyurtma yuborildi. Telefon raqamingizni yozib qoldiring.");
   }
 
   // Tema (dark / light)
@@ -977,19 +955,19 @@
 
   themeToggleBtn.addEventListener("click", toggleTheme);
 
-  // Dastlabki tema va mahsulotlar
+  // Dastlabki init
   (function init(){
     const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
     applyTheme(savedTheme);
     renderProducts();
   })();
 
-  // globalga funksiyalar
+  // Global funksiyalar
   window.addToCart = addToCart;
-  window.sendOrder = sendOrder;
   window.toggleCartSheet = toggleCartSheet;
   window.changeQty = changeQty;
   window.removeFromCart = removeFromCart;
+  window.sendOrder = sendOrder;
 </script>
 
 </body>
