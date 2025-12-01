@@ -361,9 +361,6 @@
       display:flex;align-items:center;gap:4px;
       color:#e5e7eb;
     }
-    body.theme-dark .product-img-tag{
-      background:rgba(15,23,42,0.9);
-    }
     .product-sale{
       position:absolute;
       right:8px;top:8px;
@@ -449,29 +446,17 @@
       left:10px;
       right:10px;
       bottom:24px;
-      background:linear-gradient(
-        135deg,
-        rgba(249,250,251,0.98),
-        rgba(229,231,235,0.98)
-      );
+      background:linear-gradient(135deg,rgba(249,250,251,0.98),rgba(229,231,235,0.98));
       border-radius:18px;
       border:1px solid rgba(148,163,184,0.65);
       padding:8px 12px 10px;
       z-index:35;
-      box-shadow:
-        0 16px 32px rgba(148,163,184,0.7),
-        0 0 0 1px rgba(209,213,219,0.8);
+      box-shadow:0 16px 32px rgba(148,163,184,0.7),0 0 0 1px rgba(209,213,219,0.8);
       backdrop-filter:blur(18px);
     }
     body.theme-dark .cart-bar{
-      background:linear-gradient(
-        135deg,
-        rgba(15,23,42,0.96),
-        rgba(24,24,27,0.9)
-      );
-      box-shadow:
-        0 18px 40px rgba(0,0,0,0.8),
-        0 0 0 1px rgba(15,23,42,0.8);
+      background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
+      box-shadow:0 18px 40px rgba(0,0,0,0.8),0 0 0 1px rgba(15,23,42,0.8);
     }
     .cart-bar-note{
       font-size:10px;
@@ -499,13 +484,9 @@
       justify-content:space-between;
       gap:10px;
       cursor:pointer;
-      box-shadow:
-        0 14px 32px rgba(236,72,153,0.85),
-        0 0 0 1px rgba(248,250,252,0.6);
+      box-shadow:0 14px 32px rgba(236,72,153,0.85),0 0 0 1px rgba(248,250,252,0.6);
     }
-    .cart-main-btn:active{
-      transform:scale(.97);
-    }
+    .cart-main-btn:active{transform:scale(.97);}
     .cart-main-btn > div:first-child{
       display:flex;
       flex-direction:column;
@@ -597,20 +578,12 @@
       padding:8px 14px 12px;
       border-top:1px solid var(--border-soft);
       font-size:12px;
-      background:linear-gradient(
-        135deg,
-        rgba(249,250,251,0.98),
-        rgba(219,234,254,0.98)
-      );
+      background:linear-gradient(135deg,rgba(249,250,251,0.98),rgba(219,234,254,0.98));
       color:#111827;
       border-radius:0 0 22px 22px;
     }
     body.theme-dark .cart-sheet-footer{
-      background:linear-gradient(
-        135deg,
-        rgba(15,23,42,0.96),
-        rgba(30,64,175,0.9)
-      );
+      background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(30,64,175,0.9));
       color:#e5e7eb;
     }
     .cart-sheet-footer-top{
@@ -644,15 +617,11 @@
       font-size:13px;
       font-weight:700;
       cursor:pointer;
-      box-shadow:
-        0 12px 28px rgba(34,197,94,0.65),
-        0 0 0 1px rgba(240,253,250,0.8);
+      box-shadow:0 12px 28px rgba(34,197,94,0.65),0 0 0 1px rgba(240,253,250,0.8);
       letter-spacing:0.02em;
       text-transform:uppercase;
     }
-    .cart-sheet-btn:active{
-      transform:scale(.97);
-    }
+    .cart-sheet-btn:active{transform:scale(.97);}
     .cart-empty{
       font-size:11px;
       color:var(--muted);
@@ -741,6 +710,8 @@
       transition:opacity .2s ease,transform .2s ease;
       z-index:50;
       color:#e5e7eb;
+      max-width:90%;
+      text-align:center;
     }
     .toast.show{
       opacity:1;
@@ -901,15 +872,7 @@
       cursor:pointer;
       font-size:16px;
     }
-    /* Admin status text */
-    .admin-status{
-      font-size:10px;
-      margin-top:4px;
-      min-height:14px;
-    }
-    .admin-status.ok{color:#16a34a;}
-    .admin-status.err{color:#dc2626;}
-    /* PRODUCT DETAIL (Uzum-style full screen page) */
+    /* PRODUCT DETAIL */
     .product-detail-overlay{
       position:fixed;
       inset:0;
@@ -1109,7 +1072,6 @@
         <input id="searchInput" placeholder="Mahsulot qidirish (nomi, kategoriya, tag)..." />
       </div>
     </section>
-
     <!-- FILTERS -->
     <div class="filters-wrapper">
       <div class="filters" id="filterBar">
@@ -1122,7 +1084,6 @@
         <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
       </div>
     </div>
-
     <!-- PRODUCTS -->
     <main class="products-wrap">
       <div class="products-grid" id="productsGrid"></div>
@@ -1188,7 +1149,7 @@
       </div>
       <div class="form-row">
         <label>
-          Rasm nomi yoki URL
+          Rasm nomi yoki URL  
           <small>(masalan: <b>olma</b> → images/olma.png yoki to‘liq https://...)</small>
         </label>
         <input id="adminImages" placeholder="olma yoki https://..., vergul bilan bir nechta yozish mumkin" />
@@ -1196,7 +1157,6 @@
       <button class="admin-btn" type="button" onclick="addCustomProduct()">
         ➕ Mahsulotni qo‘shish (Firestore)
       </button>
-      <p id="adminStatus" class="admin-status"></p>
       <p class="admin-info">
         Eslatma: admin qo‘shgan mahsulotlar Firestore’da saqlanadi. Hamma foydalanuvchilar bir xil katalogni ko‘rishadi.
       </p>
@@ -1296,15 +1256,15 @@
       serverTimestamp,
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    // === FIREBASE CONFIG — SENING MA'LUMOTLARING ===
+    // === SENING WEB APP KONFIGING (kosmetika) ===
     const firebaseConfig = {
       apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
       authDomain: "shahboz-5d0a3.firebaseapp.com",
       projectId: "shahboz-5d0a3",
       storageBucket: "shahboz-5d0a3.firebasestorage.app",
       messagingSenderId: "352024095535",
-      appId: "1:352024095535:web:6ca630de2c199a33c54fda",
-      measurementId: "G-YS5RGZ00EB",
+      appId: "1:352024095535:web:3f495ac74cdd40f5c54fda",
+      measurementId: "G-J8KFW5ED77"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -1316,7 +1276,6 @@
     const STORAGE_ADMIN = "beauty_admin";
     const THEME_KEY = "beauty_theme";
     const RAW_PREFIX = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
-
     const categoryEmoji = {
       "pomada":"💄",
       "krem":"🧴",
@@ -1335,7 +1294,7 @@
       "tana":"Tana / soch parvarishi"
     };
 
-    // DASTLABKI MAHSULOTLAR (default)
+    // DEFAULT MAHSULOTLAR
     const defaultProducts = [
       {
         name:"Mat pomada Nude Lux",
@@ -1411,16 +1370,16 @@
       }
     ];
 
-    // === HOLAT (STATE) ===
-    let products = [];           // default + Firestore
-    let remoteProducts = [];     // faqat Firestore’dan kelganlar
+    // === STATE ===
+    let products = [];
+    let remoteProducts = [];
     let cart = [];
     let activeCategory = "all";
     let currentSearch = "";
     let isAdmin = false;
     let detailIndex = null;
 
-    // === DOM ELEMENTLAR ===
+    // === DOM ===
     const productsGrid = document.getElementById("productsGrid");
     const filterBar = document.getElementById("filterBar");
     const cartCountTopEl = document.getElementById("cartCountTop");
@@ -1438,7 +1397,6 @@
     const adminTabBtn = document.getElementById("adminTabBtn");
     const searchInput = document.getElementById("searchInput");
 
-    // Product detail DOM
     const productDetailOverlay = document.getElementById("productDetailOverlay");
     const detailImageEl = document.getElementById("detailImage");
     const detailCategoryEl = document.getElementById("detailCategory");
@@ -1450,7 +1408,6 @@
     const detailAddBtn = document.getElementById("detailAddBtn");
     const detailBackBtn = document.getElementById("detailBackBtn");
 
-    // ADMIN INPUTS
     const adminNameEl = document.getElementById("adminName");
     const adminCategoryEl = document.getElementById("adminCategory");
     const adminPriceBaseEl = document.getElementById("adminPriceBase");
@@ -1459,24 +1416,14 @@
     const adminTagEl = document.getElementById("adminTag");
     const adminDescriptionEl = document.getElementById("adminDescription");
     const adminImagesEl = document.getElementById("adminImages");
-    const adminStatusEl = document.getElementById("adminStatus");
 
-    // === YORDAMCHI FUNKSIYALAR ===
-    function formatPrice(v){
-      return v.toLocaleString("uz-UZ");
-    }
+    // === HELPERS ===
+    function formatPrice(v){ return v.toLocaleString("uz-UZ"); }
 
     function showToast(message){
       toastEl.textContent = message;
       toastEl.classList.add("show");
-      setTimeout(()=> toastEl.classList.remove("show"), 1100);
-    }
-
-    function setAdminStatus(msg, type){
-      if(!adminStatusEl) return;
-      adminStatusEl.textContent = msg || "";
-      adminStatusEl.classList.remove("ok","err");
-      if(type) adminStatusEl.classList.add(type);
+      setTimeout(()=> toastEl.classList.remove("show"), 1500);
     }
 
     function normalizeImagesInput(raw) {
@@ -1523,7 +1470,7 @@
       return name.includes(q) || tag.includes(q) || desc.includes(q) || cat.includes(q);
     }
 
-    // === FIRESTORE MAHSULOTLARNI O‘QISH ===
+    // === FIRESTORE'DAN O‘QISH ===
     async function loadRemoteProducts(){
       try{
         const snap = await getDocs(productsCol);
@@ -1548,7 +1495,7 @@
         renderAdminCustomList();
       }catch(e){
         console.error("Firestore o‘qishda xato:", e);
-        showToast("⚠️ Firestore’dan yuklashda xatolik");
+        showToast("⚠️ Firestore’dan yuklashda xato: " + (e.message || ""));
       }
     }
 
@@ -1557,7 +1504,7 @@
       renderProducts();
     }
 
-    // === MAHSULOTLARNI CHIZISH ===
+    // === PRODUCTS RENDER ===
     function renderProducts(){
       productsGrid.innerHTML = "";
       const filtered = products.filter(p =>
@@ -1614,7 +1561,7 @@
       });
     }
 
-    // === FILTER KLIK ===
+    // FILTER BAR
     filterBar.addEventListener("click", (e)=>{
       const btn = e.target.closest(".chip");
       if(!btn) return;
@@ -1624,13 +1571,13 @@
       renderProducts();
     });
 
-    // === QIDIRUV ===
+    // SEARCH
     searchInput.addEventListener("input", ()=>{
       currentSearch = searchInput.value.trim().toLowerCase();
       renderProducts();
     });
 
-    // === SAVAT FUNKSIYALARI ===
+    // === CART FUNKSIYALARI ===
     function addToCart(index){
       const found = cart.find(c => c.index === index);
       if(found){
@@ -1735,7 +1682,7 @@
       }
     }
 
-    // === BUYURTMA TARIXI (LOCAL) ===
+    // === HISTORY (LOCAL) ===
     function saveOrderHistory(order){
       let list = [];
       try{
@@ -1788,7 +1735,7 @@
       }
     }
 
-    // === TELEGRAMGA BUYURTMA JO‘NATISH ===
+    // === TELEGRAMGA BUYURTMA ===
     function sendOrder(){
       if(cart.length === 0){
         showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
@@ -1825,7 +1772,6 @@
 
       const encoded = encodeURIComponent(text);
       const url = "https://t.me/onatili_premium?text=" + encoded + "&t=" + Date.now();
-
       const order = {
         date: new Date().toISOString(),
         totalPrice: totalPrice,
@@ -1842,12 +1788,11 @@
       showToast("✅ Buyurtma matni Telegramga tayyorlandi.");
     }
 
-    // === TEMA (DARK / LIGHT) ===
+    // === THEME ===
     function applyTheme(theme){
       document.body.classList.toggle("theme-dark", theme === "dark");
       themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
     }
-
     function toggleTheme(){
       const current = localStorage.getItem(THEME_KEY) || "light";
       const next = current === "dark" ? "light" : "dark";
@@ -1914,10 +1859,8 @@
     }
     adminAccessBtn.addEventListener("click", askAdminCode);
 
-    // === ADMIN CUSTOM MAHSULOTLAR (Firestore) ===
+    // === ADMIN: FIRESTORE'GA MAHSULOT QO‘SHISH ===
     async function addCustomProduct(){
-      setAdminStatus("", null);
-
       const name = adminNameEl.value.trim();
       const category = adminCategoryEl.value;
       const basePrice = parseInt(adminPriceBaseEl.value, 10);
@@ -1927,8 +1870,7 @@
       const description = adminDescriptionEl.value.trim();
 
       if(!name || !basePrice || basePrice <= 0){
-        setAdminStatus("❌ Xatolik: mahsulot nomi va asosiy narxini to‘g‘ri kiriting.", "err");
-        showToast("❌ Ma'lumotlarni tekshiring.");
+        showToast("❌ Nomi va narxini to‘g‘ri kiriting.");
         return;
       }
 
@@ -1975,12 +1917,10 @@
         adminDescriptionEl.value = "";
         adminImagesEl.value = "";
 
-        setAdminStatus("✅ Mahsulot muvaffaqiyatli qo‘shildi.", "ok");
-        showToast("✅ Mahsulot qo‘shildi");
+        showToast("✅ Mahsulot qo‘shildi va katalogda ko‘rinmoqda");
       }catch(e){
         console.error("Mahsulot qo‘shishda xato:", e);
-        setAdminStatus("⚠️ Firestore’ga yozishda xato: " + e.message, "err");
-        showToast("⚠️ Firestore xatosi");
+        showToast("❌ Xatolik: " + (e.message || "Firestore’ga yozishda xato"));
       }
     }
 
@@ -1994,7 +1934,7 @@
         showToast("🗑 Mahsulot o‘chirildi");
       }catch(e){
         console.error("O‘chirishda xato:", e);
-        showToast("⚠️ Firestore’dan o‘chirishda xato");
+        showToast("⚠️ Firestore’dan o‘chirishda xato: " + (e.message || ""));
       }
     }
 
@@ -2018,14 +1958,13 @@
         });
     }
 
-    // === PRODUCT DETAIL (Uzum-style full page) ===
+    // === PRODUCT DETAIL ===
     function openProductDetail(index){
       const p = products[index];
       if(!p) return;
       detailIndex = index;
       const catLabel = categoryLabel[p.category] || p.category;
       const img = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
-
       setImageWithPngJpgFallback(detailImageEl, img);
       detailCategoryEl.textContent = catLabel;
       detailNameEl.textContent = p.name;
@@ -2041,11 +1980,9 @@
       }else{
         detailOldPriceEl.classList.add("hidden");
       }
-
       detailAddBtn.classList.remove("added");
       detailAddBtn.textContent = "🛒 Savatga qo‘shish";
       detailBackBtn.classList.add("hidden");
-
       productDetailOverlay.classList.remove("hidden");
       document.body.style.overflow = "hidden";
     }
@@ -2085,7 +2022,7 @@
       loadRemoteProducts();
     })();
 
-    // === GLOBAL FUNKSIYALAR (onclick uchun) ===
+    // GLOBAL FUNCTIONS (onclick uchun)
     window.addToCart = addToCart;
     window.toggleCartSheet = toggleCartSheet;
     window.changeQty = changeQty;
@@ -2095,6 +2032,7 @@
     window.openProductDetail = openProductDetail;
     window.closeProductDetail = closeProductDetail;
     window.deleteAnyProduct = deleteAnyProduct;
+
   </script>
 </body>
 </html>
