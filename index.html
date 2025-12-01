@@ -5,9 +5,12 @@
   <title>Beauty Store — Kosmetika Do‘koni</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light">
-
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase CDN (Realtime Database, compat versiya) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
 
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -35,7 +38,6 @@
       --border-soft:rgba(148,163,184,0.8);
       --danger:#dc2626;
     }
-
     body{
       font-family:"Poppins",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:radial-gradient(circle at top,#1e1b4b 0,var(--bg) 45%,var(--bg) 100%);
@@ -94,7 +96,6 @@
     .header-right{
       display:flex;align-items:center;gap:6px;
     }
-
     .theme-toggle{
       border:none;
       border-radius:999px;
@@ -109,7 +110,6 @@
       background:#e5e7eb;
       color:#111827;
     }
-
     .cart-icon-btn{
       border:none;
       border-radius:999px;
@@ -139,7 +139,6 @@
       font-size:10px;
       opacity:.9;
     }
-
     .admin-access{
       border-radius:999px;
       border:1px solid rgba(148,163,184,0.7);
@@ -242,13 +241,14 @@
       color:var(--muted);
     }
 
-    /* FILTERS */
+    /* FILTERS – header ostida, lekin barobar tepada ko‘rinadi */
     .filters{
       padding:8px 12px 4px;
       display:flex;
       gap:8px;
       overflow-x:auto;
       scrollbar-width:none;
+      background:transparent;
     }
     .filters::-webkit-scrollbar{display:none;}
     .chip{
@@ -464,7 +464,6 @@
         0 16px 32px rgba(148,163,184,0.7),
         0 0 0 1px rgba(209,213,219,0.8);
     }
-
     .cart-bar-note{
       font-size:10px;
       color:var(--muted);
@@ -477,7 +476,6 @@
       content:"ℹ️";
       font-size:11px;
     }
-
     .cart-main-btn{
       width:100%;
       border:none;
@@ -533,7 +531,6 @@
       opacity:1;
       pointer-events:auto;
     }
-
     .cart-sheet{
       position:fixed;
       left:0;right:0;bottom:0;
@@ -650,14 +647,12 @@
     .cart-sheet-btn:active{
       transform:scale(.97);
     }
-
     .cart-empty{
       font-size:11px;
       color:var(--muted);
       text-align:center;
       padding:12px 0;
     }
-
     .cart-item-row{
       padding:7px 0;
       border-bottom:1px dashed rgba(75,85,99,0.6);
@@ -801,7 +796,6 @@
     .order-items li{
       margin-bottom:2px;
     }
-
     .clear-history-btn{
       border:none;
       background:transparent;
@@ -976,9 +970,7 @@
     }
   </style>
 </head>
-
 <body>
-
   <!-- HEADER -->
   <header class="header">
     <div class="header-row">
@@ -993,7 +985,6 @@
       </div>
       <div class="header-right">
         <button class="theme-toggle" id="themeToggleBtn" type="button">🌙</button>
-
         <button class="cart-icon-btn" type="button" onclick="toggleCartSheet(true)">
           <span class="cart-icon-left">🛒</span>
           <div class="cart-icon-info">
@@ -1001,14 +992,12 @@
             <small id="cartTotalTop">0 so‘m</small>
           </div>
         </button>
-
         <!-- Admin uchun kirish tugmasi -->
         <button id="adminAccessBtn" class="admin-access" type="button">
           👑 Admin uchun
         </button>
       </div>
     </div>
-
     <!-- TABS -->
     <div class="tabs" id="tabs">
       <button class="tab-btn active" data-page="shopPage">Do‘kon</button>
@@ -1074,7 +1063,8 @@
   <div id="adminPage" class="page hidden">
     <div class="page-title">🛠 Admin panel</div>
     <p class="page-sub">
-      Bu sahifa faqat admin uchun. Mahsulotlar localStorage’da saqlanadi (shu qurilmada).
+      Bu sahifa faqat admin uchun. Mahsulotlar <b>Firebase Realtime Database</b> da saqlanadi,
+      buyurtmalar tarixi esa har bir foydalanuvchining o‘z telefonida qoladi.
     </p>
 
     <div class="admin-form">
@@ -1113,7 +1103,7 @@
       <div class="form-row">
         <label>
           Rasm nomi yoki URL  
-          <small>(masalan: <b>olma</b> → images/olma.png yoki to‘liq https://...)</small>
+          <small>(masalan: <b>olma</b> → images/olma.png, yoki to‘liq https://...)</small>
         </label>
         <input id="adminImages" placeholder="olma yoki https://..., vergul bilan bir nechta yozish mumkin" />
       </div>
@@ -1121,13 +1111,13 @@
         ➕ Mahsulotni qo‘shish
       </button>
       <p class="admin-info">
-        Eslatma: qo‘shilgan mahsulotlar va admin holati faqat shu qurilmada eslab qolinadi.
+        Eslatma: qo‘shilgan mahsulotlar <b>Firebase</b> da saqlanadi, shuning uchun hamma foydalanuvchilar ko‘radi.
       </p>
     </div>
 
     <div class="admin-info">
-      🔴 O‘chirish faqat o‘zingiz qo‘shgan mahsulotlar uchun emas, hozircha hammasi uchun ishlaydi
-      (shu qurilmada ko‘rinishi bo‘yicha).
+      🔴 O‘chirish faqat <b>admin qo‘shgan (Firebase dagi)</b> mahsulotlar uchun ishlaydi.
+      Ichki default mahsulotlar kod ichida qoladi.
     </div>
     <div class="admin-list-title">Mahsulotlar ro‘yxati:</div>
     <div id="adminCustomList"></div>
@@ -1151,7 +1141,6 @@
 
   <!-- CART SHEET -->
   <div class="sheet-overlay" id="cartSheetOverlay" onclick="toggleCartSheet(false)"></div>
-
   <div class="cart-sheet" id="cartSheet">
     <div class="cart-sheet-header">
       <h3>🛒 Savatingiz</h3>
@@ -1196,7 +1185,6 @@
 <script>
   // --- KONSTANTALAR ---
   const ADMIN_CODE = "12345678";
-  const STORAGE_PRODUCTS = "beauty_custom_products";
   const STORAGE_HISTORY = "beauty_order_history";
   const STORAGE_ADMIN = "beauty_admin";
   const THEME_KEY = "beauty_theme";
@@ -1214,7 +1202,22 @@
     "default":"💅"
   };
 
-  // --- DASTLABKI MAHSULOTLAR ---
+  // --- FIREBASE CONFIG (BU YERGA O‘ZINGNING MA’LUMOTLARINGNI QO‘YASAN) ---
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY_HERE",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const PRODUCTS_REF = db.ref("products");
+
+  // --- DASTLABKI MAHSULOTLAR (kod ichida) ---
   const defaultProducts = [
     {
       name:"Mat pomada Nude Lux",
@@ -1445,8 +1448,8 @@
   ];
 
   // --- HOLAT ---
-  let customProducts = [];
-  let products = [];
+  let firebaseProducts = []; // Firebase’dan kelgan mahsulotlar
+  let products = [];         // default + firebase
   let cart = [];
   let activeCategory = "all";
   let isAdmin = false;
@@ -1484,7 +1487,6 @@
   // admin rasm inputini nomdan URLga aylantiradi
   function normalizeImagesInput(raw) {
     if (!raw) return [];
-
     return raw
       .split(",")
       .map(s => s.trim())
@@ -1506,21 +1508,22 @@
     setTimeout(()=> toastEl.classList.remove("show"), 1100);
   }
 
-  // --- MAHSULOTLARNI YUKLASH / SAQLASH ---
-  function loadCustomProducts(){
-    try{
-      customProducts = JSON.parse(localStorage.getItem(STORAGE_PRODUCTS) || "[]");
-    }catch(e){
-      customProducts = [];
-    }
-  }
-  function saveCustomProducts(){
-    localStorage.setItem(STORAGE_PRODUCTS, JSON.stringify(customProducts));
-  }
+  // --- MAHSULOTLARNI YANGILASH (default + Firebase) ---
   function rebuildProducts(){
-    products = [...defaultProducts, ...customProducts];
+    products = [...defaultProducts, ...firebaseProducts];
     renderProducts();
+    renderAdminCustomList();
   }
+
+  // --- FIREBASE LISTENERS ---
+  PRODUCTS_REF.on("value", (snapshot) => {
+    const data = snapshot.val() || {};
+    firebaseProducts = Object.entries(data).map(([id, val]) => ({
+      ...val,
+      id
+    }));
+    rebuildProducts();
+  });
 
   // --- MAHSULOTLARNI CHIZISH ---
   function renderProducts(){
@@ -1528,14 +1531,16 @@
     const filtered = products.filter(p =>
       activeCategory === "all" ? true : p.category === activeCategory
     );
+    if (!filtered.length) {
+      productsGrid.innerHTML = "<p class='history-empty'>Bu bo‘limda hozircha mahsulot yo‘q.</p>";
+      return;
+    }
     filtered.forEach(p=>{
       const index = products.indexOf(p);
       const discount = p.oldPrice ? (100 - Math.round(p.price*100/p.oldPrice)) : null;
       const tag = p.tag || "Ommabop mahsulot";
-
       // Birinchi rasm
       const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
-
       let imgHtml;
       if (firstImage.startsWith(RAW_PREFIX)) {
         const base = firstImage.replace(/\.(png|jpg|jpeg)$/i, "");
@@ -1544,7 +1549,6 @@
       } else {
         imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
       }
-
       productsGrid.innerHTML += `
         <article class="product-card">
           <div class="product-top" onclick="openImageViewer(${index},0)">
@@ -1601,23 +1605,21 @@
     updateCartUI();
     showToast("✅ Savatga qo‘shildi");
   }
-
   function updateCartUI(){
     let totalCount = 0;
     let totalPrice = 0;
     cart.forEach(c=>{
       const p = products[c.index];
+      if(!p) return;
       totalCount += c.qty;
       totalPrice += p.price * c.qty;
     });
     cartCountTopEl.textContent = totalCount;
     cartTotalTopEl.textContent = formatPrice(totalPrice) + " so‘m";
-
     if(cartSheet.classList.contains("open")){
       renderCartItems();
     }
   }
-
   function toggleCartSheet(force){
     const isOpen = cartSheet.classList.contains("open");
     const next = typeof force === "boolean" ? force : !isOpen;
@@ -1627,7 +1629,6 @@
       renderCartItems();
     }
   }
-
   function renderCartItems(){
     if(cart.length === 0){
       cartItemsEl.innerHTML = "<p class='cart-empty'>Savat hozircha bo‘sh 🙂</p>";
@@ -1638,6 +1639,7 @@
     let total = 0;
     cart.forEach(c=>{
       const p = products[c.index];
+      if(!p) return;
       const lineTotal = p.price * c.qty;
       total += lineTotal;
       html += `
@@ -1663,7 +1665,6 @@
     cartItemsEl.innerHTML = html;
     cartSheetTotalEl.textContent = formatPrice(total) + " so‘m";
   }
-
   function changeQty(productIndex, delta){
     const item = cart.find(c => c.index === productIndex);
     if(!item) return;
@@ -1674,7 +1675,6 @@
     updateCartUI();
     renderCartItems();
   }
-
   function removeFromCart(productIndex){
     cart = cart.filter(c=>c.index !== productIndex);
     updateCartUI();
@@ -1691,12 +1691,11 @@
         window.open(url, "_blank"); // oddiy brauzer
       }
     }catch(e){
-      // agar biror sabablarga ko'ra xato bo'lsa, yana ham ochishga urinib ko'ramiz
       window.location.href = url;
     }
   }
 
-  // --- BUYURTMA TARIXI ---
+  // --- BUYURTMA TARIXI (faqat localStorage) ---
   function saveOrderHistory(order){
     let list = [];
     try{
@@ -1706,7 +1705,6 @@
     localStorage.setItem(STORAGE_HISTORY, JSON.stringify(list));
     renderHistory();
   }
-
   function renderHistory(){
     let list = [];
     try{
@@ -1741,7 +1739,6 @@
       `;
     });
   }
-
   function clearHistory(){
     if(confirm("Buyurtmalar tarixini tozalashni xohlaysizmi?")){
       localStorage.removeItem(STORAGE_HISTORY);
@@ -1755,13 +1752,12 @@
       showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
       return;
     }
-
     let totalPrice = 0;
     let totalItems = 0;
     let lines = [];
-
     cart.forEach((c, i)=>{
       const p = products[c.index];
+      if(!p) return;
       const lineTotal = p.price * c.qty;
       totalPrice += lineTotal;
       totalItems += c.qty;
@@ -1770,9 +1766,7 @@
         `${i+1}) ${catEmoji} ${p.name} — ${c.qty} dona × ${formatPrice(p.price)} so‘m = ${formatPrice(lineTotal)} so‘m`;
       lines.push({line: lineText, product: p});
     });
-
     const totalStr = formatPrice(totalPrice);
-
     let text = "";
     text += "💖 BEAUTY STORE — Onlayn buyurtma\n";
     text += "━━━━━━━━━━━━━━━━━━━━\n";
@@ -1783,9 +1777,9 @@
     text += "\n💰 Umumiy summa: " + totalStr + " so‘m\n";
     text += "📦 Buyurtma turi: Kosmetika mahsulotlari\n";
     text += "━━━━━━━━━━━━━━━━━━━━\n";
-    text += "📱 Telefon raqamim: __________(telefoningizni yozib qoldiring!\n";
-    text += "📍 Manzilim: __________manzilingizni yozib qoldiring!\n";
-    text += "✍️ (#Siz_yuborishni _bosing_biz_sizga_tez_orada_qo_ng_iroq_qilamiz\n";
+    text += "📱 Telefon raqamim: __________ (telefoningizni yozib qoldiring)\n";
+    text += "📍 Manzilim: __________ (manzilingizni yozib qoldiring)\n";
+    text += "✍️ Siz faqat ‘Yuborish’ tugmasini bosing, biz sizga tez orada qo‘ng‘iroq qilamiz.\n";
 
     const encoded = encodeURIComponent(text);
     const url = "https://t.me/onatili_premium?text=" + encoded + "&t=" + Date.now();
@@ -1798,16 +1792,11 @@
       items: lines
     };
     saveOrderHistory(order);
-
-    // Telegram oynasini ochamiz
     openTelegramLink(url);
-
-    // Savatni tozalaymiz — yangi buyurtmalar uchun
     cart = [];
     updateCartUI();
     renderCartItems();
     toggleCartSheet(false);
-
     showToast("✅ Buyurtma matni Telegramga tayyorlandi.");
   }
 
@@ -1817,7 +1806,7 @@
     themeToggleBtn.textContent = theme === "light" ? "🌙" : "☀️";
   }
   function toggleTheme(){
-    const current = localStorage.getItem(THEME_KEY) || "dark";
+    const current = localStorage.getItem(THEME_KEY) || "light";
     const next = current === "dark" ? "light" : "dark";
     localStorage.setItem(THEME_KEY, next);
     applyTheme(next);
@@ -1828,21 +1817,17 @@
   tabsEl.addEventListener("click", (e)=>{
     const btn = e.target.closest(".tab-btn");
     if(!btn) return;
-
     const pageId = btn.dataset.page;
     if(pageId === "adminPage" && !isAdmin){
       showToast("👑 Avval admin kodini kiriting.");
       return;
     }
-
     document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-
     document.getElementById("shopPage").classList.add("hidden");
     document.getElementById("historyPage").classList.add("hidden");
     document.getElementById("adminPage").classList.add("hidden");
     document.getElementById(pageId).classList.remove("hidden");
-
     if(pageId === "historyPage"){
       renderHistory();
     }else if(pageId === "adminPage"){
@@ -1862,7 +1847,6 @@
       adminAccessBtn.textContent = "👑 Admin uchun";
     }
   }
-
   function askAdminCode(){
     if(isAdmin){
       document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
@@ -1884,10 +1868,9 @@
       showToast("❌ Noto‘g‘ri kod");
     }
   }
-
   adminAccessBtn.addEventListener("click", askAdminCode);
 
-  // --- ADMIN CUSTOM MAHSULOTLAR ---
+  // --- ADMIN CUSTOM MAHSULOTLAR (Firebase) ---
   function addCustomProduct(){
     const nameEl = document.getElementById("adminName");
     const catEl = document.getElementById("adminCategory");
@@ -1918,13 +1901,11 @@
 
     // Rasm manzillari: nom → RAW link, yoki to‘liq URL
     let images = normalizeImagesInput(imgsEl.value.trim());
-
     if (!images.length) {
       images = [RAW_PREFIX + "noimage.png"];
     }
 
     const emoji = categoryEmoji[category] || categoryEmoji.default;
-
     const product = {
       name,
       price,
@@ -1932,24 +1913,24 @@
       category,
       emoji,
       tag,
-      images,
-      custom:true,
-      id: Date.now()
+      images
     };
 
-    customProducts.push(product);
-    saveCustomProducts();
-    rebuildProducts();
-    renderAdminCustomList();
-
-    nameEl.value = "";
-    baseEl.value = "";
-    discEl.value = "";
-    hasDiscountEl.checked = false;
-    tagEl.value = "";
-    imgsEl.value = "";
-
-    showToast("✅ Mahsulot qo‘shildi");
+    // Firebasega push qilamiz
+    PRODUCTS_REF.push(product, (err) => {
+      if (err) {
+        console.error(err);
+        alert("Firebasega yozishda xatolik bo‘ldi.");
+      } else {
+        showToast("✅ Mahsulot Firebase’ga qo‘shildi");
+        nameEl.value = "";
+        baseEl.value = "";
+        discEl.value = "";
+        hasDiscountEl.checked = false;
+        tagEl.value = "";
+        imgsEl.value = "";
+      }
+    });
   }
 
   function renderAdminCustomList(){
@@ -1959,36 +1940,30 @@
     }
     adminCustomListEl.innerHTML = "";
     products.forEach((p, idx)=>{
-      const isCustom = !!p.custom;
+      const isCustom = !!p.id; // Firebase dagi mahsulotlarda id bor
       adminCustomListEl.innerHTML += `
         <div class="admin-product-row">
           <span>${p.name} ${isCustom ? "" : "(default)"}</span>
           <span>${formatPrice(p.price)} so‘m</span>
-          <button class="admin-delete-btn" onclick="deleteAnyProduct(${idx})">✕</button>
+          ${isCustom
+            ? `<button class="admin-delete-btn" onclick="deleteFirebaseProduct('${p.id}')">✕</button>`
+            : `<span style="font-size:10px;opacity:.6;text-align:right;">kod ichidagi</span>`
+          }
         </div>
       `;
     });
   }
 
-  function deleteAnyProduct(indexInProducts){
+  function deleteFirebaseProduct(id){
     if(!confirm("Bu mahsulotni o‘chirishni xohlaysizmi?")) return;
-    const p = products[indexInProducts];
-
-    // Agar custom bo'lsa, listdan ham olib tashlaymiz
-    if (p.custom) {
-      customProducts = customProducts.filter(cp => cp.id !== p.id);
-      saveCustomProducts();
-    } else {
-      // default mahsulotlar uchun: faqat shu sessiyada filterlash
-      const originalIndex = defaultProducts.findIndex(dp => dp.name === p.name && dp.price === p.price);
-      if (originalIndex !== -1) {
-        defaultProducts.splice(originalIndex, 1);
+    PRODUCTS_REF.child(id).remove((err)=>{
+      if(err){
+        console.error(err);
+        alert("Firebase’dan o‘chirishda xatolik bo‘ldi.");
+      }else{
+        showToast("🗑 Mahsulot o‘chirildi");
       }
-    }
-
-    rebuildProducts();
-    renderAdminCustomList();
-    showToast("🗑 Mahsulot o‘chirildi");
+    });
   }
 
   // --- FULLSCREEN IMAGE VIEWER ---
@@ -2000,7 +1975,6 @@
     updateImageViewer();
     imageViewerEl.classList.remove("hidden");
   }
-
   function updateImageViewer(){
     const p = products[viewerProductIndex];
     if(!p || !p.images || !p.images.length) return;
@@ -2008,7 +1982,6 @@
     if(viewerImageIndex < 0) viewerImageIndex = imgs.length - 1;
     if(viewerImageIndex >= imgs.length) viewerImageIndex = 0;
     const url = imgs[viewerImageIndex];
-
     if (url.startsWith(RAW_PREFIX)) {
       const base = url.replace(/\.(png|jpg|jpeg)$/i, "");
       imageViewerImgEl.onerror = function(){
@@ -2020,29 +1993,23 @@
       imageViewerImgEl.onerror = null;
       imageViewerImgEl.src = url;
     }
-
     imageViewerTitleEl.textContent = p.name;
     imageViewerCounterEl.textContent = (viewerImageIndex+1) + " / " + imgs.length;
   }
-
   function closeImageViewer(){
     imageViewerEl.classList.add("hidden");
   }
-
   function nextImage(){
     viewerImageIndex++;
     updateImageViewer();
   }
-
   function prevImage(){
     viewerImageIndex--;
     updateImageViewer();
   }
-
   imageViewerEl.addEventListener("click", function(){
     closeImageViewer();
   });
-
   document.addEventListener("keydown", (e)=>{
     if(e.key === "Escape"){
       if(!imageViewerEl.classList.contains("hidden")){
@@ -2053,13 +2020,13 @@
 
   // --- INIT ---
   (function init(){
-    const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+    // default KUNDUZGI rejim
+    const savedTheme = localStorage.getItem(THEME_KEY) || "light";
     applyTheme(savedTheme);
 
     isAdmin = localStorage.getItem(STORAGE_ADMIN) === "true";
     updateAdminUI();
 
-    loadCustomProducts();
     rebuildProducts();
     renderHistory();
   })();
@@ -2070,14 +2037,13 @@
   window.changeQty = changeQty;
   window.removeFromCart = removeFromCart;
   window.sendOrder = sendOrder;
-  window.addCustomProduct = addCustomProduct;
-  window.deleteAnyProduct = deleteAnyProduct;
   window.clearHistory = clearHistory;
   window.openImageViewer = openImageViewer;
   window.closeImageViewer = closeImageViewer;
   window.nextImage = nextImage;
   window.prevImage = prevImage;
+  window.addCustomProduct = addCustomProduct;
+  window.deleteFirebaseProduct = deleteFirebaseProduct;
 </script>
-
 </body>
 </html>
