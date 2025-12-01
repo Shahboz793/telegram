@@ -441,7 +441,6 @@
       gap:4px;
       box-shadow:0 6px 12px rgba(34,197,94,0.35);
       flex-shrink:0;
-      transition:transform .1s ease;
     }
     .btn-add:active{transform:scale(.96);}
     /* BOTTOM ORDER BAR */
@@ -997,8 +996,11 @@
       color:var(--muted);
       text-decoration:line-through;
     }
-
-    /* Add-to-cart button (detail) + ACTIVE HOLAT + ANIMATSIYA */
+    .detail-actions{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
     .detail-add-btn{
       width:100%;
       border:none;
@@ -1014,21 +1016,26 @@
       align-items:center;
       justify-content:center;
       gap:6px;
-      transition:background .2s ease, box-shadow .2s ease, transform .2s ease;
-    }
-    .detail-add-btn:active{
-      transform:scale(.97);
-    }
-    @keyframes btnPulse{
-      0%{transform:scale(1);}
-      50%{transform:scale(1.04);}
-      100%{transform:scale(1);}
+      transition:0.18s ease;
     }
     .detail-add-btn.added{
-      background:linear-gradient(120deg,#f97316,#ec4899);
-      box-shadow:0 0 0 2px rgba(248,250,252,0.9),0 0 25px rgba(248,113,113,0.7);
-      color:#020617;
-      animation:btnPulse .6s ease-out;
+      background:linear-gradient(120deg,#4ade80,#22c55e);
+      box-shadow:0 12px 26px rgba(34,197,94,0.9);
+      transform:translateY(-1px);
+    }
+    .detail-back-btn{
+      width:100%;
+      border:none;
+      border-radius:999px;
+      padding:9px 12px;
+      background:#e5e7eb;
+      color:#111827;
+      font-size:13px;
+      cursor:pointer;
+    }
+    body.theme-dark .detail-back-btn{
+      background:rgba(15,23,42,0.9);
+      color:#e5e7eb;
     }
   </style>
 </head>
@@ -1242,9 +1249,14 @@
           <span id="detailPrice" class="detail-price-main"></span>
           <span id="detailOldPrice" class="detail-price-old hidden"></span>
         </div>
-        <button id="detailAddBtn" class="detail-add-btn" type="button">
-          🛒 Savatga qo‘shish
-        </button>
+        <div class="detail-actions">
+          <button id="detailAddBtn" class="detail-add-btn" type="button">
+            🛒 Savatga qo‘shish
+          </button>
+          <button id="detailBackBtn" class="detail-back-btn hidden" type="button">
+            ⬅️ Orqaga, yana mahsulot tanlash
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1417,6 +1429,7 @@
     const detailPriceEl = document.getElementById("detailPrice");
     const detailOldPriceEl = document.getElementById("detailOldPrice");
     const detailAddBtn = document.getElementById("detailAddBtn");
+    const detailBackBtn = document.getElementById("detailBackBtn");
 
     // ADMIN INPUTS
     const adminNameEl = document.getElementById("adminName");
@@ -1496,8 +1509,7 @@
             emoji: data.emoji || categoryEmoji[data.category] || categoryEmoji.default,
             tag: data.tag || "",
             description: data.description || "",
-            images: Array.isArray(data.images) ? data.images : [],
-            createdAt: data.createdAt || null
+            images: Array.isArray(data.images) ? data.images : []
           });
         });
         remoteProducts = list;
@@ -1514,7 +1526,7 @@
       renderProducts();
     }
 
-    // === MAHSULOTLARNI CHIZISH (Uzumga o‘xshash katta rasmlar) ===
+    // === MAHSULOTLARNI CHIZISH ===
     function renderProducts(){
       productsGrid.innerHTML = "";
       const filtered = products.filter(p =>
@@ -1588,7 +1600,7 @@
     });
 
     // === SAVAT FUNKSIYALARI ===
-    function addToCart(index, fromDetail = false){
+    function addToCart(index){
       const found = cart.find(c => c.index === index);
       if(found){
         found.qty += 1;
@@ -1596,15 +1608,9 @@
         cart.push({index, qty:1});
       }
       updateCartUI();
-
-      // Qayerdan keldi – shunga qarab xabar
-      if(fromDetail){
-        showToast("✅ Savatga qo‘shildi. Yana mahsulot tanlaysizmi?");
-      }else{
-        showToast("✅ Savatga qo‘shildi");
-      }
+      // umumiy toast tekst
+      showToast("Savatga qo‘shildi, yana mahsulot tanlaysizmi?");
     }
-
     function updateCartUI(){
       let totalCount = 0;
       let totalPrice = 0;
@@ -1620,7 +1626,6 @@
         renderCartItems();
       }
     }
-
     function toggleCartSheet(force){
       const isOpen = cartSheet.classList.contains("open");
       const next = typeof force === "boolean" ? force : !isOpen;
@@ -1630,7 +1635,6 @@
         renderCartItems();
       }
     }
-
     function renderCartItems(){
       if(cart.length === 0){
         cartItemsEl.innerHTML = "<p class='cart-empty'>Savat hozircha bo‘sh 🙂</p>";
@@ -1667,7 +1671,6 @@
       cartItemsEl.innerHTML = html;
       cartSheetTotalEl.textContent = formatPrice(total) + " so‘m";
     }
-
     function changeQty(productIndex, delta){
       const item = cart.find(c => c.index === productIndex);
       if(!item) return;
@@ -1678,13 +1681,11 @@
       updateCartUI();
       renderCartItems();
     }
-
     function removeFromCart(productIndex){
       cart = cart.filter(c=>c.index !== productIndex);
       updateCartUI();
       renderCartItems();
     }
-
     function openTelegramLink(url){
       const tg = window.Telegram && window.Telegram.WebApp;
       try{
@@ -1708,7 +1709,6 @@
       localStorage.setItem(STORAGE_HISTORY, JSON.stringify(list));
       renderHistory();
     }
-
     function renderHistory(){
       let list = [];
       try{
@@ -1743,7 +1743,6 @@
         `;
       });
     }
-
     function clearHistory(){
       if(confirm("Buyurtmalar tarixini tozalashni xohlaysizmi?")){
         localStorage.removeItem(STORAGE_HISTORY);
@@ -1884,24 +1883,20 @@
       const discountPriceRaw = adminPriceDiscountEl.value ? parseInt(adminPriceDiscountEl.value, 10) : null;
       const tag = adminTagEl.value.trim();
       const description = adminDescriptionEl.value.trim();
-
       if(!name || !basePrice || basePrice <= 0){
         alert("Mahsulot nomi va asosiy narxini to‘g‘ri kiriting.");
         return;
       }
-
       let price = basePrice;
       let oldPrice = null;
       if(hasDiscount && discountPriceRaw && discountPriceRaw > 0 && discountPriceRaw < basePrice){
         price = discountPriceRaw;
         oldPrice = basePrice;
       }
-
       let images = normalizeImagesInput(adminImagesEl.value.trim());
       if(!images.length){
         images = [RAW_PREFIX + "noimage.png"];
       }
-
       const emoji = categoryEmoji[category] || categoryEmoji.default;
       const payload = {
         name,
@@ -1914,7 +1909,6 @@
         images,
         createdAt: serverTimestamp()
       };
-
       try{
         const docRef = await addDoc(productsCol, payload);
         remoteProducts.push({
@@ -1937,7 +1931,6 @@
         showToast("⚠️ Firestore’ga yozishda xato");
       }
     }
-
     async function deleteAnyProduct(id){
       if(!confirm("Bu mahsulotni o‘chirishni xohlaysizmi? Hamma uchun o‘chadi.")) return;
       try{
@@ -1951,7 +1944,6 @@
         showToast("⚠️ Firestore’dan o‘chirishda xato");
       }
     }
-
     function renderAdminCustomList(){
       if(!remoteProducts.length){
         adminCustomListEl.innerHTML = "<p class='history-empty'>Hozircha Firestore’da admin qo‘shgan mahsulot yo‘q.</p>";
@@ -1977,11 +1969,9 @@
       const p = products[index];
       if(!p) return;
       detailIndex = index;
-
       const catLabel = categoryLabel[p.category] || p.category;
       const img = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
       setImageWithPngJpgFallback(detailImageEl, img);
-
       detailCategoryEl.textContent = catLabel;
       detailNameEl.textContent = p.name;
       detailTagEl.textContent = p.tag ? "💡 " + p.tag : "";
@@ -1989,7 +1979,6 @@
         p.description && p.description.trim().length
           ? p.description
           : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan. Admin paneldan batafsil tavsif yozib qo‘yishingiz mumkin.";
-
       detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
       if(p.oldPrice){
         detailOldPriceEl.textContent = formatPrice(p.oldPrice) + " so‘m";
@@ -1997,36 +1986,30 @@
       }else{
         detailOldPriceEl.classList.add("hidden");
       }
-
-      // detail tugmasini default holatga qaytarib qo‘yamiz
+      // tugmalar holatini reset qilamiz
       detailAddBtn.classList.remove("added");
       detailAddBtn.textContent = "🛒 Savatga qo‘shish";
+      detailBackBtn.classList.add("hidden");
 
       productDetailOverlay.classList.remove("hidden");
       document.body.style.overflow = "hidden";
     }
-
     function closeProductDetail(){
       productDetailOverlay.classList.add("hidden");
       document.body.style.overflow = "";
       detailIndex = null;
     }
-
-    // DETAIL BUTTON CLICK — bu yerda maxsus animatsiya + savol
     detailAddBtn.addEventListener("click", ()=>{
       if(detailIndex === null) return;
-      addToCart(detailIndex, true); // fromDetail = true
-
+      addToCart(detailIndex);
+      // faqat mahsulot ichki oynasida bo‘lganda animatsiya va matn
       detailAddBtn.classList.add("added");
       detailAddBtn.textContent = "✅ Savatga qo‘shildi";
-
-      setTimeout(()=>{
-        detailAddBtn.classList.remove("added");
-        detailAddBtn.textContent = "🛒 Yana mahsulot tanlaysizmi?";
-      }, 650);
-      // agar keyin yana bosilsa, yana savatga qo‘shaveradi
+      detailBackBtn.classList.remove("hidden");
     });
-
+    detailBackBtn.addEventListener("click", ()=>{
+      closeProductDetail();
+    });
     productDetailOverlay.addEventListener("click",(e)=>{
       if(e.target === productDetailOverlay){
         closeProductDetail();
@@ -2039,10 +2022,8 @@
       applyTheme(savedTheme);
       isAdmin = localStorage.getItem(STORAGE_ADMIN) === "true";
       updateAdminUI();
-      // Avval defaultlar
       rebuildProducts();
       renderHistory();
-      // Keyin Firestore’dan yuklab ustiga qo‘shamiz
       loadRemoteProducts();
     })();
 
