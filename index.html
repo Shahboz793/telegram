@@ -4,12 +4,26 @@
   <meta charset="UTF-8" />
   <title>Beauty Store — Kosmetika Do‘koni</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark light">
+  <meta name="color-scheme" content="dark light" />
+
   <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
+      --bg:#f3f4f6;
+      --bg-soft:#e5e7eb;
+      --accent:#ec4899;
+      --accent-soft:#f9a8d4;
+      --accent-2:#f97316;
+      --text:#020617;
+      --muted:#4b5563;
+      --card:#ffffff;
+      --border-soft:rgba(148,163,184,0.7);
+      --danger:#dc2626;
+    }
+    body.theme-dark{
       --bg:#050816;
       --bg-soft:#0b1021;
       --accent:#ff3e92;
@@ -21,21 +35,9 @@
       --border-soft:rgba(148,163,184,0.4);
       --danger:#ef4444;
     }
-    body.theme-light{
-      --bg:#f3f4f6;
-      --bg-soft:#e5e7eb;
-      --accent:#ec4899;
-      --accent-soft:#f9a8d4;
-      --accent-2:#f97316;
-      --text:#020617;
-      --muted:#4b5563;
-      --card:#ffffff;
-      --border-soft:rgba(148,163,184,0.8);
-      --danger:#dc2626;
-    }
     body{
       font-family:"Poppins",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:radial-gradient(circle at top,#1e1b4b 0,var(--bg) 45%,var(--bg) 100%);
+      background:var(--bg);
       color:var(--text);
       min-height:100vh;
       padding-bottom:120px;
@@ -45,14 +47,14 @@
 
     /* HEADER */
     .header{
-      position:sticky;top:0;z-index:30;
+      position:sticky;top:0;z-index:40;
       backdrop-filter:blur(18px);
-      background:linear-gradient(90deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
+      background:linear-gradient(90deg,rgba(249,250,251,0.98),rgba(229,231,235,0.98));
       border-bottom:1px solid var(--border-soft);
-      padding:8px 10px 6px;
+      padding:8px 10px 4px;
     }
-    body.theme-light .header{
-      background:linear-gradient(90deg,rgba(249,250,251,0.96),rgba(229,231,235,0.96));
+    body.theme-dark .header{
+      background:linear-gradient(90deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
     }
     .header-row{
       display:flex;
@@ -64,51 +66,50 @@
       display:flex;align-items:center;gap:8px;
     }
     .logo-circle{
-      width:34px;height:34px;border-radius:999px;
+      width:38px;height:38px;border-radius:999px;
       background:conic-gradient(from 140deg,#fb7185,#f97316,#ede9fe,#38bdf8,#fb7185);
       display:flex;align-items:center;justify-content:center;
       box-shadow:0 0 18px rgba(248,113,113,0.6);
-      font-size:18px;
     }
     .logo-circle span{
       background:#020617;
-      padding:3px 8px;
+      padding:3px 10px;
       border-radius:999px;
       font-weight:700;
-      font-size:13px;
+      font-size:14px;
       color:#f9fafb;
     }
-    body.theme-light .logo-circle span{
-      background:#f9fafb;
-      color:#111827;
+    body.theme-dark .logo-circle span{
+      background:#020617;
+      color:#f9fafb;
     }
     .logo-text{
       display:flex;flex-direction:column;
       line-height:1.1;
     }
-    .logo-text strong{font-size:15px;}
-    .logo-text small{font-size:10px;color:var(--muted);}
+    .logo-text strong{font-size:16px;}
+    .logo-text small{font-size:11px;color:var(--muted);}
     .header-right{
       display:flex;align-items:center;gap:6px;
     }
     .theme-toggle{
       border:none;
       border-radius:999px;
-      padding:5px 8px;
-      font-size:14px;
+      padding:5px 9px;
+      font-size:15px;
       cursor:pointer;
-      background:rgba(15,23,42,0.9);
-      color:#e5e7eb;
-      display:flex;align-items:center;gap:4px;
-    }
-    body.theme-light .theme-toggle{
       background:#e5e7eb;
       color:#111827;
+      display:flex;align-items:center;gap:4px;
+    }
+    body.theme-dark .theme-toggle{
+      background:rgba(15,23,42,0.9);
+      color:#e5e7eb;
     }
     .cart-icon-btn{
       border:none;
       border-radius:999px;
-      padding:5px 9px;
+      padding:6px 10px;
       display:flex;
       align-items:center;
       gap:6px;
@@ -116,10 +117,10 @@
       background:radial-gradient(circle at top,#22c55e,#16a34a 50%,#14532d);
       color:#022c22;
       box-shadow:0 6px 16px rgba(34,197,94,0.55);
-      font-size:12px;
+      font-size:13px;
     }
     .cart-icon-left{
-      font-size:18px;
+      font-size:20px;
     }
     .cart-icon-info{
       display:flex;
@@ -128,24 +129,24 @@
       line-height:1.1;
     }
     .cart-icon-info strong{
-      font-size:12px;
+      font-size:13px;
     }
     .cart-icon-info small{
-      font-size:10px;
+      font-size:11px;
       opacity:.9;
     }
     .admin-access{
       border-radius:999px;
-      border:1px solid rgba(148,163,184,0.7);
-      background:rgba(15,23,42,0.85);
-      color:#e5e7eb;
-      font-size:10px;
-      padding:5px 8px;
-      cursor:pointer;
-    }
-    body.theme-light .admin-access{
+      border:1px solid var(--border-soft);
       background:#e5e7eb;
       color:#111827;
+      font-size:11px;
+      padding:6px 9px;
+      cursor:pointer;
+    }
+    body.theme-dark .admin-access{
+      background:rgba(15,23,42,0.85);
+      color:#e5e7eb;
     }
     .admin-access.admin-active{
       border-color:#22c55e;
@@ -156,23 +157,23 @@
     .tabs{
       display:flex;
       gap:6px;
-      margin-top:6px;
-      font-size:11px;
+      margin-top:8px;
+      font-size:12px;
     }
     .tab-btn{
       flex:1;
       border:none;
       border-radius:999px;
-      padding:5px 0;
+      padding:6px 0;
       cursor:pointer;
-      background:rgba(15,23,42,0.85);
-      color:#e5e7eb;
-      border:1px solid rgba(148,163,184,0.5);
-    }
-    body.theme-light .tab-btn{
       background:#e5e7eb;
       color:#111827;
-      border-color:rgba(148,163,184,0.8);
+      border:1px solid var(--border-soft);
+      font-size:12px;
+    }
+    body.theme-dark .tab-btn{
+      background:rgba(15,23,42,0.85);
+      color:#e5e7eb;
     }
     .tab-btn.active{
       background:linear-gradient(120deg,#f97316,#ec4899);
@@ -182,69 +183,13 @@
       box-shadow:0 0 14px rgba(248,113,113,0.5);
     }
 
-    /* SEARCH (QIDIRUV) */
-    .search-row{
-      margin-top:6px;
-      padding:0 2px;
-    }
-    .search-input{
-      width:100%;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,0.7);
-      padding:6px 12px;
-      font-size:11px;
-      background:rgba(15,23,42,0.9);
-      color:#e5e7eb;
-    }
-    body.theme-light .search-input{
-      background:#ffffff;
-      color:#111827;
-    }
-    .search-input::placeholder{
-      color:var(--muted);
-    }
-
-    /* FILTERS (KATEGORIYALAR) */
-    .filters{
-      padding:6px 0 2px;
-      display:flex;
-      gap:6px;
-      overflow-x:auto;
-      scrollbar-width:none;
-      margin-top:4px;
-    }
-    .filters::-webkit-scrollbar{display:none;}
-    .chip{
-      flex:0 0 auto;
-      font-size:10px;
-      padding:6px 11px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,0.5);
-      background:rgba(15,23,42,0.9);
-      color:#e5e7eb;
-      display:flex;align-items:center;gap:5px;
-      cursor:pointer;
-      transition:0.18s ease;
-      white-space:nowrap;
-    }
-    body.theme-light .chip{
-      background:#ffffff;
-      color:#111827;
-    }
-    .chip.active{
-      background:linear-gradient(120deg,#f97316,#ec4899);
-      border-color:transparent;
-      color:#0f172a;
-      font-weight:600;
-      box-shadow:0 0 14px rgba(248,113,113,0.4);
-    }
-
-    /* HERO (shop) */
+    /* HERO */
     .hero{
-      padding:10px 12px 4px;
+      padding:10px 14px 6px;
+      background:var(--bg);
     }
     .hero-title{
-      font-size:20px;
+      font-size:21px;
       font-weight:700;
     }
     .hero-title span{
@@ -253,8 +198,8 @@
       color:transparent;
     }
     .hero-sub{
-      margin-top:4px;
-      font-size:11px;
+      margin-top:6px;
+      font-size:12px;
       color:var(--muted);
     }
     .hero-badges{
@@ -264,161 +209,217 @@
       gap:6px;
     }
     .badge{
-      font-size:9px;
-      padding:3px 7px;
+      font-size:10px;
+      padding:4px 8px;
       border-radius:999px;
       border:1px solid rgba(148,163,184,0.45);
-      background:rgba(15,23,42,0.9);
-      display:flex;align-items:center;gap:4px;
-      color:#e5e7eb;
-    }
-    body.theme-light .badge{
       background:#ffffff;
+      display:flex;align-items:center;gap:4px;
       color:#111827;
     }
+    body.theme-dark .badge{
+      background:rgba(15,23,42,0.9);
+      color:#e5e7eb;
+    }
     .hero-tag{
-      font-size:10px;
+      font-size:11px;
       margin-top:8px;
       display:inline-flex;
       align-items:center;
       gap:6px;
-      padding:4px 8px;
+      padding:5px 10px;
       border-radius:999px;
-      background:linear-gradient(90deg,rgba(56,189,248,0.25),rgba(129,140,248,0.15));
+      background:linear-gradient(90deg,rgba(56,189,248,0.2),rgba(129,140,248,0.1));
       border:1px solid rgba(59,130,246,0.55);
     }
     .hero-note{
       margin-top:6px;
-      font-size:10px;
+      font-size:11px;
       color:var(--muted);
     }
 
-    /* PRODUCT GRID */
+    /* SEARCH BAR */
+    .search-bar{
+      margin-top:10px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      background:#ffffff;
+      border-radius:999px;
+      border:1px solid var(--border-soft);
+      padding:4px 10px;
+    }
+    body.theme-dark .search-bar{
+      background:rgba(15,23,42,0.9);
+    }
+    .search-bar span{
+      font-size:16px;
+    }
+    .search-bar input{
+      border:none;
+      outline:none;
+      background:transparent;
+      width:100%;
+      font-size:12px;
+      color:var(--text);
+    }
+    .search-bar input::placeholder{
+      color:var(--muted);
+    }
+
+    /* FILTERS */
+    .filters-wrapper{
+      position:sticky;
+      top:90px;
+      z-index:30;
+      background:var(--bg);
+      border-bottom:1px solid rgba(148,163,184,0.2);
+    }
+    .filters{
+      padding:8px 12px 6px;
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      scrollbar-width:none;
+    }
+    .filters::-webkit-scrollbar{display:none;}
+    .chip{
+      flex:0 0 auto;
+      font-size:11px;
+      padding:7px 12px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.5);
+      background:#ffffff;
+      color:#111827;
+      display:flex;align-items:center;gap:6px;
+      cursor:pointer;
+      white-space:nowrap;
+      transition:0.18s ease;
+    }
+    body.theme-dark .chip{
+      background:rgba(15,23,42,0.9);
+      color:#e5e7eb;
+    }
+    .chip.active{
+      background:linear-gradient(120deg,#f97316,#ec4899);
+      border-color:transparent;
+      color:#0f172a;
+      font-weight:600;
+      box-shadow:0 0 14px rgba(248,113,113,0.4);
+    }
+
+    /* PRODUCTS GRID - Uzumga o‘xshash katta rasmlar */
     .products-wrap{
-      padding:6px 10px 90px;
+      padding:8px 10px 90px;
+      background:var(--bg-soft);
     }
     .products-grid{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
       gap:10px;
     }
-    @media(max-width:480px){
+    @media(max-width:520px){
       .products-grid{
         grid-template-columns:1fr;
       }
     }
-    @media(min-width:768px){
+    @media(min-width:820px){
       .products-grid{
         grid-template-columns:repeat(3,minmax(0,1fr));
       }
-      body{padding-bottom:130px;}
     }
     .product-card{
-      background:linear-gradient(145deg,#020617,var(--card));
+      background:var(--card);
       border-radius:18px;
-      border:1px solid rgba(31,41,55,0.9);
-      padding:10px;
-      position:relative;
-      overflow:hidden;
-      box-shadow:0 10px 22px rgba(0,0,0,0.55);
-    }
-    body.theme-light .product-card{
-      background:#ffffff;
-      border-color:rgba(209,213,219,0.9);
-      box-shadow:0 10px 24px rgba(148,163,184,0.65);
-    }
-    .product-top{
-      position:relative;
-      border-radius:16px;
-      padding:8px;
-      background:radial-gradient(circle at top,#1d4ed8,#020617 55%);
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      cursor:pointer;
-    }
-    body.theme-light .product-top{
-      background:radial-gradient(circle at top,#bfdbfe,#e5e7eb 55%);
-    }
-    .product-photo{
-      width:150px;height:150px;
-      border-radius:14px;
-      overflow:hidden;
-      flex-shrink:0;
       border:1px solid rgba(148,163,184,0.7);
+      overflow:hidden;
+      box-shadow:0 10px 22px rgba(0,0,0,0.08);
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
     }
-    @media(max-width:480px){
-      .product-photo{
-        width:170px;height:170px;
-      }
+    body.theme-dark .product-card{
+      background:linear-gradient(145deg,#020617,var(--card));
+      border-color:rgba(31,41,55,0.9);
+      box-shadow:0 10px 22px rgba(0,0,0,0.7);
     }
-    .product-photo img{
-      width:100%;height:100%;object-fit:cover;
+    .product-img-wrap{
+      position:relative;
+      width:100%;
+      padding-top:100%; /* 1:1 — Uzum uslubidagi kvadrat katta rasm */
+      overflow:hidden;
+      background:#020617;
+    }
+    .product-img-wrap img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
       display:block;
-    }
-    .product-emoji{
-      font-size:32px;
-      margin-left:auto;
     }
     .product-img-tag{
       position:absolute;
       left:8px;top:8px;
-      font-size:8px;
-      padding:2px 6px;
+      font-size:9px;
+      padding:3px 7px;
       border-radius:999px;
       background:rgba(15,23,42,0.9);
       border:1px solid rgba(148,163,184,0.7);
       display:flex;align-items:center;gap:4px;
       color:#e5e7eb;
     }
-    body.theme-light .product-img-tag{
-      background:#ffffff;
-      color:#111827;
+    body.theme-dark .product-img-tag{
+      background:rgba(15,23,42,0.9);
     }
     .product-sale{
       position:absolute;
-      right:-22px;
-      bottom:6px;
+      right:8px;top:8px;
       background:linear-gradient(120deg,#f97316,#ec4899);
-      padding:3px 26px;
-      transform:rotate(14deg);
+      padding:3px 10px;
+      border-radius:999px;
       font-size:10px;
       font-weight:700;
       color:#111827;
     }
     .product-body{
-      margin-top:8px;
+      padding:8px 9px 10px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
     }
     .product-name{
       font-size:13px;
       font-weight:600;
-      min-height:32px;
+      min-height:34px;
     }
     .product-meta{
-      font-size:9px;
+      font-size:10px;
       color:var(--muted);
-      margin-top:2px;
     }
     .tag-mini{
-      font-size:8px;
+      font-size:9px;
       padding:3px 7px;
       border-radius:999px;
-      background:rgba(15,23,42,0.9);
-      border:1px solid rgba(55,65,81,0.9);
-      margin-top:5px;
+      background:#f9fafb;
+      border:1px solid rgba(209,213,219,0.9);
       display:inline-flex;
       align-items:center;
       gap:4px;
+      color:#111827;
+      margin-top:2px;
+      max-width:100%;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    body.theme-dark .tag-mini{
+      background:rgba(15,23,42,0.9);
+      border-color:rgba(55,65,81,0.9);
       color:#e5e7eb;
     }
-    body.theme-light .tag-mini{
-      background:#f9fafb;
-      border-color:rgba(209,213,219,0.9);
-      color:#111827;
-    }
     .price-row{
-      margin-top:8px;
+      margin-top:6px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -459,27 +460,27 @@
       bottom:24px;
       background:linear-gradient(
         135deg,
-        rgba(15,23,42,0.96),
-        rgba(24,24,27,0.9)
+        rgba(249,250,251,0.98),
+        rgba(229,231,235,0.98)
       );
       border-radius:18px;
       border:1px solid rgba(148,163,184,0.65);
       padding:8px 12px 10px;
-      z-index:25;
-      box-shadow:
-        0 18px 40px rgba(0,0,0,0.8),
-        0 0 0 1px rgba(15,23,42,0.8);
-      backdrop-filter:blur(18px);
-    }
-    body.theme-light .cart-bar{
-      background:linear-gradient(
-        135deg,
-        rgba(249,250,251,0.98),
-        rgba(229,231,235,0.98)
-      );
+      z-index:35;
       box-shadow:
         0 16px 32px rgba(148,163,184,0.7),
         0 0 0 1px rgba(209,213,219,0.8);
+      backdrop-filter:blur(18px);
+    }
+    body.theme-dark .cart-bar{
+      background:linear-gradient(
+        135deg,
+        rgba(15,23,42,0.96),
+        rgba(24,24,27,0.9)
+      );
+      box-shadow:
+        0 18px 40px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(15,23,42,0.8);
     }
     .cart-bar-note{
       font-size:10px;
@@ -542,7 +543,7 @@
       opacity:0;
       pointer-events:none;
       transition:opacity .25s ease;
-      z-index:35;
+      z-index:36;
     }
     .sheet-overlay.show{
       opacity:1;
@@ -551,24 +552,22 @@
     .cart-sheet{
       position:fixed;
       left:0;right:0;bottom:0;
-      background:radial-gradient(circle at top,#020617,var(--bg-soft));
+      background:radial-gradient(circle at top,#f9fafb,#e5e7eb);
       border-radius:22px 22px 0 0;
       border-top:1px solid var(--border-soft);
       max-height:75vh;
       transform:translateY(100%);
       transition:transform .25s ease;
-      z-index:40;
+      z-index:37;
       display:flex;
       flex-direction:column;
-      box-shadow:0 -24px 36px rgba(0,0,0,0.9);
-    }
-    body.theme-light .cart-sheet{
-      background:radial-gradient(circle at top,#f9fafb,#e5e7eb);
       box-shadow:0 -18px 30px rgba(148,163,184,0.8);
     }
-    .cart-sheet.open{
-      transform:translateY(0);
+    body.theme-dark .cart-sheet{
+      background:radial-gradient(circle at top,#020617,#0b1021);
+      box-shadow:0 -24px 36px rgba(0,0,0,0.9);
     }
+    .cart-sheet.open{transform:translateY(0);}
     .cart-sheet-header{
       padding:10px 14px 8px;
       border-bottom:1px solid var(--border-soft);
@@ -585,8 +584,8 @@
     }
     .cart-sheet-header button{
       border:none;
-      background:rgba(15,23,42,0.85);
-      color:#e5e7eb;
+      background:#e5e7eb;
+      color:#111827;
       width:26px;height:26px;
       border-radius:999px;
       cursor:pointer;
@@ -595,9 +594,9 @@
       align-items:center;
       justify-content:center;
     }
-    body.theme-light .cart-sheet-header button{
-      background:#e5e7eb;
-      color:#111827;
+    body.theme-dark .cart-sheet-header button{
+      background:rgba(15,23,42,0.85);
+      color:#e5e7eb;
     }
     .cart-sheet-body{
       padding:6px 14px 4px;
@@ -610,19 +609,19 @@
       font-size:12px;
       background:linear-gradient(
         135deg,
-        rgba(15,23,42,0.96),
-        rgba(30,64,175,0.9)
-      );
-      color:#e5e7eb;
-      border-radius:0 0 22px 22px;
-    }
-    body.theme-light .cart-sheet-footer{
-      background:linear-gradient(
-        135deg,
         rgba(249,250,251,0.98),
         rgba(219,234,254,0.98)
       );
       color:#111827;
+      border-radius:0 0 22px 22px;
+    }
+    body.theme-dark .cart-sheet-footer{
+      background:linear-gradient(
+        135deg,
+        rgba(15,23,42,0.96),
+        rgba(30,64,175,0.9)
+      );
+      color:#e5e7eb;
     }
     .cart-sheet-footer-top{
       display:flex;
@@ -706,15 +705,15 @@
     }
     .qty-control button{
       border:none;
-      background:rgba(15,23,42,0.95);
-      color:#e5e7eb;
+      background:#e5e7eb;
+      color:#111827;
       width:22px;height:20px;
       cursor:pointer;
       font-size:13px;
     }
-    body.theme-light .qty-control button{
-      background:#e5e7eb;
-      color:#111827;
+    body.theme-dark .qty-control button{
+      background:rgba(15,23,42,0.95);
+      color:#e5e7eb;
     }
     .qty-control span{
       padding:0 7px;
@@ -752,6 +751,7 @@
       pointer-events:none;
       transition:opacity .2s ease,transform .2s ease;
       z-index:50;
+      color:#e5e7eb;
     }
     .toast.show{
       opacity:1;
@@ -764,7 +764,7 @@
       padding:10px 12px 80px;
     }
     .page-title{
-      font-size:15px;
+      font-size:16px;
       font-weight:600;
       margin-bottom:4px;
     }
@@ -786,11 +786,10 @@
       padding:8px 10px;
       margin-bottom:8px;
       font-size:11px;
-      box-shadow:0 6px 16px rgba(0,0,0,0.5);
+      box-shadow:0 6px 16px rgba(0,0,0,0.08);
     }
-    body.theme-light .order-card{
-      background:#ffffff;
-      box-shadow:0 6px 14px rgba(148,163,184,0.6);
+    body.theme-dark .order-card{
+      box-shadow:0 6px 16px rgba(0,0,0,0.6);
     }
     .order-head{
       display:flex;
@@ -831,10 +830,10 @@
       padding:8px 10px;
       font-size:11px;
       margin-bottom:10px;
+      box-shadow:0 6px 14px rgba(148,163,184,0.25);
     }
-    body.theme-light .admin-form{
-      background:#ffffff;
-      box-shadow:0 6px 14px rgba(148,163,184,0.4);
+    body.theme-dark .admin-form{
+      box-shadow:0 6px 14px rgba(0,0,0,0.6);
     }
     .admin-form h3{
       font-size:13px;
@@ -851,18 +850,21 @@
       color:var(--muted);
     }
     .form-row input,
+    .form-row textarea,
     .form-row select{
       border-radius:8px;
       border:1px solid rgba(148,163,184,0.7);
       padding:5px 7px;
       font-size:11px;
-      background:rgba(15,23,42,0.7);
-      color:#f9fafb;
-    }
-    body.theme-light .form-row input,
-    body.theme-light .form-row select{
       background:#f9fafb;
       color:#111827;
+      resize:vertical;
+    }
+    body.theme-dark .form-row input,
+    body.theme-dark .form-row textarea,
+    body.theme-dark .form-row select{
+      background:rgba(15,23,42,0.7);
+      color:#f9fafb;
     }
     .admin-check-row{
       display:flex;
@@ -913,78 +915,118 @@
       font-size:16px;
     }
 
-    /* IMAGE VIEWER (full screen gallery) */
-    .image-viewer{
+    /* PRODUCT DETAIL (Uzum-style full screen page) */
+    .product-detail-overlay{
       position:fixed;
       inset:0;
-      background:rgba(15,23,42,0.96);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      background:rgba(15,23,42,0.82);
       z-index:60;
-    }
-    .image-viewer-inner{
-      position:relative;
-      max-width:100%;
-      max-height:100%;
-      padding:40px 16px 22px;
       display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:10px;
-    }
-    .image-viewer-title{
-      font-size:12px;
-      text-align:center;
-      max-width:90%;
-    }
-    .image-viewer-img-wrap{
-      position:relative;
-      max-width:100%;
-      max-height:70vh;
-      display:flex;
-      align-items:center;
       justify-content:center;
+      align-items:flex-end;
     }
-    .image-viewer-img-wrap img{
-      max-width:100%;
-      max-height:70vh;
-      object-fit:contain;
-      border-radius:12px;
-      border:1px solid rgba(148,163,184,0.8);
+    .product-detail-card{
+      background:var(--card);
+      color:var(--text);
+      width:100%;
+      max-width:520px;
+      max-height:95vh;
+      border-radius:20px 20px 0 0;
+      overflow-y:auto;
+      box-shadow:0 -18px 34px rgba(0,0,0,0.9);
+    }
+    @media(min-width:720px){
+      .product-detail-card{
+        max-height:90vh;
+        border-radius:20px;
+        margin-bottom:18px;
+      }
+    }
+    .product-detail-header{
+      position:relative;
+    }
+    .product-detail-image-wrap{
+      position:relative;
+      width:100%;
+      padding-top:100%;
       background:#020617;
     }
-    .image-viewer-close{
+    .product-detail-image-wrap img{
       position:absolute;
-      top:10px;right:16px;
-      border:none;
-      background:rgba(15,23,42,0.9);
-      color:#e5e7eb;
-      border-radius:999px;
-      width:32px;height:32px;
-      display:flex;align-items:center;justify-content:center;
-      cursor:pointer;
-      font-size:16px;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
     }
-    .image-viewer-arrow{
+    .product-detail-close{
       position:absolute;
-      top:50%;
-      transform:translateY(-50%);
+      top:10px;right:10px;
       border:none;
+      width:32px;height:32px;
+      border-radius:999px;
       background:rgba(15,23,42,0.85);
       color:#e5e7eb;
-      width:32px;height:32px;
-      border-radius:999px;
-      display:flex;align-items:center;justify-content:center;
       cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       font-size:18px;
     }
-    .image-viewer-arrow.left{left:10px;}
-    .image-viewer-arrow.right{right:10px;}
-    .image-viewer-counter{
-      font-size:11px;
-      color:#9ca3af;
+    .product-detail-body{
+      padding:12px 14px 16px;
     }
+    .product-detail-category{
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .product-detail-name{
+      font-size:17px;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+    .product-detail-tag{
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    .product-detail-desc{
+      font-size:12px;
+      line-height:1.5;
+      margin-bottom:10px;
+    }
+    .product-detail-prices{
+      display:flex;
+      align-items:baseline;
+      gap:8px;
+      margin-bottom:12px;
+    }
+    .detail-price-main{
+      font-size:16px;
+      font-weight:700;
+    }
+    .detail-price-old{
+      font-size:12px;
+      color:var(--muted);
+      text-decoration:line-through;
+    }
+    .detail-add-btn{
+      width:100%;
+      border:none;
+      border-radius:999px;
+      padding:11px 12px;
+      background:linear-gradient(120deg,#22c55e,#16a34a);
+      color:#022c22;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 12px 26px rgba(34,197,94,0.6);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+    }
+
   </style>
 </head>
 <body>
@@ -1001,7 +1043,7 @@
         </div>
       </div>
       <div class="header-right">
-        <button class="theme-toggle" id="themeToggleBtn" type="button">☀️</button>
+        <button class="theme-toggle" id="themeToggleBtn" type="button">🌙</button>
         <button class="cart-icon-btn" type="button" onclick="toggleCartSheet(true)">
           <span class="cart-icon-left">🛒</span>
           <div class="cart-icon-info">
@@ -1009,35 +1051,16 @@
             <small id="cartTotalTop">0 so‘m</small>
           </div>
         </button>
-        <!-- Admin uchun kirish tugmasi -->
         <button id="adminAccessBtn" class="admin-access" type="button">
           👑 Admin uchun
         </button>
       </div>
     </div>
-
     <!-- TABS -->
     <div class="tabs" id="tabs">
       <button class="tab-btn active" data-page="shopPage">Do‘kon</button>
       <button class="tab-btn" data-page="historyPage">Buyurtmalar tarixi</button>
       <button class="tab-btn hidden" data-page="adminPage" id="adminTabBtn">Admin panel</button>
-    </div>
-
-    <!-- SEARCH -->
-    <div class="search-row">
-      <input id="searchInput" class="search-input" type="search"
-             placeholder="Mahsulot qidirish (nomi, tag)...">
-    </div>
-
-    <!-- FILTERS (KATEGORIYALAR) -->
-    <div class="filters" id="filterBar">
-      <button class="chip active" data-category="all">⭐ Barchasi</button>
-      <button class="chip" data-category="pomada">💄 Pomada</button>
-      <button class="chip" data-category="krem">🧴 Kremlar</button>
-      <button class="chip" data-category="parfyum">🌸 Parfyum</button>
-      <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
-      <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
-      <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
     </div>
   </header>
 
@@ -1060,9 +1083,28 @@
       </div>
       <div class="hero-note">
         Buyurtma yuborilgandan keyin faqat telefon raqamingizni yozib qoldiring —
-        admin sizga tez orada qo‘ng‘iroq qiladi.
+        sotuvchi sizga tez orada qo‘ng‘iroq qiladi.
+      </div>
+
+      <!-- QIDIRUV -->
+      <div class="search-bar">
+        <span>🔍</span>
+        <input id="searchInput" placeholder="Mahsulot qidirish (nomi, kategoriya, tag)..." />
       </div>
     </section>
+
+    <!-- FILTERS -->
+    <div class="filters-wrapper">
+      <div class="filters" id="filterBar">
+        <button class="chip active" data-category="all">⭐ Barchasi</button>
+        <button class="chip" data-category="pomada">💄 Pomada</button>
+        <button class="chip" data-category="krem">🧴 Kremlar</button>
+        <button class="chip" data-category="parfyum">🌸 Parfyum</button>
+        <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
+        <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
+        <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
+      </div>
+    </div>
 
     <!-- PRODUCTS -->
     <main class="products-wrap">
@@ -1087,9 +1129,10 @@
   <div id="adminPage" class="page hidden">
     <div class="page-title">🛠 Admin panel</div>
     <p class="page-sub">
-      Bu sahifa faqat admin uchun. Admin qo‘shgan mahsulotlar Firebase Firestore’da
-      saqlanadi, hamma foydalanuvchi ko‘radi.
+      Bu sahifa faqat admin uchun. Mahsulotlar Firestore’da saqlanadi, shuning uchun
+      boshqa telefonlar ham bir xil katalogni ko‘radi.
     </p>
+
     <div class="admin-form">
       <h3>Yangi mahsulot qo‘shish</h3>
       <div class="form-row">
@@ -1120,8 +1163,12 @@
         <input id="adminPriceDiscount" type="number" min="0" placeholder="Masalan: 99000" />
       </div>
       <div class="form-row">
-        <label>Qisqa tavsiya / tag (ixtiyoriy)</label>
+        <label>Qisqa tag / tavsiya (masalan: “Best seller”)</label>
         <input id="adminTag" placeholder="Masalan: Kundalik foydalanish uchun" />
+      </div>
+      <div class="form-row">
+        <label>Batafsil tavsif (product page uchun)</label>
+        <textarea id="adminDescription" rows="3" placeholder="Mahsulot nima uchun mo‘ljallangan, qanday ishlatiladi va hokazo."></textarea>
       </div>
       <div class="form-row">
         <label>
@@ -1131,16 +1178,17 @@
         <input id="adminImages" placeholder="olma yoki https://..., vergul bilan bir nechta yozish mumkin" />
       </div>
       <button class="admin-btn" type="button" onclick="addCustomProduct()">
-        ➕ Mahsulotni qo‘shish
+        ➕ Mahsulotni qo‘shish (Firestore)
       </button>
       <p class="admin-info">
-        Eslatma: qo‘shilgan mahsulotlar Firestore’da saqlanadi. Default (dastlabki) mahsulotlarni o‘chira olmaysiz.
+        Eslatma: admin qo‘shgan mahsulotlar Firestore’da saqlanadi. Hamma foydalanuvchilar bir xil katalogni ko‘rishadi.
       </p>
     </div>
-    <div class="admin-list-title">Mahsulotlar ro‘yxati:</div>
+
+    <div class="admin-list-title">Firestore’dagi mahsulotlar:</div>
     <div id="adminCustomList"></div>
     <p class="admin-info">
-      🔴 O‘chirish faqat admin qo‘shgan mahsulotlar uchun ishlaydi.
+      🔴 O‘chirsangiz, hamma foydalanuvchilar uchun o‘chadi.
     </p>
   </div>
 
@@ -1153,7 +1201,7 @@
       <div>
         <div>🛍 Buyurtma berish</div>
         <span class="small">
-          Siz tanlagan mahsulotlar Telegram orqali sotuvchiga yuboriladi.
+          Tanlagan mahsulotlaringiz Telegram orqali sotuvchiga yuboriladi.
         </span>
       </div>
       <div><span>›</span></div>
@@ -1176,11 +1224,36 @@
       <p class="cart-info-text">
         <strong>Izoh:</strong> “Buyurtmani yuborish” tugmasini bossangiz,
         hozir tanlagan mahsulotlaringiz Telegram orqali sotuvchiga jo‘natiladi.
-        Sotuvchi sizga telefon qiladi, yetkazib berish va to‘lovni siz bilan kelishib oladi.
+        Sotuvchi sizga telefon qilib, yetkazib berish va to‘lovni kelishib oladi.
       </p>
       <button class="cart-sheet-btn" type="button" onclick="sendOrder()">
-        📩 Buyurtmani yuborish
+        📩 Buyurtmani yuborish (@onatili_premium)
       </button>
+    </div>
+  </div>
+
+  <!-- PRODUCT DETAIL OVERLAY -->
+  <div id="productDetailOverlay" class="product-detail-overlay hidden">
+    <div class="product-detail-card">
+      <div class="product-detail-header">
+        <div class="product-detail-image-wrap">
+          <img id="detailImage" src="" alt="Mahsulot rasmi" />
+        </div>
+        <button class="product-detail-close" type="button" onclick="closeProductDetail()">✕</button>
+      </div>
+      <div class="product-detail-body">
+        <div id="detailCategory" class="product-detail-category"></div>
+        <h2 id="detailName" class="product-detail-name"></h2>
+        <p id="detailTag" class="product-detail-tag"></p>
+        <p id="detailDesc" class="product-detail-desc"></p>
+        <div class="product-detail-prices">
+          <span id="detailPrice" class="detail-price-main"></span>
+          <span id="detailOldPrice" class="detail-price-old hidden"></span>
+        </div>
+        <button id="detailAddBtn" class="detail-add-btn" type="button">
+          🛒 Savatga qo‘shish
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1189,46 +1262,38 @@
     ✅ Savatga qo‘shildi
   </div>
 
-  <!-- FULLSCREEN IMAGE VIEWER -->
-  <div id="imageViewer" class="image-viewer hidden">
-    <div class="image-viewer-inner" onclick="event.stopPropagation()">
-      <button class="image-viewer-close" onclick="closeImageViewer()">✕</button>
-      <div class="image-viewer-title" id="imageViewerTitle"></div>
-      <div class="image-viewer-img-wrap">
-        <button class="image-viewer-arrow left" onclick="prevImage()">‹</button>
-        <img id="imageViewerImg" src="" alt="Mahsulot rasmi">
-        <button class="image-viewer-arrow right" onclick="nextImage()">›</button>
-      </div>
-      <div class="image-viewer-counter" id="imageViewerCounter"></div>
-    </div>
-  </div>
+  <!-- FIREBASE + APP SCRIPT -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      addDoc,
+      deleteDoc,
+      doc,
+      serverTimestamp,
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-  <!-- Firebase JS (v8) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script>
-    // Siz bergan konfiguratsiya
-    var firebaseConfig = {
+    // === FIREBASE CONFIG — SENING MA'LUMOTLARING ===
+    const firebaseConfig = {
       apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
       authDomain: "shahboz-5d0a3.firebaseapp.com",
       projectId: "shahboz-5d0a3",
       storageBucket: "shahboz-5d0a3.firebasestorage.app",
       messagingSenderId: "352024095535",
       appId: "1:352024095535:web:6ca630de2c199a33c54fda",
-      measurementId: "G-YS5RGZ00EB"
+      measurementId: "G-YS5RGZ00EB",
     };
-    firebase.initializeApp(firebaseConfig);
-    var db = firebase.firestore();
-  </script>
 
-  <script>
-    // --- KONSTANTALAR ---
-    const ADMIN_CODE = "12345678";
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const productsCol = collection(db, "beauty_products");
+
+    // === KONSTANTALAR (LOCAL STORAGE) ===
     const STORAGE_HISTORY = "beauty_order_history";
     const STORAGE_ADMIN = "beauty_admin";
     const THEME_KEY = "beauty_theme";
-
-    // GitHub raw images papkangiz:
     const RAW_PREFIX = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
 
     const categoryEmoji = {
@@ -1241,7 +1306,16 @@
       "default":"💅"
     };
 
-    // --- DASTLABKI MAHSULOTLAR ---
+    const categoryLabel = {
+      "pomada":"Pomada / lab uchun",
+      "krem":"Krem / yuz uchun",
+      "parfyum":"Parfyum",
+      "niqob":"Niqob / mask",
+      "ko‘z":"Ko‘z uchun",
+      "tana":"Tana / soch parvarishi"
+    };
+
+    // DASTLABKI MAHSULOTLAR (default)
     const defaultProducts = [
       {
         name:"Mat pomada Nude Lux",
@@ -1250,9 +1324,9 @@
         category:"pomada",
         emoji:"💄",
         tag:"Yangi kolleksiya",
+        description:"Mat effektli, kundalik foydalanish uchun mos nude pomada. Lablarni quritmaydi, uzoq vaqt saqlanadi.",
         images:[
-          "https://images.pexels.com/photos/3373744/pexels-photo-3373744.jpeg?auto=compress&cs=tinysrgb&w=400",
-          "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400"
+          "https://images.pexels.com/photos/3373744/pexels-photo-3373744.jpeg?auto=compress&cs=tinysrgb&w=600"
         ]
       },
       {
@@ -1262,20 +1336,9 @@
         category:"pomada",
         emoji:"💋",
         tag:"Best seller",
+        description:"Klassik qizil rang, bayram va maxsus tadbirlar uchun juda mos.",
         images:[
-          "https://images.pexels.com/photos/947301/pexels-photo-947301.jpeg?auto=compress&cs=tinysrgb&w=400",
-          "https://images.pexels.com/photos/3738360/pexels-photo-3738360.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Lip gloss Shimmer Rose",
-        price:76000,
-        oldPrice:null,
-        category:"pomada",
-        emoji:"✨",
-        tag:"Yaltirroq effekt",
-        images:[
-          "https://images.pexels.com/photos/3373749/pexels-photo-3373749.jpeg?auto=compress&cs=tinysrgb&w=400"
+          "https://images.pexels.com/photos/947301/pexels-photo-947301.jpeg?auto=compress&cs=tinysrgb&w=600"
         ]
       },
       {
@@ -1285,9 +1348,9 @@
         category:"krem",
         emoji:"🧴",
         tag:"Namlik 24 soat",
+        description:"Quruq va normal teri uchun. Kun bo‘yi namlikni ushlab turishga yordam beradi.",
         images:[
-          "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&cs=tinysrgb&w=400",
-          "https://images.pexels.com/photos/3738364/pexels-photo-3738364.jpeg?auto=compress&cs=tinysrgb&w=400"
+          "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&cs=tinysrgb&w=600"
         ]
       },
       {
@@ -1296,20 +1359,10 @@
         oldPrice:159000,
         category:"krem",
         emoji:"🌞",
-        tag:"SPF qo‘riqlovchi",
+        tag:"Quyoshdan himoya",
+        description:"SPF50 bilan kunduzgi krem — quyosh nurlaridan himoya va namlantirish birgalikda.",
         images:[
-          "https://images.pexels.com/photos/3738342/pexels-photo-3738342.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Tungi regeneratsion krem",
-        price:155000,
-        oldPrice:179000,
-        category:"krem",
-        emoji:"🌙",
-        tag:"Tungi parvarish",
-        images:[
-          "https://images.pexels.com/photos/3738364/pexels-photo-3738364.jpeg?auto=compress&cs=tinysrgb&w=400"
+          "https://images.pexels.com/photos/3738342/pexels-photo-3738342.jpeg?auto=compress&cs=tinysrgb&w=600"
         ]
       },
       {
@@ -1319,143 +1372,9 @@
         category:"parfyum",
         emoji:"🌸",
         tag:"Eng ko‘p yoqadigan",
+        description:"Yengil, mayin floral hid. Har kuni foydalanish uchun mos.",
         images:[
-          "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=400",
-          "https://images.pexels.com/photos/965991/pexels-photo-965991.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Erkaklar uchun Fresh parfyum",
-        price:189000,
-        oldPrice:219000,
-        category:"parfyum",
-        emoji:"🕺",
-        tag:"Uzoq saqlanadi",
-        images:[
-          "https://images.pexels.com/photos/965992/pexels-photo-965992.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Unisex Citrus parfyum",
-        price:215000,
-        oldPrice:249000,
-        category:"parfyum",
-        emoji:"🍋",
-        tag:"Citrus hidi",
-        images:[
-          "https://images.pexels.com/photos/965990/pexels-photo-965990.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Ko‘z soyasi palitrasi 16 rang",
-        price:175000,
-        oldPrice:199000,
-        category:"ko‘z",
-        emoji:"👁",
-        tag:"Professional",
-        images:[
-          "https://images.pexels.com/photos/3373735/pexels-photo-3373735.jpeg?auto=compress&cs=tinysrgb&w=400",
-          "https://images.pexels.com/photos/3738360/pexels-photo-3738360.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Qalam tusuvchi ko‘z layner",
-        price:59000,
-        oldPrice:null,
-        category:"ko‘z",
-        emoji:"✏️",
-        tag:"Qora klassik",
-        images:[
-          "https://images.pexels.com/photos/3738345/pexels-photo-3738345.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Hajm beruvchi maskara Volume+",
-        price:97000,
-        oldPrice:119000,
-        category:"ko‘z",
-        emoji:"🎯",
-        tag:"Juda mashhur",
-        images:[
-          "https://images.pexels.com/photos/3373737/pexels-photo-3373737.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Qora maska (poralarni tozalovchi)",
-        price:69000,
-        oldPrice:84000,
-        category:"niqob",
-        emoji:"😷",
-        tag:"Terlashga qarshi",
-        images:[
-          "https://images.pexels.com/photos/3738346/pexels-photo-3738346.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Namlik beruvchi mato niqob",
-        price:39000,
-        oldPrice:49000,
-        category:"niqob",
-        emoji:"💧",
-        tag:"1 dona",
-        images:[
-          "https://images.pexels.com/photos/3738355/pexels-photo-3738355.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Tana uchun shokolad skrab",
-        price:99000,
-        oldPrice:115000,
-        category:"tana",
-        emoji:"🍫",
-        tag:"Yumshoq teri",
-        images:[
-          "https://images.pexels.com/photos/3738370/pexels-photo-3738370.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Dush geli Coconut Dream",
-        price:67000,
-        oldPrice:null,
-        category:"tana",
-        emoji:"🛁",
-        tag:"Kokos hidi",
-        images:[
-          "https://images.pexels.com/photos/3738373/pexels-photo-3738373.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Qo‘l kremi Almond Care",
-        price:49000,
-        oldPrice:null,
-        category:"tana",
-        emoji:"🤲",
-        tag:"Quruq teri uchun",
-        images:[
-          "https://images.pexels.com/photos/3738375/pexels-photo-3738375.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Sochlar uchun argan yog‘i",
-        price:129000,
-        oldPrice:145000,
-        category:"tana",
-        emoji:"💆‍♀️",
-        tag:"Sochni tiklaydi",
-        images:[
-          "https://images.pexels.com/photos/3738371/pexels-photo-3738371.jpeg?auto=compress&cs=tinysrgb&w=400"
-        ]
-      },
-      {
-        name:"Make-up cho‘tkalar seti 7 dona",
-        price:139000,
-        oldPrice:159000,
-        category:"tana",
-        emoji:"🖌",
-        tag:"To‘liq to‘plam",
-        images:[
-          "https://images.pexels.com/photos/3738385/pexels-photo-3738385.jpeg?auto=compress&cs=tinysrgb&w=400",
-          "https://images.pexels.com/photos/3738365/pexels-photo-3738365.jpeg?auto=compress&cs=tinysrgb&w=400"
+          "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=600"
         ]
       },
       {
@@ -1465,28 +1384,25 @@
         category:"ko‘z",
         emoji:"💧",
         tag:"Suvga chidamli",
+        description:"Suvga chidamli maskara — ko‘z yoshlari va yomg‘irga ham chidamli.",
         images:[
-          "https://images.pexels.com/photos/3738367/pexels-photo-3738367.jpeg?auto=compress&cs=tinysrgb&w=400"
+          "https://images.pexels.com/photos/3738367/pexels-photo-3738367.jpeg?auto=compress&cs=tinysrgb&w=600"
         ]
       }
     ];
 
-    // --- HOLAT ---
-    let firestoreProducts = [];   // faqat admin qo‘shganlar (Firestore’dan)
-    let products = [];            // ekranda ko‘rinadigan (default + firestoreProducts)
+    // === HOLAT (STATE) ===
+    let products = [];           // default + Firestore
+    let remoteProducts = [];     // faqat Firestore’dan kelganlar
     let cart = [];
     let activeCategory = "all";
+    let currentSearch = "";
     let isAdmin = false;
-    let searchQuery = "";
+    let detailIndex = null;
 
-    // Fullscreen image viewer state
-    let viewerProductIndex = null;
-    let viewerImageIndex = 0;
-
-    // --- DOM ELEMENTLAR ---
+    // === DOM ELEMENTLAR ===
     const productsGrid = document.getElementById("productsGrid");
     const filterBar = document.getElementById("filterBar");
-    const searchInput = document.getElementById("searchInput");
     const cartCountTopEl = document.getElementById("cartCountTop");
     const cartTotalTopEl = document.getElementById("cartTotalTop");
     const toastEl = document.getElementById("toast");
@@ -1500,32 +1416,32 @@
     const adminCustomListEl = document.getElementById("adminCustomList");
     const adminAccessBtn = document.getElementById("adminAccessBtn");
     const adminTabBtn = document.getElementById("adminTabBtn");
-    const imageViewerEl = document.getElementById("imageViewer");
-    const imageViewerTitleEl = document.getElementById("imageViewerTitle");
-    const imageViewerImgEl = document.getElementById("imageViewerImg");
-    const imageViewerCounterEl = document.getElementById("imageViewerCounter");
+    const searchInput = document.getElementById("searchInput");
 
-    // --- YORDAMCHI FUNKSIYALAR ---
+    // Product detail DOM
+    const productDetailOverlay = document.getElementById("productDetailOverlay");
+    const detailImageEl = document.getElementById("detailImage");
+    const detailCategoryEl = document.getElementById("detailCategory");
+    const detailNameEl = document.getElementById("detailName");
+    const detailTagEl = document.getElementById("detailTag");
+    const detailDescEl = document.getElementById("detailDesc");
+    const detailPriceEl = document.getElementById("detailPrice");
+    const detailOldPriceEl = document.getElementById("detailOldPrice");
+    const detailAddBtn = document.getElementById("detailAddBtn");
+
+    // ADMIN INPUTS
+    const adminNameEl = document.getElementById("adminName");
+    const adminCategoryEl = document.getElementById("adminCategory");
+    const adminPriceBaseEl = document.getElementById("adminPriceBase");
+    const adminHasDiscountEl = document.getElementById("adminHasDiscount");
+    const adminPriceDiscountEl = document.getElementById("adminPriceDiscount");
+    const adminTagEl = document.getElementById("adminTag");
+    const adminDescriptionEl = document.getElementById("adminDescription");
+    const adminImagesEl = document.getElementById("adminImages");
+
+    // === YORDAMCHI FUNKSIYALAR ===
     function formatPrice(v){
       return v.toLocaleString("uz-UZ");
-    }
-
-    // admin rasm inputini nomdan URLga aylantiradi
-    function normalizeImagesInput(raw) {
-      if (!raw) return [];
-      return raw
-        .split(",")
-        .map(s => s.trim())
-        .filter(Boolean)
-        .map(token => {
-          // To'liq URL bo'lsa
-          if (/^https?:\/\//i.test(token)) {
-            return token;
-          }
-          // Faqat nom: olma, olma.png, olma.jpg...
-          const name = token.replace(/\.(png|jpg|jpeg)$/i, "");
-          return RAW_PREFIX + name + ".png"; // asosiy PNG
-        });
     }
 
     function showToast(message){
@@ -1534,70 +1450,134 @@
       setTimeout(()=> toastEl.classList.remove("show"), 1100);
     }
 
-    // --- MAHSULOTLARNI CHIZISH ---
-    function rebuildProducts(){
-      products = [...defaultProducts, ...firestoreProducts];
-      renderProducts();
-      renderAdminCustomList();
+    function normalizeImagesInput(raw) {
+      if (!raw) return [];
+      return raw
+        .split(",")
+        .map(s => s.trim())
+        .filter(Boolean)
+        .map(token => {
+          if (/^https?:\/\//i.test(token)) {
+            return token;
+          }
+          const name = token.replace(/\.(png|jpg|jpeg)$/i, "");
+          return RAW_PREFIX + name + ".png";
+        });
     }
 
-    function renderProducts(){
-      productsGrid.innerHTML = "";
-      const filtered = products.filter(p => {
-        const okCat = activeCategory === "all" ? true : p.category === activeCategory;
-        const q = searchQuery.trim().toLowerCase();
-        const okSearch = !q
-          ? true
-          : (p.name.toLowerCase().includes(q) ||
-             (p.tag && p.tag.toLowerCase().includes(q)));
-        return okCat && okSearch;
-      });
-
-      if (!filtered.length){
-        productsGrid.innerHTML = "<p class='history-empty'>Bu bo‘lim / qidiruv bo‘yicha mahsulot topilmadi.</p>";
+    function setImageWithPngJpgFallback(imgElement, url) {
+      if (!url) {
+        imgElement.onerror = null;
+        imgElement.src = RAW_PREFIX + "noimage.png";
         return;
       }
+      if (url.startsWith(RAW_PREFIX)) {
+        const base = url.replace(/\.(png|jpg|jpeg)$/i, "");
+        imgElement.onerror = function(){
+          this.onerror = null;
+          this.src = base + ".jpg";
+        };
+        imgElement.src = base + ".png";
+      } else {
+        imgElement.onerror = null;
+        imgElement.src = url;
+      }
+    }
 
+    function matchesSearch(p){
+      if(!currentSearch) return true;
+      const q = currentSearch;
+      const name = (p.name || "").toLowerCase();
+      const tag = (p.tag || "").toLowerCase();
+      const desc = (p.description || "").toLowerCase();
+      const cat = (p.category || "").toLowerCase();
+      return name.includes(q) || tag.includes(q) || desc.includes(q) || cat.includes(q);
+    }
+
+    // === FIRESTORE MAHSULOTLARNI O‘QISH ===
+    async function loadRemoteProducts(){
+      try{
+        const snap = await getDocs(productsCol);
+        const list = [];
+        snap.forEach(d => {
+          const data = d.data();
+          list.push({
+            id: d.id,
+            fromFirebase: true,
+            name: data.name || "",
+            price: data.price || 0,
+            oldPrice: data.oldPrice || null,
+            category: data.category || "tana",
+            emoji: data.emoji || categoryEmoji[data.category] || categoryEmoji.default,
+            tag: data.tag || "",
+            description: data.description || "",
+            images: Array.isArray(data.images) ? data.images : []
+          });
+        });
+        remoteProducts = list;
+        rebuildProducts();
+        renderAdminCustomList();
+      }catch(e){
+        console.error("Firestore o‘qishda xato:", e);
+        showToast("⚠️ Firestore’dan yuklashda xatolik");
+      }
+    }
+
+    function rebuildProducts(){
+      products = [...defaultProducts, ...remoteProducts];
+      renderProducts();
+    }
+
+    // === MAHSULOTLARNI CHIZISH (Uzumga o‘xshash katta rasmlar) ===
+    function renderProducts(){
+      productsGrid.innerHTML = "";
+      const filtered = products.filter(p =>
+        (activeCategory === "all" ? true : p.category === activeCategory) &&
+        matchesSearch(p)
+      );
+      if(!filtered.length){
+        productsGrid.innerHTML = "<p class='history-empty'>Bu filtrlarda mahsulot topilmadi.</p>";
+        return;
+      }
       filtered.forEach(p=>{
         const index = products.indexOf(p);
-        const discount = p.oldPrice ? (100 - Math.round(p.price*100/p.oldPrice)) : null;
+        const discount = p.oldPrice && p.oldPrice > p.price
+          ? (100 - Math.round(p.price*100/p.oldPrice))
+          : null;
         const tag = p.tag || "Ommabop mahsulot";
-        // Birinchi rasm
         const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
+
         let imgHtml;
         if (firstImage.startsWith(RAW_PREFIX)) {
           const base = firstImage.replace(/\.(png|jpg|jpeg)$/i, "");
-          imgHtml = `<img src="${base}.png" alt="${p.name}"
-                        onerror="this.onerror=null;this.src='${base}.jpg';">`;
+          imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
         } else {
           imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
         }
+
         productsGrid.innerHTML += `
-          <article class="product-card">
-            <div class="product-top" onclick="openImageViewer(${index},0)">
+          <article class="product-card" onclick="openProductDetail(${index})">
+            <div class="product-img-wrap">
+              ${imgHtml}
               <div class="product-img-tag">
-                <span>Beauty</span> <span>Pro</span>
+                <span>Beauty</span><span>Pro</span>
               </div>
-              <div class="product-photo">
-                ${imgHtml}
-              </div>
-              <div class="product-emoji">${p.emoji || categoryEmoji[p.category] || categoryEmoji.default}</div>
-              ${discount ? `<div class="product-sale">- ${discount}%</div>` : ``}
+              ${discount ? `<div class="product-sale">-${discount}%</div>` : ``}
             </div>
             <div class="product-body">
               <div class="product-name">${p.name}</div>
               <div class="product-meta">
-                ${p.category.toUpperCase()} • ${tag}
+                ${(categoryLabel[p.category] || p.category)} • ${tag}
               </div>
               <div class="tag-mini">
-                💡 Tavsiya: ${tag}
+                💡 ${tag}
               </div>
               <div class="price-row">
                 <div>
                   <div class="price-main">${formatPrice(p.price)} so‘m</div>
                   ${p.oldPrice ? `<div class="price-old">${formatPrice(p.oldPrice)} so‘m</div>` : ``}
                 </div>
-                <button class="btn-add" onclick="addToCart(${index});event.stopPropagation();">
+                <button class="btn-add" onclick="event.stopPropagation(); addToCart(${index});">
                   ➕ Savatga
                 </button>
               </div>
@@ -1607,7 +1587,7 @@
       });
     }
 
-    // --- FILTER & QIDIRUV ---
+    // === FILTER KLIK ===
     filterBar.addEventListener("click", (e)=>{
       const btn = e.target.closest(".chip");
       if(!btn) return;
@@ -1617,12 +1597,13 @@
       renderProducts();
     });
 
-    searchInput.addEventListener("input", (e)=>{
-      searchQuery = e.target.value;
+    // === QIDIRUV ===
+    searchInput.addEventListener("input", ()=>{
+      currentSearch = searchInput.value.trim().toLowerCase();
       renderProducts();
     });
 
-    // --- SAVAT FUNKSIYALARI ---
+    // === SAVAT FUNKSIYALARI ===
     function addToCart(index){
       const found = cart.find(c => c.index === index);
       if(found){
@@ -1678,7 +1659,7 @@
             <div class="cart-item-main">
               <div class="cart-item-name">${p.name}</div>
               <div class="cart-item-meta">
-                ${formatPrice(p.price)} so‘m • ${p.category.toUpperCase()}
+                ${formatPrice(p.price)} so‘m • ${(categoryLabel[p.category] || p.category)}
               </div>
             </div>
             <div class="cart-item-actions">
@@ -1714,21 +1695,20 @@
       renderCartItems();
     }
 
-    // --- TELEGRAM WEBAPP LINK ---
     function openTelegramLink(url){
       const tg = window.Telegram && window.Telegram.WebApp;
       try{
         if(tg && typeof tg.openTelegramLink === "function"){
-          tg.openTelegramLink(url);  // WebApp ichida
+          tg.openTelegramLink(url);
         }else{
-          window.open(url, "_blank"); // oddiy brauzer
+          window.open(url, "_blank");
         }
       }catch(e){
         window.location.href = url;
       }
     }
 
-    // --- BUYURTMA TARIXI (localStorage) ---
+    // === BUYURTMA TARIXI (LOCAL) ===
     function saveOrderHistory(order){
       let list = [];
       try{
@@ -1781,7 +1761,7 @@
       }
     }
 
-    // --- TELEGRAMGA BUYURTMA JO'NATISH ---
+    // === TELEGRAMGA BUYURTMA JO‘NATISH ===
     function sendOrder(){
       if(cart.length === 0){
         showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
@@ -1812,11 +1792,13 @@
       text += "\n💰 Umumiy summa: " + totalStr + " so‘m\n";
       text += "📦 Buyurtma turi: Kosmetika mahsulotlari\n";
       text += "━━━━━━━━━━━━━━━━━━━━\n";
-      text += "📱 Telefon raqamim: __________ (telefoningizni yozib qoldiring)\n";
-      text += "📍 Manzilim: __________ (manzilingizni yozib qoldiring)\n";
-      text += "✍️ (Yuborish tugmasini bosib, buyurtmani jo‘nating. Tez orada sizga qo‘ng‘iroq qilamiz.)\n";
+      text += "📱 Telefon raqamim: _______\n";
+      text += "📍 Manzilim: _______\n";
+      text += "✍️ Iltimos, ushbu ma'lumotlarni to‘ldirib, xabarni yuboring.\n";
+
       const encoded = encodeURIComponent(text);
       const url = "https://t.me/onatili_premium?text=" + encoded + "&t=" + Date.now();
+
       const order = {
         date: new Date().toISOString(),
         totalPrice: totalPrice,
@@ -1825,9 +1807,7 @@
         items: lines
       };
       saveOrderHistory(order);
-      // Telegram oynasini ochamiz
       openTelegramLink(url);
-      // Savatni tozalaymiz
       cart = [];
       updateCartUI();
       renderCartItems();
@@ -1835,10 +1815,10 @@
       showToast("✅ Buyurtma matni Telegramga tayyorlandi.");
     }
 
-    // --- TEMA (DARK / LIGHT) ---
+    // === TEMA (DARK / LIGHT) ===
     function applyTheme(theme){
-      document.body.classList.toggle("theme-light", theme === "light");
-      themeToggleBtn.textContent = theme === "light" ? "🌙" : "☀️";
+      document.body.classList.toggle("theme-dark", theme === "dark");
+      themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
     }
     function toggleTheme(){
       const current = localStorage.getItem(THEME_KEY) || "light";
@@ -1848,7 +1828,7 @@
     }
     themeToggleBtn.addEventListener("click", toggleTheme);
 
-    // --- TABS ---
+    // === TABS ===
     tabsEl.addEventListener("click", (e)=>{
       const btn = e.target.closest(".tab-btn");
       if(!btn) return;
@@ -1870,7 +1850,7 @@
       }
     });
 
-    // --- ADMIN LOGIN ---
+    // === ADMIN LOGIN ===
     function updateAdminUI(){
       if(isAdmin){
         adminTabBtn.classList.remove("hidden");
@@ -1882,7 +1862,6 @@
         adminAccessBtn.textContent = "👑 Admin uchun";
       }
     }
-
     function askAdminCode(){
       if(isAdmin){
         document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
@@ -1895,7 +1874,7 @@
       }
       const code = prompt("Admin uchun kirish kodi:");
       if(code === null) return;
-      if(code === ADMIN_CODE){
+      if(code === "12345678"){
         isAdmin = true;
         localStorage.setItem(STORAGE_ADMIN, "true");
         updateAdminUI();
@@ -1906,37 +1885,15 @@
     }
     adminAccessBtn.addEventListener("click", askAdminCode);
 
-    // --- ADMIN CUSTOM MAHSULOTLAR (FIRESTORE) ---
-    async function loadFirestoreProducts(){
-      try{
-        const snap = await db.collection("products").get();
-        firestoreProducts = snap.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-      }catch(e){
-        console.error("Firestore products error:", e);
-        firestoreProducts = [];
-      }
-      rebuildProducts();
-    }
-
+    // === ADMIN CUSTOM MAHSULOTLAR (Firestore) ===
     async function addCustomProduct(){
-      const nameEl = document.getElementById("adminName");
-      const catEl = document.getElementById("adminCategory");
-      const baseEl = document.getElementById("adminPriceBase");
-      const hasDiscountEl = document.getElementById("adminHasDiscount");
-      const discEl = document.getElementById("adminPriceDiscount");
-      const tagEl = document.getElementById("adminTag");
-      const imgsEl = document.getElementById("adminImages");
-
-      const name = nameEl.value.trim();
-      const category = catEl.value;
-      const basePrice = parseInt(baseEl.value, 10);
-      const hasDiscount = hasDiscountEl.checked;
-      const discountPriceRaw = discEl.value ? parseInt(discEl.value, 10) : null;
-      const tag = tagEl.value.trim();
-
+      const name = adminNameEl.value.trim();
+      const category = adminCategoryEl.value;
+      const basePrice = parseInt(adminPriceBaseEl.value, 10);
+      const hasDiscount = adminHasDiscountEl.checked;
+      const discountPriceRaw = adminPriceDiscountEl.value ? parseInt(adminPriceDiscountEl.value, 10) : null;
+      const tag = adminTagEl.value.trim();
+      const description = adminDescriptionEl.value.trim();
       if(!name || !basePrice || basePrice <= 0){
         alert("Mahsulot nomi va asosiy narxini to‘g‘ri kiriting.");
         return;
@@ -1947,158 +1904,148 @@
         price = discountPriceRaw;
         oldPrice = basePrice;
       }
-
-      let images = normalizeImagesInput(imgsEl.value.trim());
-      if (!images.length) {
+      let images = normalizeImagesInput(adminImagesEl.value.trim());
+      if(!images.length){
         images = [RAW_PREFIX + "noimage.png"];
       }
       const emoji = categoryEmoji[category] || categoryEmoji.default;
 
-      const product = {
+      const payload = {
         name,
         price,
         oldPrice,
         category,
         emoji,
         tag,
+        description,
         images,
-        custom:true
+        createdAt: serverTimestamp()
       };
 
       try{
-        const docRef = await db.collection("products").add(product);
-        product.id = docRef.id;
-        firestoreProducts.push(product);
+        const docRef = await addDoc(productsCol, payload);
+        remoteProducts.push({
+          ...payload,
+          id: docRef.id,
+          fromFirebase:true
+        });
         rebuildProducts();
         renderAdminCustomList();
-        nameEl.value = "";
-        baseEl.value = "";
-        discEl.value = "";
-        hasDiscountEl.checked = false;
-        tagEl.value = "";
-        imgsEl.value = "";
-        showToast("✅ Mahsulot Firestore’ga qo‘shildi");
+        adminNameEl.value = "";
+        adminPriceBaseEl.value = "";
+        adminPriceDiscountEl.value = "";
+        adminHasDiscountEl.checked = false;
+        adminTagEl.value = "";
+        adminDescriptionEl.value = "";
+        adminImagesEl.value = "";
+        showToast("✅ Mahsulot Firestore’ga yozildi");
       }catch(e){
-        console.error("Add product error:", e);
-        showToast("❌ Firestore’ga yozishda xatolik");
+        console.error("Mahsulot qo‘shishda xato:", e);
+        showToast("⚠️ Firestore’ga yozishda xato");
       }
     }
 
-    async function deleteAnyProduct(indexInProducts){
-      const p = products[indexInProducts];
-      if(!p || !p.id){
-        alert("Default (oldindan berilgan) mahsulotni o‘chira olmaysiz. Faqat admin qo‘shganlarini o‘chirsa bo‘ladi.");
-        return;
-      }
-      if(!confirm("Bu mahsulotni o‘chirishni xohlaysizmi?")) return;
+    async function deleteAnyProduct(id){
+      if(!confirm("Bu mahsulotni o‘chirishni xohlaysizmi? Hamma uchun o‘chadi.")) return;
       try{
-        await db.collection("products").doc(p.id).delete();
-        firestoreProducts = firestoreProducts.filter(cp => cp.id !== p.id);
+        await deleteDoc(doc(db,"beauty_products",id));
+        remoteProducts = remoteProducts.filter(p=>p.id !== id);
         rebuildProducts();
         renderAdminCustomList();
-        showToast("🗑 Mahsulot Firestore’dan o‘chirildi");
+        showToast("🗑 Mahsulot o‘chirildi");
       }catch(e){
-        console.error("Delete product error:", e);
-        showToast("❌ O‘chirishda xatolik");
+        console.error("O‘chirishda xato:", e);
+        showToast("⚠️ Firestore’dan o‘chirishda xato");
       }
     }
 
     function renderAdminCustomList(){
-      if(!products.length){
-        adminCustomListEl.innerHTML = "<p class='history-empty'>Hali mahsulot yo‘q.</p>";
+      if(!remoteProducts.length){
+        adminCustomListEl.innerHTML = "<p class='history-empty'>Hozircha Firestore’da admin qo‘shgan mahsulot yo‘q.</p>";
         return;
       }
       adminCustomListEl.innerHTML = "";
-      products.forEach((p, idx)=>{
-        const isCustom = !!p.id;
-        adminCustomListEl.innerHTML += `
-          <div class="admin-product-row">
-            <span>${p.name} ${isCustom ? "" : "(default)"}</span>
-            <span>${formatPrice(p.price)} so‘m</span>
-            ${isCustom ? `<button class="admin-delete-btn" onclick="deleteAnyProduct(${idx})">✕</button>` : ""}
-          </div>
-        `;
-      });
+      remoteProducts
+        .slice()
+        .sort((a,b)=> (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
+        .forEach(p=>{
+          adminCustomListEl.innerHTML += `
+            <div class="admin-product-row">
+              <span>${p.name}</span>
+              <span>${formatPrice(p.price)} so‘m</span>
+              <button class="admin-delete-btn" onclick="deleteAnyProduct('${p.id}')">✕</button>
+            </div>
+          `;
+        });
     }
 
-    // --- FULLSCREEN IMAGE VIEWER ---
-    function openImageViewer(productIndex, imageIndex){
-      const p = products[productIndex];
-      if(!p || !p.images || !p.images.length) return;
-      viewerProductIndex = productIndex;
-      viewerImageIndex = imageIndex || 0;
-      updateImageViewer();
-      imageViewerEl.classList.remove("hidden");
-    }
-    function updateImageViewer(){
-      const p = products[viewerProductIndex];
-      if(!p || !p.images || !p.images.length) return;
-      const imgs = p.images;
-      if(viewerImageIndex < 0) viewerImageIndex = imgs.length - 1;
-      if(viewerImageIndex >= imgs.length) viewerImageIndex = 0;
-      const url = imgs[viewerImageIndex];
-      if (url.startsWith(RAW_PREFIX)) {
-        const base = url.replace(/\.(png|jpg|jpeg)$/i, "");
-        imageViewerImgEl.onerror = function(){
-          this.onerror = null;
-          this.src = base + ".jpg";
-        };
-        imageViewerImgEl.src = base + ".png";
-      } else {
-        imageViewerImgEl.onerror = null;
-        imageViewerImgEl.src = url;
+    // === PRODUCT DETAIL (Uzum-style full page) ===
+    function openProductDetail(index){
+      const p = products[index];
+      if(!p) return;
+      detailIndex = index;
+      const catLabel = categoryLabel[p.category] || p.category;
+      const img = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
+
+      setImageWithPngJpgFallback(detailImageEl, img);
+      detailCategoryEl.textContent = catLabel;
+      detailNameEl.textContent = p.name;
+      detailTagEl.textContent = p.tag ? "💡 " + p.tag : "";
+      detailDescEl.textContent =
+        p.description && p.description.trim().length
+          ? p.description
+          : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan. Admin paneldan batafsil tavsif yozib qo‘yishingiz mumkin.";
+      detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
+      if(p.oldPrice){
+        detailOldPriceEl.textContent = formatPrice(p.oldPrice) + " so‘m";
+        detailOldPriceEl.classList.remove("hidden");
+      }else{
+        detailOldPriceEl.classList.add("hidden");
       }
-      imageViewerTitleEl.textContent = p.name;
-      imageViewerCounterEl.textContent = (viewerImageIndex+1) + " / " + imgs.length;
+      productDetailOverlay.classList.remove("hidden");
+      document.body.style.overflow = "hidden";
     }
-    function closeImageViewer(){
-      imageViewerEl.classList.add("hidden");
+
+    function closeProductDetail(){
+      productDetailOverlay.classList.add("hidden");
+      document.body.style.overflow = "";
+      detailIndex = null;
     }
-    function nextImage(){
-      viewerImageIndex++;
-      updateImageViewer();
-    }
-    function prevImage(){
-      viewerImageIndex--;
-      updateImageViewer();
-    }
-    imageViewerEl.addEventListener("click", function(){
-      closeImageViewer();
+
+    detailAddBtn.addEventListener("click", ()=>{
+      if(detailIndex === null) return;
+      addToCart(detailIndex);
     });
-    document.addEventListener("keydown", (e)=>{
-      if(e.key === "Escape"){
-        if(!imageViewerEl.classList.contains("hidden")){
-          closeImageViewer();
-        }
+
+    productDetailOverlay.addEventListener("click",(e)=>{
+      if(e.target === productDetailOverlay){
+        closeProductDetail();
       }
     });
 
-    // --- INIT ---
-    (async function init(){
-      // Kunduzgi dizayn default bo‘lsin
+    // === INIT ===
+    (function init(){
       const savedTheme = localStorage.getItem(THEME_KEY) || "light";
       applyTheme(savedTheme);
-
       isAdmin = localStorage.getItem(STORAGE_ADMIN) === "true";
       updateAdminUI();
-
-      await loadFirestoreProducts(); // Firestore’dan admin mahsulotlar
+      // Avval defaultlar
+      rebuildProducts();
       renderHistory();
+      // Keyin Firestore’dan yuklab ustiga qo‘shamiz
+      loadRemoteProducts();
     })();
 
-    // global funksiyalar
+    // === GLOBAL FUNKSIYALAR (onclick uchun) ===
     window.addToCart = addToCart;
     window.toggleCartSheet = toggleCartSheet;
     window.changeQty = changeQty;
     window.removeFromCart = removeFromCart;
     window.sendOrder = sendOrder;
-    window.addCustomProduct = addCustomProduct;
-    window.deleteAnyProduct = deleteAnyProduct;
     window.clearHistory = clearHistory;
-    window.openImageViewer = openImageViewer;
-    window.closeImageViewer = closeImageViewer;
-    window.nextImage = nextImage;
-    window.prevImage = prevImage;
+    window.openProductDetail = openProductDetail;
+    window.closeProductDetail = closeProductDetail;
+    window.deleteAnyProduct = deleteAnyProduct;
   </script>
 </body>
 </html>
