@@ -5,10 +5,8 @@
   <title>Beauty Store — Kosmetika Do‘koni</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
-
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -44,7 +42,6 @@
     }
     a{text-decoration:none;color:inherit}
     .hidden{display:none!important;}
-
     /* HEADER */
     .header{
       position:sticky;top:0;z-index:40;
@@ -152,7 +149,6 @@
       border-color:#22c55e;
       box-shadow:0 0 10px rgba(34,197,94,0.7);
     }
-
     /* TABS */
     .tabs{
       display:flex;
@@ -182,7 +178,6 @@
       font-weight:600;
       box-shadow:0 0 14px rgba(248,113,113,0.5);
     }
-
     /* HERO */
     .hero{
       padding:10px 14px 6px;
@@ -237,7 +232,6 @@
       font-size:11px;
       color:var(--muted);
     }
-
     /* SEARCH BAR */
     .search-bar{
       margin-top:10px;
@@ -266,7 +260,6 @@
     .search-bar input::placeholder{
       color:var(--muted);
     }
-
     /* FILTERS */
     .filters-wrapper{
       position:sticky;
@@ -307,7 +300,6 @@
       font-weight:600;
       box-shadow:0 0 14px rgba(248,113,113,0.4);
     }
-
     /* PRODUCTS GRID - Uzumga o‘xshash katta rasmlar */
     .products-wrap{
       padding:8px 10px 90px;
@@ -449,9 +441,9 @@
       gap:4px;
       box-shadow:0 6px 12px rgba(34,197,94,0.35);
       flex-shrink:0;
+      transition:transform .1s ease;
     }
     .btn-add:active{transform:scale(.96);}
-
     /* BOTTOM ORDER BAR */
     .cart-bar{
       position:fixed;
@@ -534,7 +526,6 @@
     .cart-main-btn > div:last-child span{
       font-size:20px;
     }
-
     /* CART SHEET */
     .sheet-overlay{
       position:fixed;
@@ -731,7 +722,6 @@
       cursor:pointer;
       font-size:16px;
     }
-
     /* TOAST */
     .toast{
       position:fixed;
@@ -758,7 +748,6 @@
       transform:translate(-50%, -2px);
       pointer-events:auto;
     }
-
     /* HISTORY PAGE */
     .page{
       padding:10px 12px 80px;
@@ -821,7 +810,6 @@
       cursor:pointer;
       margin-bottom:6px;
     }
-
     /* ADMIN PAGE */
     .admin-form{
       background:var(--card);
@@ -914,7 +902,6 @@
       cursor:pointer;
       font-size:16px;
     }
-
     /* PRODUCT DETAIL (Uzum-style full screen page) */
     .product-detail-overlay{
       position:fixed;
@@ -1010,6 +997,8 @@
       color:var(--muted);
       text-decoration:line-through;
     }
+
+    /* Add-to-cart button (detail) + ACTIVE HOLAT + ANIMATSIYA */
     .detail-add-btn{
       width:100%;
       border:none;
@@ -1025,8 +1014,22 @@
       align-items:center;
       justify-content:center;
       gap:6px;
+      transition:background .2s ease, box-shadow .2s ease, transform .2s ease;
     }
-
+    .detail-add-btn:active{
+      transform:scale(.97);
+    }
+    @keyframes btnPulse{
+      0%{transform:scale(1);}
+      50%{transform:scale(1.04);}
+      100%{transform:scale(1);}
+    }
+    .detail-add-btn.added{
+      background:linear-gradient(120deg,#f97316,#ec4899);
+      box-shadow:0 0 0 2px rgba(248,250,252,0.9),0 0 25px rgba(248,113,113,0.7);
+      color:#020617;
+      animation:btnPulse .6s ease-out;
+    }
   </style>
 </head>
 <body>
@@ -1063,7 +1066,6 @@
       <button class="tab-btn hidden" data-page="adminPage" id="adminTabBtn">Admin panel</button>
     </div>
   </header>
-
   <!-- SHOP PAGE -->
   <div id="shopPage">
     <section class="hero">
@@ -1085,14 +1087,12 @@
         Buyurtma yuborilgandan keyin faqat telefon raqamingizni yozib qoldiring —
         sotuvchi sizga tez orada qo‘ng‘iroq qiladi.
       </div>
-
       <!-- QIDIRUV -->
       <div class="search-bar">
         <span>🔍</span>
         <input id="searchInput" placeholder="Mahsulot qidirish (nomi, kategoriya, tag)..." />
       </div>
     </section>
-
     <!-- FILTERS -->
     <div class="filters-wrapper">
       <div class="filters" id="filterBar">
@@ -1105,13 +1105,11 @@
         <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
       </div>
     </div>
-
     <!-- PRODUCTS -->
     <main class="products-wrap">
       <div class="products-grid" id="productsGrid"></div>
     </main>
   </div>
-
   <!-- HISTORY PAGE -->
   <div id="historyPage" class="page hidden">
     <div class="page-title">📜 Buyurtmalar tarixi</div>
@@ -1124,7 +1122,6 @@
     </button>
     <div id="historyList"></div>
   </div>
-
   <!-- ADMIN PAGE -->
   <div id="adminPage" class="page hidden">
     <div class="page-title">🛠 Admin panel</div>
@@ -1132,7 +1129,6 @@
       Bu sahifa faqat admin uchun. Mahsulotlar Firestore’da saqlanadi, shuning uchun
       boshqa telefonlar ham bir xil katalogni ko‘radi.
     </p>
-
     <div class="admin-form">
       <h3>Yangi mahsulot qo‘shish</h3>
       <div class="form-row">
@@ -1184,14 +1180,12 @@
         Eslatma: admin qo‘shgan mahsulotlar Firestore’da saqlanadi. Hamma foydalanuvchilar bir xil katalogni ko‘rishadi.
       </p>
     </div>
-
     <div class="admin-list-title">Firestore’dagi mahsulotlar:</div>
     <div id="adminCustomList"></div>
     <p class="admin-info">
       🔴 O‘chirsangiz, hamma foydalanuvchilar uchun o‘chadi.
     </p>
   </div>
-
   <!-- BOTTOM ORDER BAR -->
   <div class="cart-bar">
     <div class="cart-bar-note">
@@ -1207,7 +1201,6 @@
       <div><span>›</span></div>
     </button>
   </div>
-
   <!-- CART SHEET -->
   <div class="sheet-overlay" id="cartSheetOverlay" onclick="toggleCartSheet(false)"></div>
   <div class="cart-sheet" id="cartSheet">
@@ -1231,7 +1224,6 @@
       </button>
     </div>
   </div>
-
   <!-- PRODUCT DETAIL OVERLAY -->
   <div id="productDetailOverlay" class="product-detail-overlay hidden">
     <div class="product-detail-card">
@@ -1256,12 +1248,10 @@
       </div>
     </div>
   </div>
-
   <!-- TOAST -->
   <div class="toast" id="toast">
     ✅ Savatga qo‘shildi
   </div>
-
   <!-- FIREBASE + APP SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -1305,7 +1295,6 @@
       "tana":"🛁",
       "default":"💅"
     };
-
     const categoryLabel = {
       "pomada":"Pomada / lab uchun",
       "krem":"Krem / yuz uchun",
@@ -1443,13 +1432,11 @@
     function formatPrice(v){
       return v.toLocaleString("uz-UZ");
     }
-
     function showToast(message){
       toastEl.textContent = message;
       toastEl.classList.add("show");
       setTimeout(()=> toastEl.classList.remove("show"), 1100);
     }
-
     function normalizeImagesInput(raw) {
       if (!raw) return [];
       return raw
@@ -1464,7 +1451,6 @@
           return RAW_PREFIX + name + ".png";
         });
     }
-
     function setImageWithPngJpgFallback(imgElement, url) {
       if (!url) {
         imgElement.onerror = null;
@@ -1483,7 +1469,6 @@
         imgElement.src = url;
       }
     }
-
     function matchesSearch(p){
       if(!currentSearch) return true;
       const q = currentSearch;
@@ -1511,7 +1496,8 @@
             emoji: data.emoji || categoryEmoji[data.category] || categoryEmoji.default,
             tag: data.tag || "",
             description: data.description || "",
-            images: Array.isArray(data.images) ? data.images : []
+            images: Array.isArray(data.images) ? data.images : [],
+            createdAt: data.createdAt || null
           });
         });
         remoteProducts = list;
@@ -1546,7 +1532,6 @@
           : null;
         const tag = p.tag || "Ommabop mahsulot";
         const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
-
         let imgHtml;
         if (firstImage.startsWith(RAW_PREFIX)) {
           const base = firstImage.replace(/\.(png|jpg|jpeg)$/i, "");
@@ -1554,7 +1539,6 @@
         } else {
           imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
         }
-
         productsGrid.innerHTML += `
           <article class="product-card" onclick="openProductDetail(${index})">
             <div class="product-img-wrap">
@@ -1604,7 +1588,7 @@
     });
 
     // === SAVAT FUNKSIYALARI ===
-    function addToCart(index){
+    function addToCart(index, fromDetail = false){
       const found = cart.find(c => c.index === index);
       if(found){
         found.qty += 1;
@@ -1612,7 +1596,13 @@
         cart.push({index, qty:1});
       }
       updateCartUI();
-      showToast("✅ Savatga qo‘shildi");
+
+      // Qayerdan keldi – shunga qarab xabar
+      if(fromDetail){
+        showToast("✅ Savatga qo‘shildi. Yana mahsulot tanlaysizmi?");
+      }else{
+        showToast("✅ Savatga qo‘shildi");
+      }
     }
 
     function updateCartUI(){
@@ -1894,22 +1884,25 @@
       const discountPriceRaw = adminPriceDiscountEl.value ? parseInt(adminPriceDiscountEl.value, 10) : null;
       const tag = adminTagEl.value.trim();
       const description = adminDescriptionEl.value.trim();
+
       if(!name || !basePrice || basePrice <= 0){
         alert("Mahsulot nomi va asosiy narxini to‘g‘ri kiriting.");
         return;
       }
+
       let price = basePrice;
       let oldPrice = null;
       if(hasDiscount && discountPriceRaw && discountPriceRaw > 0 && discountPriceRaw < basePrice){
         price = discountPriceRaw;
         oldPrice = basePrice;
       }
+
       let images = normalizeImagesInput(adminImagesEl.value.trim());
       if(!images.length){
         images = [RAW_PREFIX + "noimage.png"];
       }
-      const emoji = categoryEmoji[category] || categoryEmoji.default;
 
+      const emoji = categoryEmoji[category] || categoryEmoji.default;
       const payload = {
         name,
         price,
@@ -1984,10 +1977,11 @@
       const p = products[index];
       if(!p) return;
       detailIndex = index;
+
       const catLabel = categoryLabel[p.category] || p.category;
       const img = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
-
       setImageWithPngJpgFallback(detailImageEl, img);
+
       detailCategoryEl.textContent = catLabel;
       detailNameEl.textContent = p.name;
       detailTagEl.textContent = p.tag ? "💡 " + p.tag : "";
@@ -1995,6 +1989,7 @@
         p.description && p.description.trim().length
           ? p.description
           : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan. Admin paneldan batafsil tavsif yozib qo‘yishingiz mumkin.";
+
       detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
       if(p.oldPrice){
         detailOldPriceEl.textContent = formatPrice(p.oldPrice) + " so‘m";
@@ -2002,6 +1997,11 @@
       }else{
         detailOldPriceEl.classList.add("hidden");
       }
+
+      // detail tugmasini default holatga qaytarib qo‘yamiz
+      detailAddBtn.classList.remove("added");
+      detailAddBtn.textContent = "🛒 Savatga qo‘shish";
+
       productDetailOverlay.classList.remove("hidden");
       document.body.style.overflow = "hidden";
     }
@@ -2012,9 +2012,19 @@
       detailIndex = null;
     }
 
+    // DETAIL BUTTON CLICK — bu yerda maxsus animatsiya + savol
     detailAddBtn.addEventListener("click", ()=>{
       if(detailIndex === null) return;
-      addToCart(detailIndex);
+      addToCart(detailIndex, true); // fromDetail = true
+
+      detailAddBtn.classList.add("added");
+      detailAddBtn.textContent = "✅ Savatga qo‘shildi";
+
+      setTimeout(()=>{
+        detailAddBtn.classList.remove("added");
+        detailAddBtn.textContent = "🛒 Yana mahsulot tanlaysizmi?";
+      }, 650);
+      // agar keyin yana bosilsa, yana savatga qo‘shaveradi
     });
 
     productDetailOverlay.addEventListener("click",(e)=>{
