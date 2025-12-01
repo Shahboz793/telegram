@@ -842,6 +842,7 @@
       font-weight:600;
       cursor:pointer;
       margin-top:4px;
+      transition:0.2s ease;
     }
     .admin-info{
       font-size:10px;
@@ -858,7 +859,7 @@
       padding:5px 0;
       border-bottom:1px dashed rgba(75,85,99,0.6);
       display:flex;
-      justify-content:space-between;
+      justify-content:flex-start;
       align-items:center;
       gap:6px;
     }
@@ -871,6 +872,19 @@
       color:var(--danger);
       cursor:pointer;
       font-size:16px;
+    }
+    /* Yangi: admin tahrirlash tugmasi */
+    .admin-edit-btn{
+      border:none;
+      background:transparent;
+      cursor:pointer;
+      font-size:16px;
+      color:#16a34a;
+    }
+    /* Yangi: mahsulot qo‘shilganda/tahrirlanganda tugma rangi o‘zgarishi */
+    .admin-btn-success{
+      background:linear-gradient(120deg,#4ade80,#22c55e);
+      box-shadow:0 0 0 1px rgba(34,197,94,0.7);
     }
     /* PRODUCT DETAIL */
     .product-detail-overlay{
@@ -1111,7 +1125,7 @@
       boshqa telefonlar ham bir xil katalogni ko‘radi.
     </p>
     <div class="admin-form">
-      <h3>Yangi mahsulot qo‘shish</h3>
+      <h3>Yangi mahsulot qo‘shish / tahrirlash</h3>
       <div class="form-row">
         <label>Mahsulot nomi</label>
         <input id="adminName" placeholder="Masalan: Luxury Lipstick Pink" />
@@ -1254,6 +1268,8 @@
       deleteDoc,
       doc,
       serverTimestamp,
+      getDoc,
+      updateDoc,
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
     // === SENING WEB APP KONFIGING (kosmetika) ===
@@ -1273,7 +1289,6 @@
 
     // === KONSTANTALAR (LOCAL STORAGE) ===
     const STORAGE_HISTORY = "beauty_order_history";
-    const STORAGE_ADMIN = "beauty_admin";
     const THEME_KEY = "beauty_theme";
     const RAW_PREFIX = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
     const categoryEmoji = {
@@ -1378,6 +1393,7 @@
     let currentSearch = "";
     let isAdmin = false;
     let detailIndex = null;
+    let editingProductId = null;
 
     // === DOM ===
     const productsGrid = document.getElementById("productsGrid");
@@ -1487,7 +1503,8 @@
             emoji: data.emoji || categoryEmoji[data.category] || categoryEmoji.default,
             tag: data.tag || "",
             description: data.description || "",
-            images: Array.isArray(data.images) ? data.images : []
+            images: Array.isArray(data.images) ? data.images : [],
+            createdAt: data.createdAt || null
           });
         });
         remoteProducts = list;
@@ -1823,7 +1840,7 @@
       }
     });
 
-    // === ADMIN LOGIN ===
+    // === ADMIN UI ===
     function updateAdminUI(){
       if(isAdmin){
         adminTabBtn.classList.remove("hidden");
@@ -1836,7 +1853,8 @@
       }
     }
 
-    function askAdminCode(){
+    // === ADMIN LOGIN — FIRESTORE DAGI KOD BILAN ===
+    async function askAdminCode(){
       if(isAdmin){
         document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
         adminTabBtn.classList.add("active");
@@ -1848,18 +1866,54 @@
       }
       const code = prompt("Admin uchun kirish kodi:");
       if(code === null) return;
-      if(code === "12345678"){
-        isAdmin = true;
-        localStorage.setItem(STORAGE_ADMIN, "true");
-        updateAdminUI();
-        showToast("✅ Admin sifatida kirdingiz");
-      }else{
-        showToast("❌ Noto‘g‘ri kod");
+
+      try{
+        const settingsRef = doc(db, "beauty_admin_settings", "security");
+        const snap = await getDoc(settingsRef);
+
+        if(!snap.exists()){
+          showToast("⚠️ Admin kodi Firestore’da hali sozlanmagan.");
+          return;
+        }
+
+        const data = snap.data();
+        const realCode = String(data.adminCode || data.code || "").trim();
+
+        if(!realCode){
+          showToast("⚠️ Admin kodi noto‘g‘ri sozlangan.");
+          return;
+        }
+
+        if(code === realCode){
+          isAdmin = true; // faqat seans davomida
+          updateAdminUI();
+          showToast("✅ Admin sifatida kirdingiz");
+        }else{
+          showToast("❌ Noto‘g‘ri kod");
+        }
+      }catch(e){
+        console.error("Admin kodni tekshirishda xato:", e);
+        showToast("⚠️ Admin kodi tekshiruvida xato: " + (e.message || ""));
       }
     }
     adminAccessBtn.addEventListener("click", askAdminCode);
 
-    // === ADMIN: FIRESTORE'GA MAHSULOT QO‘SHISH ===
+    // === ADMIN HELPER: TUGMANI "FLASH" QILISH ===
+    function flashAdminButton(text){
+      const btn = document.querySelector(".admin-btn");
+      if(!btn) return;
+      const originalText = btn.textContent;
+      btn.textContent = text;
+      btn.classList.add("admin-btn-success");
+      setTimeout(()=>{
+        btn.classList.remove("admin-btn-success");
+        btn.textContent = editingProductId
+          ? "💾 Mahsulotni saqlash (tahrirlash)"
+          : "➕ Mahsulotni qo‘shish (Firestore)";
+      }, 1500);
+    }
+
+    // === ADMIN: FIRESTORE'GA MAHSULOT QO‘SHISH / TAHRIRLASH ===
     async function addCustomProduct(){
       const name = adminNameEl.value.trim();
       const category = adminCategoryEl.value;
@@ -1896,19 +1950,47 @@
         tag,
         description,
         images,
-        createdAt: serverTimestamp()
       };
 
       try{
-        const docRef = await addDoc(productsCol, payload);
-        remoteProducts.push({
-          ...payload,
-          id: docRef.id,
-          fromFirebase:true
-        });
-        rebuildProducts();
-        renderAdminCustomList();
+        if(editingProductId){
+          // Tahrirlash
+          await updateDoc(doc(db,"beauty_products",editingProductId), {
+            ...payload,
+            updatedAt: serverTimestamp()
+          });
 
+          remoteProducts = remoteProducts.map(p =>
+            p.id === editingProductId ? { ...p, ...payload } : p
+          );
+
+          rebuildProducts();
+          renderAdminCustomList();
+          showToast("✅ Mahsulot yangilandi");
+          flashAdminButton("✅ Yangilandi");
+
+        }else{
+          // Yangi mahsulot qo‘shish
+          const docRef = await addDoc(productsCol, {
+            ...payload,
+            createdAt: serverTimestamp()
+          });
+
+          remoteProducts.push({
+            ...payload,
+            id: docRef.id,
+            fromFirebase:true,
+            createdAt: { seconds: Date.now()/1000 }
+          });
+
+          rebuildProducts();
+          renderAdminCustomList();
+          showToast("✅ Mahsulot qo‘shildi va katalogda ko‘rinmoqda");
+          flashAdminButton("✅ Mahsulot qo‘shildi");
+        }
+
+        // Formani tozalaymiz
+        editingProductId = null;
         adminNameEl.value = "";
         adminPriceBaseEl.value = "";
         adminPriceDiscountEl.value = "";
@@ -1917,10 +1999,9 @@
         adminDescriptionEl.value = "";
         adminImagesEl.value = "";
 
-        showToast("✅ Mahsulot qo‘shildi va katalogda ko‘rinmoqda");
       }catch(e){
-        console.error("Mahsulot qo‘shishda xato:", e);
-        showToast("❌ Xatolik: " + (e.message || "Firestore’ga yozishda xato"));
+        console.error("Mahsulot yozishda/tahrirlashda xato:", e);
+        showToast("❌ Xatolik: " + (e.message || "Firestore bilan ishlashda xato"));
       }
     }
 
@@ -1952,10 +2033,42 @@
             <div class="admin-product-row">
               <span>${p.name}</span>
               <span>${formatPrice(p.price)} so‘m</span>
+              <button class="admin-edit-btn" onclick="editProduct('${p.id}')">✏️</button>
               <button class="admin-delete-btn" onclick="deleteAnyProduct('${p.id}')">✕</button>
             </div>
           `;
         });
+    }
+
+    function editProduct(id){
+      const p = remoteProducts.find(r => r.id === id);
+      if(!p) return;
+
+      editingProductId = id;
+
+      adminNameEl.value = p.name || "";
+      adminCategoryEl.value = p.category || "pomada";
+
+      if(p.oldPrice && p.oldPrice > p.price){
+        adminPriceBaseEl.value = p.oldPrice;
+        adminPriceDiscountEl.value = p.price;
+        adminHasDiscountEl.checked = true;
+      }else{
+        adminPriceBaseEl.value = p.price;
+        adminPriceDiscountEl.value = "";
+        adminHasDiscountEl.checked = false;
+      }
+
+      adminTagEl.value = p.tag || "";
+      adminDescriptionEl.value = p.description || "";
+      adminImagesEl.value = (p.images && p.images.length) ? p.images.join(", ") : "";
+
+      const btn = document.querySelector(".admin-btn");
+      if(btn){
+        btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
+      }
+
+      showToast("✏️ Tahrirlash rejimi: formani o‘zgartirib, saqlang");
     }
 
     // === PRODUCT DETAIL ===
@@ -2015,7 +2128,7 @@
     (function init(){
       const savedTheme = localStorage.getItem(THEME_KEY) || "light";
       applyTheme(savedTheme);
-      isAdmin = localStorage.getItem(STORAGE_ADMIN) === "true";
+      isAdmin = false;
       updateAdminUI();
       rebuildProducts();
       renderHistory();
@@ -2032,6 +2145,7 @@
     window.openProductDetail = openProductDetail;
     window.closeProductDetail = closeProductDetail;
     window.deleteAnyProduct = deleteAnyProduct;
+    window.editProduct = editProduct;
 
   </script>
 </body>
