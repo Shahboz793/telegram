@@ -1,19 +1,7 @@
-/* =========================================
-   GLOBAL RESET
-========================================= */
 *{
   box-sizing:border-box;
   margin:0;
   padding:0;
-}
-
-html,body{
-  max-width:100%;
-  overflow-x:hidden;
-  /* Telegram WebApp + mobil scroll */
-  -webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;
-  overscroll-behavior-y:none;
 }
 
 /* =========================================
@@ -31,11 +19,14 @@ html,body{
   --border-soft:rgba(148,163,184,0.7);
   --danger:#dc2626;
 
-  /* radius va shadowlar */
-  --radius-lg:18px;
-  --radius-xl:22px;
-  --shadow-soft:0 10px 22px rgba(15,23,42,0.08);
-  --shadow-strong:0 18px 32px rgba(15,23,42,0.20);
+  /* 🔥 Yangi: yumshoq radius va shadow */
+  --radius-xl:18px;
+  --radius-2xl:22px;
+  --shadow-soft:0 10px 22px rgba(15,23,42,0.10);
+  --shadow-strong:0 18px 40px rgba(15,23,42,0.25);
+
+  /* Telegram / iOS safe area */
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
 }
 body.theme-dark{
   --bg:#050816;
@@ -50,29 +41,20 @@ body.theme-dark{
   --danger:#ef4444;
 }
 
-/* safe-area (iPhone, Telegram) */
+/* 🔥 Yangi: silliq animatsiyalar uchun */
+html{
+  scroll-behavior:smooth;
+}
+
 body{
   font-family:"Poppins",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:var(--bg);
   color:var(--text);
   min-height:100vh;
-  padding-bottom:calc(100px + env(safe-area-inset-bottom, 0px));
+  padding-bottom:calc(120px + var(--safe-bottom)); /* 🧷 Telegram WebApp uchun */
+  -webkit-tap-highlight-color:transparent; /* Mobil klik rangini o‘chiradi */
 }
-
-/* agar Telegram WebApp bo‘lsa, animatsiya juda tez bo‘lmasin */
-@media (prefers-reduced-motion: reduce){
-  *{
-    scroll-behavior:auto!important;
-    animation-duration:0.01ms!important;
-    animation-iteration-count:1!important;
-    transition-duration:0.01ms!important;
-  }
-}
-
 a{text-decoration:none;color:inherit}
-button,input,textarea,select{
-  font-family:inherit;
-}
 .hidden{display:none!important;}
 
 /* =========================================
@@ -83,13 +65,25 @@ button,input,textarea,select{
   top:0;
   z-index:40;
   backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  background:linear-gradient(90deg,rgba(249,250,251,0.98),rgba(229,231,235,0.96));
+  background:linear-gradient(90deg,rgba(249,250,251,0.98),rgba(229,231,235,0.98));
   border-bottom:1px solid var(--border-soft);
   padding:8px 10px 4px;
 }
+
+/* 🔥 Yangi: header pastida chiziqsimon shadow */
+.header::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-1px;
+  height:10px;
+  pointer-events:none;
+  background:linear-gradient(to bottom,rgba(15,23,42,0.13),transparent);
+}
+
 body.theme-dark .header{
-  background:linear-gradient(90deg,rgba(15,23,42,0.96),rgba(24,24,27,0.94));
+  background:linear-gradient(90deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
 }
 
 .header-row{
@@ -98,13 +92,13 @@ body.theme-dark .header{
   justify-content:space-between;
   gap:8px;
 }
-
-/* LOGO */
 .logo-wrap{
   display:flex;
   align-items:center;
   gap:8px;
 }
+
+/* 🔥 Yangi: engil pulsing glow */
 .logo-circle{
   width:38px;
   height:38px;
@@ -114,6 +108,15 @@ body.theme-dark .header{
   align-items:center;
   justify-content:center;
   box-shadow:0 0 18px rgba(248,113,113,0.6);
+  position:relative;
+  overflow:hidden;
+}
+.logo-circle::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:inherit;
+  background:radial-gradient(circle at 30% 0,rgba(255,255,255,0.75),transparent 60%);
 }
 .logo-circle span{
   background:#020617;
@@ -130,14 +133,18 @@ body.theme-dark .header{
 }
 .logo-text strong{font-size:16px;}
 .logo-text small{font-size:11px;color:var(--muted);}
-
-/* HEADER RIGHT */
 .header-right{
   display:flex;
   align-items:center;
   gap:6px;
 }
 
+/* 🔥 Yangi: umumiy button-style */
+button{
+  font-family:inherit;
+}
+
+/* Theme tugma */
 .theme-toggle{
   border:none;
   border-radius:999px;
@@ -149,17 +156,17 @@ body.theme-dark .header{
   display:flex;
   align-items:center;
   gap:4px;
-  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+  transition:background .16s ease, transform .12s ease, box-shadow .16s ease;
 }
 body.theme-dark .theme-toggle{
   background:rgba(15,23,42,0.9);
   color:#e5e7eb;
 }
 .theme-toggle:active{
-  transform:scale(.94);
-  box-shadow:0 0 0 1px rgba(148,163,184,0.4);
+  transform:scale(.92) translateY(1px);
 }
 
+/* Savat tugmasi */
 .cart-icon-btn{
   border:none;
   border-radius:999px;
@@ -172,12 +179,13 @@ body.theme-dark .theme-toggle{
   color:#022c22;
   box-shadow:0 6px 16px rgba(34,197,94,0.55);
   font-size:13px;
-  transition:transform .12s ease, box-shadow .12s ease;
+  transition:transform .12s ease, box-shadow .16s ease;
 }
 .cart-icon-btn:active{
-  transform:scale(.95);
-  box-shadow:0 3px 10px rgba(34,197,94,0.6);
+  transform:scale(.95) translateY(1px);
+  box-shadow:0 2px 8px rgba(22,163,74,0.6);
 }
+
 .cart-icon-left{font-size:20px;}
 .cart-icon-info{
   display:flex;
@@ -188,6 +196,7 @@ body.theme-dark .theme-toggle{
 .cart-icon-info strong{font-size:13px;}
 .cart-icon-info small{font-size:11px;opacity:.9;}
 
+/* Admin tugma */
 .admin-access{
   border-radius:999px;
   border:1px solid var(--border-soft);
@@ -196,14 +205,14 @@ body.theme-dark .theme-toggle{
   font-size:11px;
   padding:6px 9px;
   cursor:pointer;
-  transition:background .12s ease, transform .12s ease, box-shadow .12s ease;
+  transition:background .14s ease, box-shadow .14s ease, transform .1s ease;
 }
 body.theme-dark .admin-access{
   background:rgba(15,23,42,0.85);
   color:#e5e7eb;
 }
 .admin-access:active{
-  transform:scale(.96);
+  transform:scale(.96) translateY(1px);
 }
 .admin-access.admin-active{
   border-color:#22c55e;
@@ -229,7 +238,7 @@ body.theme-dark .admin-access{
   color:#111827;
   border:1px solid var(--border-soft);
   font-size:12px;
-  transition:background .12s ease, transform .12s ease, box-shadow .12s ease;
+  transition:background .18s ease, transform .12s ease, box-shadow .18s ease;
 }
 body.theme-dark .tab-btn{
   background:rgba(15,23,42,0.85);
@@ -243,11 +252,11 @@ body.theme-dark .tab-btn{
   box-shadow:0 0 14px rgba(248,113,113,0.5);
 }
 .tab-btn:active{
-  transform:scale(.97);
+  transform:scale(.96);
 }
 
 /* =========================================
-   HERO (sarlavha + qidiruv)
+   HERO
 ========================================= */
 .hero{
   padding:10px 14px 6px;
@@ -315,10 +324,11 @@ body.theme-dark .badge{
   border-radius:999px;
   border:1px solid var(--border-soft);
   padding:4px 10px;
-  box-shadow:0 6px 14px rgba(148,163,184,0.18);
+  box-shadow:0 6px 14px rgba(148,163,184,0.24);
 }
 body.theme-dark .search-bar{
   background:rgba(15,23,42,0.9);
+  box-shadow:0 8px 18px rgba(0,0,0,0.7);
 }
 .search-bar span{font-size:16px;}
 .search-bar input{
@@ -332,7 +342,7 @@ body.theme-dark .search-bar{
 .search-bar input::placeholder{color:var(--muted);}
 
 /* =========================================
-   FILTERLAR (KATEGORIYALAR)
+   FILTERLAR
 ========================================= */
 .filters-wrapper{
   position:sticky;
@@ -376,7 +386,7 @@ body.theme-dark .chip{
   box-shadow:0 0 14px rgba(248,113,113,0.4);
 }
 .chip:active{
-  transform:scale(.96);
+  transform:scale(.94);
 }
 
 /* =========================================
@@ -401,28 +411,29 @@ body.theme-dark .chip{
     grid-template-columns:repeat(3,minmax(0,1fr));
   }
 }
+
+/* 🔥 Yangi: card hover/press animatsiya */
 .product-card{
   background:var(--card);
-  border-radius:var(--radius-lg);
+  border-radius:var(--radius-xl);
   border:1px solid rgba(148,163,184,0.7);
   overflow:hidden;
   box-shadow:var(--shadow-soft);
   cursor:pointer;
   display:flex;
   flex-direction:column;
-  transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  transition:transform .16s ease, box-shadow .18s ease, border-color .16s ease;
 }
 body.theme-dark .product-card{
-  background:radial-gradient(circle at top,var(--card),#020617);
+  background:linear-gradient(145deg,#020617,var(--card));
   border-color:rgba(31,41,55,0.9);
   box-shadow:0 10px 22px rgba(0,0,0,0.7);
 }
 .product-card:active{
-  transform:scale(.97);
-  box-shadow:0 6px 16px rgba(15,23,42,0.45);
+  transform:scale(.97) translateY(1px);
+  box-shadow:0 4px 10px rgba(15,23,42,0.45);
 }
 
-/* Rasm */
 .product-img-wrap{
   position:relative;
   width:100%;
@@ -437,6 +448,10 @@ body.theme-dark .product-card{
   height:100%;
   object-fit:cover;
   display:block;
+  transition:transform .25s ease;
+}
+.product-card:hover .product-img-wrap img{
+  transform:scale(1.03);
 }
 .product-img-tag{
   position:absolute;
@@ -463,8 +478,6 @@ body.theme-dark .product-card{
   font-weight:700;
   color:#111827;
 }
-
-/* Product body */
 .product-body{
   padding:8px 9px 10px;
   display:flex;
@@ -518,8 +531,6 @@ body.theme-dark .tag-mini{
   color:var(--muted);
   text-decoration:line-through;
 }
-
-/* Savatga qo‘shish tugmasi */
 .btn-add{
   border:none;
   border-radius:999px;
@@ -534,11 +545,11 @@ body.theme-dark .tag-mini{
   gap:4px;
   box-shadow:0 6px 12px rgba(34,197,94,0.35);
   flex-shrink:0;
-  transition:transform .12s ease, box-shadow .12s ease;
+  transition:transform .12s ease, box-shadow .16s ease;
 }
 .btn-add:active{
-  transform:scale(.95);
-  box-shadow:0 4px 9px rgba(34,197,94,0.5);
+  transform:scale(.94) translateY(1px);
+  box-shadow:0 2px 6px rgba(22,163,74,0.55);
 }
 
 /* =========================================
@@ -548,18 +559,17 @@ body.theme-dark .tag-mini{
   position:fixed;
   left:10px;
   right:10px;
-  bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  bottom:calc(24px + var(--safe-bottom)); /* 📱 pastki panel bilan urishmaydi */
   background:linear-gradient(135deg,rgba(249,250,251,0.98),rgba(229,231,235,0.98));
-  border-radius:var(--radius-xl);
+  border-radius:var(--radius-2xl);
   border:1px solid rgba(148,163,184,0.65);
   padding:8px 12px 10px;
   z-index:35;
   box-shadow:0 16px 32px rgba(148,163,184,0.7),0 0 0 1px rgba(209,213,219,0.8);
   backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
 }
 body.theme-dark .cart-bar{
-  background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(24,24,27,0.92));
+  background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
   box-shadow:0 18px 40px rgba(0,0,0,0.8),0 0 0 1px rgba(15,23,42,0.8);
 }
 .cart-bar-note{
@@ -589,11 +599,11 @@ body.theme-dark .cart-bar{
   gap:10px;
   cursor:pointer;
   box-shadow:0 14px 32px rgba(236,72,153,0.85),0 0 0 1px rgba(248,250,252,0.6);
-  transition:transform .12s ease, box-shadow .12s ease;
+  transition:transform .14s ease, box-shadow .18s ease;
 }
 .cart-main-btn:active{
-  transform:scale(.97);
-  box-shadow:0 8px 20px rgba(236,72,153,0.9);
+  transform:scale(.97) translateY(1px);
+  box-shadow:0 8px 16px rgba(190,24,93,0.75);
 }
 .cart-main-btn > div:first-child{
   display:flex;
@@ -641,11 +651,12 @@ body.theme-dark .cart-bar{
   border-top:1px solid var(--border-soft);
   max-height:75vh;
   transform:translateY(100%);
-  transition:transform .25s ease-out;
+  transition:transform .25s ease;
   z-index:37;
   display:flex;
   flex-direction:column;
   box-shadow:0 -18px 30px rgba(148,163,184,0.8);
+  padding-bottom:var(--safe-bottom);
 }
 body.theme-dark .cart-sheet{
   background:radial-gradient(circle at top,#020617,#0b1021);
@@ -732,11 +743,11 @@ body.theme-dark .cart-sheet-footer{
   box-shadow:0 12px 28px rgba(34,197,94,0.65),0 0 0 1px rgba(240,253,250,0.8);
   letter-spacing:0.02em;
   text-transform:uppercase;
-  transition:transform .12s ease, box-shadow .12s ease;
+  transition:transform .14s ease, box-shadow .18s ease;
 }
 .cart-sheet-btn:active{
-  transform:scale(.97);
-  box-shadow:0 8px 18px rgba(34,197,94,0.8);
+  transform:scale(.97) translateY(1px);
+  box-shadow:0 8px 16px rgba(22,163,74,0.6);
 }
 .cart-empty{
   font-size:11px;
@@ -811,7 +822,7 @@ body.theme-dark .qty-control button{
   position:fixed;
   left:50%;
   transform:translateX(-50%);
-  bottom:calc(95px + env(safe-area-inset-bottom, 0px));
+  bottom:calc(95px + var(--safe-bottom));
   background:rgba(15,23,42,0.98);
   border-radius:999px;
   padding:6px 12px;
@@ -963,7 +974,7 @@ body.theme-dark .form-row select{
   transition:0.2s ease;
 }
 .admin-btn:active{
-  transform:scale(.97);
+  transform:scale(.96) translateY(1px);
 }
 .admin-info{
   font-size:10px;
@@ -1068,7 +1079,6 @@ body.theme-dark .form-row select{
   align-items:center;
   justify-content:center;
   backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
 }
 .detail-gallery-btn.left{left:8px;}
 .detail-gallery-btn.right{right:8px;}
@@ -1211,6 +1221,11 @@ body.theme-dark .detail-qty-controls button{
   box-shadow:0 12px 26px rgba(34,197,94,0.9);
   transform:translateY(-1px);
 }
+.detail-add-btn:active{
+  transform:scale(.97) translateY(1px);
+}
+
+/* 5 soniyali qaytish tugmasi */
 .detail-back-btn{
   width:100%;
   border:none;
