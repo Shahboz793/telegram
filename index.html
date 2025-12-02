@@ -25,6 +25,7 @@
           <small>Premium kosmetika do‘koni</small>
         </div>
       </div>
+
       <div class="header-right">
         <button class="theme-toggle" id="themeToggleBtn" type="button">🌙</button>
 
@@ -52,7 +53,7 @@
 
   <!-- SHOP PAGE -->
   <div id="shopPage">
-    <!-- SODDALASHTIRILGAN QISM: FAQAT QIDIRUV -->
+    <!-- SODDALAШGAN QISM: FAQAT QIDIRUV -->
     <section class="hero">
       <div class="search-bar">
         <span>🔍</span>
@@ -63,12 +64,9 @@
     <!-- KATALOGLAR (KATEGORIYALAR) — DOIM OCHIQ -->
     <div class="filters-wrapper">
       <div class="filters" id="filterBar">
-        <!-- JS orqali to‘ldiriladi:
-             ⭐ Barchasi
-             💄 Pomada
-             🧴 Kremlar
-             🌸 Parfyum
-             🛁 Tana va hokazo -->
+        <!-- Kategoriyalarni JS (app.js) dinamik to'ldiradi.
+             Firestore’da beauty_categories bo‘lmasa,
+             pomada / krem / parfyum / tana default bo‘ladi. -->
       </div>
     </div>
 
@@ -95,8 +93,8 @@
   <div id="adminPage" class="page hidden">
     <div class="page-title">🛠 Admin panel</div>
     <p class="page-sub">
-      Bu sahifa faqat admin uchun. Mahsulotlar Firestore’da saqlanadi, shuning uchun
-      boshqa telefonlar ham bir xil katalogni ko‘radi.
+      Bu sahifa faqat admin uchun. Mahsulotlar va kategoriyalar Firestore’da saqlanadi,
+      shuning uchun boshqa telefonlar ham bir xil katalogni ko‘radi.
     </p>
 
     <!-- MAHSULOT QO‘SHISH / TAHRIRLASH -->
@@ -110,7 +108,7 @@
 
       <div class="form-row">
         <label>Kategoriya</label>
-        <!-- options’lar JS orqali kategoriyalardan to‘ldiriladi -->
+        <!-- variantlar app.js ichida Firestore kategoriyalaridan to'ldiriladi -->
         <select id="adminCategory"></select>
       </div>
 
@@ -141,7 +139,7 @@
 
       <div class="form-row">
         <label>
-          Rasm nomi yoki URL
+          Rasm nomi yoki URL  
           <small>(masalan: <b>olma</b> → images/olma.png yoki to‘liq https://...)</small>
         </label>
         <input id="adminImages" placeholder="olma yoki https://..., vergul bilan bir nechta yozish mumkin" />
@@ -154,57 +152,50 @@
       <p class="admin-info">
         Eslatma: admin qo‘shgan mahsulotlar Firestore’da saqlanadi. Hamma foydalanuvchilar bir xil katalogni ko‘rishadi.
       </p>
-
-      <p class="admin-info">
-        Agar mijoz ma'lumotlarini (ism, telefon, manzil) yangilamoqchi bo‘lsangiz,
-        <button type="button" class="link-btn" onclick="resetCustomerInfo()">mijoz ma'lumotlarini tozalash</button>
-        tugmasidan foydalanishingiz mumkin.
-      </p>
     </div>
 
-    <!-- FIRESTORE’DAGI MAHSULOTLAR RO‘YXATI -->
     <div class="admin-list-title">Firestore’dagi mahsulotlar:</div>
     <div id="adminCustomList"></div>
     <p class="admin-info">
       🔴 O‘chirsangiz, hamma foydalanuvchilar uchun o‘chadi.
     </p>
 
-    <!-- 🆕 KATEGORIYA QO‘SHISH / TAHRIRLASH -->
-    <div class="admin-form admin-category-box">
+    <hr class="admin-separator" />
+
+    <!-- 🆕 KATEGORIYA QO‘SHISH / TAHRIRLASH BLOKI -->
+    <div class="admin-form">
       <h3>Kategoriya qo‘shish / tahrirlash</h3>
 
       <div class="form-row">
         <label>Kategoriya kodi (lotincha, kichik harf)</label>
-        <input id="adminCatCode" placeholder="Masalan: pomada, krem, parfyum, tana..." />
+        <input id="adminCatCode" placeholder="Masalan: pomada, krem, parfyum..." />
       </div>
 
       <div class="form-row">
         <label>Kategoriya nomi (ekranda ko‘rinadigan)</label>
-        <input id="adminCatLabel" placeholder="Masalan: Pomadalar, Kremlar, Parfyumlar, Tana parvarishi..." />
+        <input id="adminCatLabel" placeholder="Masalan: Pomada / lab uchun" />
       </div>
 
       <div class="form-row">
         <label>Emoji (ixtiyoriy)</label>
-        <input id="adminCatEmoji" placeholder="Masalan: 💄 yoki 🧴 yoki 🌸" />
+        <input id="adminCatEmoji" placeholder="Masalan: 💄 yoki 🌸" />
       </div>
 
-      <button class="admin-btn admin-btn-secondary" type="button" onclick="saveCategory()">
+      <button class="admin-btn" type="button" onclick="saveCategory()">
         ✅ Kategoriyani saqlash
       </button>
 
       <p class="admin-info">
-        Masalan, ichida 4 ta katalog bo‘lishini xohlasangiz, quyidagi kodlarni qo‘shasiz:
-        <b>pomada</b>, <b>krem</b>, <b>parfyum</b>, <b>tana</b>. Keyin mahsulot qo‘shayotganda
-        aynan shu kodlardan birini tanlaysiz.
-      </p>
-
-      <div class="admin-list-title">Kategoriyalar ro‘yxati:</div>
-      <div id="adminCategoryList"></div>
-
-      <p class="admin-info">
-        🔴 Kategoriyani o‘chirsangiz, shu kod bilan bog‘langan mahsulotlar filtrda ko‘rinmasligi mumkin.
+        Masalan, 4 ta katalog qilish uchun: <b>pomada</b>, <b>krem</b>, <b>parfyum</b>, <b>tana</b>
+        kabi kategoriyalarni qo‘shasiz. Keyin mahsulot qo‘shayotganda shu kodlardan birini tanlaysiz.
       </p>
     </div>
+
+    <div class="admin-list-title">Kategoriyalar ro‘yxati:</div>
+    <div id="adminCategoryList"></div>
+    <p class="admin-info">
+      🔴 Kategoriyani o‘chirsangiz, shu kategoriya bilan bog‘langan mahsulotlar filtrlashda topilmay qolishi mumkin.
+    </p>
   </div>
 
   <!-- BOTTOM ORDER BAR -->
@@ -247,16 +238,14 @@
     </div>
   </div>
 
-  <!-- PRODUCT DETAIL OVERLAY (UZUM STYLE) -->
+  <!-- PRODUCT DETAIL OVERLAY -->
   <div id="productDetailOverlay" class="product-detail-overlay hidden">
     <div class="product-detail-card">
       <div class="product-detail-header">
         <div class="product-detail-image-wrap">
-          <!-- Galereya tugmalari -->
           <button id="detailPrevBtn" class="detail-gallery-btn left" type="button">‹</button>
           <img id="detailImage" src="" alt="Mahsulot rasmi" />
           <button id="detailNextBtn" class="detail-gallery-btn right" type="button">›</button>
-          <!-- Rasm raqami: 1 / N -->
           <div id="detailImageIndex" class="detail-image-index">1 / 1</div>
         </div>
         <button class="product-detail-close" type="button" onclick="closeProductDetail()">✕</button>
@@ -273,7 +262,6 @@
           <span id="detailOldPrice" class="detail-price-old hidden"></span>
         </div>
 
-        <!-- Miqdor (qty) Uzum uslubida -->
         <div class="detail-qty-row">
           <span>Miqdor:</span>
           <div class="detail-qty-controls">
@@ -300,7 +288,7 @@
     ✅ Savatga qo‘shildi
   </div>
 
-  <!-- FIREBASE + APP JS -->
+  <!-- JS -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
