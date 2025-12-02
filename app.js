@@ -37,24 +37,6 @@ const STORAGE_CUSTOMER = "beauty_customer_info"; // 👤 ism + telefon + manzil
 const THEME_KEY        = "beauty_theme";
 const RAW_PREFIX       = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
 
-// DEFAULT EMOJI / LABEL (fallback uchun)
-const categoryEmoji = {
-  "pomada":"💄",
-  "krem":"🧴",
-  "parfyum":"🌸",
-  "niqob":"😷",
-  "ko‘z":"👁",
-  "tana":"🛁",
-  "default":"💅"
-};
-const categoryLabel = {
-  "pomada":"Pomada / lab uchun",
-  "krem":"Krem / yuz uchun",
-  "parfyum":"Parfyum",
-  "niqob":"Niqob / mask",
-  "ko‘z":"Ko‘z uchun",
-  "tana":"Tana / soch parvarishi"
-};
 
 // STATE
 let products = [];
