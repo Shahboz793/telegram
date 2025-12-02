@@ -3,13 +3,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import {
   getFirestore,
   collection,
-  getDocs,
   addDoc,
   deleteDoc,
   doc,
   serverTimestamp,
   getDoc,
   updateDoc,
+  onSnapshot,        // 🔄 REAL-TIME LISTENER
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // SENING KONFIGING
@@ -135,13 +135,13 @@ let cart = [];
 let activeCategory = "all";
 let currentSearch = "";
 let isAdmin = false;
-let detailIndex = null;
-let editingProductId = null;
 
-// Galereya va teskari sanash uchun
-let galleryImages = [];
-let galleryIndex = 0;
-let detailCloseTimer = null;
+// Detail oynasi uchun state
+let detailIndex = null;
+let detailImageIndex = 0;
+let detailQty = 1;
+let detailCountdownTimer = null;
+let detailCountdownRemaining = 0;
 
 // DOM
 const productsGrid = document.getElementById("productsGrid");
@@ -172,6 +172,17 @@ const detailOldPriceEl = document.getElementById("detailOldPrice");
 const detailAddBtn = document.getElementById("detailAddBtn");
 const detailBackBtn = document.getElementById("detailBackBtn");
 
+// 🖼 Galereya tugmalari + rasm raqami
+const detailPrevBtn = document.getElementById("detailPrevBtn");
+const detailNextBtn = document.getElementById("detailNextBtn");
+const detailImageIndexEl = document.getElementById("detailImageIndex");
+
+// 🔢 Miqdor tugmalari
+const detailQtyMinus = document.getElementById("detailQtyMinus");
+const detailQtyPlus = document.getElementById("detailQtyPlus");
+const detailQtyValue = document.getElementById("detailQtyValue");
+
+// ADMIN FORM DOM
 const adminNameEl = document.getElementById("adminName");
 const adminCategoryEl = document.getElementById("adminCategory");
 const adminPriceBaseEl = document.getElementById("adminPriceBase");
@@ -180,19 +191,6 @@ const adminPriceDiscountEl = document.getElementById("adminPriceDiscount");
 const adminTagEl = document.getElementById("adminTag");
 const adminDescriptionEl = document.getElementById("adminDescription");
 const adminImagesEl = document.getElementById("adminImages");
-
-// Rasm galereyasi
-const imageGalleryOverlay = document.getElementById("imageGalleryOverlay");
-const galleryImageEl = document.getElementById("galleryImage");
-const galleryCloseBtn = document.getElementById("galleryCloseBtn");
-const galleryPrevBtn = document.getElementById("galleryPrevBtn");
-const galleryNextBtn = document.getElementById("galleryNextBtn");
-const galleryCounterEl = document.getElementById("galleryCounter");
-
-// Detalldagi savat boshqaruvlari
-const detailCartActionsEl = document.getElementById("detailCartActions");
-const detailOpenCartBtn = document.getElementById("detailOpenCartBtn");
-const detailRemoveFromCartBtn = document.getElementById("detailRemoveFromCartBtn");
 
 // HELPERS
 function formatPrice(v){ return v.toLocaleString("uz-UZ"); }
@@ -219,7 +217,6 @@ function normalizeImagesInput(raw) {
 }
 
 function setImageWithPngJpgFallback(imgElement, url) {
-  if (!imgElement) return;
   if (!url) {
     imgElement.onerror = null;
     imgElement.src = RAW_PREFIX + "noimage.png";
@@ -248,44 +245,46 @@ function matchesSearch(p){
   return name.includes(q) || tag.includes(q) || desc.includes(q) || cat.includes(q);
 }
 
-// FIRESTORE'DAN O‘QISH
-async function loadRemoteProducts(){
-  try{
-    const snap = await getDocs(productsCol);
-    const list = [];
-    snap.forEach(d => {
-      const data = d.data();
-      list.push({
-        id: d.id,
-        fromFirebase: true,
-        name: data.name || "",
-        price: data.price || 0,
-        oldPrice: data.oldPrice || null,
-        category: data.category || "tana",
-        emoji: data.emoji || categoryEmoji[data.category] || categoryEmoji.default,
-        tag: data.tag || "",
-        description: data.description || "",
-        images: Array.isArray(data.images) ? data.images : [],
-        createdAt: data.createdAt || null
+// 🔄 REAL-TIME: FIRESTORE'DAN UZLUKSIZ O‘QISH
+function subscribeProductsRealtime(){
+  onSnapshot(
+    productsCol,
+    (snap) => {
+      const list = [];
+      snap.forEach(d => {
+        const data = d.data();
+        list.push({
+          id: d.id,
+          fromFirebase: true,
+          name: data.name || "",
+          price: data.price || 0,
+          oldPrice: data.oldPrice || null,
+          category: data.category || "tana",
+          emoji: data.emoji || categoryEmoji[data.category] || categoryEmoji.default,
+          tag: data.tag || "",
+          description: data.description || "",
+          images: Array.isArray(data.images) ? data.images : [],
+          createdAt: data.createdAt || null
+        });
       });
-    });
-    remoteProducts = list;
-    rebuildProducts();
-    renderAdminCustomList();
-  }catch(e){
-    console.error("Firestore o‘qishda xato:", e);
-    showToast("⚠️ Firestore’dan yuklashda xato: " + (e.message || ""));
-  }
+      remoteProducts = list;
+      rebuildProducts();        // do‘kondagi kartalar yangilanadi
+      renderAdminCustomList();  // admin ro‘yxati yangilanadi
+    },
+    (e) => {
+      console.error("Realtime o‘qishda xato:", e);
+      showToast("⚠️ Real-time yangilashda xato: " + (e.message || ""));
+    }
+  );
 }
 
+// PRODUCTS
 function rebuildProducts(){
   products = [...defaultProducts, ...remoteProducts];
   renderProducts();
 }
 
-// PRODUCTS RENDER
 function renderProducts(){
-  if(!productsGrid) return;
   productsGrid.innerHTML = "";
   const filtered = products.filter(p =>
     (activeCategory === "all" ? true : p.category === activeCategory) &&
@@ -342,32 +341,29 @@ function renderProducts(){
 }
 
 // FILTER BAR
-if(filterBar){
-  filterBar.addEventListener("click", (e)=>{
-    const btn = e.target.closest(".chip");
-    if(!btn) return;
-    document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
-    btn.classList.add("active");
-    activeCategory = btn.dataset.category;
-    renderProducts();
-  });
-}
+filterBar.addEventListener("click", (e)=>{
+  const btn = e.target.closest(".chip");
+  if(!btn) return;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+  btn.classList.add("active");
+  activeCategory = btn.dataset.category;
+  renderProducts();
+});
 
 // SEARCH
-if(searchInput){
-  searchInput.addEventListener("input", ()=>{
-    currentSearch = searchInput.value.trim().toLowerCase();
-    renderProducts();
-  });
-}
+searchInput.addEventListener("input", ()=>{
+  currentSearch = searchInput.value.trim().toLowerCase();
+  renderProducts();
+});
 
-// CART FUNKSIYALARI
-function addToCart(index){
+// CART
+function addToCart(index, qty = 1){
+  if(qty <= 0) return;
   const found = cart.find(c => c.index === index);
   if(found){
-    found.qty += 1;
+    found.qty += qty;
   }else{
-    cart.push({index, qty:1});
+    cart.push({index, qty});
   }
   updateCartUI();
   showToast("Savatga qo‘shildi, yana mahsulot tanlaysizmi?");
@@ -382,15 +378,14 @@ function updateCartUI(){
     totalCount += c.qty;
     totalPrice += p.price * c.qty;
   });
-  if(cartCountTopEl) cartCountTopEl.textContent = totalCount;
-  if(cartTotalTopEl) cartTotalTopEl.textContent = formatPrice(totalPrice) + " so‘m";
-  if(cartSheet && cartSheet.classList.contains("open")){
+  cartCountTopEl.textContent = totalCount;
+  cartTotalTopEl.textContent = formatPrice(totalPrice) + " so‘m";
+  if(cartSheet.classList.contains("open")){
     renderCartItems();
   }
 }
 
 function toggleCartSheet(force){
-  if(!cartSheet || !cartSheetOverlay) return;
   const isOpen = cartSheet.classList.contains("open");
   const next = typeof force === "boolean" ? force : !isOpen;
   cartSheet.classList.toggle("open", next);
@@ -401,7 +396,6 @@ function toggleCartSheet(force){
 }
 
 function renderCartItems(){
-  if(!cartItemsEl || !cartSheetTotalEl) return;
   if(cart.length === 0){
     cartItemsEl.innerHTML = "<p class='cart-empty'>Savat hozircha bo‘sh 🙂</p>";
     cartSheetTotalEl.textContent = "0 so‘m";
@@ -480,7 +474,6 @@ function saveOrderHistory(order){
 }
 
 function renderHistory(){
-  if(!historyListEl) return;
   let list = [];
   try{
     list = JSON.parse(localStorage.getItem(STORAGE_HISTORY) || "[]");
@@ -578,9 +571,7 @@ function sendOrder(){
 // THEME
 function applyTheme(theme){
   document.body.classList.toggle("theme-dark", theme === "dark");
-  if(themeToggleBtn){
-    themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
-  }
+  themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
 }
 function toggleTheme(){
   const current = localStorage.getItem(THEME_KEY) || "light";
@@ -588,37 +579,32 @@ function toggleTheme(){
   localStorage.setItem(THEME_KEY, next);
   applyTheme(next);
 }
-if(themeToggleBtn){
-  themeToggleBtn.addEventListener("click", toggleTheme);
-}
+themeToggleBtn.addEventListener("click", toggleTheme);
 
 // TABS
-if(tabsEl){
-  tabsEl.addEventListener("click", (e)=>{
-    const btn = e.target.closest(".tab-btn");
-    if(!btn) return;
-    const pageId = btn.dataset.page;
-    if(pageId === "adminPage" && !isAdmin){
-      showToast("👑 Avval admin kodini kiriting.");
-      return;
-    }
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById("shopPage").classList.add("hidden");
-    document.getElementById("historyPage").classList.add("hidden");
-    document.getElementById("adminPage").classList.add("hidden");
-    document.getElementById(pageId).classList.remove("hidden");
-    if(pageId === "historyPage"){
-      renderHistory();
-    }else if(pageId === "adminPage"){
-      renderAdminCustomList();
-    }
-  });
-}
+tabsEl.addEventListener("click", (e)=>{
+  const btn = e.target.closest(".tab-btn");
+  if(!btn) return;
+  const pageId = btn.dataset.page;
+  if(pageId === "adminPage" && !isAdmin){
+    showToast("👑 Avval admin kodini kiriting.");
+    return;
+  }
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("shopPage").classList.add("hidden");
+  document.getElementById("historyPage").classList.add("hidden");
+  document.getElementById("adminPage").classList.add("hidden");
+  document.getElementById(pageId).classList.remove("hidden");
+  if(pageId === "historyPage"){
+    renderHistory();
+  }else if(pageId === "adminPage"){
+    renderAdminCustomList();
+  }
+});
 
 // ADMIN UI
 function updateAdminUI(){
-  if(!adminTabBtn || !adminAccessBtn) return;
   if(isAdmin){
     adminTabBtn.classList.remove("hidden");
     adminAccessBtn.classList.add("admin-active");
@@ -634,7 +620,7 @@ function updateAdminUI(){
 async function askAdminCode(){
   if(isAdmin){
     document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    if(adminTabBtn) adminTabBtn.classList.add("active");
+    adminTabBtn.classList.add("active");
     document.getElementById("shopPage").classList.add("hidden");
     document.getElementById("historyPage").classList.add("hidden");
     document.getElementById("adminPage").classList.remove("hidden");
@@ -673,15 +659,12 @@ async function askAdminCode(){
     showToast("⚠️ Admin kodi tekshiruvida xato: " + (e.message || ""));
   }
 }
-if(adminAccessBtn){
-  adminAccessBtn.addEventListener("click", askAdminCode);
-}
+adminAccessBtn.addEventListener("click", askAdminCode);
 
 // ADMIN HELPER: TUGMANI "FLASH" QILISH
 function flashAdminButton(text){
   const btn = document.querySelector(".admin-btn");
   if(!btn) return;
-  const originalText = btn.textContent;
   btn.textContent = text;
   btn.classList.add("admin-btn-success");
   setTimeout(()=>{
@@ -692,15 +675,17 @@ function flashAdminButton(text){
   }, 1500);
 }
 
+let editingProductId = null;
+
 // ADMIN: FIRESTORE'GA MAHSULOT QO‘SHISH / TAHRIRLASH
 async function addCustomProduct(){
-  const name = adminNameEl?.value.trim();
-  const category = adminCategoryEl?.value;
-  const basePrice = parseInt(adminPriceBaseEl?.value || "0", 10);
-  const hasDiscount = adminHasDiscountEl?.checked;
-  const discountPriceRaw = adminPriceDiscountEl?.value ? parseInt(adminPriceDiscountEl.value, 10) : null;
-  const tag = adminTagEl?.value.trim();
-  const description = adminDescriptionEl?.value.trim();
+  const name = adminNameEl.value.trim();
+  const category = adminCategoryEl.value;
+  const basePrice = parseInt(adminPriceBaseEl.value, 10);
+  const hasDiscount = adminHasDiscountEl.checked;
+  const discountPriceRaw = adminPriceDiscountEl.value ? parseInt(adminPriceDiscountEl.value, 10) : null;
+  const tag = adminTagEl.value.trim();
+  const description = adminDescriptionEl.value.trim();
 
   if(!name || !basePrice || basePrice <= 0){
     showToast("❌ Nomi va narxini to‘g‘ri kiriting.");
@@ -714,7 +699,7 @@ async function addCustomProduct(){
     oldPrice = basePrice;
   }
 
-  let images = normalizeImagesInput(adminImagesEl?.value.trim());
+  let images = normalizeImagesInput(adminImagesEl.value.trim());
   if(!images.length){
     images = [RAW_PREFIX + "noimage.png"];
   }
@@ -770,13 +755,13 @@ async function addCustomProduct(){
 
     // Formani tozalash
     editingProductId = null;
-    if(adminNameEl) adminNameEl.value = "";
-    if(adminPriceBaseEl) adminPriceBaseEl.value = "";
-    if(adminPriceDiscountEl) adminPriceDiscountEl.value = "";
-    if(adminHasDiscountEl) adminHasDiscountEl.checked = false;
-    if(adminTagEl) adminTagEl.value = "";
-    if(adminDescriptionEl) adminDescriptionEl.value = "";
-    if(adminImagesEl) adminImagesEl.value = "";
+    adminNameEl.value = "";
+    adminPriceBaseEl.value = "";
+    adminPriceDiscountEl.value = "";
+    adminHasDiscountEl.checked = false;
+    adminTagEl.value = "";
+    adminDescriptionEl.value = "";
+    adminImagesEl.value = "";
 
   }catch(e){
     console.error("Mahsulot yozishda/tahrirlashda xato:", e);
@@ -799,9 +784,6 @@ async function deleteAnyProduct(id){
 }
 
 function renderAdminCustomList(){
-  if(!adminCustomListEl){
-    return;
-  }
   if(!remoteProducts.length){
     adminCustomListEl.innerHTML = "<p class='history-empty'>Hozircha Firestore’da admin qo‘shgan mahsulot yo‘q.</p>";
     return;
@@ -828,22 +810,22 @@ function editProduct(id){
 
   editingProductId = id;
 
-  if(adminNameEl) adminNameEl.value = p.name || "";
-  if(adminCategoryEl) adminCategoryEl.value = p.category || "pomada";
+  adminNameEl.value = p.name || "";
+  adminCategoryEl.value = p.category || "pomada";
 
   if(p.oldPrice && p.oldPrice > p.price){
-    if(adminPriceBaseEl) adminPriceBaseEl.value = p.oldPrice;
-    if(adminPriceDiscountEl) adminPriceDiscountEl.value = p.price;
-    if(adminHasDiscountEl) adminHasDiscountEl.checked = true;
+    adminPriceBaseEl.value = p.oldPrice;
+    adminPriceDiscountEl.value = p.price;
+    adminHasDiscountEl.checked = true;
   }else{
-    if(adminPriceBaseEl) adminPriceBaseEl.value = p.price;
-    if(adminPriceDiscountEl) adminPriceDiscountEl.value = "";
-    if(adminHasDiscountEl) adminHasDiscountEl.checked = false;
+    adminPriceBaseEl.value = p.price;
+    adminPriceDiscountEl.value = "";
+    adminHasDiscountEl.checked = false;
   }
 
-  if(adminTagEl) adminTagEl.value = p.tag || "";
-  if(adminDescriptionEl) adminDescriptionEl.value = p.description || "";
-  if(adminImagesEl) adminImagesEl.value = (p.images && p.images.length) ? p.images.join(", ") : "";
+  adminTagEl.value = p.tag || "";
+  adminDescriptionEl.value = p.description || "";
+  adminImagesEl.value = (p.images && p.images.length) ? p.images.join(", ") : "";
 
   const btn = document.querySelector(".admin-btn");
   if(btn){
@@ -853,71 +835,71 @@ function editProduct(id){
   showToast("✏️ Tahrirlash rejimi: formani o‘zgartirib, saqlang");
 }
 
-// === RASM GALEREYASI FUNKSIYALARI ===
-
-function updateGalleryImage(){
-  if(!galleryImages.length || !galleryImageEl || !galleryCounterEl) return;
-  const url = galleryImages[galleryIndex];
-  setImageWithPngJpgFallback(galleryImageEl, url);
-  galleryCounterEl.textContent = (galleryIndex + 1) + " / " + galleryImages.length;
+// 🖼 DETAIL GALEREYA FUNKSIYALARI
+function getDetailImages(){
+  if(detailIndex === null) return [RAW_PREFIX + "noimage.png"];
+  const p = products[detailIndex];
+  if(!p) return [RAW_PREFIX + "noimage.png"];
+  if(p.images && p.images.length) return p.images;
+  return [RAW_PREFIX + "noimage.png"];
 }
 
-function openGallery(startIndex = 0){
-  if(!galleryImages.length || !imageGalleryOverlay) return;
-  galleryIndex = startIndex;
-  updateGalleryImage();
-  imageGalleryOverlay.classList.remove("hidden");
-  document.body.classList.add("no-scroll");
-
-  // Galereya ochilganda teskari sanashni to‘xtatamiz
-  if(detailCloseTimer){
-    clearInterval(detailCloseTimer);
-    detailCloseTimer = null;
+function renderDetailImage(){
+  if(!detailImageEl) return;
+  const imgs = getDetailImages();
+  if(detailImageIndex >= imgs.length) detailImageIndex = 0;
+  if(detailImageIndex < 0) detailImageIndex = imgs.length - 1;
+  setImageWithPngJpgFallback(detailImageEl, imgs[detailImageIndex]);
+  if(detailImageIndexEl){
+    detailImageIndexEl.textContent = `${detailImageIndex + 1} / ${imgs.length}`;
   }
 }
 
-function closeGallery(){
-  if(!imageGalleryOverlay) return;
-  imageGalleryOverlay.classList.add("hidden");
-  document.body.classList.remove("no-scroll");
+function changeDetailImage(delta){
+  if(detailIndex === null) return;
+  const imgs = getDetailImages();
+  if(imgs.length <= 1) return;
+  detailImageIndex = (detailImageIndex + delta + imgs.length) % imgs.length;
+  renderDetailImage();
 }
 
-function galleryNext(){
-  if(!galleryImages.length) return;
-  galleryIndex = (galleryIndex + 1) % galleryImages.length;
-  updateGalleryImage();
+// ⏱ 5 SONIYALI QAYTISH COUNTDOWN
+function updateDetailCountdownUI(){
+  if(!detailBackBtn) return;
+  detailBackBtn.textContent = `◀ Magaziniga qaytish (${detailCountdownRemaining} s)`;
+  if(detailCountdownRemaining <= 3){
+    detailBackBtn.style.color = "#ef4444"; // qizil
+  } else {
+    detailBackBtn.style.color = "";
+  }
 }
 
-function galleryPrev(){
-  if(!galleryImages.length) return;
-  galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
-  updateGalleryImage();
+function clearDetailCountdown(){
+  if(detailCountdownTimer){
+    clearInterval(detailCountdownTimer);
+    detailCountdownTimer = null;
+  }
+  if(detailBackBtn){
+    detailBackBtn.style.color = "";
+    detailBackBtn.textContent = "◀ Magaziniga qaytish";
+  }
 }
 
-// Galereya eventlari
-if(galleryCloseBtn){
-  galleryCloseBtn.addEventListener("click", closeGallery);
-}
-if(galleryNextBtn){
-  galleryNextBtn.addEventListener("click", galleryNext);
-}
-if(galleryPrevBtn){
-  galleryPrevBtn.addEventListener("click", galleryPrev);
-}
-if(imageGalleryOverlay){
-  imageGalleryOverlay.addEventListener("click",(e)=>{
-    if(e.target === imageGalleryOverlay || e.target.classList.contains("gallery-backdrop")){
-      closeGallery();
+function startDetailCountdown(){
+  if(!detailBackBtn) return;
+  clearDetailCountdown();
+  detailCountdownRemaining = 5;
+  detailBackBtn.classList.remove("hidden");
+  updateDetailCountdownUI();
+  detailCountdownTimer = setInterval(()=>{
+    detailCountdownRemaining--;
+    if(detailCountdownRemaining <= 0){
+      clearDetailCountdown();
+      closeProductDetail();
+    }else{
+      updateDetailCountdownUI();
     }
-  });
-}
-
-// Detal rasmini bosganda galereya ochish
-if(detailImageEl){
-  detailImageEl.style.cursor = "zoom-in";
-  detailImageEl.addEventListener("click", ()=>{
-    openGallery(0);
-  });
+  }, 1000);
 }
 
 // PRODUCT DETAIL
@@ -925,138 +907,111 @@ function openProductDetail(index){
   const p = products[index];
   if(!p) return;
   detailIndex = index;
-
-  // Galereya uchun rasmlar
-  galleryImages = (p.images && p.images.length) ? p.images : [RAW_PREFIX + "noimage.png"];
+  detailImageIndex = 0;
+  detailQty = 1;
+  clearDetailCountdown();
 
   const catLabel = categoryLabel[p.category] || p.category;
-  const img = galleryImages[0];
 
-  setImageWithPngJpgFallback(detailImageEl, img);
-  if(detailCategoryEl) detailCategoryEl.textContent = catLabel;
-  if(detailNameEl) detailNameEl.textContent = p.name;
-  if(detailTagEl) detailTagEl.textContent = p.tag ? "💡 " + p.tag : "";
-  if(detailDescEl){
-    detailDescEl.textContent =
-      p.description && p.description.trim().length
-        ? p.description
-        : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan. Admin paneldan batafsil tavsif yozib qo‘yishingiz mumkin.";
-  }
-  if(detailPriceEl) detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
+  renderDetailImage();
 
-  if(detailOldPriceEl){
-    if(p.oldPrice){
-      detailOldPriceEl.textContent = formatPrice(p.oldPrice) + " so‘m";
-      detailOldPriceEl.classList.remove("hidden");
-    }else{
-      detailOldPriceEl.classList.add("hidden");
-    }
+  detailCategoryEl.textContent = catLabel;
+  detailNameEl.textContent = p.name;
+  detailTagEl.textContent = p.tag ? "💡 " + p.tag : "";
+  detailDescEl.textContent =
+    p.description && p.description.trim().length
+      ? p.description
+      : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan. Admin paneldan batafsil tavsif yozib qo‘yishingiz mumkin.";
+  detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
+  if(p.oldPrice){
+    detailOldPriceEl.textContent = formatPrice(p.oldPrice) + " so‘m";
+    detailOldPriceEl.classList.remove("hidden");
+  }else{
+    detailOldPriceEl.classList.add("hidden");
   }
 
-  if(detailAddBtn){
-    detailAddBtn.classList.remove("added");
-    detailAddBtn.textContent = "🛒 Savatga qo‘shish";
+  // Miqdor 1 dan boshlanadi
+  if(detailQtyValue){
+    detailQtyValue.textContent = detailQty;
   }
+
+  detailAddBtn.classList.remove("added");
+  detailAddBtn.textContent = "🛒 Savatga qo‘shish";
+
   if(detailBackBtn){
     detailBackBtn.classList.add("hidden");
-  }
-  if(detailCartActionsEl){
-    detailCartActionsEl.classList.add("hidden");
+    detailBackBtn.style.color = "";
+    detailBackBtn.textContent = "◀ Magaziniga qaytish";
   }
 
-  if(productDetailOverlay){
-    productDetailOverlay.classList.remove("hidden");
-  }
+  productDetailOverlay.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 }
 
 function closeProductDetail(){
-  if(productDetailOverlay){
-    productDetailOverlay.classList.add("hidden");
-  }
+  clearDetailCountdown();
+  productDetailOverlay.classList.add("hidden");
   document.body.style.overflow = "";
   detailIndex = null;
-
-  if(detailCartActionsEl){
-    detailCartActionsEl.classList.add("hidden");
-  }
-
-  if(detailCloseTimer){
-    clearInterval(detailCloseTimer);
-    detailCloseTimer = null;
-  }
 }
 
-// Detal savat tugmasi
+// DETAIL EVENTLAR
 if(detailAddBtn){
   detailAddBtn.addEventListener("click", ()=>{
     if(detailIndex === null) return;
-
-    addToCart(detailIndex);
-
-    // Eski timer bo'lsa tozalaymiz
-    if(detailCloseTimer){
-      clearInterval(detailCloseTimer);
-      detailCloseTimer = null;
-    }
-
-    let secondsLeft = 5;
+    addToCart(detailIndex, detailQty);
     detailAddBtn.classList.add("added");
-    detailAddBtn.textContent = `✅ Savatingizga qo‘shildi (${secondsLeft})`;
+    detailAddBtn.textContent = "✅ Savatga qo‘shildi";
     if(detailBackBtn){
       detailBackBtn.classList.remove("hidden");
     }
-    if(detailCartActionsEl){
-      detailCartActionsEl.classList.remove("hidden");
-    }
-
-    // 5 soniyalik teskari sanash – faqat detal oynasi uchun
-    detailCloseTimer = setInterval(()=>{
-      secondsLeft--;
-      if(secondsLeft <= 0){
-        clearInterval(detailCloseTimer);
-        detailCloseTimer = null;
-        closeProductDetail();
-        return;
-      }
-      detailAddBtn.textContent = `✅ Savatingizga qo‘shildi (${secondsLeft})`;
-    }, 1000);
+    // ⏱ 5 soniyali countdown
+    startDetailCountdown();
   });
 }
 
 if(detailBackBtn){
   detailBackBtn.addEventListener("click", ()=>{
+    // Foydalanuvchi o‘zi bosib chiqmoqchi bo‘lsa ham, countdown tozalanadi
     closeProductDetail();
   });
 }
 
-if(productDetailOverlay){
-  productDetailOverlay.addEventListener("click",(e)=>{
-    if(e.target === productDetailOverlay){
-      closeProductDetail();
-    }
+productDetailOverlay.addEventListener("click",(e)=>{
+  if(e.target === productDetailOverlay){
+    closeProductDetail();
+  }
+});
+
+// 🖼 GALEREYA TUGMALARI EVENTLARI
+if(detailPrevBtn){
+  detailPrevBtn.addEventListener("click",(e)=>{
+    e.stopPropagation();
+    changeDetailImage(-1);
+  });
+}
+if(detailNextBtn){
+  detailNextBtn.addEventListener("click",(e)=>{
+    e.stopPropagation();
+    changeDetailImage(1);
   });
 }
 
-// Detal pastidagi savat tugmalari
-if(detailOpenCartBtn){
-  detailOpenCartBtn.addEventListener("click", ()=>{
-    closeProductDetail();
-    toggleCartSheet(true);
+// 🔢 MIQDOR TUGMALARI
+if(detailQtyMinus){
+  detailQtyMinus.addEventListener("click",(e)=>{
+    e.stopPropagation();
+    if(detailQty > 1){
+      detailQty--;
+      if(detailQtyValue) detailQtyValue.textContent = detailQty;
+    }
   });
 }
-if(detailRemoveFromCartBtn){
-  detailRemoveFromCartBtn.addEventListener("click", ()=>{
-    if(detailIndex === null) return;
-    removeFromCart(detailIndex);
-    if(detailCartActionsEl){
-      detailCartActionsEl.classList.add("hidden");
-    }
-    if(detailAddBtn){
-      detailAddBtn.classList.remove("added");
-      detailAddBtn.textContent = "🛒 Savatga qo‘shish";
-    }
-    showToast("Mahsulot savatdan olib tashlandi");
+if(detailQtyPlus){
+  detailQtyPlus.addEventListener("click",(e)=>{
+    e.stopPropagation();
+    detailQty++;
+    if(detailQtyValue) detailQtyValue.textContent = detailQty;
   });
 }
 
@@ -1066,9 +1021,9 @@ if(detailRemoveFromCartBtn){
   applyTheme(savedTheme);
   isAdmin = false;
   updateAdminUI();
-  rebuildProducts();
+  rebuildProducts();          // faqat default mahsulotlar
   renderHistory();
-  loadRemoteProducts();
+  subscribeProductsRealtime(); // 🔄 REAL-TIME FIRESTORE
 })();
 
 // GLOBAL FUNCTIONS (onclick uchun)
