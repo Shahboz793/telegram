@@ -60,10 +60,10 @@ let editingProductId   = null;
 let editingCategoryId  = null;
 
 // Detail oynasi uchun state
-let detailIndex              = null;
-let detailImageIndex         = 0;
-let detailQty                = 1;
-let detailCountdownTimer     = null;
+let detailIndex           = null;
+let detailImageIndex      = 0;
+let detailQty             = 1;
+let detailCountdownTimer  = null;
 let detailCountdownRemaining = 0;
 
 // DOM
@@ -123,9 +123,7 @@ const adminCatEmojiEl     = document.getElementById("adminCatEmoji");
 const adminCategoryListEl = document.getElementById("adminCategoryList");
 
 // HELPERS
-function formatPrice(v){ 
-  return Number(v || 0).toLocaleString("uz-UZ"); 
-}
+function formatPrice(v){ return v.toLocaleString("uz-UZ"); }
 
 function showToast(message){
   if(!toastEl) return;
@@ -169,24 +167,6 @@ function setImageWithPngJpgFallback(imgElement, url) {
   }
 }
 
-// 🔵 RASM PRELOAD (detail ochilganda hamma rasmlar yuklanadi)
-function preloadProductImages(p) {
-  if (!p || !p.images || !p.images.length) return;
-  p.images.forEach(url => {
-    const img = new Image();
-    if (url.startsWith(RAW_PREFIX)) {
-      const base = url.replace(/\.(png|jpg|jpeg)$/i, "");
-      img.onerror = function(){
-        this.onerror = null;
-        this.src = base + ".jpg";
-      };
-      img.src = base + ".png";
-    } else {
-      img.src = url;
-    }
-  });
-}
-
 function matchesSearch(p){
   if(!currentSearch) return true;
   const q    = currentSearch;
@@ -222,6 +202,7 @@ function promptNewCustomerInfo() {
   if (!phone) return null;
   const address = prompt("📍 Manzilingizni kiriting (shahar, tuman, ko'cha, uy):");
   if (!address) return null;
+
   const info = {
     name: name.trim(),
     phone: phone.trim(),
@@ -354,8 +335,6 @@ function renderProducts(){
     productsGrid.innerHTML = "<p class='history-empty'>Hozircha mahsulot qo‘shilmagan.</p>";
     return;
   }
-
-  let html = "";
   filtered.forEach(p=>{
     const index = products.indexOf(p);
     const discount = p.oldPrice && p.oldPrice > p.price
@@ -363,15 +342,17 @@ function renderProducts(){
       : null;
     const tag = p.tag || "Ommabop mahsulot";
     const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
+
     let imgHtml;
     if (firstImage.startsWith(RAW_PREFIX)) {
       const base = firstImage.replace(/\.(png|jpg|jpeg)$/i, "");
-      imgHtml = `<img loading="lazy" src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
+      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
     } else {
-      imgHtml = `<img loading="lazy" src="${firstImage}" alt="${p.name}">`;
+      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
-    html += `
+
+    productsGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${index})">
         <div class="product-img-wrap">
           ${imgHtml}
@@ -401,8 +382,6 @@ function renderProducts(){
       </article>
     `;
   });
-
-  productsGrid.innerHTML = html;
 }
 
 /* ===================== KATEGORIYA FILTR KNOPKALARI ===================== */
@@ -432,16 +411,11 @@ if(filterBar){
   });
 }
 
-/* ===================== SEARCH (debounce bilan) ===================== */
-let searchTimeout = null;
+/* ===================== SEARCH ===================== */
 if(searchInput){
   searchInput.addEventListener("input", ()=>{
-    clearTimeout(searchTimeout);
-    const value = searchInput.value.trim().toLowerCase();
-    searchTimeout = setTimeout(()=>{
-      currentSearch = value;
-      renderProducts();
-    }, 200); // 200ms – telefon uchun yetarli tez
+    currentSearch = searchInput.value.trim().toLowerCase();
+    renderProducts();
   });
 }
 
@@ -612,14 +586,17 @@ function sendOrder(){
     showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
     return;
   }
+
   const customer = askCustomerInfo();
   if (!customer) {
     showToast("❌ Ism, telefon yoki manzil kiritilmagani uchun buyurtma matni tayyorlanmadi.");
     return;
   }
+
   let totalPrice = 0;
   let totalItems = 0;
   let lines      = [];
+
   cart.forEach((c, i) => {
     const p = products[c.index];
     if (!p) return;
@@ -631,7 +608,9 @@ function sendOrder(){
       `${i + 1}) ${catEmj} ${p.name} — ${c.qty} dona × ${formatPrice(p.price)} so‘m = ${formatPrice(lineTotal)} so‘m`;
     lines.push({ line: lineText, product: p });
   });
+
   const totalStr = formatPrice(totalPrice);
+
   let text = "";
   text += "ONLINE MAGAZIN YANGIOBOD  — Onlayn buyurtma\n";
   text += "━━━━━━━━━━━━━━━━━━━━\n";
@@ -646,11 +625,14 @@ function sendOrder(){
   text += "📱 Telefon raqamim: " + customer.phone + "\n";
   text += "📍 Manzilim: " + customer.address + "\n";
   text += "✍️ Qo‘shimcha izoh: _______\n";
+
   const encoded = encodeURIComponent(text);
   const baseUrl = "https://t.me/onatili_premium";
+  // ⚠️ Har safar URL boshqacha bo‘lsin (t param bilan), shunda
+  // bir xil buyurtmani ham ketma-ket yuborish mumkin bo‘ladi
   const url     = `${baseUrl}?text=${encoded}&t=${Date.now()}`;
 
-  // 🔥 BUYURTMA TARIXIGA YOZAMIZ
+  // 🔥 BUYURTMA TARIXIGA YOZAMIZ (LEKIN DUPLIKAT TEKSHIRISH YO‘Q!)
   const order = {
     date: new Date().toISOString(),
     totalPrice: totalPrice,
@@ -665,6 +647,8 @@ function sendOrder(){
   updateCartUI();
   renderCartItems();
   toggleCartSheet(false);
+
+  // Telegramni ochish
   openTelegramLink(url);
 }
 
@@ -813,6 +797,7 @@ async function addCustomProduct(){
   }
 
   const emoji = categoryEmoji[category] || "💅";
+
   const payload = {
     name,
     price,
@@ -921,6 +906,7 @@ function editProduct(id){
   adminTagEl.value         = p.tag || "";
   adminDescriptionEl.value = p.description || "";
   adminImagesEl.value      = (p.images && p.images.length) ? p.images.join(", ") : "";
+
   const btn = document.querySelector(".admin-btn");
   if(btn){
     btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
@@ -933,20 +919,22 @@ function updateAdminCategorySelect(){
   if(!adminCategoryEl) return;
   const current = adminCategoryEl.value;
   adminCategoryEl.innerHTML = "";
+
   if(!categories.length){
-    // hali kategoriya yo‘q – placeholder
     const opt = document.createElement("option");
     opt.value = "";
     opt.textContent = "Avval kategoriyani qo‘shing";
     adminCategoryEl.appendChild(opt);
     return;
   }
+
   categories.forEach(cat=>{
     const opt = document.createElement("option");
     opt.value = cat.code;
     opt.textContent = cat.label;
     adminCategoryEl.appendChild(opt);
   });
+
   if(current && categories.some(c=>c.code === current)){
     adminCategoryEl.value = current;
   }
@@ -976,10 +964,12 @@ async function saveCategory(){
   const code    = rawCode.toLowerCase();
   const label   = adminCatLabelEl.value.trim();
   const emoji   = (adminCatEmojiEl.value.trim() || "💅");
+
   if(!code || !label){
     showToast("❌ Kategoriya kodi va nomini kiriting.");
     return;
   }
+
   try{
     const existing = categories.find(c=>c.code === code);
     if(existing){
@@ -1020,7 +1010,7 @@ function editCategory(id){
 }
 
 async function deleteCategory(id){
-  if(!confirm("Bu kategoriyani o‘chirishni xohlaysizmi? Hamma uchun o‘chadi.")) return;
+  if(!confirm("Bu kategoriyani o‘chirishni xohlaysizmi? Hamma foydalanuvchilar uchun o‘chadi.")) return;
   try{
     await deleteDoc(doc(db,"beauty_categories",id));
     showToast("🗑 Kategoriya o‘chirildi");
@@ -1105,10 +1095,8 @@ function openProductDetail(index){
   detailQty        = 1;
   clearDetailCountdown();
 
-  // 🔵 Bu yerda hamma rasmlarni fon rejimida preload qilamiz
-  preloadProductImages(p);
-
   const catLbl = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
+
   renderDetailImage();
   detailCategoryEl.textContent = catLbl;
   detailNameEl.textContent     = p.name;
@@ -1118,22 +1106,27 @@ function openProductDetail(index){
       ? p.description
       : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan.";
   detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
+
   if(p.oldPrice){
     detailOldPriceEl.textContent = formatPrice(p.oldPrice) + " so‘m";
     detailOldPriceEl.classList.remove("hidden");
   }else{
     detailOldPriceEl.classList.add("hidden");
   }
+
   if(detailQtyValue){
     detailQtyValue.textContent = detailQty;
   }
+
   detailAddBtn.classList.remove("added");
   detailAddBtn.textContent = "🛒 Savatga qo‘shish";
+
   if(detailBackBtn){
     detailBackBtn.classList.add("hidden");
     detailBackBtn.style.color = "";
     detailBackBtn.textContent = "◀ Magaziniga qaytish";
   }
+
   productDetailOverlay.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 }
@@ -1149,16 +1142,18 @@ function closeProductDetail(){
 if(detailAddBtn){
   detailAddBtn.addEventListener("click", ()=>{
     if(detailIndex === null) return;
-    // Agar allaqachon qo‘shilgan bo‘lsa → darhol magazinga qaytish
+
+    // Bu yerda hech qanday "oxirgi buyurtma" saqlash, tekshirish YO‘Q.
+    // Faqat savatga qo‘shamiz va magazinga qaytamiz.
     if(detailAddBtn.classList.contains("added")){
-        closeProductDetail(); // magazinga qaytish
+        closeProductDetail();
         return;
     }
-    // 1-marta bosilganda — savatga qo‘shamiz
+
     addToCart(detailIndex, detailQty);
     detailAddBtn.classList.add("added");
     detailAddBtn.textContent = "⬅️ Magaziniga qaytish";
-    // Endi 2-soniya sanab avtomatik qaytadi
+
     if(detailBackBtn){
       detailBackBtn.classList.remove("hidden");
     }
@@ -1219,8 +1214,8 @@ if(detailQtyPlus){
   isAdmin = false;
   updateAdminUI();
   renderCustomerInfo();   // 👤 ism/telefonni chiqarish
-  renderCategoryFilter(); // boshida faqat ⭐ Barchasi
-  renderProducts();       // hozircha "mahsulot yo‘q" degan yozuv
+  renderCategoryFilter(); // boshida faqat ⭐ Barchasi (kategoriyalar kelsa yangilanadi)
+  renderProducts();       // hozircha "mahsulot yo‘q" degan yozuv bo‘ladi
   renderHistory();
   subscribeProductsRealtime();   // mahsulotlar
   subscribeCategoriesRealtime(); // kategoriyalar
