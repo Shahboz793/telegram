@@ -25,10 +25,8 @@
           <small>Premium kosmetika do‘koni</small>
         </div>
       </div>
-
       <div class="header-right">
         <button class="theme-toggle" id="themeToggleBtn" type="button">🌙</button>
-
         <button class="cart-icon-btn" type="button" onclick="toggleCartSheet(true)">
           <span class="cart-icon-left">🛒</span>
           <div class="cart-icon-info">
@@ -36,7 +34,6 @@
             <small id="cartTotalTop">0 so‘m</small>
           </div>
         </button>
-
         <button id="adminAccessBtn" class="admin-access" type="button">
           👑 Admin uchun
         </button>
@@ -53,7 +50,7 @@
 
   <!-- SHOP PAGE -->
   <div id="shopPage">
-    <!-- FAQAT QIDIRUV -->
+    <!-- SODDALAШGAN QISM: FAQAT QIDIRUV -->
     <section class="hero">
       <div class="search-bar">
         <span>🔍</span>
@@ -61,18 +58,16 @@
       </div>
     </section>
 
-    <!-- KATALOGLAR (KATEGORIYALAR) — DOIM OCHIQ, 4 TA -->
+    <!-- KATALOGLAR (KATEGORIYALAR) — DOIM OCHIQ -->
     <div class="filters-wrapper">
       <div class="filters" id="filterBar">
+        <!-- Bu joyni JS (renderCategoryFilter) baribir yangilab chiqadi.
+             Firestore’da kategoriya bo‘lmaguncha fallback sifatida turadi. -->
         <button class="chip active" data-category="all">⭐ Barchasi</button>
         <button class="chip" data-category="pomada">💄 Pomada</button>
         <button class="chip" data-category="krem">🧴 Kremlar</button>
         <button class="chip" data-category="parfyum">🌸 Parfyum</button>
-        <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
-        <!-- Agar xohlasang keyin yana qo‘shib yuboramiz:
-        <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
         <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
-        -->
       </div>
     </div>
 
@@ -99,10 +94,11 @@
   <div id="adminPage" class="page hidden">
     <div class="page-title">🛠 Admin panel</div>
     <p class="page-sub">
-      Bu sahifa faqat admin uchun. Mahsulotlar Firestore’da saqlanadi, shuning uchun
-      boshqa telefonlar ham bir xil katalogni ko‘radi.
+      Bu sahifa faqat admin uchun. Mahsulotlar va kategoriyalar Firestore’da saqlanadi,
+      shuning uchun boshqa telefonlar ham bir xil katalogni ko‘radi.
     </p>
 
+    <!-- 🧴 MAHSULOTLAR FORMASI (o‘zing mahsulot qo‘sha olasan) -->
     <div class="admin-form">
       <h3>Yangi mahsulot qo‘shish / tahrirlash</h3>
 
@@ -113,12 +109,11 @@
 
       <div class="form-row">
         <label>Kategoriya</label>
+        <!-- Bu selectni JS (updateAdminCategorySelect) Firestore’dagi kategoriyalar bilan to‘ldiradi -->
         <select id="adminCategory">
           <option value="pomada">Pomada / lab uchun</option>
           <option value="krem">Krem / yuz uchun</option>
           <option value="parfyum">Parfyum</option>
-          <option value="niqob">Niqob / mask</option>
-          <option value="ko‘z">Ko‘z uchun</option>
           <option value="tana">Tana / soch parvarishi</option>
         </select>
       </div>
@@ -165,11 +160,43 @@
       </p>
     </div>
 
+    <!-- 🗂 KATEGORIYA BOSHQARUVI (YANGI) -->
+    <div class="admin-form admin-form-categories">
+      <h3>Kategoriya qo‘shish / tahrirlash</h3>
+
+      <div class="form-row">
+        <label>Kategoriya kodi (lotincha, kichik harf)</label>
+        <input id="adminCatCode" placeholder="Masalan: pomada, krem, parfyum..." />
+      </div>
+
+      <div class="form-row">
+        <label>Kategoriya nomi (ekranda ko‘rinadigan)</label>
+        <input id="adminCatLabel" placeholder="Masalan: Pomada / lab uchun" />
+      </div>
+
+      <div class="form-row">
+        <label>Emoji (ixtiyoriy)</label>
+        <input id="adminCatEmoji" placeholder="Masalan: 💄 yoki 🧴" />
+      </div>
+
+      <button class="admin-btn admin-btn-secondary" type="button" onclick="saveCategory()">
+        💾 Kategoriyani saqlash
+      </button>
+
+      <p class="admin-info">
+        Masalan, 4 ta katalog qilish uchun: <b>pomada</b>, <b>krem</b>, <b>parfyum</b>, <b>tana</b> 
+        kabi kategoriyalarni qo‘shib qo‘yasiz. Keyin mahsulot qo‘shayotganda shu kodlardan birini tanlaysiz.
+      </p>
+    </div>
+
+    <div class="admin-list-title">Kategoriyalar ro‘yxati:</div>
+    <div id="adminCategoryList"></div>
+
     <div class="admin-list-title">Firestore’dagi mahsulotlar:</div>
     <div id="adminCustomList"></div>
 
     <p class="admin-info">
-      🔴 O‘chirsangiz, hamma foydalanuvchilar uchun o‘chadi.
+      🔴 Mahsulot yoki kategoriya o‘chirilsa, hamma foydalanuvchilar uchun o‘chadi.
     </p>
   </div>
 
@@ -196,21 +223,17 @@
       <h3>🛒 Savatingiz</h3>
       <button type="button" onclick="toggleCartSheet(false)">✕</button>
     </div>
-
     <div class="cart-sheet-body" id="cartItems"></div>
-
     <div class="cart-sheet-footer">
       <div class="cart-sheet-footer-top">
         <span>Umumiy summa:</span>
         <strong id="cartSheetTotal">0 so‘m</strong>
       </div>
-
       <p class="cart-info-text">
         <strong>Izoh:</strong> “Buyurtmani yuborish” tugmasini bossangiz,
         hozir tanlagan mahsulotlaringiz Telegram orqali sotuvchiga jo‘natiladi.
         Sotuvchi sizga telefon qilib, yetkazib berish va to‘lovni kelishib oladi.
       </p>
-
       <button class="cart-sheet-btn" type="button" onclick="sendOrder()">
         📩 Buyurtmani yuborish (@onatili_premium)
       </button>
@@ -229,7 +252,6 @@
           <!-- Rasm raqami: 1 / N -->
           <div id="detailImageIndex" class="detail-image-index">1 / 1</div>
         </div>
-
         <button class="product-detail-close" type="button" onclick="closeProductDetail()">✕</button>
       </div>
 
