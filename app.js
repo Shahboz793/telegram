@@ -32,8 +32,8 @@ const productsCol   = collection(db, "beauty_products");
 const categoriesCol = collection(db, "beauty_categories");
 
 // KONSTANTALAR
-const STORAGE_HISTORY  = "beauty_order_history";
-const STORAGE_CUSTOMER = "beauty_customer_info"; // 👤 ism + telefon + manzil
+const STORAGE_HISTORY  = "beauty_order_history"; // endi ishlatmaymiz (saqlash o‘chirilgan)
+const STORAGE_CUSTOMER = "beauty_customer_info"; // 👤 ism + telefon + manzil (qoldiramiz)
 const THEME_KEY        = "beauty_theme";
 const RAW_PREFIX       = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
 
@@ -60,10 +60,10 @@ let editingProductId   = null;
 let editingCategoryId  = null;
 
 // Detail oynasi uchun state
-let detailIndex           = null;
-let detailImageIndex      = 0;
-let detailQty             = 1;
-let detailCountdownTimer  = null;
+let detailIndex              = null;
+let detailImageIndex         = 0;
+let detailQty                = 1;
+let detailCountdownTimer     = null;
 let detailCountdownRemaining = 0;
 
 // DOM
@@ -84,7 +84,6 @@ const adminAccessBtn       = document.getElementById("adminAccessBtn");
 const adminTabBtn          = document.getElementById("adminTabBtn");
 const searchInput          = document.getElementById("searchInput");
 const customerInfoTextEl   = document.getElementById("customerInfoText");
-
 const productDetailOverlay = document.getElementById("productDetailOverlay");
 const detailImageEl        = document.getElementById("detailImage");
 const detailCategoryEl     = document.getElementById("detailCategory");
@@ -202,7 +201,6 @@ function promptNewCustomerInfo() {
   if (!phone) return null;
   const address = prompt("📍 Manzilingizni kiriting (shahar, tuman, ko'cha, uy):");
   if (!address) return null;
-
   const info = {
     name: name.trim(),
     phone: phone.trim(),
@@ -342,7 +340,6 @@ function renderProducts(){
       : null;
     const tag = p.tag || "Ommabop mahsulot";
     const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
-
     let imgHtml;
     if (firstImage.startsWith(RAW_PREFIX)) {
       const base = firstImage.replace(/\.(png|jpg|jpeg)$/i, "");
@@ -351,7 +348,6 @@ function renderProducts(){
       imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
-
     productsGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${index})">
         <div class="product-img-wrap">
@@ -527,57 +523,20 @@ function openTelegramLink(url){
   }
 }
 
-/* ===================== HISTORY (LOCAL) ===================== */
+/* ===================== HISTORY (LOCAL) – SAQLASH O‘CHIRILGAN ===================== */
+// Endi buyurtmalar localStorage’ga yozilmaydi. Faqat statik xabar ko‘rsatamiz.
+
 function saveOrderHistory(order){
-  let list = [];
-  try{
-    list = JSON.parse(localStorage.getItem(STORAGE_HISTORY) || "[]");
-  }catch(e){}
-  list.unshift(order);
-  localStorage.setItem(STORAGE_HISTORY, JSON.stringify(list));
-  renderHistory();
+  // ataylab bo‘sh: tarix saqlamaymiz
 }
 
 function renderHistory(){
-  let list = [];
-  try{
-    list = JSON.parse(localStorage.getItem(STORAGE_HISTORY) || "[]");
-  }catch(e){}
-  if(!list.length){
-    historyListEl.innerHTML = "<p class='history-empty'>Hozircha buyurtmalar tarixi bo‘sh.</p>";
-    return;
-  }
-  historyListEl.innerHTML = "";
-  list.forEach((order, idx)=>{
-    const date    = new Date(order.date);
-    const dateStr = date.toLocaleString("uz-UZ");
-    let itemsHtml = "";
-    order.items.forEach(it=>{
-      itemsHtml += `<li>${it.line}</li>`;
-    });
-    historyListEl.innerHTML += `
-      <div class="order-card">
-        <div class="order-head">
-          <strong>Buyurtma #${list.length - idx}</strong>
-          <span>${order.totalFormatted}</span>
-        </div>
-        <div class="order-meta">
-          📅 ${dateStr} • 🧺 ${order.totalItems} ta mahsulot
-        </div>
-        <div>Mahsulotlar:</div>
-        <ul class="order-items">
-          ${itemsHtml}
-        </ul>
-      </div>
-    `;
-  });
+  if(!historyListEl) return;
+  historyListEl.innerHTML = "<p class='history-empty'>Buyurtmalar tarixi saqlanmaydi. Har bir buyurtma alohida yuboriladi.</p>";
 }
 
 function clearHistory(){
-  if(confirm("Buyurtmalar tarixini tozalashni xohlaysizmi?")){
-    localStorage.removeItem(STORAGE_HISTORY);
-    renderHistory();
-  }
+  showToast("Tarix allaqachon saqlanmaydi 🙂");
 }
 
 /* ===================== TELEGRAMGA BUYURTMA ===================== */
@@ -628,27 +587,14 @@ function sendOrder(){
 
   const encoded = encodeURIComponent(text);
   const baseUrl = "https://t.me/onatili_premium";
-  // ⚠️ Har safar URL boshqacha bo‘lsin (t param bilan), shunda
-  // bir xil buyurtmani ham ketma-ket yuborish mumkin bo‘ladi
+  // t=timestamp qo‘shib turamiz — har safar link yangi bo‘ladi
   const url     = `${baseUrl}?text=${encoded}&t=${Date.now()}`;
 
-  // 🔥 BUYURTMA TARIXIGA YOZAMIZ (LEKIN DUPLIKAT TEKSHIRISH YO‘Q!)
-  const order = {
-    date: new Date().toISOString(),
-    totalPrice: totalPrice,
-    totalFormatted: totalStr + " so‘m",
-    totalItems: totalItems,
-    items: lines
-  };
-  saveOrderHistory(order);
-
-  // Savatni tozalash
+  // ❌ HECH QAYERGA SAQLAMAYMIZ – faqat yuboramiz
   cart = [];
   updateCartUI();
   renderCartItems();
   toggleCartSheet(false);
-
-  // Telegramni ochish
   openTelegramLink(url);
 }
 
@@ -687,6 +633,7 @@ if(tabsEl){
     document.getElementById("historyPage").classList.add("hidden");
     document.getElementById("adminPage").classList.add("hidden");
     document.getElementById(pageId).classList.remove("hidden");
+
     if(pageId === "historyPage"){
       renderHistory();
     }else if(pageId === "adminPage"){
@@ -797,7 +744,6 @@ async function addCustomProduct(){
   }
 
   const emoji = categoryEmoji[category] || "💅";
-
   const payload = {
     name,
     price,
@@ -906,7 +852,6 @@ function editProduct(id){
   adminTagEl.value         = p.tag || "";
   adminDescriptionEl.value = p.description || "";
   adminImagesEl.value      = (p.images && p.images.length) ? p.images.join(", ") : "";
-
   const btn = document.querySelector(".admin-btn");
   if(btn){
     btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
@@ -919,22 +864,20 @@ function updateAdminCategorySelect(){
   if(!adminCategoryEl) return;
   const current = adminCategoryEl.value;
   adminCategoryEl.innerHTML = "";
-
   if(!categories.length){
+    // hali kategoriya yo‘q – placeholder
     const opt = document.createElement("option");
     opt.value = "";
     opt.textContent = "Avval kategoriyani qo‘shing";
     adminCategoryEl.appendChild(opt);
     return;
   }
-
   categories.forEach(cat=>{
     const opt = document.createElement("option");
     opt.value = cat.code;
     opt.textContent = cat.label;
     adminCategoryEl.appendChild(opt);
   });
-
   if(current && categories.some(c=>c.code === current)){
     adminCategoryEl.value = current;
   }
@@ -964,12 +907,10 @@ async function saveCategory(){
   const code    = rawCode.toLowerCase();
   const label   = adminCatLabelEl.value.trim();
   const emoji   = (adminCatEmojiEl.value.trim() || "💅");
-
   if(!code || !label){
     showToast("❌ Kategoriya kodi va nomini kiriting.");
     return;
   }
-
   try{
     const existing = categories.find(c=>c.code === code);
     if(existing){
@@ -1010,7 +951,7 @@ function editCategory(id){
 }
 
 async function deleteCategory(id){
-  if(!confirm("Bu kategoriyani o‘chirishni xohlaysizmi? Hamma foydalanuvchilar uchun o‘chadi.")) return;
+  if(!confirm("Bu kategoriyani o‘chirishni xohlaysizmi? Hamma uchun o‘chadi.")) return;
   try{
     await deleteDoc(doc(db,"beauty_categories",id));
     showToast("🗑 Kategoriya o‘chirildi");
@@ -1106,7 +1047,6 @@ function openProductDetail(index){
       ? p.description
       : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan.";
   detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
-
   if(p.oldPrice){
     detailOldPriceEl.textContent = formatPrice(p.oldPrice) + " so‘m";
     detailOldPriceEl.classList.remove("hidden");
@@ -1143,13 +1083,13 @@ if(detailAddBtn){
   detailAddBtn.addEventListener("click", ()=>{
     if(detailIndex === null) return;
 
-    // Bu yerda hech qanday "oxirgi buyurtma" saqlash, tekshirish YO‘Q.
-    // Faqat savatga qo‘shamiz va magazinga qaytamiz.
+    // Agar allaqachon qo‘shilgan bo‘lsa → darhol magazinga qaytish
     if(detailAddBtn.classList.contains("added")){
-        closeProductDetail();
+        closeProductDetail(); // magazinga qaytish
         return;
     }
 
+    // 1-marta bosilganda — savatga qo‘shamiz
     addToCart(detailIndex, detailQty);
     detailAddBtn.classList.add("added");
     detailAddBtn.textContent = "⬅️ Magaziniga qaytish";
@@ -1214,28 +1154,28 @@ if(detailQtyPlus){
   isAdmin = false;
   updateAdminUI();
   renderCustomerInfo();   // 👤 ism/telefonni chiqarish
-  renderCategoryFilter(); // boshida faqat ⭐ Barchasi (kategoriyalar kelsa yangilanadi)
-  renderProducts();       // hozircha "mahsulot yo‘q" degan yozuv bo‘ladi
-  renderHistory();
+  renderCategoryFilter(); // boshida faqat ⭐ Barchasi (kategoriyalar kelganda yangilanadi)
+  renderProducts();       // hozircha "mahsulot yo‘q" degan yozuv
+  renderHistory();        // endi faqat "tarix saqlanmaydi" xabari
   subscribeProductsRealtime();   // mahsulotlar
   subscribeCategoriesRealtime(); // kategoriyalar
 })();
 
 /* ===================== GLOBAL FUNKSIYALAR ===================== */
-window.addToCart         = addToCart;
-window.toggleCartSheet   = toggleCartSheet;
-window.changeQty         = changeQty;
-window.removeFromCart    = removeFromCart;
-window.sendOrder         = sendOrder;
-window.clearHistory      = clearHistory;
-window.openProductDetail = openProductDetail;
-window.closeProductDetail= closeProductDetail;
-window.deleteAnyProduct  = deleteAnyProduct;
-window.editProduct       = editProduct;
-window.addCustomProduct  = addCustomProduct;
-window.resetCustomerInfo = resetCustomerInfo;
-window.editCustomerInfo  = editCustomerInfo;
+window.addToCart          = addToCart;
+window.toggleCartSheet    = toggleCartSheet;
+window.changeQty          = changeQty;
+window.removeFromCart     = removeFromCart;
+window.sendOrder          = sendOrder;
+window.clearHistory       = clearHistory;
+window.openProductDetail  = openProductDetail;
+window.closeProductDetail = closeProductDetail;
+window.deleteAnyProduct   = deleteAnyProduct;
+window.editProduct        = editProduct;
+window.addCustomProduct   = addCustomProduct;
+window.resetCustomerInfo  = resetCustomerInfo;
+window.editCustomerInfo   = editCustomerInfo;
 // kategoriya uchun
-window.saveCategory      = saveCategory;
-window.deleteCategory    = deleteCategory;
-window.editCategory      = editCategory;
+window.saveCategory       = saveCategory;
+window.deleteCategory     = deleteCategory;
+window.editCategory       = editCategory;
