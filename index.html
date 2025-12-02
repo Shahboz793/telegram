@@ -49,25 +49,19 @@
 
   <!-- SHOP PAGE -->
   <div id="shopPage">
-    <!-- SODDALAШGAN QISM: FAQAT QIDIRUV -->
+    <!-- Qidiruv -->
     <section class="hero">
-      <!-- QIDIRUV -->
       <div class="search-bar">
         <span>🔍</span>
         <input id="searchInput" placeholder="Mahsulot qidirish (nomi, kategoriya, tag)..." />
       </div>
     </section>
 
-    <!-- KATALOGLAR (KATEGORIYALAR) — DOIM OCHIQ -->
+    <!-- KATALOGLAR (KATEGORIYALAR) — DOIM OCHIQ, DINAMIK -->
     <div class="filters-wrapper">
       <div class="filters" id="filterBar">
-        <button class="chip active" data-category="all">⭐ Barchasi</button>
-        <button class="chip" data-category="pomada">💄 Pomada</button>
-        <button class="chip" data-category="krem">🧴 Kremlar</button>
-        <button class="chip" data-category="parfyum">🌸 Parfyum</button>
-        <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
-        <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
-        <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
+        <!-- JS dan dinamik ravishda to‘ladi:
+             ⭐ Barchasi + Firestore’dan kelgan kategoriyalar -->
       </div>
     </div>
 
@@ -94,24 +88,54 @@
   <div id="adminPage" class="page hidden">
     <div class="page-title">🛠 Admin panel</div>
     <p class="page-sub">
-      Bu sahifa faqat admin uchun. Mahsulotlar Firestore’da saqlanadi, shuning uchun
-      boshqa telefonlar ham bir xil katalogni ko‘radi.
+      Bu sahifa faqat admin uchun. Mahsulotlar va kategoriyalar Firestore’da
+      saqlanadi, shuning uchun boshqa telefonlar ham bir xil katalogni ko‘radi.
     </p>
+
+    <!-- KATEGORIYALAR BOSHQARUVI -->
     <div class="admin-form">
-      <h3>Yangi mahsulot qo‘shish / tahrirlash</h3>
+      <h3>📂 Kategoriyalar boshqaruvi</h3>
+      <div class="form-row">
+        <label>Kategoriya kodi (lotin, bo‘sh joysiz)</label>
+        <input id="adminCatCode" placeholder="masalan: pomada, krem, parfyum" />
+      </div>
+      <div class="form-row">
+        <label>Kategoriya nomi (mijoz ko‘radigan nom)</label>
+        <input id="adminCatLabel" placeholder="masalan: Pomada / lab uchun" />
+      </div>
+      <div class="form-row">
+        <label>Emoji (ixtiyoriy)</label>
+        <input id="adminCatEmoji" placeholder="masalan: 💄" />
+      </div>
+      <button class="admin-btn" type="button" onclick="saveCategory()">
+        ➕ Kategoriya qo‘shish / yangilash
+      </button>
+      <p class="admin-info">
+        Eslatma: <b>kategoriya kodi</b> bo‘yicha tekshiriladi. Agar bunday kodli
+        kategoriya bo‘lsa — yangilanadi, bo‘lmasa — yangi kategoriya qo‘shiladi.
+      </p>
+    </div>
+
+    <div class="admin-list-title">Kategoriyalar ro‘yxati:</div>
+    <div id="adminCategoryList"></div>
+    <p class="admin-info">
+      ❗ Kategoriyani o‘chirsangiz, shu kodli mahsulotlar bazada qoladi,
+      lekin filtrda “noma’lum kategoriya” bo‘lishi mumkin.
+    </p>
+
+    <hr class="admin-divider" />
+
+    <!-- MAHSULOT BOSHQARUVI -->
+    <div class="admin-form">
+      <h3>🧴 Yangi mahsulot qo‘shish / tahrirlash</h3>
       <div class="form-row">
         <label>Mahsulot nomi</label>
         <input id="adminName" placeholder="Masalan: Luxury Lipstick Pink" />
       </div>
       <div class="form-row">
-        <label>Kategoriya</label>
+        <label>Kategoriya (Firestore’dan)</label>
         <select id="adminCategory">
-          <option value="pomada">Pomada / lab uchun</option>
-          <option value="krem">Krem / yuz uchun</option>
-          <option value="parfyum">Parfyum</option>
-          <option value="niqob">Niqob / mask</option>
-          <option value="ko‘z">Ko‘z uchun</option>
-          <option value="tana">Tana / soch parvarishi</option>
+          <!-- JS dan kategoriyalar asosida to‘ladi -->
         </select>
       </div>
       <div class="form-row">
@@ -137,7 +161,7 @@
       <div class="form-row">
         <label>
           Rasm nomi yoki URL  
-          <small>(masalan: <b>olma</b> → images/olma.png yoki to‘liq https://...)</small>
+          <small>(masalan: <b>olma</b> yoki to‘liq https://...)</small>
         </label>
         <input id="adminImages" placeholder="olma yoki https://..., vergul bilan bir nechta yozish mumkin" />
       </div>
@@ -145,9 +169,11 @@
         ➕ Mahsulotni qo‘shish (Firestore)
       </button>
       <p class="admin-info">
-        Eslatma: admin qo‘shgan mahsulotlar Firestore’da saqlanadi. Hamma foydalanuvchilar bir xil katalogni ko‘rishadi.
+        Admin qo‘shgan mahsulotlar Firestore’da saqlanadi.
+        Hamma foydalanuvchilar bir xil katalogni ko‘rishadi.
       </p>
     </div>
+
     <div class="admin-list-title">Firestore’dagi mahsulotlar:</div>
     <div id="adminCustomList"></div>
     <p class="admin-info">
@@ -195,19 +221,14 @@
     </div>
   </div>
 
-  <!-- PRODUCT DETAIL OVERLAY (UZUM STYLE) -->
+  <!-- PRODUCT DETAIL OVERLAY -->
   <div id="productDetailOverlay" class="product-detail-overlay hidden">
     <div class="product-detail-card">
       <div class="product-detail-header">
         <div class="product-detail-image-wrap">
-          <!-- Galereya tugmalari -->
           <button id="detailPrevBtn" class="detail-gallery-btn left" type="button">‹</button>
-
           <img id="detailImage" src="" alt="Mahsulot rasmi" />
-
           <button id="detailNextBtn" class="detail-gallery-btn right" type="button">›</button>
-
-          <!-- Rasm raqami: 1 / N -->
           <div id="detailImageIndex" class="detail-image-index">1 / 1</div>
         </div>
         <button class="product-detail-close" type="button" onclick="closeProductDetail()">✕</button>
@@ -224,7 +245,6 @@
           <span id="detailOldPrice" class="detail-price-old hidden"></span>
         </div>
 
-        <!-- Miqdor (qty) Uzum uslubida -->
         <div class="detail-qty-row">
           <span>Miqdor:</span>
           <div class="detail-qty-controls">
@@ -251,7 +271,7 @@
     ✅ Savatga qo‘shildi
   </div>
 
-  <!-- FIREBASE + APP JS -->
+  <!-- APP JS -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
