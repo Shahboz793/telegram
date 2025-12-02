@@ -32,6 +32,7 @@ const productsCol = collection(db, "beauty_products");
 const STORAGE_HISTORY = "beauty_order_history";
 const THEME_KEY = "beauty_theme";
 const RAW_PREFIX = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
+const STORAGE_CUSTOMER = "beauty_customer_info"; // 👤 ism + telefon + manzil
 
 const categoryEmoji = {
   "pomada":"💄",
@@ -243,6 +244,65 @@ function matchesSearch(p){
   const desc = (p.description || "").toLowerCase();
   const cat = (p.category || "").toLowerCase();
   return name.includes(q) || tag.includes(q) || desc.includes(q) || cat.includes(q);
+}
+
+// 👤 MIJOZ MA'LUMOTLARI (ISM + TELEFON + MANZIL)
+
+// Yangi ma'lumotni so'rab, saqlaydigan funksiya
+function promptNewCustomerInfo() {
+  const name = prompt("👤 Ismingizni kiriting (masalan, Shahboz):");
+  if (!name) return null;
+
+  const phone = prompt("📱 Telefon raqamingizni kiriting (masalan, +99890 123 45 67):");
+  if (!phone) return null;
+
+  const address = prompt("📍 Manzilingizni kiriting (shahar, tuman, ko'cha, uy):");
+  if (!address) return null;
+
+  const info = {
+    name: name.trim(),
+    phone: phone.trim(),
+    address: address.trim()
+  };
+
+  localStorage.setItem(STORAGE_CUSTOMER, JSON.stringify(info));
+  return info;
+}
+
+// Har safar buyurtma berishda taklif qiluvchi funksiya
+function askCustomerInfo() {
+  let info = null;
+  try {
+    info = JSON.parse(localStorage.getItem(STORAGE_CUSTOMER) || "null");
+  } catch (e) {
+    info = null;
+  }
+
+  if (info && info.name && info.phone && info.address) {
+    const ok = confirm(
+      "📦 Oldingi buyurtma ma'lumotlari:\n\n" +
+      "👤 Ism: " + info.name + "\n" +
+      "📱 Telefon: " + info.phone + "\n" +
+      "📍 Manzil: " + info.address + "\n\n" +
+      "Shu ma'lumotlar bilan yuborilsinmi?\n\n" +
+      "OK — Ha, shu ma'lumotlar bilan\n" +
+      "Cancel — Yangi ma'lumot kiritaman"
+    );
+
+    if (ok) {
+      return info;
+    } else {
+      return promptNewCustomerInfo();
+    }
+  }
+
+  return promptNewCustomerInfo();
+}
+
+// Ma'lumotni tozalash (ixtiyoriy: HTML tugmadan chaqirish mumkin)
+function resetCustomerInfo() {
+  localStorage.removeItem(STORAGE_CUSTOMER);
+  showToast("👤 Mijoz ma'lumotlari o'chirildi. Keyingi buyurtmada qaytadan kiritasiz.");
 }
 
 // 🔄 REAL-TIME: FIRESTORE'DAN UZLUKSIZ O‘QISH
@@ -515,12 +575,20 @@ function clearHistory(){
   }
 }
 
-// TELEGRAMGA BUYURTMA
+// TELEGRAMGA BUYURTMA — ISM + TEL + MANZIL BILAN
 function sendOrder(){
   if(cart.length === 0){
     showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
     return;
   }
+
+  // 👤 Har safar: mijoz ma'lumotini olib olamiz (eski yoki yangi)
+  const customer = askCustomerInfo();
+  if (!customer) {
+    showToast("❌ Ism, telefon yoki manzil kiritilmagani uchun buyurtma matni tayyorlanmadi.");
+    return;
+  }
+
   let totalPrice = 0;
   let totalItems = 0;
   let lines = [];
@@ -535,6 +603,7 @@ function sendOrder(){
       `${i+1}) ${catEmoji} ${p.name} — ${c.qty} dona × ${formatPrice(p.price)} so‘m = ${formatPrice(lineTotal)} so‘m`;
     lines.push({line: lineText, product: p});
   });
+
   const totalStr = formatPrice(totalPrice);
   let text = "";
   text += "💖 BEAUTY STORE — Onlayn buyurtma\n";
@@ -543,15 +612,19 @@ function sendOrder(){
   lines.forEach(l=>{
     text += "• " + l.line + "\n";
   });
+
+  // 👤 Mijoz ma'lumotlari avtomatik qo'shiladi
   text += "\n💰 Umumiy summa: " + totalStr + " so‘m\n";
   text += "📦 Buyurtma turi: Kosmetika mahsulotlari\n";
   text += "━━━━━━━━━━━━━━━━━━━━\n";
-  text += "📱 Telefon raqamim: _______\n";
-  text += "📍 Manzilim: _______\n";
-  text += "✍️ Iltimos, ushbu ma'lumotlarni to‘ldirib, xabarni yuboring.\n";
+  text += "👤 Ismim: " + customer.name + "\n";
+  text += "📱 Telefon raqamim: " + customer.phone + "\n";
+  text += "📍 Manzilim: " + customer.address + "\n";
+  text += "✍️ Qo‘shimcha izoh: _______\n";
 
   const encoded = encodeURIComponent(text);
   const url = "https://t.me/onatili_premium?text=" + encoded + "&t=" + Date.now();
+
   const order = {
     date: new Date().toISOString(),
     totalPrice: totalPrice,
@@ -568,7 +641,7 @@ function sendOrder(){
   showToast("✅ Buyurtma matni Telegramga tayyorlandi.");
 }
 
-// THEMEa
+// THEME
 function applyTheme(theme){
   document.body.classList.toggle("theme-dark", theme === "dark");
   themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
@@ -972,7 +1045,6 @@ if(detailAddBtn){
 
 if(detailBackBtn){
   detailBackBtn.addEventListener("click", ()=>{
-    // Foydalanuvchi o‘zi bosib chiqmoqchi bo‘lsa ham, countdown tozalanadi
     closeProductDetail();
   });
 }
@@ -1038,3 +1110,4 @@ window.closeProductDetail = closeProductDetail;
 window.deleteAnyProduct = deleteAnyProduct;
 window.editProduct = editProduct;
 window.addCustomProduct = addCustomProduct;
+window.resetCustomerInfo = resetCustomerInfo;

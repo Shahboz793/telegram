@@ -68,24 +68,45 @@
         Buyurtma yuborilgandan keyin faqat telefon raqamingizni yozib qoldiring —
         sotuvchi sizga tez orada qo‘ng‘iroq qiladi.
       </div>
+
+      <!-- 🔥 HAR 10 SONIYADA ALMASADIGAN REKLAMA BLOK -->
+      <div class="hero-promo" id="heroPromo">
+        <div class="hero-promo-img">
+          <img id="heroPromoImg" src="" alt="Reklama mahsuloti" />
+        </div>
+        <div class="hero-promo-text">
+          <div class="hero-promo-label">Tavsiya etilayotgan mahsulot</div>
+          <div class="hero-promo-name" id="heroPromoName">Mahsulot nomi</div>
+          <div class="hero-promo-tag" id="heroPromoTag">Tag / tavsiya</div>
+          <div class="hero-promo-price" id="heroPromoPrice">0 so‘m</div>
+        </div>
+      </div>
+
       <!-- QIDIRUV -->
       <div class="search-bar">
         <span>🔍</span>
         <input id="searchInput" placeholder="Mahsulot qidirish (nomi, kategoriya, tag)..." />
       </div>
     </section>
-    <!-- FILTERS -->
+
+    <!-- FILTERS (bitta tugma ostida) -->
     <div class="filters-wrapper">
-      <div class="filters" id="filterBar">
-        <button class="chip active" data-category="all">⭐ Barchasi</button>
-        <button class="chip" data-category="pomada">💄 Pomada</button>
-        <button class="chip" data-category="krem">🧴 Kremlar</button>
-        <button class="chip" data-category="parfyum">🌸 Parfyum</button>
-        <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
-        <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
-        <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
+      <button class="category-toggle" id="categoryToggleBtn" type="button">
+        🗂 Kategoriyalarni tanlash
+      </button>
+      <div class="filters-dropdown" id="filterDropdown">
+        <div class="filters" id="filterBar">
+          <button class="chip active" data-category="all">⭐ Barchasi</button>
+          <button class="chip" data-category="pomada">💄 Pomada</button>
+          <button class="chip" data-category="krem">🧴 Kremlar</button>
+          <button class="chip" data-category="parfyum">🌸 Parfyum</button>
+          <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
+          <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
+          <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
+        </div>
       </div>
     </div>
+
     <!-- PRODUCTS -->
     <main class="products-wrap">
       <div class="products-grid" id="productsGrid"></div>
