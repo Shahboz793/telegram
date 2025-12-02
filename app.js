@@ -877,18 +877,6 @@ function editProduct(id){
   showToast("✏️ Tahrirlash rejimi: formani o‘zgartirib, saqlang");
 }
 
-/* ===================== ADMIN: KATEGORIYALAR ===================== */
-function updateAdminCategorySelect(){
-  if(!adminCategoryEl) return;
-
-  const current = adminCategoryEl.value;
-
-  let list = categories.length ? categories : [
-    { code: "pomada", label: categoryLabel.pomada },
-    { code: "krem",   label: categoryLabel.krem },
-    { code: "parfyum",label: categoryLabel.parfyum },
-    { code: "tana",   label: categoryLabel.tana },
-  ];
 
   adminCategoryEl.innerHTML = "";
   list.forEach(cat=>{
