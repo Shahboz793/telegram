@@ -156,7 +156,6 @@
         </label>
         <input id="adminImages" placeholder="olma yoki https://..., vergul bilan bir nechta yozish mumkin" />
       </div>
-      <!-- 👉 MUHIM: onclick & window.addCustomProduct app.js da bor -->
       <button class="admin-btn" type="button" onclick="addCustomProduct()">
         ➕ Mahsulotni qo‘shish (Firestore)
       </button>
@@ -211,30 +210,51 @@
     </div>
   </div>
 
-  <!-- PRODUCT DETAIL OVERLAY -->
+  <!-- PRODUCT DETAIL OVERLAY (UZUM STYLE) -->
   <div id="productDetailOverlay" class="product-detail-overlay hidden">
     <div class="product-detail-card">
       <div class="product-detail-header">
         <div class="product-detail-image-wrap">
+          <!-- Galereya tugmalari -->
+          <button id="detailPrevBtn" class="detail-gallery-btn left" type="button">‹</button>
+
           <img id="detailImage" src="" alt="Mahsulot rasmi" />
+
+          <button id="detailNextBtn" class="detail-gallery-btn right" type="button">›</button>
+
+          <!-- Rasm raqami: 1 / N -->
+          <div id="detailImageIndex" class="detail-image-index">1 / 1</div>
         </div>
         <button class="product-detail-close" type="button" onclick="closeProductDetail()">✕</button>
       </div>
+
       <div class="product-detail-body">
         <div id="detailCategory" class="product-detail-category"></div>
         <h2 id="detailName" class="product-detail-name"></h2>
         <p id="detailTag" class="product-detail-tag"></p>
         <p id="detailDesc" class="product-detail-desc"></p>
+
         <div class="product-detail-prices">
           <span id="detailPrice" class="detail-price-main"></span>
           <span id="detailOldPrice" class="detail-price-old hidden"></span>
         </div>
+
+        <!-- Miqdor (qty) Uzum uslubida -->
+        <div class="detail-qty-row">
+          <span>Miqdor:</span>
+          <div class="detail-qty-controls">
+            <button id="detailQtyMinus" type="button">−</button>
+            <span id="detailQtyValue">1</span>
+            <button id="detailQtyPlus" type="button">+</button>
+          </div>
+        </div>
+
         <div class="detail-actions">
           <button id="detailAddBtn" class="detail-add-btn" type="button">
             🛒 Savatga qo‘shish
           </button>
           <button id="detailBackBtn" class="detail-back-btn hidden" type="button">
-            ⬅️ Orqaga, yana mahsulot tanlash
+            ◀ Magaziniga qaytish
           </button>
         </div>
       </div>
