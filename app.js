@@ -509,15 +509,19 @@ function removeFromCart(productIndex){
   renderCartItems();
 }
 
+// 🔁 TELEGRAMGA LINK OCHISH FUNKSIYASI — YANGI VARIANT
 function openTelegramLink(url){
   const tg = window.Telegram && window.Telegram.WebApp;
-  try{
-    if(tg && typeof tg.openTelegramLink === "function"){
+
+  try {
+    if (tg && typeof tg.openTelegramLink === "function") {
+      // Agar Telegram Mini App ichida bo'lsang
       tg.openTelegramLink(url);
-    }else{
-      window.open(url, "_blank");
+    } else {
+      // Oddiy brauzerda bo'lsang – shu tabning o'zida t.me ochiladi (popup emas)
+      window.location.href = url;
     }
-  }catch(e){
+  } catch (e) {
     window.location.href = url;
   }
 }
@@ -575,45 +579,53 @@ function clearHistory(){
   }
 }
 
-// TELEGRAMGA BUYURTMA — ISM + TEL + MANZIL BILAN
+// 🔄 YANGI: TELEGRAMGA BUYURTMA — avtomatik chat ochish, savatni tozalash
 function sendOrder(){
-  if(cart.length === 0){
+  // 1) Savat bo'sh bo'lmasa davom etamiz
+  if (cart.length === 0) {
     showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
     return;
   }
 
-  // 👤 Har safar: mijoz ma'lumotini olib olamiz (eski yoki yangi)
+  // 2) Mijoz ma'lumotlari (ism, telefon, manzil)
   const customer = askCustomerInfo();
   if (!customer) {
     showToast("❌ Ism, telefon yoki manzil kiritilmagani uchun buyurtma matni tayyorlanmadi.");
     return;
   }
 
+  // 3) Savatdagi mahsulotlardan matn yig'amiz
   let totalPrice = 0;
   let totalItems = 0;
   let lines = [];
-  cart.forEach((c, i)=>{
+
+  cart.forEach((c, i) => {
     const p = products[c.index];
-    if(!p) return;
+    if (!p) return;
+
     const lineTotal = p.price * c.qty;
     totalPrice += lineTotal;
     totalItems += c.qty;
+
     const catEmoji = categoryEmoji[p.category] || p.emoji || categoryEmoji.default;
     const lineText =
-      `${i+1}) ${catEmoji} ${p.name} — ${c.qty} dona × ${formatPrice(p.price)} so‘m = ${formatPrice(lineTotal)} so‘m`;
-    lines.push({line: lineText, product: p});
+      `${i + 1}) ${catEmoji} ${p.name} — ${c.qty} dona × ${formatPrice(p.price)} so‘m = ${formatPrice(lineTotal)} so‘m`;
+
+    lines.push({ line: lineText, product: p });
   });
 
   const totalStr = formatPrice(totalPrice);
+
+  // 4) Yuboriladigan xabar matni
   let text = "";
   text += "💖 BEAUTY STORE — Onlayn buyurtma\n";
   text += "━━━━━━━━━━━━━━━━━━━━\n";
   text += "🧺 Savatimdagi mahsulotlar:\n\n";
-  lines.forEach(l=>{
+
+  lines.forEach(l => {
     text += "• " + l.line + "\n";
   });
 
-  // 👤 Mijoz ma'lumotlari avtomatik qo'shiladi
   text += "\n💰 Umumiy summa: " + totalStr + " so‘m\n";
   text += "📦 Buyurtma turi: Kosmetika mahsulotlari\n";
   text += "━━━━━━━━━━━━━━━━━━━━\n";
@@ -623,8 +635,14 @@ function sendOrder(){
   text += "✍️ Qo‘shimcha izoh: _______\n";
 
   const encoded = encodeURIComponent(text);
-  const url = "https://t.me/onatili_premium?text=" + encoded + "&t=" + Date.now();
 
+  // ❗ MUHIM:
+  // bu yerda faqat bitta link ishlatamiz (t parametrisiz),
+  // shu bilan har safar sening shaxsiy akkaunting ochiladi
+  const url = "https://t.me/onatili_premium?text=" + encoded;
+
+  // Agar tarixni saqlamoqchi bo'lsang, quyidagi blokni ochiq qoldir:
+  /*
   const order = {
     date: new Date().toISOString(),
     totalPrice: totalPrice,
@@ -633,12 +651,19 @@ function sendOrder(){
     items: lines
   };
   saveOrderHistory(order);
-  openTelegramLink(url);
+  */
+
+  // 6) Savatni buyurtmani yuborish tugmasini bosgan paytning o'zida tozalaymiz
   cart = [];
   updateCartUI();
   renderCartItems();
   toggleCartSheet(false);
-  showToast("✅ Buyurtma matni Telegramga tayyorlandi.");
+
+  // 7) Telegramni ochamiz (Mini App bo'lsa – WebApp, oddiy brauzer bo'lsa – t.me sahifasi)
+  openTelegramLink(url);
+
+  // Xohlasang, qisqa eslatma:
+  // showToast("Telegram ochildi, xabarni jo'natishni unutmang 🙂");
 }
 
 // THEME
@@ -936,7 +961,7 @@ function changeDetailImage(delta){
   renderDetailImage();
 }
 
-// ⏱ 5 SONIYALI QAYTISH COUNTDOWN
+// ⏱ 5 SONIYALI QAYTISH COUNTDOWN (agar kerak bo'lsa, detailda ishlatiladi)
 function updateDetailCountdownUI(){
   if(!detailBackBtn) return;
   detailBackBtn.textContent = `◀ Magaziniga qaytish (${detailCountdownRemaining} s)`;
@@ -1038,7 +1063,7 @@ if(detailAddBtn){
     if(detailBackBtn){
       detailBackBtn.classList.remove("hidden");
     }
-    // ⏱ 5 soniyali countdown
+    // ⏱ 5 soniyali countdown (istamasang, shu 2 qatorni olib tashlashing mumkin)
     startDetailCountdown();
   });
 }
