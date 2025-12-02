@@ -25,8 +25,10 @@
           <small>Premium kosmetika do‘koni</small>
         </div>
       </div>
+
       <div class="header-right">
         <button class="theme-toggle" id="themeToggleBtn" type="button">🌙</button>
+
         <button class="cart-icon-btn" type="button" onclick="toggleCartSheet(true)">
           <span class="cart-icon-left">🛒</span>
           <div class="cart-icon-info">
@@ -34,11 +36,13 @@
             <small id="cartTotalTop">0 so‘m</small>
           </div>
         </button>
+
         <button id="adminAccessBtn" class="admin-access" type="button">
           👑 Admin uchun
         </button>
       </div>
     </div>
+
     <!-- TABS -->
     <div class="tabs" id="tabs">
       <button class="tab-btn active" data-page="shopPage">Do‘kon</button>
@@ -49,16 +53,15 @@
 
   <!-- SHOP PAGE -->
   <div id="shopPage">
-    <!-- SODDALAШGAN QISM: FAQAT QIDIRUV -->
+    <!-- FAQAT QIDIRUV -->
     <section class="hero">
-      <!-- QIDIRUV -->
       <div class="search-bar">
         <span>🔍</span>
         <input id="searchInput" placeholder="Mahsulot qidirish (nomi, kategoriya, tag)..." />
       </div>
     </section>
 
-    <!-- KATALOGLAR (KATEGORIYALAR) — DOIM OCHIQ -->
+    <!-- KATALOGLAR (KATEGORIYALAR) — DOIM OCHIQ, 4 TA -->
     <div class="filters-wrapper">
       <div class="filters" id="filterBar">
         <button class="chip active" data-category="all">⭐ Barchasi</button>
@@ -66,8 +69,10 @@
         <button class="chip" data-category="krem">🧴 Kremlar</button>
         <button class="chip" data-category="parfyum">🌸 Parfyum</button>
         <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
+        <!-- Agar xohlasang keyin yana qo‘shib yuboramiz:
         <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
         <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
+        -->
       </div>
     </div>
 
@@ -97,12 +102,15 @@
       Bu sahifa faqat admin uchun. Mahsulotlar Firestore’da saqlanadi, shuning uchun
       boshqa telefonlar ham bir xil katalogni ko‘radi.
     </p>
+
     <div class="admin-form">
       <h3>Yangi mahsulot qo‘shish / tahrirlash</h3>
+
       <div class="form-row">
         <label>Mahsulot nomi</label>
         <input id="adminName" placeholder="Masalan: Luxury Lipstick Pink" />
       </div>
+
       <div class="form-row">
         <label>Kategoriya</label>
         <select id="adminCategory">
@@ -114,26 +122,32 @@
           <option value="tana">Tana / soch parvarishi</option>
         </select>
       </div>
+
       <div class="form-row">
         <label>Asosiy narx (chegirmadan oldin), so‘m</label>
         <input id="adminPriceBase" type="number" min="0" placeholder="Masalan: 119000" />
       </div>
+
       <div class="admin-check-row">
         <input id="adminHasDiscount" type="checkbox" />
         <span>Chegirma bor (yangi narxni kiriting)</span>
       </div>
+
       <div class="form-row">
         <label>Chegirma narxi (agar belgilangan bo‘lsa), so‘m</label>
         <input id="adminPriceDiscount" type="number" min="0" placeholder="Masalan: 99000" />
       </div>
+
       <div class="form-row">
         <label>Qisqa tag / tavsiya (masalan: “Best seller”)</label>
         <input id="adminTag" placeholder="Masalan: Kundalik foydalanish uchun" />
       </div>
+
       <div class="form-row">
         <label>Batafsil tavsif (product page uchun)</label>
         <textarea id="adminDescription" rows="3" placeholder="Mahsulot nima uchun mo‘ljallangan, qanday ishlatiladi va hokazo."></textarea>
       </div>
+
       <div class="form-row">
         <label>
           Rasm nomi yoki URL  
@@ -141,15 +155,19 @@
         </label>
         <input id="adminImages" placeholder="olma yoki https://..., vergul bilan bir nechta yozish mumkin" />
       </div>
+
       <button class="admin-btn" type="button" onclick="addCustomProduct()">
         ➕ Mahsulotni qo‘shish (Firestore)
       </button>
+
       <p class="admin-info">
         Eslatma: admin qo‘shgan mahsulotlar Firestore’da saqlanadi. Hamma foydalanuvchilar bir xil katalogni ko‘rishadi.
       </p>
     </div>
+
     <div class="admin-list-title">Firestore’dagi mahsulotlar:</div>
     <div id="adminCustomList"></div>
+
     <p class="admin-info">
       🔴 O‘chirsangiz, hamma foydalanuvchilar uchun o‘chadi.
     </p>
@@ -178,17 +196,21 @@
       <h3>🛒 Savatingiz</h3>
       <button type="button" onclick="toggleCartSheet(false)">✕</button>
     </div>
+
     <div class="cart-sheet-body" id="cartItems"></div>
+
     <div class="cart-sheet-footer">
       <div class="cart-sheet-footer-top">
         <span>Umumiy summa:</span>
         <strong id="cartSheetTotal">0 so‘m</strong>
       </div>
+
       <p class="cart-info-text">
         <strong>Izoh:</strong> “Buyurtmani yuborish” tugmasini bossangiz,
         hozir tanlagan mahsulotlaringiz Telegram orqali sotuvchiga jo‘natiladi.
         Sotuvchi sizga telefon qilib, yetkazib berish va to‘lovni kelishib oladi.
       </p>
+
       <button class="cart-sheet-btn" type="button" onclick="sendOrder()">
         📩 Buyurtmani yuborish (@onatili_premium)
       </button>
@@ -202,14 +224,12 @@
         <div class="product-detail-image-wrap">
           <!-- Galereya tugmalari -->
           <button id="detailPrevBtn" class="detail-gallery-btn left" type="button">‹</button>
-
           <img id="detailImage" src="" alt="Mahsulot rasmi" />
-
           <button id="detailNextBtn" class="detail-gallery-btn right" type="button">›</button>
-
           <!-- Rasm raqami: 1 / N -->
           <div id="detailImageIndex" class="detail-image-index">1 / 1</div>
         </div>
+
         <button class="product-detail-close" type="button" onclick="closeProductDetail()">✕</button>
       </div>
 
