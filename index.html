@@ -27,6 +27,7 @@
       </div>
       <div class="header-right">
         <button class="theme-toggle" id="themeToggleBtn" type="button">🌙</button>
+
         <button class="cart-icon-btn" type="button" onclick="toggleCartSheet(true)">
           <span class="cart-icon-left">🛒</span>
           <div class="cart-icon-info">
@@ -34,6 +35,7 @@
             <small id="cartTotalTop">0 so‘m</small>
           </div>
         </button>
+
         <button id="adminAccessBtn" class="admin-access" type="button">
           👑 Admin uchun
         </button>
@@ -50,7 +52,7 @@
 
   <!-- SHOP PAGE -->
   <div id="shopPage">
-    <!-- SODDALAШGAN QISM: FAQAT QIDIRUV -->
+    <!-- SODDALASHTIRILGAN QISM: FAQAT QIDIRUV -->
     <section class="hero">
       <div class="search-bar">
         <span>🔍</span>
@@ -61,13 +63,12 @@
     <!-- KATALOGLAR (KATEGORIYALAR) — DOIM OCHIQ -->
     <div class="filters-wrapper">
       <div class="filters" id="filterBar">
-        <!-- Bu joyni JS (renderCategoryFilter) baribir yangilab chiqadi.
-             Firestore’da kategoriya bo‘lmaguncha fallback sifatida turadi. -->
-        <button class="chip active" data-category="all">⭐ Barchasi</button>
-        <button class="chip" data-category="pomada">💄 Pomada</button>
-        <button class="chip" data-category="krem">🧴 Kremlar</button>
-        <button class="chip" data-category="parfyum">🌸 Parfyum</button>
-        <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
+        <!-- JS orqali to‘ldiriladi:
+             ⭐ Barchasi
+             💄 Pomada
+             🧴 Kremlar
+             🌸 Parfyum
+             🛁 Tana va hokazo -->
       </div>
     </div>
 
@@ -94,11 +95,11 @@
   <div id="adminPage" class="page hidden">
     <div class="page-title">🛠 Admin panel</div>
     <p class="page-sub">
-      Bu sahifa faqat admin uchun. Mahsulotlar va kategoriyalar Firestore’da saqlanadi,
-      shuning uchun boshqa telefonlar ham bir xil katalogni ko‘radi.
+      Bu sahifa faqat admin uchun. Mahsulotlar Firestore’da saqlanadi, shuning uchun
+      boshqa telefonlar ham bir xil katalogni ko‘radi.
     </p>
 
-    <!-- 🧴 MAHSULOTLAR FORMASI (o‘zing mahsulot qo‘sha olasan) -->
+    <!-- MAHSULOT QO‘SHISH / TAHRIRLASH -->
     <div class="admin-form">
       <h3>Yangi mahsulot qo‘shish / tahrirlash</h3>
 
@@ -109,13 +110,8 @@
 
       <div class="form-row">
         <label>Kategoriya</label>
-        <!-- Bu selectni JS (updateAdminCategorySelect) Firestore’dagi kategoriyalar bilan to‘ldiradi -->
-        <select id="adminCategory">
-          <option value="pomada">Pomada / lab uchun</option>
-          <option value="krem">Krem / yuz uchun</option>
-          <option value="parfyum">Parfyum</option>
-          <option value="tana">Tana / soch parvarishi</option>
-        </select>
+        <!-- options’lar JS orqali kategoriyalardan to‘ldiriladi -->
+        <select id="adminCategory"></select>
       </div>
 
       <div class="form-row">
@@ -145,7 +141,7 @@
 
       <div class="form-row">
         <label>
-          Rasm nomi yoki URL  
+          Rasm nomi yoki URL
           <small>(masalan: <b>olma</b> → images/olma.png yoki to‘liq https://...)</small>
         </label>
         <input id="adminImages" placeholder="olma yoki https://..., vergul bilan bir nechta yozish mumkin" />
@@ -158,46 +154,57 @@
       <p class="admin-info">
         Eslatma: admin qo‘shgan mahsulotlar Firestore’da saqlanadi. Hamma foydalanuvchilar bir xil katalogni ko‘rishadi.
       </p>
+
+      <p class="admin-info">
+        Agar mijoz ma'lumotlarini (ism, telefon, manzil) yangilamoqchi bo‘lsangiz,
+        <button type="button" class="link-btn" onclick="resetCustomerInfo()">mijoz ma'lumotlarini tozalash</button>
+        tugmasidan foydalanishingiz mumkin.
+      </p>
     </div>
 
-    <!-- 🗂 KATEGORIYA BOSHQARUVI (YANGI) -->
-    <div class="admin-form admin-form-categories">
+    <!-- FIRESTORE’DAGI MAHSULOTLAR RO‘YXATI -->
+    <div class="admin-list-title">Firestore’dagi mahsulotlar:</div>
+    <div id="adminCustomList"></div>
+    <p class="admin-info">
+      🔴 O‘chirsangiz, hamma foydalanuvchilar uchun o‘chadi.
+    </p>
+
+    <!-- 🆕 KATEGORIYA QO‘SHISH / TAHRIRLASH -->
+    <div class="admin-form admin-category-box">
       <h3>Kategoriya qo‘shish / tahrirlash</h3>
 
       <div class="form-row">
         <label>Kategoriya kodi (lotincha, kichik harf)</label>
-        <input id="adminCatCode" placeholder="Masalan: pomada, krem, parfyum..." />
+        <input id="adminCatCode" placeholder="Masalan: pomada, krem, parfyum, tana..." />
       </div>
 
       <div class="form-row">
         <label>Kategoriya nomi (ekranda ko‘rinadigan)</label>
-        <input id="adminCatLabel" placeholder="Masalan: Pomada / lab uchun" />
+        <input id="adminCatLabel" placeholder="Masalan: Pomadalar, Kremlar, Parfyumlar, Tana parvarishi..." />
       </div>
 
       <div class="form-row">
         <label>Emoji (ixtiyoriy)</label>
-        <input id="adminCatEmoji" placeholder="Masalan: 💄 yoki 🧴" />
+        <input id="adminCatEmoji" placeholder="Masalan: 💄 yoki 🧴 yoki 🌸" />
       </div>
 
       <button class="admin-btn admin-btn-secondary" type="button" onclick="saveCategory()">
-        💾 Kategoriyani saqlash
+        ✅ Kategoriyani saqlash
       </button>
 
       <p class="admin-info">
-        Masalan, 4 ta katalog qilish uchun: <b>pomada</b>, <b>krem</b>, <b>parfyum</b>, <b>tana</b> 
-        kabi kategoriyalarni qo‘shib qo‘yasiz. Keyin mahsulot qo‘shayotganda shu kodlardan birini tanlaysiz.
+        Masalan, ichida 4 ta katalog bo‘lishini xohlasangiz, quyidagi kodlarni qo‘shasiz:
+        <b>pomada</b>, <b>krem</b>, <b>parfyum</b>, <b>tana</b>. Keyin mahsulot qo‘shayotganda
+        aynan shu kodlardan birini tanlaysiz.
+      </p>
+
+      <div class="admin-list-title">Kategoriyalar ro‘yxati:</div>
+      <div id="adminCategoryList"></div>
+
+      <p class="admin-info">
+        🔴 Kategoriyani o‘chirsangiz, shu kod bilan bog‘langan mahsulotlar filtrda ko‘rinmasligi mumkin.
       </p>
     </div>
-
-    <div class="admin-list-title">Kategoriyalar ro‘yxati:</div>
-    <div id="adminCategoryList"></div>
-
-    <div class="admin-list-title">Firestore’dagi mahsulotlar:</div>
-    <div id="adminCustomList"></div>
-
-    <p class="admin-info">
-      🔴 Mahsulot yoki kategoriya o‘chirilsa, hamma foydalanuvchilar uchun o‘chadi.
-    </p>
   </div>
 
   <!-- BOTTOM ORDER BAR -->
