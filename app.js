@@ -1107,7 +1107,7 @@ function changeDetailImage(delta){
 function updateDetailCountdownUI(){
   if(!detailBackBtn) return;
   detailBackBtn.textContent = `◀ Magaziniga qaytish (${detailCountdownRemaining} s)`;
-  if(detailCountdownRemaining <= 3){
+  if(detailCountdownRemaining <= 1){
     detailBackBtn.style.color = "#ef4444";
   } else {
     detailBackBtn.style.color = "";
@@ -1128,7 +1128,7 @@ function clearDetailCountdown(){
 function startDetailCountdown(){
   if(!detailBackBtn) return;
   clearDetailCountdown();
-  detailCountdownRemaining = 5;
+  detailCountdownRemaining = 2;
   detailBackBtn.classList.remove("hidden");
   updateDetailCountdownUI();
   detailCountdownTimer = setInterval(()=>{
@@ -1198,9 +1198,19 @@ function closeProductDetail(){
 if(detailAddBtn){
   detailAddBtn.addEventListener("click", ()=>{
     if(detailIndex === null) return;
+
+    // Agar allaqachon qo‘shilgan bo‘lsa → darhol magazinga qaytish
+    if(detailAddBtn.classList.contains("added")){
+        closeProductDetail(); // magazinga qaytish
+        return;
+    }
+
+    // 1-marta bosilganda — savatga qo‘shamiz
     addToCart(detailIndex, detailQty);
     detailAddBtn.classList.add("added");
-    detailAddBtn.textContent = "✅ Savatga qo‘shildi";
+    detailAddBtn.textContent = "⬅️ Magaziniga qaytish";
+
+    // Endi 2-soniya sanab avtomatik qaytadi
     if(detailBackBtn){
       detailBackBtn.classList.remove("hidden");
     }

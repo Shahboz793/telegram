@@ -1,7 +1,24 @@
+/* =========================================
+   RESET
+========================================= */
 *{
   box-sizing:border-box;
   margin:0;
   padding:0;
+}
+
+/* Scroll biroz yumshoq bo‘lsin */
+html{
+  scroll-behavior:smooth;
+}
+
+/* Harakatni yoqtirmaydiganlar uchun */
+@media (prefers-reduced-motion: reduce){
+  *{
+    scroll-behavior:auto !important;
+    animation:none !important;
+    transition:none !important;
+  }
 }
 
 /* =========================================
@@ -18,6 +35,9 @@
   --card:#ffffff;
   --border-soft:rgba(148,163,184,0.7);
   --danger:#dc2626;
+
+  --shadow-soft:0 8px 18px rgba(15,23,42,0.08);
+  --shadow-strong:0 18px 38px rgba(15,23,42,0.25);
 }
 
 body.theme-dark{
@@ -30,19 +50,49 @@ body.theme-dark{
   --muted:#9ca3af;
   --card:#111827;
   --border-soft:rgba(148,163,184,0.4);
-  --danger:#ef4444;
+
+  --shadow-soft:0 8px 18px rgba(0,0,0,0.65);
+  --shadow-strong:0 18px 38px rgba(0,0,0,0.9);
 }
 
+/* =========================================
+   BODY
+   – mobil uchun qulay bo‘lsin, telegram web app’ga mos
+========================================= */
 body{
   font-family:"Poppins",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:var(--bg);
   color:var(--text);
   min-height:100vh;
-  padding-bottom:120px;
+  padding-bottom:calc(120px + env(safe-area-inset-bottom, 0px));
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* Katta ekranlarda app biroz markazda tursin */
+@media(min-width:768px){
+  body{
+    display:flex;
+    justify-content:center;
+    background:radial-gradient(circle at top,#1f2933,#020617);
+  }
+  body > *{
+    max-width:480px;
+    width:100%;
+  }
 }
 
 a{text-decoration:none;color:inherit}
 .hidden{display:none!important;}
+
+/* Fokusda klaviatura bilan ham qulay ishlasin */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
 
 /* =========================================
    HEADER
@@ -52,12 +102,12 @@ a{text-decoration:none;color:inherit}
   top:0;
   z-index:40;
   backdrop-filter:blur(18px);
-  background:linear-gradient(90deg,rgba(249,250,251,0.98),rgba(229,231,235,0.98));
+  background:linear-gradient(90deg,rgba(249,250,251,0.96),rgba(229,231,235,0.96));
   border-bottom:1px solid var(--border-soft);
   padding:8px 10px 4px;
 }
 body.theme-dark .header{
-  background:linear-gradient(90deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
+  background:linear-gradient(90deg,rgba(15,23,42,0.94),rgba(24,24,27,0.94));
 }
 
 .header-row{
@@ -81,7 +131,7 @@ body.theme-dark .header{
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 0 18px rgba(248,113,113,0.6);
+  box-shadow:0 0 18px rgba(248,113,113,0.35);
 }
 
 .logo-circle span{
@@ -107,6 +157,20 @@ body.theme-dark .header{
   gap:6px;
 }
 
+/* Kichik umumiy button stili */
+button{
+  font-family:inherit;
+  transition:
+    background-color .18s ease,
+    box-shadow .18s ease,
+    transform .08s ease,
+    border-color .18s ease;
+}
+button:active{
+  transform:scale(.97);
+}
+
+/* Theme tugmasi */
 .theme-toggle{
   border:none;
   border-radius:999px;
@@ -118,24 +182,29 @@ body.theme-dark .header{
   display:flex;
   align-items:center;
   gap:4px;
+  box-shadow:var(--shadow-soft);
 }
 body.theme-dark .theme-toggle{
   background:rgba(15,23,42,0.9);
   color:#e5e7eb;
 }
 
+/* Savat icon tugmasi */
 .cart-icon-btn{
   border:none;
   border-radius:999px;
-  padding:6px 10px;
+  padding:6px 11px;
   display:flex;
   align-items:center;
   gap:6px;
   cursor:pointer;
-  background:radial-gradient(circle at top,#22c55e,#16a34a 50%,#14532d);
+  background:radial-gradient(circle at top,#22c55e,#16a34a 55%,#14532d);
   color:#022c22;
-  box-shadow:0 6px 16px rgba(34,197,94,0.55);
+  box-shadow:0 6px 16px rgba(34,197,94,0.58);
   font-size:13px;
+}
+.cart-icon-btn:hover{
+  box-shadow:0 10px 22px rgba(34,197,94,0.7);
 }
 .cart-icon-left{font-size:20px;}
 .cart-icon-info{
@@ -145,8 +214,9 @@ body.theme-dark .theme-toggle{
   line-height:1.1;
 }
 .cart-icon-info strong{font-size:13px;}
-.cart-icon-info small{font-size:11px;opacity:.9;}
+.cart-icon-info small{font-size:11px;opacity:.94;}
 
+/* Admin tugmasi */
 .admin-access{
   border-radius:999px;
   border:1px solid var(--border-soft);
@@ -162,7 +232,7 @@ body.theme-dark .admin-access{
 }
 .admin-access.admin-active{
   border-color:#22c55e;
-  box-shadow:0 0 10px rgba(34,197,94,0.7);
+  box-shadow:0 0 12px rgba(34,197,94,0.8);
 }
 
 /* =========================================
@@ -174,11 +244,12 @@ body.theme-dark .admin-access{
   margin-top:8px;
   font-size:12px;
 }
+
 .tab-btn{
   flex:1;
   border:none;
   border-radius:999px;
-  padding:6px 0;
+  padding:7px 0;
   cursor:pointer;
   background:#e5e7eb;
   color:#111827;
@@ -186,15 +257,16 @@ body.theme-dark .admin-access{
   font-size:12px;
 }
 body.theme-dark .tab-btn{
-  background:rgba(15,23,42,0.85);
+  background:rgba(15,23,42,0.9);
   color:#e5e7eb;
 }
+
 .tab-btn.active{
-  background:linear-gradient(120deg,#f97316,#ec4899);
+  background:linear-gradient(135deg,#f97316,#ec4899);
   color:#020617;
   border-color:transparent;
   font-weight:600;
-  box-shadow:0 0 14px rgba(248,113,113,0.5);
+  box-shadow:0 0 18px rgba(236,72,153,0.6);
 }
 
 /* =========================================
@@ -204,6 +276,8 @@ body.theme-dark .tab-btn{
   padding:10px 14px 6px;
   background:var(--bg);
 }
+
+/* Agar kelajakda yana title ishlatmoqchi bo‘lsang – tayyor */
 .hero-title{
   font-size:21px;
   font-weight:700;
@@ -213,11 +287,13 @@ body.theme-dark .tab-btn{
   -webkit-background-clip:text;
   color:transparent;
 }
+
 .hero-sub{
   margin-top:6px;
   font-size:12px;
   color:var(--muted);
 }
+
 .hero-badges{
   margin-top:8px;
   display:flex;
@@ -236,9 +312,10 @@ body.theme-dark .tab-btn{
   color:#111827;
 }
 body.theme-dark .badge{
-  background:rgba(15,23,42,0.9);
+  background:rgba(15,23,42,0.92);
   color:#e5e7eb;
 }
+
 .hero-tag{
   font-size:11px;
   margin-top:8px;
@@ -247,7 +324,7 @@ body.theme-dark .badge{
   gap:6px;
   padding:5px 10px;
   border-radius:999px;
-  background:linear-gradient(90deg,rgba(56,189,248,0.2),rgba(129,140,248,0.1));
+  background:linear-gradient(90deg,rgba(56,189,248,0.12),rgba(129,140,248,0.12));
   border:1px solid rgba(59,130,246,0.55);
 }
 .hero-note{
@@ -265,10 +342,11 @@ body.theme-dark .badge{
   background:#ffffff;
   border-radius:999px;
   border:1px solid var(--border-soft);
-  padding:4px 10px;
+  padding:5px 11px;
+  box-shadow:var(--shadow-soft);
 }
 body.theme-dark .search-bar{
-  background:rgba(15,23,42,0.9);
+  background:rgba(15,23,42,0.96);
 }
 .search-bar span{font-size:16px;}
 .search-bar input{
@@ -282,14 +360,14 @@ body.theme-dark .search-bar{
 .search-bar input::placeholder{color:var(--muted);}
 
 /* =========================================
-   FILTERLAR
+   FILTERLAR (KATEGORIYALAR)
 ========================================= */
 .filters-wrapper{
   position:sticky;
   top:90px;
   z-index:30;
   background:var(--bg);
-  border-bottom:1px solid rgba(148,163,184,0.2);
+  border-bottom:1px solid rgba(148,163,184,0.18);
 }
 .filters{
   padding:8px 12px 6px;
@@ -303,9 +381,9 @@ body.theme-dark .search-bar{
 .chip{
   flex:0 0 auto;
   font-size:11px;
-  padding:7px 12px;
+  padding:8px 13px;
   border-radius:999px;
-  border:1px solid rgba(148,163,184,0.5);
+  border:1px solid rgba(148,163,184,0.6);
   background:#ffffff;
   color:#111827;
   display:flex;
@@ -316,15 +394,18 @@ body.theme-dark .search-bar{
   transition:0.18s ease;
 }
 body.theme-dark .chip{
-  background:rgba(15,23,42,0.9);
+  background:rgba(15,23,42,0.95);
   color:#e5e7eb;
+}
+.chip:hover{
+  border-color:var(--accent-soft);
 }
 .chip.active{
   background:linear-gradient(120deg,#f97316,#ec4899);
   border-color:transparent;
   color:#0f172a;
   font-weight:600;
-  box-shadow:0 0 14px rgba(248,113,113,0.4);
+  box-shadow:0 0 16px rgba(248,113,113,0.45);
 }
 
 /* =========================================
@@ -355,15 +436,20 @@ body.theme-dark .chip{
   border-radius:18px;
   border:1px solid rgba(148,163,184,0.7);
   overflow:hidden;
-  box-shadow:0 10px 22px rgba(0,0,0,0.08);
+  box-shadow:var(--shadow-soft);
   cursor:pointer;
   display:flex;
   flex-direction:column;
+  transform:translateY(0);
+}
+.product-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 24px rgba(15,23,42,0.16);
 }
 body.theme-dark .product-card{
-  background:linear-gradient(145deg,#020617,var(--card));
+  background:radial-gradient(circle at top left,#020617,#111827);
   border-color:rgba(31,41,55,0.9);
-  box-shadow:0 10px 22px rgba(0,0,0,0.7);
+  box-shadow:var(--shadow-soft);
 }
 
 .product-img-wrap{
@@ -380,7 +466,12 @@ body.theme-dark .product-card{
   height:100%;
   object-fit:cover;
   display:block;
+  transition:transform .3s ease;
 }
+.product-card:hover .product-img-wrap img{
+  transform:scale(1.03);
+}
+
 .product-img-tag{
   position:absolute;
   left:8px;
@@ -388,7 +479,7 @@ body.theme-dark .product-card{
   font-size:9px;
   padding:3px 7px;
   border-radius:999px;
-  background:rgba(15,23,42,0.9);
+  background:rgba(15,23,42,0.92);
   border:1px solid rgba(148,163,184,0.7);
   display:flex;
   align-items:center;
@@ -465,7 +556,7 @@ body.theme-dark .tag-mini{
 .btn-add{
   border:none;
   border-radius:999px;
-  padding:7px 11px;
+  padding:8px 12px;
   font-size:11px;
   font-weight:600;
   background:linear-gradient(120deg,#22c55e,#16a34a);
@@ -477,7 +568,6 @@ body.theme-dark .tag-mini{
   box-shadow:0 6px 12px rgba(34,197,94,0.35);
   flex-shrink:0;
 }
-.btn-add:active{transform:scale(.96);}
 
 /* =========================================
    BOTTOM ORDER BAR
@@ -486,7 +576,7 @@ body.theme-dark .tag-mini{
   position:fixed;
   left:10px;
   right:10px;
-  bottom:24px;
+  bottom:calc(24px + env(safe-area-inset-bottom, 0px));
   background:linear-gradient(135deg,rgba(249,250,251,0.98),rgba(229,231,235,0.98));
   border-radius:18px;
   border:1px solid rgba(148,163,184,0.65);
@@ -497,9 +587,8 @@ body.theme-dark .tag-mini{
 }
 body.theme-dark .cart-bar{
   background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
-  box-shadow:0 18px 40px rgba(0,0,0,0.8),0 0 0 1px rgba(15,23,42,0.8);
+  box-shadow:var(--shadow-strong);
 }
-
 .cart-bar-note{
   font-size:10px;
   color:var(--muted);
@@ -527,9 +616,8 @@ body.theme-dark .cart-bar{
   justify-content:space-between;
   gap:10px;
   cursor:pointer;
-  box-shadow:0 14px 32px rgba(236,72,153,0.85),0 0 0 1px rgba(248,250,252,0.6);
+  box-shadow:0 14px 32px rgba(236,72,153,0.85),0 0 0 1px rgba(248,250,252,0.7);
 }
-.cart-main-btn:active{transform:scale(.97);}
 .cart-main-btn > div:first-child{
   display:flex;
   flex-direction:column;
@@ -581,11 +669,10 @@ body.theme-dark .cart-bar{
   z-index:37;
   display:flex;
   flex-direction:column;
-  box-shadow:0 -18px 30px rgba(148,163,184,0.8);
+  box-shadow:var(--shadow-strong);
 }
 body.theme-dark .cart-sheet{
   background:radial-gradient(circle at top,#020617,#0b1021);
-  box-shadow:0 -24px 36px rgba(0,0,0,0.9);
 }
 .cart-sheet.open{transform:translateY(0);}
 
@@ -617,7 +704,7 @@ body.theme-dark .cart-sheet{
   justify-content:center;
 }
 body.theme-dark .cart-sheet-header button{
-  background:rgba(15,23,42,0.85);
+  background:rgba(15,23,42,0.93);
   color:#e5e7eb;
 }
 
@@ -626,7 +713,6 @@ body.theme-dark .cart-sheet-header button{
   overflow-y:auto;
   max-height:48vh;
 }
-
 .cart-sheet-footer{
   padding:8px 14px 12px;
   border-top:1px solid var(--border-soft);
@@ -675,7 +761,6 @@ body.theme-dark .cart-sheet-footer{
   letter-spacing:0.02em;
   text-transform:uppercase;
 }
-.cart-sheet-btn:active{transform:scale(.97);}
 
 .cart-empty{
   font-size:11px;
@@ -702,7 +787,6 @@ body.theme-dark .cart-sheet-footer{
   font-size:10px;
   color:var(--muted);
 }
-
 .cart-item-actions{
   display:flex;
   align-items:center;
@@ -710,6 +794,7 @@ body.theme-dark .cart-sheet-footer{
   gap:6px;
   font-size:10px;
 }
+
 .qty-control{
   display:flex;
   align-items:center;
@@ -721,22 +806,24 @@ body.theme-dark .cart-sheet-footer{
   border:none;
   background:#e5e7eb;
   color:#111827;
-  width:22px;
-  height:20px;
+  width:24px;
+  height:22px;
   cursor:pointer;
   font-size:13px;
 }
 body.theme-dark .qty-control button{
-  background:rgba(15,23,42,0.95);
+  background:rgba(15,23,42,0.96);
   color:#e5e7eb;
 }
 .qty-control span{
   padding:0 7px;
-  min-width:20px;
+  min-width:22px;
   text-align:center;
   font-size:11px;
 }
+
 .cart-item-total{font-weight:600;}
+
 .cart-remove{
   border:none;
   background:transparent;
@@ -752,7 +839,7 @@ body.theme-dark .qty-control button{
   position:fixed;
   left:50%;
   transform:translateX(-50%);
-  bottom:95px;
+  bottom:calc(95px + env(safe-area-inset-bottom, 0px));
   background:rgba(15,23,42,0.98);
   border-radius:999px;
   padding:6px 12px;
@@ -792,12 +879,14 @@ body.theme-dark .qty-control button{
   color:var(--muted);
   margin-bottom:10px;
 }
+
 .history-empty{
   font-size:11px;
   color:var(--muted);
   padding:16px 0;
   text-align:center;
 }
+
 .order-card{
   background:var(--card);
   border-radius:12px;
@@ -805,10 +894,10 @@ body.theme-dark .qty-control button{
   padding:8px 10px;
   margin-bottom:8px;
   font-size:11px;
-  box-shadow:0 6px 16px rgba(0,0,0,0.08);
+  box-shadow:var(--shadow-soft);
 }
 body.theme-dark .order-card{
-  box-shadow:0 6px 16px rgba(0,0,0,0.6);
+  box-shadow:var(--shadow-soft);
 }
 .order-head{
   display:flex;
@@ -827,6 +916,7 @@ body.theme-dark .order-card{
   padding-left:10px;
 }
 .order-items li{margin-bottom:2px;}
+
 .clear-history-btn{
   border:none;
   background:transparent;
@@ -847,10 +937,7 @@ body.theme-dark .order-card{
   padding:8px 10px;
   font-size:11px;
   margin-bottom:10px;
-  box-shadow:0 6px 14px rgba(148,163,184,0.25);
-}
-body.theme-dark .admin-form{
-  box-shadow:0 6px 14px rgba(0,0,0,0.6);
+  box-shadow:var(--shadow-soft);
 }
 .admin-form h3{
   font-size:13px;
@@ -880,9 +967,10 @@ body.theme-dark .admin-form{
 body.theme-dark .form-row input,
 body.theme-dark .form-row textarea,
 body.theme-dark .form-row select{
-  background:rgba(15,23,42,0.7);
+  background:rgba(15,23,42,0.8);
   color:#f9fafb;
 }
+
 .admin-check-row{
   display:flex;
   align-items:center;
@@ -891,6 +979,7 @@ body.theme-dark .form-row select{
   margin:4px 0 2px;
   color:var(--muted);
 }
+
 .admin-btn{
   border:none;
   border-radius:999px;
@@ -901,7 +990,6 @@ body.theme-dark .form-row select{
   font-weight:600;
   cursor:pointer;
   margin-top:4px;
-  transition:0.2s ease;
 }
 .admin-info{
   font-size:10px;
@@ -954,6 +1042,7 @@ body.theme-dark .form-row select{
   justify-content:center;
   align-items:flex-end;
 }
+
 .product-detail-card{
   background:var(--card);
   color:var(--text);
@@ -962,7 +1051,7 @@ body.theme-dark .form-row select{
   max-height:95vh;
   border-radius:20px 20px 0 0;
   overflow-y:auto;
-  box-shadow:0 -18px 34px rgba(0,0,0,0.9);
+  box-shadow:var(--shadow-strong);
 }
 @media(min-width:720px){
   .product-detail-card{
@@ -971,13 +1060,14 @@ body.theme-dark .form-row select{
     margin-bottom:18px;
   }
 }
+
 .product-detail-header{
   position:relative;
 }
 .product-detail-image-wrap{
   position:relative;
   width:100%;
-  padding-top:80%; /* Uzum uslubida nisbatan pastroq */
+  padding-top:80%;
   background:#020617;
   overflow:hidden;
 }
@@ -999,7 +1089,7 @@ body.theme-dark .form-row select{
   border-radius:999px;
   border:none;
   cursor:pointer;
-  background:rgba(15,23,42,0.7);
+  background:rgba(15,23,42,0.72);
   color:#f9fafb;
   font-size:18px;
   display:flex;
@@ -1013,7 +1103,7 @@ body.theme-dark .form-row select{
   transform:translateY(-50%) scale(.95);
 }
 
-/* Rasm indexi (1 / N) */
+/* Rasm indexi */
 .detail-image-index{
   position:absolute;
   right:10px;
@@ -1021,7 +1111,7 @@ body.theme-dark .form-row select{
   padding:3px 8px;
   border-radius:999px;
   font-size:10px;
-  background:rgba(15,23,42,0.85);
+  background:rgba(15,23,42,0.88);
   color:#e5e7eb;
 }
 
@@ -1034,7 +1124,7 @@ body.theme-dark .form-row select{
   width:32px;
   height:32px;
   border-radius:999px;
-  background:rgba(15,23,42,0.85);
+  background:rgba(15,23,42,0.9);
   color:#e5e7eb;
   cursor:pointer;
   display:flex;
@@ -1085,7 +1175,7 @@ body.theme-dark .form-row select{
   text-decoration:line-through;
 }
 
-/* Miqdor (qty) Uzum uslubida */
+/* Miqdor (qty) */
 .detail-qty-row{
   display:flex;
   align-items:center;
@@ -1110,7 +1200,7 @@ body.theme-dark .form-row select{
   font-size:16px;
 }
 body.theme-dark .detail-qty-controls button{
-  background:rgba(15,23,42,0.95);
+  background:rgba(15,23,42,0.96);
   color:#e5e7eb;
 }
 .detail-qty-controls span{
@@ -1141,7 +1231,6 @@ body.theme-dark .detail-qty-controls button{
   align-items:center;
   justify-content:center;
   gap:6px;
-  transition:0.18s ease;
 }
 .detail-add-btn.added{
   background:linear-gradient(120deg,#4ade80,#22c55e);
@@ -1149,7 +1238,7 @@ body.theme-dark .detail-qty-controls button{
   transform:translateY(-1px);
 }
 
-/* 5 soniyali qaytish tugmasi */
+/* Qaytish tugmasi */
 .detail-back-btn{
   width:100%;
   border:none;
@@ -1164,8 +1253,6 @@ body.theme-dark .detail-back-btn{
   background:rgba(15,23,42,0.9);
   color:#e5e7eb;
 }
-
-/* Countdown bo‘lganda qizil holat */
 .detail-back-btn.danger{
   background:var(--danger);
   color:#fef2f2;
