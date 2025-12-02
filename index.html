@@ -1,2136 +1,293 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <title>Beauty Store — Kosmetika Do‘koni</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
+
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#f3f4f6;
-      --bg-soft:#e5e7eb;
-      --accent:#ec4899;
-      --accent-soft:#f9a8d4;
-      --accent-2:#f97316;
-      --text:#020617;
-      --muted:#4b5563;
-      --card:#ffffff;
-      --border-soft:rgba(148,163,184,0.7);
-      --danger:#dc2626;
-    }
-    body.theme-dark{
-      --bg:#050816;
-      --bg-soft:#0b1021;
-      --accent:#ff3e92;
-      --accent-soft:#ff8bd0;
-      --accent-2:#ffb800;
-      --text:#f9fafb;
-      --muted:#9ca3af;
-      --card:#0f172a;
-      --border-soft:rgba(148,163,184,0.4);
-      --danger:#f97373;
-    }
-    body{
-      font-family:"Poppins",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:radial-gradient(circle at top,#f9a8d4 0,#fef3c7 26%,#f3f4f6 50%,#e5e7eb 100%);
-      color:var(--text);
-      min-height:100vh;
-    }
-    body.theme-dark{
-      background:radial-gradient(circle at top,#1f2937 0,#020617 40%,#020617 100%);
-    }
-    .page{
-      max-width:960px;
-      margin:0 auto;
-      padding:10px 12px 26px;
-    }
 
-    /* HEADER */
-    .header{
-      position:sticky;top:0;z-index:20;
-      padding:10px 12px;
-      margin:-10px -12px 10px;
-      backdrop-filter:blur(18px);
-      background:linear-gradient(90deg,rgba(15,23,42,0.9),rgba(30,64,175,0.7),rgba(244,114,182,0.9));
-      color:#f9fafb;
-      box-shadow:0 12px 30px rgba(15,23,42,0.38);
-    }
-    .header-inner{
-      max-width:960px;
-      margin:0 auto;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .logo-circle{
-      width:36px;height:36px;border-radius:999px;
-      display:flex;align-items:center;justify-content:center;
-      background:radial-gradient(circle at top,var(--accent-soft),var(--accent));
-      box-shadow:0 10px 25px rgba(0,0,0,0.4);
-      font-size:18px;
-    }
-    .brand{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-    .brand-title{
-      font-size:15px;font-weight:700;letter-spacing:0.04em;
-      text-transform:uppercase;
-    }
-    .brand-sub{
-      font-size:11px;opacity:.9;display:flex;gap:4px;align-items:center;flex-wrap:wrap;
-    }
-    .chip-small{
-      border-radius:999px;
-      border:1px solid rgba(248,250,252,0.3);
-      padding:1px 8px;font-size:10px;
-      display:inline-flex;align-items:center;gap:4px;
-      background:rgba(15,23,42,0.2);
-    }
-    .header-actions{
-      display:flex;align-items:center;gap:8px;
-    }
-    .icon-btn{
-      border:none;border-radius:999px;
-      padding:7px 9px;
-      background:rgba(15,23,42,0.2);
-      color:#f9fafb;
-      display:inline-flex;align-items:center;justify-content:center;
-      font-size:15px;
-      cursor:pointer;
-      box-shadow:0 4px 10px rgba(15,23,42,0.5);
-      transition:transform .1s ease,box-shadow .1s ease,background .12s ease;
-    }
-    .icon-btn:hover{
-      transform:translateY(-1px);
-      background:rgba(15,23,42,0.35);
-      box-shadow:0 8px 18px rgba(15,23,42,0.7);
-    }
-    .icon-btn:active{
-      transform:translateY(0);
-      box-shadow:0 4px 10px rgba(15,23,42,0.4);
-    }
-    .cart-pill{
-      display:flex;align-items:center;gap:8px;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(15,23,42,0.2);
-      font-size:11px;
-      cursor:pointer;
-      box-shadow:0 4px 12px rgba(15,23,42,0.6);
-      transition:transform .1s ease,box-shadow .1s ease,background .12s ease;
-    }
-    .cart-pill:hover{
-      transform:translateY(-1px);
-      background:rgba(15,23,42,0.3);
-      box-shadow:0 8px 18px rgba(15,23,42,0.7);
-    }
-    .cart-count{
-      min-width:18px;height:18px;border-radius:999px;
-      background:#f97316;
-      display:flex;align-items:center;justify-content:center;
-      font-size:11px;font-weight:600;
-    }
-    .cart-total{
-      font-size:11px;opacity:.9;
-    }
-
-    main{margin-top:10px;}
-
-    /* TABS */
-    .tabs{
-      display:flex;
-      gap:6px;
-      background:rgba(255,255,255,0.8);
-      border-radius:999px;
-      padding:3px;
-      box-shadow:0 8px 18px rgba(148,163,184,0.4);
-      margin-bottom:12px;
-    }
-    body.theme-dark .tabs{
-      background:rgba(15,23,42,0.94);
-      box-shadow:0 14px 32px rgba(15,23,42,0.85);
-    }
-    .tab-btn{
-      flex:1;
-      border-radius:999px;
-      border:none;
-      background:transparent;
-      font-size:12px;
-      padding:7px 10px;
-      cursor:pointer;
-      color:var(--muted);
-      display:flex;align-items:center;justify-content:center;
-      gap:6px;
-      transition:background .12s ease,color .12s ease,box-shadow .12s ease,transform .1s ease;
-    }
-    .tab-btn.active{
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      color:#f9fafb;
-      box-shadow:0 10px 22px rgba(248,113,113,0.45);
-      transform:translateY(-1px);
-    }
-    .tab-btn span.emoji{font-size:14px;}
-
-    .page-section{margin-top:6px;}
-    .page-section.hidden{display:none;}
-    .section-title{
-      font-size:15px;
-      font-weight:600;
-      margin-bottom:10px;
-      display:flex;align-items:center;gap:6px;
-    }
-
-    /* FILTER & SEARCH */
-    .top-row{
-      display:flex;flex-direction:column;gap:8px;margin-bottom:10px;
-    }
-    @media(min-width:600px){
-      .top-row{flex-direction:row;align-items:center;}
-    }
-    .filter-bar{
-      display:flex;gap:6px;flex-wrap:wrap;
-    }
-    .chip{
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid var(--border-soft);
-      background:rgba(255,255,255,0.75);
-      font-size:11px;
-      cursor:pointer;
-      display:inline-flex;align-items:center;gap:5px;
-      transition:background .12s ease,transform .1s ease,box-shadow .12s ease,border-color .12s ease;
-    }
-    body.theme-dark .chip{
-      background:rgba(15,23,42,0.92);
-    }
-    .chip.active{
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      color:#f9fafb;
-      border-color:transparent;
-      box-shadow:0 8px 18px rgba(248,113,113,0.45);
-      transform:translateY(-1px);
-    }
-    .search-box{
-      flex:1;
-      position:relative;
-    }
-    .search-box input{
-      width:100%;
-      padding:8px 10px 8px 28px;
-      border-radius:999px;
-      border:1px solid var(--border-soft);
-      font-size:12px;
-      background:rgba(255,255,255,0.9);
-      outline:none;
-    }
-    body.theme-dark .search-box input{
-      background:rgba(15,23,42,0.95);
-      color:var(--text);
-    }
-    .search-icon{
-      position:absolute;
-      left:9px;top:50%;transform:translateY(-50%);
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    /* PRODUCTS GRID */
-    .products-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:10px;
-    }
-    @media(min-width:720px){
-      .products-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
-    }
-    .product-card{
-      background:var(--card);
-      border-radius:18px;
-      border:1px solid rgba(148,163,184,0.35);
-      box-shadow:0 10px 24px rgba(148,163,184,0.35);
-      overflow:hidden;
-      cursor:pointer;
-      display:flex;
-      flex-direction:column;
-      transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;
-    }
-    body.theme-dark .product-card{
-      box-shadow:0 18px 38px rgba(15,23,42,0.9);
-    }
-    .product-card:hover{
-      transform:translateY(-3px);
-      box-shadow:0 14px 30px rgba(148,163,184,0.5);
-      border-color:rgba(248,113,113,0.8);
-    }
-    .product-img-wrap{
-      position:relative;
-      overflow:hidden;
-      background:#111827;
-      min-height:120px;
-    }
-    .product-img-wrap img{
-      width:100%;
-      height:140px;
-      object-fit:cover;
-      display:block;
-      transition:transform .25s ease;
-    }
-    .product-card:hover .product-img-wrap img{
-      transform:scale(1.06);
-    }
-    .product-img-tag{
-      position:absolute;
-      left:8px;top:8px;
-      display:flex;gap:4px;
-      font-size:10px;
-    }
-    .product-img-tag span{
-      padding:2px 6px;
-      border-radius:999px;
-      background:rgba(15,23,42,0.8);
-      color:#e5e7eb;
-      border:1px solid rgba(148,163,184,0.7);
-    }
-    .product-sale{
-      position:absolute;
-      right:8px;top:8px;
-      padding:2px 7px;
-      border-radius:999px;
-      background:linear-gradient(135deg,#ef4444,#f97316);
-      color:#f9fafb;
-      font-size:10px;
-      font-weight:600;
-      box-shadow:0 8px 18px rgba(248,113,113,0.5);
-    }
-    .product-body{
-      padding:8px 9px 9px;
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-    .product-name{
-      font-size:12px;font-weight:600;line-height:1.2;min-height:28px;
-    }
-    .product-meta{
-      font-size:10px;color:var(--muted);
-      white-space:nowrap;
-      overflow:hidden;text-overflow:ellipsis;
-    }
-    .tag-mini{
-      font-size:10px;
-      padding:2px 6px;
-      border-radius:999px;
-      background:rgba(251,113,133,0.12);
-      color:#b91c1c;
-      width:max-content;
-      max-width:100%;
-      white-space:nowrap;
-      overflow:hidden;text-overflow:ellipsis;
-    }
-    body.theme-dark .tag-mini{
-      background:rgba(248,250,252,0.06);
-      color:#fecaca;
-    }
-    .price-row{
-      margin-top:4px;
-      display:flex;align-items:flex-end;justify-content:space-between;gap:6px;
-    }
-    .price-main{
-      font-size:12px;font-weight:700;color:#16a34a;
-    }
-    body.theme-dark .price-main{color:#4ade80;}
-    .price-old{
-      font-size:10px;color:var(--muted);text-decoration:line-through;
-    }
-    .btn-add{
-      border:none;border-radius:999px;
-      padding:4px 8px;
-      font-size:11px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      color:#f9fafb;
-      display:inline-flex;align-items:center;gap:4px;
-      cursor:pointer;
-      white-space:nowrap;
-      box-shadow:0 10px 20px rgba(248,113,113,0.45);
-      transition:transform .1s ease,box-shadow .1s ease,background .12s ease;
-    }
-    .btn-add:hover{
-      transform:translateY(-1px);
-      box-shadow:0 14px 26px rgba(248,113,113,0.6);
-    }
-    .btn-add:active{
-      transform:translateY(0);
-      box-shadow:0 6px 14px rgba(248,113,113,0.55);
-    }
-
-    /* CART SHEET */
-    .cart-sheet-overlay{
-      position:fixed;inset:0;
-      background:rgba(15,23,42,0.5);
-      backdrop-filter:blur(4px);
-      opacity:0;pointer-events:none;
-      transition:opacity .15s ease;
-      z-index:30;
-    }
-    .cart-sheet-overlay.show{
-      opacity:1;pointer-events:auto;
-    }
-    .cart-sheet{
-      position:fixed;left:0;right:0;bottom:-100%;
-      background:var(--card);
-      border-radius:18px 18px 0 0;
-      box-shadow:0 -16px 40px rgba(15,23,42,0.65);
-      padding:10px 12px 14px;
-      max-height:70vh;
-      display:flex;flex-direction:column;gap:8px;
-      transition:bottom .18s ease;
-      z-index:40;
-    }
-    .cart-sheet.open{bottom:0;}
-    .cart-header{
-      display:flex;align-items:center;justify-content:space-between;gap:8px;
-    }
-    .cart-title{
-      font-size:13px;font-weight:600;
-      display:flex;align-items:center;gap:6px;
-    }
-    .cart-total-pill{
-      border-radius:999px;
-      padding:3px 8px;
-      background:rgba(248,250,252,0.9);
-      border:1px solid var(--border-soft);
-      font-size:11px;
-    }
-    body.theme-dark .cart-total-pill{
-      background:rgba(15,23,42,0.94);
-    }
-    .cart-close{
-      border:none;border-radius:999px;
-      padding:4px 8px;
-      background:transparent;
-      font-size:12px;
-      cursor:pointer;
-      color:var(--muted);
-    }
-    .cart-items{
-      margin-top:4px;
-      flex:1;
-      overflow:auto;
-      padding-right:4px;
-    }
-    .cart-item-row{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:8px;
-      padding:6px 0;
-      border-bottom:1px dashed rgba(148,163,184,0.5);
-    }
-    .cart-item-row:last-child{border-bottom:none;}
-    .cart-item-main{
-      flex:1;min-width:0;
-    }
-    .cart-item-name{
-      font-size:12px;font-weight:500;
-    }
-    .cart-item-meta{
-      font-size:10px;color:var(--muted);
-    }
-    .cart-item-actions{
-      display:flex;flex-direction:column;align-items:flex-end;gap:2px;
-      font-size:11px;min-width:96px;
-    }
-    .qty-control{
-      display:flex;align-items:center;gap:4px;
-    }
-    .qty-control button{
-      width:20px;height:20px;border-radius:999px;
-      border:1px solid var(--border-soft);
-      background:rgba(248,250,252,0.9);
-      font-size:12px;cursor:pointer;
-    }
-    body.theme-dark .qty-control button{
-      background:rgba(15,23,42,0.94);
-      color:var(--text);
-    }
-    .cart-item-total{
-      font-weight:600;
-    }
-    .cart-remove{
-      border:none;background:transparent;
-      color:var(--danger);font-size:13px;
-      cursor:pointer;
-    }
-    .cart-footer{
-      margin-top:4px;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-    .cart-sum-row{
-      display:flex;align-items:center;justify-content:space-between;
-      font-size:12px;font-weight:600;
-    }
-    .btn-primary{
-      width:100%;
-      border:none;border-radius:999px;
-      padding:7px 10px;
-      font-size:12px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      color:#f9fafb;
-      display:inline-flex;align-items:center;justify-content:center;gap:6px;
-      cursor:pointer;
-      box-shadow:0 12px 26px rgba(248,113,113,0.5);
-      transition:transform .1s ease,box-shadow .1s ease,background .12s ease;
-    }
-    .btn-primary:hover{
-      transform:translateY(-1px);
-      box-shadow:0 16px 32px rgba(248,113,113,0.65);
-    }
-    .btn-primary:active{
-      transform:translateY(0);
-      box-shadow:0 8px 20px rgba(248,113,113,0.6);
-    }
-    .cart-empty,.history-empty{
-      font-size:12px;
-      color:var(--muted);
-      padding:8px 2px;
-    }
-
-    /* HISTORY */
-    .order-card{
-      background:var(--card);
-      border-radius:16px;
-      border:1px solid var(--border-soft);
-      padding:8px 9px;
-      box-shadow:0 8px 20px rgba(148,163,184,0.35);
-      font-size:11px;
-      margin-bottom:8px;
-    }
-    body.theme-dark .order-card{
-      box-shadow:0 16px 34px rgba(15,23,42,0.9);
-    }
-    .order-head{
-      display:flex;align-items:center;justify-content:space-between;gap:8px;
-      margin-bottom:4px;
-      font-size:11px;font-weight:600;
-    }
-    .order-meta{
-      font-size:10px;color:var(--muted);margin-bottom:4px;
-    }
-    .order-items{
-      padding-left:16px;
-      margin-top:2px;
-    }
-    .order-items li{
-      margin-bottom:2px;
-    }
-
-    /* SETTINGS CARD (ism/tel/manzilni o‘zgartirish) */
-    .settings-card{
-      margin-top:16px;
-      padding:14px 12px;
-      border-radius:16px;
-      background:var(--bg-soft);
-      border:1px solid var(--border-soft);
-    }
-    body.theme-dark .settings-card{
-      background:rgba(15,23,42,0.9);
-    }
-    .settings-title{
-      font-size:14px;
-      font-weight:600;
-      margin-bottom:6px;
-    }
-    .settings-desc{
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.4;
-      margin-bottom:10px;
-    }
-    .settings-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:6px;
-      padding:8px 14px;
-      font-size:12px;
-      border-radius:999px;
-      border:none;
-      cursor:pointer;
-      background:var(--accent);
-      color:#fff;
-      box-shadow:0 8px 20px rgba(248,113,113,0.6);
-      transition:transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-    }
-    .settings-btn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 12px 26px rgba(248,113,113,0.75);
-      background:var(--accent-soft);
-    }
-    .settings-btn:active{
-      transform:translateY(0);
-      box-shadow:0 6px 16px rgba(248,113,113,0.7);
-    }
-
-    /* ADMIN */
-    #adminPage{
-      font-size:12px;
-    }
-    .admin-head{
-      display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;
-    }
-    .admin-info{
-      font-size:11px;color:var(--muted);
-    }
-    .admin-form{
-      background:var(--card);
-      border-radius:16px;
-      border:1px solid var(--border-soft);
-      padding:8px 9px;
-      box-shadow:0 10px 24px rgba(148,163,184,0.35);
-      margin-bottom:10px;
-    }
-    .admin-row{
-      display:flex;flex-direction:column;gap:4px;margin-bottom:6px;
-    }
-    .admin-row label{font-size:11px;font-weight:500;}
-    .admin-row input,
-    .admin-row select,
-    .admin-row textarea{
-      width:100%;
-      padding:6px 8px;
-      border-radius:10px;
-      border:1px solid var(--border-soft);
-      font-size:11px;
-      background:rgba(255,255,255,0.9);
-      outline:none;
-    }
-    body.theme-dark .admin-row input,
-    body.theme-dark .admin-row select,
-    body.theme-dark .admin-row textarea{
-      background:rgba(15,23,42,0.95);
-      color:var(--text);
-    }
-    .admin-row textarea{min-height:50px;resize:vertical;}
-    .admin-fields-inline{
-      display:flex;gap:6px;
-    }
-    .admin-fields-inline .admin-row{flex:1;margin-bottom:0;}
-    .admin-checkbox{
-      display:flex;align-items:center;gap:4px;font-size:11px;margin-bottom:6px;
-    }
-    .admin-checkbox input{width:14px;height:14px;}
-    .admin-btn{
-      width:100%;
-      border:none;border-radius:999px;
-      padding:7px 10px;
-      font-size:12px;
-      background:linear-gradient(135deg,#22c55e,#16a34a);
-      color:#f9fafb;
-      cursor:pointer;
-      box-shadow:0 10px 24px rgba(34,197,94,0.55);
-      transition:transform .1s ease,box-shadow .1s ease,background .12s ease;
-      margin-top:4px;
-    }
-    .admin-btn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 16px 32px rgba(34,197,94,0.7);
-    }
-    .admin-btn-success{
-      background:linear-gradient(135deg,#22c55e,#4ade80)!important;
-    }
-    .admin-list{
-      background:var(--card);
-      border-radius:16px;
-      border:1px solid var(--border-soft);
-      padding:8px 9px;
-      box-shadow:0 10px 22px rgba(148,163,184,0.35);
-    }
-    .admin-product-row{
-      display:flex;align-items:center;justify-content:space-between;gap:6px;
-      padding:4px 0;
-      border-bottom:1px dashed rgba(148,163,184,0.6);
-      font-size:11px;
-    }
-    .admin-product-row:last-child{border-bottom:none;}
-    .admin-edit-btn,
-    .admin-delete-btn{
-      border:none;
-      border-radius:999px;
-      padding:2px 6px;
-      font-size:11px;
-      cursor:pointer;
-    }
-    .admin-edit-btn{background:rgba(34,197,94,0.15);}
-    .admin-delete-btn{background:rgba(239,68,68,0.1);color:var(--danger);}
-
-    .admin-access-btn{
-      border:none;border-radius:999px;
-      padding:4px 8px;font-size:11px;
-      background:rgba(15,23,42,0.12);
-      color:var(--muted);
-      cursor:pointer;
-    }
-    .admin-access-btn.admin-active{
-      background:rgba(34,197,94,0.15);
-      color:#16a34a;
-    }
-
-    /* PRODUCT DETAIL OVERLAY */
-    .detail-overlay{
-      position:fixed;inset:0;
-      background:rgba(15,23,42,0.75);
-      display:none;
-      align-items:flex-end;
-      justify-content:center;
-      z-index:50;
-    }
-    .detail-overlay:not(.hidden){display:flex;}
-    .detail-sheet{
-      width:100%;
-      max-width:420px;
-      background:var(--card);
-      border-radius:22px 22px 0 0;
-      box-shadow:0 -20px 40px rgba(15,23,42,0.9);
-      padding:10px 12px 14px;
-      max-height:80vh;
-      display:flex;flex-direction:column;gap:8px;
-    }
-    .detail-img-wrap{
-      position:relative;
-      border-radius:16px;
-      overflow:hidden;
-      background:#020617;
-    }
-    .detail-img-wrap img{
-      width:100%;height:180px;object-fit:cover;
-      display:block;
-    }
-    .detail-img-controls{
-      position:absolute;
-      left:0;right:0;bottom:4px;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 6px;
-      font-size:11px;
-      color:#f9fafb;
-    }
-    .detail-nav-btn{
-      border:none;border-radius:999px;
-      padding:2px 8px;
-      background:rgba(15,23,42,0.65);
-      cursor:pointer;
-      color:#f9fafb;
-    }
-    .detail-meta{
-      font-size:10px;color:var(--muted);margin-top:2px;
-    }
-    .detail-name{
-      font-size:14px;font-weight:600;margin-top:2px;
-    }
-    .detail-tag{
-      font-size:11px;margin-top:2px;
-    }
-    .detail-desc{
-      font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4;
-    }
-    .detail-price-row{
-      margin-top:6px;
-      display:flex;align-items:center;justify-content:space-between;gap:8px;
-    }
-    .detail-price-main{font-size:14px;font-weight:700;color:#16a34a;}
-    .detail-price-old{font-size:11px;color:var(--muted);text-decoration:line-through;}
-    .hidden{display:none!important;}
-    .detail-qty-row{
-      display:flex;align-items:center;gap:8px;margin-top:4px;font-size:12px;
-    }
-    .detail-qty-controls{
-      display:flex;align-items:center;gap:4px;
-    }
-    .detail-qty-controls button{
-      width:22px;height:22px;border-radius:999px;
-      border:1px solid var(--border-soft);
-      background:rgba(248,250,252,0.95);
-      font-size:13px;cursor:pointer;
-    }
-    body.theme-dark .detail-qty-controls button{
-      background:rgba(15,23,42,0.96);
-      color:var(--text);
-    }
-    .detail-back-btn{
-      margin-top:4px;
-      border:none;border-radius:999px;
-      padding:5px 8px;
-      font-size:11px;
-      background:rgba(15,23,42,0.04);
-      cursor:pointer;
-      color:var(--muted);
-      width:100%;
-    }
-    .detail-actions{
-      margin-top:6px;
-      display:flex;flex-direction:column;gap:6px;
-    }
-    .detail-add-btn{
-      width:100%;
-      border:none;border-radius:999px;
-      padding:7px 10px;
-      font-size:12px;
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      color:#f9fafb;
-      cursor:pointer;
-      box-shadow:0 12px 28px rgba(248,113,113,0.55);
-      transition:transform .1s ease,box-shadow .1s ease,background .12s ease;
-    }
-    .detail-add-btn.added{
-      background:linear-gradient(135deg,#22c55e,#16a34a);
-      box-shadow:0 12px 28px rgba(34,197,94,0.7);
-    }
-    .detail-add-btn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 16px 32px rgba(248,113,113,0.7);
-    }
-    .detail-add-btn:active{
-      transform:translateY(0);
-      box-shadow:0 8px 20px rgba(248,113,113,0.6);
-    }
-
-    /* TOAST */
-    .toast{
-      position:fixed;
-      left:50%;bottom:14px;
-      transform:translateX(-50%) translateY(40px);
-      background:rgba(15,23,42,0.96);
-      color:#f9fafb;
-      padding:6px 12px;
-      border-radius:999px;
-      font-size:11px;
-      box-shadow:0 12px 30px rgba(15,23,42,0.8);
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .15s ease,transform .15s ease;
-      z-index:60;
-    }
-    .toast.show{
-      opacity:1;
-      transform:translateX(-50%) translateY(0);
-    }
-  </style>
+  <!-- STYLES -->
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="theme-light">
+<body>
+  <!-- HEADER -->
   <header class="header">
-    <div class="header-inner">
-      <div class="logo-circle">💋</div>
-      <div class="brand">
-        <div class="brand-title">Beauty Store</div>
-        <div class="brand-sub">
-          <span class="chip-small">Kosmetika &amp; Parfyum</span>
-          <span class="chip-small">Onlayn buyurtma</span>
+    <div class="header-row">
+      <div class="logo-wrap">
+        <div class="logo-circle">
+          <span>B</span>
+        </div>
+        <div class="logo-text">
+          <strong>Beauty Store</strong>
+          <small>Premium kosmetika do‘koni</small>
         </div>
       </div>
-      <div class="header-actions">
-        <button id="themeToggleBtn" class="icon-btn" type="button">🌙</button>
-        <button class="admin-access-btn" id="adminAccessBtn" type="button">👑 Admin uchun</button>
-        <div class="cart-pill" onclick="toggleCartSheet()">
-          <div class="cart-count" id="cartCountTop">0</div>
-          <div class="cart-total" id="cartTotalTop">0 so‘m</div>
-        </div>
+      <div class="header-right">
+        <button class="theme-toggle" id="themeToggleBtn" type="button">🌙</button>
+        <button class="cart-icon-btn" type="button" onclick="toggleCartSheet(true)">
+          <span class="cart-icon-left">🛒</span>
+          <div class="cart-icon-info">
+            <strong><span id="cartCountTop">0</span> ta</strong>
+            <small id="cartTotalTop">0 so‘m</small>
+          </div>
+        </button>
+        <button id="adminAccessBtn" class="admin-access" type="button">
+          👑 Admin uchun
+        </button>
       </div>
+    </div>
+    <!-- TABS -->
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" data-page="shopPage">Do‘kon</button>
+      <button class="tab-btn" data-page="historyPage">Buyurtmalar tarixi</button>
+      <button class="tab-btn hidden" data-page="adminPage" id="adminTabBtn">Admin panel</button>
     </div>
   </header>
 
-  <div class="page">
-    <main>
-      <div id="tabs" class="tabs">
-        <button class="tab-btn active" data-page="shopPage">
-          <span class="emoji">🛍</span><span>Magazin</span>
-        </button>
-        <button class="tab-btn" data-page="historyPage">
-          <span class="emoji">🧾</span><span>Tarix</span>
-        </button>
-        <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">
-          <span class="emoji">👑</span><span>Admin</span>
-        </button>
+  <!-- SHOP PAGE -->
+  <div id="shopPage">
+    <section class="hero">
+      <div class="hero-title">
+        Har kuni <span>go‘zallik</span> kayfiyati 💫
+      </div>
+      <p class="hero-sub">
+        Pomada, krem, parfyum, niqob va yana ko‘plab mahsulotlar — hammasi bitta joyda.
+      </p>
+      <div class="hero-badges">
+        <div class="badge">⭐ Original sifat</div>
+        <div class="badge">🔥 Eng ko‘p sotilganlar</div>
+        <div class="badge">💌 Telegram orqali buyurtma</div>
+      </div>
+      <div class="hero-tag">
+        ✨ Buyurtmalar <strong>@onatili_premium</strong> ga chiroyli formatda boradi
+      </div>
+      <div class="hero-note">
+        Buyurtma yuborilgandan keyin faqat telefon raqamingizni yozib qoldiring —
+        sotuvchi sizga tez orada qo‘ng‘iroq qiladi.
       </div>
 
-      <!-- SHOP PAGE -->
-      <section id="shopPage" class="page-section">
-        <h2 class="section-title">🛍 Mahsulotlar</h2>
-        <div class="top-row">
-          <div id="filterBar" class="filter-bar">
-            <button class="chip active" data-category="all">Hammasi</button>
-            <button class="chip" data-category="pomada">💄 Pomada</button>
-            <button class="chip" data-category="krem">🧴 Krem</button>
-            <button class="chip" data-category="parfyum">🌸 Parfyum</button>
-            <button class="chip" data-category="ko‘z">👁 Ko‘z</button>
-            <button class="chip" data-category="tana">🛁 Tana</button>
-          </div>
-          <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input id="searchInput" type="search" placeholder="Mahsulot nomi, kategoriya yoki tavsif..." />
-          </div>
+      <!-- 🔥 HAR 10 SONIYADA ALMASADIGAN REKLAMA BLOK -->
+      <div class="hero-promo" id="heroPromo">
+        <div class="hero-promo-img">
+          <img id="heroPromoImg" src="" alt="Reklama mahsuloti" />
         </div>
-
-        <div id="productsGrid" class="products-grid"></div>
-      </section>
-
-      <!-- HISTORY PAGE -->
-      <section id="historyPage" class="page-section hidden">
-        <div class="section-title">
-          <span>🧾 Buyurtmalar tarixi</span>
-          <button style="margin-left:auto;font-size:11px;border:none;background:transparent;color:var(--muted);cursor:pointer" onclick="clearHistory()">🧹 Tozalash</button>
+        <div class="hero-promo-text">
+          <div class="hero-promo-label">Tavsiya etilayotgan mahsulot</div>
+          <div class="hero-promo-name" id="heroPromoName">Mahsulot nomi</div>
+          <div class="hero-promo-tag" id="heroPromoTag">Tag / tavsiya</div>
+          <div class="hero-promo-price" id="heroPromoPrice">0 so‘m</div>
         </div>
-        <div id="historyList"></div>
+      </div>
 
-        <div class="settings-card">
-          <h3 class="settings-title">👤 Mijoz ma'lumotlari</h3>
-          <p class="settings-desc">
-            Agar ismingiz, telefon raqamingiz yoki manzilingiz o'zgargan bo'lsa, quyidagi tugmani bosing.
-            Keyingi buyurtmada qaytadan yangi ma'lumotlarni kiritasiz.
-          </p>
-          <button class="settings-btn" type="button" onclick="resetCustomerInfo()">
-            🔄 Ism, telefon va manzilni o'zgartirish
-          </button>
+      <!-- QIDIRUV -->
+      <div class="search-bar">
+        <span>🔍</span>
+        <input id="searchInput" placeholder="Mahsulot qidirish (nomi, kategoriya, tag)..." />
+      </div>
+    </section>
+
+    <!-- FILTERS (bitta tugma ostida) -->
+    <div class="filters-wrapper">
+      <button class="category-toggle" id="categoryToggleBtn" type="button">
+        🗂 Kategoriyalarni tanlash
+      </button>
+      <div class="filters-dropdown" id="filterDropdown">
+        <div class="filters" id="filterBar">
+          <button class="chip active" data-category="all">⭐ Barchasi</button>
+          <button class="chip" data-category="pomada">💄 Pomada</button>
+          <button class="chip" data-category="krem">🧴 Kremlar</button>
+          <button class="chip" data-category="parfyum">🌸 Parfyum</button>
+          <button class="chip" data-category="niqob">😷 Niqob / Mask</button>
+          <button class="chip" data-category="ko‘z">👁 Ko‘z uchun</button>
+          <button class="chip" data-category="tana">🛁 Tana parvarishi</button>
         </div>
-      </section>
+      </div>
+    </div>
 
-      <!-- ADMIN PAGE -->
-      <section id="adminPage" class="page-section hidden">
-        <div class="admin-head">
-          <h2 class="section-title" style="margin-bottom:0;">👑 Admin panel</h2>
-          <div class="admin-info">
-            Firestore orqali mahsulot qo'shish, tahrirlash va o'chirish.
-          </div>
-        </div>
-
-        <div class="admin-form">
-          <div class="admin-row">
-            <label for="adminName">Mahsulot nomi</label>
-            <input id="adminName" type="text" placeholder="Masalan: Mat pomada Nude Lux" />
-          </div>
-          <div class="admin-fields-inline">
-            <div class="admin-row">
-              <label for="adminCategory">Kategoriya</label>
-              <select id="adminCategory">
-                <option value="pomada">Pomada</option>
-                <option value="krem">Krem</option>
-                <option value="parfyum">Parfyum</option>
-                <option value="ko‘z">Ko‘z uchun</option>
-                <option value="tana">Tana / soch</option>
-              </select>
-            </div>
-            <div class="admin-row">
-              <label for="adminPriceBase">Asosiy narx (so‘m)</label>
-              <input id="adminPriceBase" type="number" min="0" placeholder="129000" />
-            </div>
-          </div>
-
-          <div class="admin-checkbox">
-            <input id="adminHasDiscount" type="checkbox" />
-            <label for="adminHasDiscount">Chegirma narxini kiritaman</label>
-          </div>
-
-          <div class="admin-row">
-            <label for="adminPriceDiscount">Chegirma narx (agar bo‘lsa)</label>
-            <input id="adminPriceDiscount" type="number" min="0" placeholder="99000" />
-          </div>
-
-          <div class="admin-row">
-            <label for="adminTag">Tag / stiker (ixtiyoriy)</label>
-            <input id="adminTag" type="text" placeholder="Masalan: Best seller, Yangi, Chegirma" />
-          </div>
-
-          <div class="admin-row">
-            <label for="adminDescription">Tavsif</label>
-            <textarea id="adminDescription" placeholder="Mahsulot haqida qisqacha ma'lumot yozing..."></textarea>
-          </div>
-
-          <div class="admin-row">
-            <label for="adminImages">Rasm URL / nomlari (vergul bilan)</label>
-            <textarea id="adminImages" placeholder="https://..., pomada1, pomada2"></textarea>
-          </div>
-
-          <button class="admin-btn" type="button" onclick="addCustomProduct()">➕ Mahsulotni qo‘shish (Firestore)</button>
-        </div>
-
-        <div class="admin-list">
-          <h3 style="font-size:12px;font-weight:600;margin-bottom:4px;">Firestore’dagi mahsulotlar</h3>
-          <div id="adminCustomList"></div>
-        </div>
-      </section>
+    <!-- PRODUCTS -->
+    <main class="products-wrap">
+      <div class="products-grid" id="productsGrid"></div>
     </main>
   </div>
 
-  <!-- CART SHEET -->
-  <div id="cartSheetOverlay" class="cart-sheet-overlay" onclick="toggleCartSheet(false)"></div>
-  <div id="cartSheet" class="cart-sheet">
-    <div class="cart-header">
-      <div class="cart-title">
-        <span>🧺 Savat</span>
-        <span id="cartSheetTotal" class="cart-total-pill">0 so‘m</span>
+  <!-- HISTORY PAGE -->
+  <div id="historyPage" class="page hidden">
+    <div class="page-title">📜 Buyurtmalar tarixi</div>
+    <p class="page-sub">
+      Bu yerda shu qurilmadan yuborilgan buyurtmalaringiz ro‘yxati saqlanadi
+      (faqat shu brauzer / telefon uchun).
+    </p>
+    <button class="clear-history-btn" type="button" onclick="clearHistory()">
+      Tarixni tozalash
+    </button>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- ADMIN PAGE -->
+  <div id="adminPage" class="page hidden">
+    <div class="page-title">🛠 Admin panel</div>
+    <p class="page-sub">
+      Bu sahifa faqat admin uchun. Mahsulotlar Firestore’da saqlanadi, shuning uchun
+      boshqa telefonlar ham bir xil katalogni ko‘radi.
+    </p>
+    <div class="admin-form">
+      <h3>Yangi mahsulot qo‘shish / tahrirlash</h3>
+      <div class="form-row">
+        <label>Mahsulot nomi</label>
+        <input id="adminName" placeholder="Masalan: Luxury Lipstick Pink" />
       </div>
-      <button class="cart-close" type="button" onclick="toggleCartSheet(false)">Yopish ✕</button>
+      <div class="form-row">
+        <label>Kategoriya</label>
+        <select id="adminCategory">
+          <option value="pomada">Pomada / lab uchun</option>
+          <option value="krem">Krem / yuz uchun</option>
+          <option value="parfyum">Parfyum</option>
+          <option value="niqob">Niqob / mask</option>
+          <option value="ko‘z">Ko‘z uchun</option>
+          <option value="tana">Tana / soch parvarishi</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Asosiy narx (chegirmadan oldin), so‘m</label>
+        <input id="adminPriceBase" type="number" min="0" placeholder="Masalan: 119000" />
+      </div>
+      <div class="admin-check-row">
+        <input id="adminHasDiscount" type="checkbox" />
+        <span>Chegirma bor (yangi narxni kiriting)</span>
+      </div>
+      <div class="form-row">
+        <label>Chegirma narxi (agar belgilangan bo‘lsa), so‘m</label>
+        <input id="adminPriceDiscount" type="number" min="0" placeholder="Masalan: 99000" />
+      </div>
+      <div class="form-row">
+        <label>Qisqa tag / tavsiya (masalan: “Best seller”)</label>
+        <input id="adminTag" placeholder="Masalan: Kundalik foydalanish uchun" />
+      </div>
+      <div class="form-row">
+        <label>Batafsil tavsif (product page uchun)</label>
+        <textarea id="adminDescription" rows="3" placeholder="Mahsulot nima uchun mo‘ljallangan, qanday ishlatiladi va hokazo."></textarea>
+      </div>
+      <div class="form-row">
+        <label>
+          Rasm nomi yoki URL  
+          <small>(masalan: <b>olma</b> → images/olma.png yoki to‘liq https://...)</small>
+        </label>
+        <input id="adminImages" placeholder="olma yoki https://..., vergul bilan bir nechta yozish mumkin" />
+      </div>
+      <button class="admin-btn" type="button" onclick="addCustomProduct()">
+        ➕ Mahsulotni qo‘shish (Firestore)
+      </button>
+      <p class="admin-info">
+        Eslatma: admin qo‘shgan mahsulotlar Firestore’da saqlanadi. Hamma foydalanuvchilar bir xil katalogni ko‘rishadi.
+      </p>
     </div>
-    <div id="cartItems" class="cart-items"></div>
-    <div class="cart-footer">
-      <div class="cart-sum-row">
-        <span>Umumiy summa</span>
-        <span id="cartSheetTotalBottom">0 so‘m</span>
+    <div class="admin-list-title">Firestore’dagi mahsulotlar:</div>
+    <div id="adminCustomList"></div>
+    <p class="admin-info">
+      🔴 O‘chirsangiz, hamma foydalanuvchilar uchun o‘chadi.
+    </p>
+  </div>
+
+  <!-- BOTTOM ORDER BAR -->
+  <div class="cart-bar">
+    <div class="cart-bar-note">
+      Savatdagi mahsulotlarni ko‘rish va o‘zgartirish uchun tepadagi 🛒 tugmasini yoki pastdagi tugmani bosing.
+    </div>
+    <button class="cart-main-btn" type="button" onclick="toggleCartSheet(true)">
+      <div>
+        <div>🛍 Buyurtma berish</div>
+        <span class="small">
+          Tanlagan mahsulotlaringiz Telegram orqali sotuvchiga yuboriladi.
+        </span>
       </div>
-      <button class="btn-primary" type="button" onclick="sendOrder()">
-        ✈️ Telegramga yuborish
+      <div><span>›</span></div>
+    </button>
+  </div>
+
+  <!-- CART SHEET -->
+  <div class="sheet-overlay" id="cartSheetOverlay" onclick="toggleCartSheet(false)"></div>
+  <div class="cart-sheet" id="cartSheet">
+    <div class="cart-sheet-header">
+      <h3>🛒 Savatingiz</h3>
+      <button type="button" onclick="toggleCartSheet(false)">✕</button>
+    </div>
+    <div class="cart-sheet-body" id="cartItems"></div>
+    <div class="cart-sheet-footer">
+      <div class="cart-sheet-footer-top">
+        <span>Umumiy summa:</span>
+        <strong id="cartSheetTotal">0 so‘m</strong>
+      </div>
+      <p class="cart-info-text">
+        <strong>Izoh:</strong> “Buyurtmani yuborish” tugmasini bossangiz,
+        hozir tanlagan mahsulotlaringiz Telegram orqali sotuvchiga jo‘natiladi.
+        Sotuvchi sizga telefon qilib, yetkazib berish va to‘lovni kelishib oladi.
+      </p>
+      <button class="cart-sheet-btn" type="button" onclick="sendOrder()">
+        📩 Buyurtmani yuborish (@onatili_premium)
       </button>
     </div>
   </div>
 
-  <!-- PRODUCT DETAIL OVERLAY -->
-  <div id="productDetailOverlay" class="detail-overlay hidden">
-    <div class="detail-sheet">
-      <div class="detail-img-wrap">
-        <img id="detailImage" src="" alt="Mahsulot rasmi" />
-        <div class="detail-img-controls">
-          <button id="detailPrevBtn" class="detail-nav-btn" type="button">◀</button>
-          <span id="detailImageIndex">1 / 1</span>
-          <button id="detailNextBtn" class="detail-nav-btn" type="button">▶</button>
+  <!-- PRODUCT DETAIL OVERLAY (UZUM STYLE) -->
+  <div id="productDetailOverlay" class="product-detail-overlay hidden">
+    <div class="product-detail-card">
+      <div class="product-detail-header">
+        <div class="product-detail-image-wrap">
+          <!-- Galereya tugmalari -->
+          <button id="detailPrevBtn" class="detail-gallery-btn left" type="button">‹</button>
+
+          <img id="detailImage" src="" alt="Mahsulot rasmi" />
+
+          <button id="detailNextBtn" class="detail-gallery-btn right" type="button">›</button>
+
+          <!-- Rasm raqami: 1 / N -->
+          <div id="detailImageIndex" class="detail-image-index">1 / 1</div>
         </div>
+        <button class="product-detail-close" type="button" onclick="closeProductDetail()">✕</button>
       </div>
-      <div class="detail-meta" id="detailCategory">Kategoriya</div>
-      <div class="detail-name" id="detailName">Mahsulot nomi</div>
-      <div class="detail-tag" id="detailTag"></div>
-      <div class="detail-desc" id="detailDesc"></div>
-      <div class="detail-qty-row">
-        <span>Miqdor:</span>
-        <div class="detail-qty-controls">
-          <button id="detailQtyMinus" type="button">-</button>
-          <span id="detailQtyValue">1</span>
-          <button id="detailQtyPlus" type="button">+</button>
+
+      <div class="product-detail-body">
+        <div id="detailCategory" class="product-detail-category"></div>
+        <h2 id="detailName" class="product-detail-name"></h2>
+        <p id="detailTag" class="product-detail-tag"></p>
+        <p id="detailDesc" class="product-detail-desc"></p>
+
+        <div class="product-detail-prices">
+          <span id="detailPrice" class="detail-price-main"></span>
+          <span id="detailOldPrice" class="detail-price-old hidden"></span>
         </div>
-      </div>
-      <div class="detail-price-row">
-        <div>
-          <div class="detail-price-main" id="detailPrice">0 so‘m</div>
-          <div class="detail-price-old hidden" id="detailOldPrice">0 so‘m</div>
+
+        <!-- Miqdor (qty) Uzum uslubida -->
+        <div class="detail-qty-row">
+          <span>Miqdor:</span>
+          <div class="detail-qty-controls">
+            <button id="detailQtyMinus" type="button">−</button>
+            <span id="detailQtyValue">1</span>
+            <button id="detailQtyPlus" type="button">+</button>
+          </div>
         </div>
-      </div>
-      <div class="detail-actions">
-        <button id="detailAddBtn" class="detail-add-btn" type="button">
-          🛒 Savatga qo‘shish
-        </button>
-        <button id="detailBackBtn" class="detail-back-btn hidden" type="button">
-          ◀ Magaziniga qaytish
-        </button>
+
+        <div class="detail-actions">
+          <button id="detailAddBtn" class="detail-add-btn" type="button">
+            🛒 Savatga qo‘shish
+          </button>
+          <button id="detailBackBtn" class="detail-back-btn hidden" type="button">
+            ◀ Magaziniga qaytish
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- TOAST -->
-  <div id="toast" class="toast"></div>
-
-  <!-- APP SCRIPT -->
-  <script type="module">
-    // FIREBASE MODULLARI CDN ORQALI
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      deleteDoc,
-      doc,
-      serverTimestamp,
-      getDoc,
-      updateDoc,
-      onSnapshot,
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-    // SENING KONFIGING
-    const firebaseConfig = {
-      apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
-      authDomain: "shahboz-5d0a3.firebaseapp.com",
-      projectId: "shahboz-5d0a3",
-      storageBucket: "shahboz-5d0a3.firebasestorage.app",
-      messagingSenderId: "352024095535",
-      appId: "1:352024095535:web:3f495ac74cdd40f5c54fda",
-      measurementId: "G-J8KFW5ED77"
-    };
-
-    // INIT
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const productsCol = collection(db, "beauty_products");
-
-    // KONSTANTALAR
-    const STORAGE_HISTORY = "beauty_order_history";
-    const THEME_KEY = "beauty_theme";
-    const RAW_PREFIX = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
-    const STORAGE_CUSTOMER = "beauty_customer_info"; // 👤 ism + telefon + manzil
-
-    const categoryEmoji = {
-      "pomada":"💄",
-      "krem":"🧴",
-      "parfyum":"🌸",
-      "niqob":"😷",
-      "ko‘z":"👁",
-      "tana":"🛁",
-      "default":"💅"
-    };
-
-    const categoryLabel = {
-      "pomada":"Pomada / lab uchun",
-      "krem":"Krem / yuz uchun",
-      "parfyum":"Parfyum",
-      "niqob":"Niqob / mask",
-      "ko‘z":"Ko‘z uchun",
-      "tana":"Tana / soch parvarishi"
-    };
-
-    // DEFAULT MAHSULOTLAR
-    const defaultProducts = [
-      {
-        name:"Mat pomada Nude Lux",
-        price:89000,
-        oldPrice:109000,
-        category:"pomada",
-        emoji:"💄",
-        tag:"Yangi kolleksiya",
-        description:"Mat efektli, kundalik foydalanish uchun mos nude pomada. Lablarni quritmaydi, uzoq vaqt saqlanadi.",
-        images:[
-          "https://images.pexels.com/photos/3373744/pexels-photo-3373744.jpeg?auto=compress&cs=tinysrgb&w=600"
-        ]
-      },
-      {
-        name:"Qizil mat pomada Classic Red",
-        price:99000,
-        oldPrice:119000,
-        category:"pomada",
-        emoji:"💋",
-        tag:"Best seller",
-        description:"Klassik qizil rang, bayram va maxsus tadbirlar uchun juda mos.",
-        images:[
-          "https://images.pexels.com/photos/947301/pexels-photo-947301.jpeg?auto=compress&cs=tinysrgb&w=600"
-        ]
-      },
-      {
-        name:"Gialuronli yuz kremi",
-        price:129000,
-        oldPrice:149000,
-        category:"krem",
-        emoji:"🧴",
-        tag:"Namlik 24 soat",
-        description:"Quruq va normal teri uchun. Kun bo‘yi namlikni ushlab turishga yordam beradi.",
-        images:[
-          "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&cs=tinysrgb&w=600"
-        ]
-      },
-      {
-        name:"Kunduzgi SPF 50 krem",
-        price:139000,
-        oldPrice:159000,
-        category:"krem",
-        emoji:"🌞",
-        tag:"Quyoshdan himoya",
-        description:"SPF50 bilan kunduzgi krem — quyosh nurlaridan himoya va namlantirish birgalikda.",
-        images:[
-          "https://images.pexels.com/photos/3738342/pexels-photo-3738342.jpeg?auto=compress&cs=tinysrgb&w=600"
-        ]
-      },
-      {
-        name:"Gul hidli ayollar parfyumi",
-        price:199000,
-        oldPrice:229000,
-        category:"parfyum",
-        emoji:"🌸",
-        tag:"Eng ko‘p yoqadigan",
-        description:"Yengil, mayin floral hid. Har kuni foydalanish uchun mos.",
-        images:[
-          "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=600"
-        ]
-      },
-      {
-        name:"Maskara Waterproof",
-        price:93000,
-        oldPrice:109000,
-        category:"ko‘z",
-        emoji:"💧",
-        tag:"Suvga chidamli",
-        description:"Suvga chidamli maskara — ko‘z yoshlari va yomg‘irga ham chidamli.",
-        images:[
-          "https://images.pexels.com/photos/3738367/pexels-photo-3738367.jpeg?auto=compress&cs=tinysrgb&w=600"
-        ]
-      }
-    ];
-
-    // STATE
-    let products = [];
-    let remoteProducts = [];
-    let cart = [];
-    let activeCategory = "all";
-    let currentSearch = "";
-    let isAdmin = false;
-
-    // Detail oynasi uchun state
-    let detailIndex = null;
-    let detailImageIndex = 0;
-    let detailQty = 1;
-    let detailCountdownTimer = null;
-    let detailCountdownRemaining = 0;
-
-    // DOM
-    const productsGrid = document.getElementById("productsGrid");
-    const filterBar = document.getElementById("filterBar");
-    const cartCountTopEl = document.getElementById("cartCountTop");
-    const cartTotalTopEl = document.getElementById("cartTotalTop");
-    const toastEl = document.getElementById("toast");
-    const cartSheet = document.getElementById("cartSheet");
-    const cartSheetOverlay = document.getElementById("cartSheetOverlay");
-    const cartItemsEl = document.getElementById("cartItems");
-    const cartSheetTotalEl = document.getElementById("cartSheetTotal");
-    const cartSheetTotalBottomEl = document.getElementById("cartSheetTotalBottom");
-    const themeToggleBtn = document.getElementById("themeToggleBtn");
-    const tabsEl = document.getElementById("tabs");
-    const historyListEl = document.getElementById("historyList");
-    const adminCustomListEl = document.getElementById("adminCustomList");
-    const adminAccessBtn = document.getElementById("adminAccessBtn");
-    const adminTabBtn = document.getElementById("adminTabBtn");
-    const searchInput = document.getElementById("searchInput");
-
-    const productDetailOverlay = document.getElementById("productDetailOverlay");
-    const detailImageEl = document.getElementById("detailImage");
-    const detailCategoryEl = document.getElementById("detailCategory");
-    const detailNameEl = document.getElementById("detailName");
-    const detailTagEl = document.getElementById("detailTag");
-    const detailDescEl = document.getElementById("detailDesc");
-    const detailPriceEl = document.getElementById("detailPrice");
-    const detailOldPriceEl = document.getElementById("detailOldPrice");
-    const detailAddBtn = document.getElementById("detailAddBtn");
-    const detailBackBtn = document.getElementById("detailBackBtn");
-    const detailPrevBtn = document.getElementById("detailPrevBtn");
-    const detailNextBtn = document.getElementById("detailNextBtn");
-    const detailImageIndexEl = document.getElementById("detailImageIndex");
-    const detailQtyMinus = document.getElementById("detailQtyMinus");
-    const detailQtyPlus = document.getElementById("detailQtyPlus");
-    const detailQtyValue = document.getElementById("detailQtyValue");
-
-    // ADMIN FORM DOM
-    const adminNameEl = document.getElementById("adminName");
-    const adminCategoryEl = document.getElementById("adminCategory");
-    const adminPriceBaseEl = document.getElementById("adminPriceBase");
-    const adminHasDiscountEl = document.getElementById("adminHasDiscount");
-    const adminPriceDiscountEl = document.getElementById("adminPriceDiscount");
-    const adminTagEl = document.getElementById("adminTag");
-    const adminDescriptionEl = document.getElementById("adminDescription");
-    const adminImagesEl = document.getElementById("adminImages");
-
-    // HELPERS
-    function formatPrice(v){ return v.toLocaleString("uz-UZ"); }
-
-    function showToast(message){
-      toastEl.textContent = message;
-      toastEl.classList.add("show");
-      setTimeout(()=> toastEl.classList.remove("show"), 1500);
-    }
-
-    function normalizeImagesInput(raw) {
-      if (!raw) return [];
-      return raw
-        .split(",")
-        .map(s => s.trim())
-        .filter(Boolean)
-        .map(token => {
-          if (/^https?:\/\//i.test(token)) {
-            return token;
-          }
-          const name = token.replace(/\.(png|jpg|jpeg)$/i, "");
-          return RAW_PREFIX + name + ".png";
-        });
-    }
-
-    function setImageWithPngJpgFallback(imgElement, url) {
-      if (!url) {
-        imgElement.onerror = null;
-        imgElement.src = RAW_PREFIX + "noimage.png";
-        return;
-      }
-      if (url.startsWith(RAW_PREFIX)) {
-        const base = url.replace(/\.(png|jpg|jpeg)$/i, "");
-        imgElement.onerror = function(){
-          this.onerror = null;
-          this.src = base + ".jpg";
-        };
-        imgElement.src = base + ".png";
-      } else {
-        imgElement.onerror = null;
-        imgElement.src = url;
-      }
-    }
-
-    function matchesSearch(p){
-      if(!currentSearch) return true;
-      const q = currentSearch;
-      const name = (p.name || "").toLowerCase();
-      const tag = (p.tag || "").toLowerCase();
-      const desc = (p.description || "").toLowerCase();
-      const cat = (p.category || "").toLowerCase();
-      return name.includes(q) || tag.includes(q) || desc.includes(q) || cat.includes(q);
-    }
-
-    // 👤 MIJOZ MA'LUMOTLARI (ISM + TELEFON + MANZIL)
-
-    function promptNewCustomerInfo() {
-      const name = prompt("👤 Ismingizni kiriting (masalan, Shahboz):");
-      if (!name) return null;
-
-      const phone = prompt("📱 Telefon raqamingizni kiriting (masalan, +99890 123 45 67):");
-      if (!phone) return null;
-
-      const address = prompt("📍 Manzilingizni kiriting (shahar, tuman, ko'cha, uy):");
-      if (!address) return null;
-
-      const info = {
-        name: name.trim(),
-        phone: phone.trim(),
-        address: address.trim()
-      };
-
-      localStorage.setItem(STORAGE_CUSTOMER, JSON.stringify(info));
-      return info;
-    }
-
-    function askCustomerInfo() {
-      let info = null;
-      try {
-        info = JSON.parse(localStorage.getItem(STORAGE_CUSTOMER) || "null");
-      } catch (e) {
-        info = null;
-      }
-
-      if (info && info.name && info.phone && info.address) {
-        const ok = confirm(
-          "📦 Oldingi buyurtma ma'lumotlari:\n\n" +
-          "👤 Ism: " + info.name + "\n" +
-          "📱 Telefon: " + info.phone + "\n" +
-          "📍 Manzil: " + info.address + "\n\n" +
-          "Shu ma'lumotlar bilan yuborilsinmi?\n\n" +
-          "OK — Ha, shu ma'lumotlar bilan\n" +
-          "Cancel — Yangi ma'lumot kiritaman"
-        );
-
-        if (ok) {
-          return info;
-        } else {
-          return promptNewCustomerInfo();
-        }
-      }
-
-      return promptNewCustomerInfo();
-    }
-
-    function resetCustomerInfo() {
-      localStorage.removeItem(STORAGE_CUSTOMER);
-      showToast("👤 Mijoz ma'lumotlari o'chirildi. Keyingi buyurtmada qaytadan kiritasiz.");
-    }
-
-    // 🔄 REAL-TIME: FIRESTORE'DAN UZLUKSIZ O‘QISH
-    function subscribeProductsRealtime(){
-      onSnapshot(
-        productsCol,
-        (snap) => {
-          const list = [];
-          snap.forEach(d => {
-            const data = d.data();
-            list.push({
-              id: d.id,
-              fromFirebase: true,
-              name: data.name || "",
-              price: data.price || 0,
-              oldPrice: data.oldPrice || null,
-              category: data.category || "tana",
-              emoji: data.emoji || categoryEmoji[data.category] || categoryEmoji.default,
-              tag: data.tag || "",
-              description: data.description || "",
-              images: Array.isArray(data.images) ? data.images : [],
-              createdAt: data.createdAt || null
-            });
-          });
-          remoteProducts = list;
-          rebuildProducts();
-          renderAdminCustomList();
-        },
-        (e) => {
-          console.error("Realtime o‘qishda xato:", e);
-          showToast("⚠️ Real-time yangilashda xato: " + (e.message || ""));
-        }
-      );
-    }
-
-    // PRODUCTS
-    function rebuildProducts(){
-      products = [...defaultProducts, ...remoteProducts];
-      renderProducts();
-    }
-
-    function renderProducts(){
-      productsGrid.innerHTML = "";
-      const filtered = products.filter(p =>
-        (activeCategory === "all" ? true : p.category === activeCategory) &&
-        matchesSearch(p)
-      );
-      if(!filtered.length){
-        productsGrid.innerHTML = "<p class='history-empty'>Bu filtrlarda mahsulot topilmadi.</p>";
-        return;
-      }
-      filtered.forEach(p=>{
-        const index = products.indexOf(p);
-        const discount = p.oldPrice && p.oldPrice > p.price
-          ? (100 - Math.round(p.price*100/p.oldPrice))
-          : null;
-        const tag = p.tag || "Ommabop mahsulot";
-        const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
-        let imgHtml;
-        if (firstImage.startsWith(RAW_PREFIX)) {
-          const base = firstImage.replace(/\.(png|jpg|jpeg)$/i, "");
-          imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
-        } else {
-          imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
-        }
-        productsGrid.innerHTML += `
-          <article class="product-card" onclick="openProductDetail(${index})">
-            <div class="product-img-wrap">
-              ${imgHtml}
-              <div class="product-img-tag">
-                <span>Beauty</span><span>Pro</span>
-              </div>
-              ${discount ? `<div class="product-sale">-${discount}%</div>` : ``}
-            </div>
-            <div class="product-body">
-              <div class="product-name">${p.name}</div>
-              <div class="product-meta">
-                ${(categoryLabel[p.category] || p.category)} • ${tag}
-              </div>
-              <div class="tag-mini">
-                💡 ${tag}
-              </div>
-              <div class="price-row">
-                <div>
-                  <div class="price-main">${formatPrice(p.price)} so‘m</div>
-                  ${p.oldPrice ? `<div class="price-old">${formatPrice(p.oldPrice)} so‘m</div>` : ``}
-                </div>
-                <button class="btn-add" onclick="event.stopPropagation(); addToCart(${index});">
-                  ➕ Savatga
-                </button>
-              </div>
-            </div>
-          </article>
-        `;
-      });
-    }
-
-    // FILTER BAR
-    filterBar.addEventListener("click", (e)=>{
-      const btn = e.target.closest(".chip");
-      if(!btn) return;
-      document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
-      btn.classList.add("active");
-      activeCategory = btn.dataset.category;
-      renderProducts();
-    });
-
-    // SEARCH
-    searchInput.addEventListener("input", ()=>{
-      currentSearch = searchInput.value.trim().toLowerCase();
-      renderProducts();
-    });
-
-    // CART
-    function addToCart(index, qty = 1){
-      if(qty <= 0) return;
-      const found = cart.find(c => c.index === index);
-      if(found){
-        found.qty += qty;
-      }else{
-        cart.push({index, qty});
-      }
-      updateCartUI();
-      showToast("Savatga qo‘shildi, yana mahsulot tanlaysizmi?");
-    }
-
-    function updateCartUI(){
-      let totalCount = 0;
-      let totalPrice = 0;
-      cart.forEach(c=>{
-        const p = products[c.index];
-        if(!p) return;
-        totalCount += c.qty;
-        totalPrice += p.price * c.qty;
-      });
-      cartCountTopEl.textContent = totalCount;
-      const totalStr = formatPrice(totalPrice) + " so‘m";
-      cartTotalTopEl.textContent = totalStr;
-      cartSheetTotalEl.textContent = totalStr;
-      cartSheetTotalBottomEl.textContent = totalStr;
-      if(cartSheet.classList.contains("open")){
-        renderCartItems();
-      }
-    }
-
-    function toggleCartSheet(force){
-      const isOpen = cartSheet.classList.contains("open");
-      const next = typeof force === "boolean" ? force : !isOpen;
-      cartSheet.classList.toggle("open", next);
-      cartSheetOverlay.classList.toggle("show", next);
-      if(next){
-        renderCartItems();
-      }
-    }
-
-    function renderCartItems(){
-      if(cart.length === 0){
-        cartItemsEl.innerHTML = "<p class='cart-empty'>Savat hozircha bo‘sh 🙂</p>";
-        cartSheetTotalEl.textContent = "0 so‘m";
-        cartSheetTotalBottomEl.textContent = "0 so‘m";
-        return;
-      }
-      let html = "";
-      let total = 0;
-      cart.forEach(c=>{
-        const p = products[c.index];
-        if(!p) return;
-        const lineTotal = p.price * c.qty;
-        total += lineTotal;
-        html += `
-          <div class="cart-item-row">
-            <div class="cart-item-main">
-              <div class="cart-item-name">${p.name}</div>
-              <div class="cart-item-meta">
-                ${formatPrice(p.price)} so‘m • ${(categoryLabel[p.category] || p.category)}
-              </div>
-            </div>
-            <div class="cart-item-actions">
-              <div class="qty-control">
-                <button onclick="changeQty(${c.index}, -1)">-</button>
-                <span>${c.qty}</span>
-                <button onclick="changeQty(${c.index}, 1)">+</button>
-              </div>
-              <div class="cart-item-total">${formatPrice(lineTotal)} so‘m</div>
-              <button class="cart-remove" onclick="removeFromCart(${c.index})">✕</button>
-            </div>
-          </div>
-        `;
-      });
-      cartItemsEl.innerHTML = html;
-      cartSheetTotalEl.textContent = formatPrice(total) + " so‘m";
-      cartSheetTotalBottomEl.textContent = formatPrice(total) + " so‘m";
-    }
-
-    function changeQty(productIndex, delta){
-      const item = cart.find(c => c.index === productIndex);
-      if(!item) return;
-      item.qty += delta;
-      if(item.qty <= 0){
-        cart = cart.filter(c=>c.index !== productIndex);
-      }
-      updateCartUI();
-      renderCartItems();
-    }
-
-    function removeFromCart(productIndex){
-      cart = cart.filter(c=>c.index !== productIndex);
-      updateCartUI();
-      renderCartItems();
-    }
-
-    function openTelegramLink(url){
-      const tg = window.Telegram && window.Telegram.WebApp;
-      try{
-        if(tg && typeof tg.openTelegramLink === "function"){
-          tg.openTelegramLink(url);
-        }else{
-          window.open(url, "_blank");
-        }
-      }catch(e){
-        window.location.href = url;
-      }
-    }
-
-    // HISTORY (LOCAL)
-    function saveOrderHistory(order){
-      let list = [];
-      try{
-        list = JSON.parse(localStorage.getItem(STORAGE_HISTORY) || "[]");
-      }catch(e){}
-      list.unshift(order);
-      localStorage.setItem(STORAGE_HISTORY, JSON.stringify(list));
-      renderHistory();
-    }
-
-    function renderHistory(){
-      let list = [];
-      try{
-        list = JSON.parse(localStorage.getItem(STORAGE_HISTORY) || "[]");
-      }catch(e){}
-      if(!list.length){
-        historyListEl.innerHTML = "<p class='history-empty'>Hozircha buyurtmalar tarixi bo‘sh.</p>";
-        return;
-      }
-      historyListEl.innerHTML = "";
-      list.forEach((order, idx)=>{
-        const date = new Date(order.date);
-        const dateStr = date.toLocaleString("uz-UZ");
-        let itemsHtml = "";
-        order.items.forEach(it=>{
-          itemsHtml += `<li>${it.line}</li>`;
-        });
-        historyListEl.innerHTML += `
-          <div class="order-card">
-            <div class="order-head">
-              <strong>Buyurtma #${list.length - idx}</strong>
-              <span>${order.totalFormatted}</span>
-            </div>
-            <div class="order-meta">
-              📅 ${dateStr} • 🧺 ${order.totalItems} ta mahsulot
-            </div>
-            <div>Mahsulotlar:</div>
-            <ul class="order-items">
-              ${itemsHtml}
-            </ul>
-          </div>
-        `;
-      });
-    }
-
-    function clearHistory(){
-      if(confirm("Buyurtmalar tarixini tozalashni xohlaysizmi?")){
-        localStorage.removeItem(STORAGE_HISTORY);
-        renderHistory();
-      }
-    }
-
-    // TELEGRAMGA BUYURTMA — ISM + TEL + MANZIL BILAN
-    function sendOrder(){
-      if(cart.length === 0){
-        showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
-        return;
-      }
-
-      const customer = askCustomerInfo();
-      if (!customer) {
-        showToast("❌ Ism, telefon yoki manzil kiritilmagani uchun buyurtma matni tayyorlanmadi.");
-        return;
-      }
-
-      let totalPrice = 0;
-      let totalItems = 0;
-      let lines = [];
-      cart.forEach((c, i)=>{
-        const p = products[c.index];
-        if(!p) return;
-        const lineTotal = p.price * c.qty;
-        totalPrice += lineTotal;
-        totalItems += c.qty;
-        const catEmoji = categoryEmoji[p.category] || p.emoji || categoryEmoji.default;
-        const lineText =
-          `${i+1}) ${catEmoji} ${p.name} — ${c.qty} dona × ${formatPrice(p.price)} so‘m = ${formatPrice(lineTotal)} so‘m`;
-        lines.push({line: lineText, product: p});
-      });
-
-      const totalStr = formatPrice(totalPrice);
-      let text = "";
-      text += "💖 BEAUTY STORE — Onlayn buyurtma\n";
-      text += "━━━━━━━━━━━━━━━━━━━━\n";
-      text += "🧺 Savatimdagi mahsulotlar:\n\n";
-      lines.forEach(l=>{
-        text += "• " + l.line + "\n";
-      });
-
-      text += "\n💰 Umumiy summa: " + totalStr + " so‘m\n";
-      text += "📦 Buyurtma turi: Kosmetika mahsulotlari\n";
-      text += "━━━━━━━━━━━━━━━━━━━━\n";
-      text += "👤 Ismim: " + customer.name + "\n";
-      text += "📱 Telefon raqamim: " + customer.phone + "\n";
-      text += "📍 Manzilim: " + customer.address + "\n";
-      text += "✍️ Qo‘shimcha izoh: _______\n";
-
-      const encoded = encodeURIComponent(text);
-      const url = "https://t.me/onatili_premium?text=" + encoded + "&t=" + Date.now();
-
-      const order = {
-        date: new Date().toISOString(),
-        totalPrice: totalPrice,
-        totalFormatted: totalStr + " so‘m",
-        totalItems: totalItems,
-        items: lines
-      };
-      saveOrderHistory(order);
-      openTelegramLink(url);
-      cart = [];
-      updateCartUI();
-      renderCartItems();
-      toggleCartSheet(false);
-      showToast("✅ Buyurtma matni Telegramga tayyorlandi.");
-    }
-
-    // THEME
-    function applyTheme(theme){
-      document.body.classList.toggle("theme-dark", theme === "dark");
-      themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
-    }
-    function toggleTheme(){
-      const current = localStorage.getItem(THEME_KEY) || "light";
-      const next = current === "dark" ? "light" : "dark";
-      localStorage.setItem(THEME_KEY, next);
-      applyTheme(next);
-    }
-    themeToggleBtn.addEventListener("click", toggleTheme);
-
-    // TABS
-    tabsEl.addEventListener("click", (e)=>{
-      const btn = e.target.closest(".tab-btn");
-      if(!btn) return;
-      const pageId = btn.dataset.page;
-      if(pageId === "adminPage" && !isAdmin){
-        showToast("👑 Avval admin kodini kiriting.");
-        return;
-      }
-      document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-      btn.classList.add("active");
-      document.getElementById("shopPage").classList.add("hidden");
-      document.getElementById("historyPage").classList.add("hidden");
-      document.getElementById("adminPage").classList.add("hidden");
-      document.getElementById(pageId).classList.remove("hidden");
-      if(pageId === "historyPage"){
-        renderHistory();
-      }else if(pageId === "adminPage"){
-        renderAdminCustomList();
-      }
-    });
-
-    // ADMIN UI
-    function updateAdminUI(){
-      if(isAdmin){
-        adminTabBtn.classList.remove("hidden");
-        adminAccessBtn.classList.add("admin-active");
-        adminAccessBtn.textContent = "👑 Admin (kirdingiz)";
-      }else{
-        adminTabBtn.classList.add("hidden");
-        adminAccessBtn.classList.remove("admin-active");
-        adminAccessBtn.textContent = "👑 Admin uchun";
-      }
-    }
-
-    async function askAdminCode(){
-      if(isAdmin){
-        document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-        adminTabBtn.classList.add("active");
-        document.getElementById("shopPage").classList.add("hidden");
-        document.getElementById("historyPage").classList.add("hidden");
-        document.getElementById("adminPage").classList.remove("hidden");
-        renderAdminCustomList();
-        return;
-      }
-      const code = prompt("Admin uchun kirish kodi:");
-      if(code === null) return;
-
-      try{
-        const settingsRef = doc(db, "beauty_admin_settings", "security");
-        const snap = await getDoc(settingsRef);
-
-        if(!snap.exists()){
-          showToast("⚠️ Admin kodi Firestore’da hali sozlanmagan.");
-          return;
-        }
-
-        const data = snap.data();
-        const realCode = String(data.adminCode || data.code || "").trim();
-
-        if(!realCode){
-          showToast("⚠️ Admin kodi noto‘g‘ri sozlangan.");
-          return;
-        }
-
-        if(code === realCode){
-          isAdmin = true;
-          updateAdminUI();
-          showToast("✅ Admin sifatida kirdingiz");
-        }else{
-          showToast("❌ Noto‘g‘ri kod");
-        }
-      }catch(e){
-        console.error("Admin kodni tekshirishda xato:", e);
-        showToast("⚠️ Admin kodi tekshiruvida xato: " + (e.message || ""));
-      }
-    }
-    adminAccessBtn.addEventListener("click", askAdminCode);
-
-    function flashAdminButton(text){
-      const btn = document.querySelector(".admin-btn");
-      if(!btn) return;
-      btn.textContent = text;
-      btn.classList.add("admin-btn-success");
-      setTimeout(()=>{
-        btn.classList.remove("admin-btn-success");
-        btn.textContent = editingProductId
-          ? "💾 Mahsulotni saqlash (tahrirlash)"
-          : "➕ Mahsulotni qo‘shish (Firestore)";
-      }, 1500);
-    }
-
-    let editingProductId = null;
-
-    async function addCustomProduct(){
-      const name = adminNameEl.value.trim();
-      const category = adminCategoryEl.value;
-      const basePrice = parseInt(adminPriceBaseEl.value, 10);
-      const hasDiscount = adminHasDiscountEl.checked;
-      const discountPriceRaw = adminPriceDiscountEl.value ? parseInt(adminPriceDiscountEl.value, 10) : null;
-      const tag = adminTagEl.value.trim();
-      const description = adminDescriptionEl.value.trim();
-
-      if(!name || !basePrice || basePrice <= 0){
-        showToast("❌ Nomi va narxini to‘g‘ri kiriting.");
-        return;
-      }
-
-      let price = basePrice;
-      let oldPrice = null;
-      if(hasDiscount && discountPriceRaw && discountPriceRaw > 0 && discountPriceRaw < basePrice){
-        price = discountPriceRaw;
-        oldPrice = basePrice;
-      }
-
-      let images = normalizeImagesInput(adminImagesEl.value.trim());
-      if(!images.length){
-        images = [RAW_PREFIX + "noimage.png"];
-      }
-
-      const emoji = categoryEmoji[category] || categoryEmoji.default;
-      const payload = {
-        name,
-        price,
-        oldPrice,
-        category,
-        emoji,
-        tag,
-        description,
-        images,
-      };
-
-      try{
-        if(editingProductId){
-          await updateDoc(doc(db,"beauty_products",editingProductId), {
-            ...payload,
-            updatedAt: serverTimestamp()
-          });
-
-          remoteProducts = remoteProducts.map(p =>
-            p.id === editingProductId ? { ...p, ...payload } : p
-          );
-
-          rebuildProducts();
-          renderAdminCustomList();
-          showToast("✅ Mahsulot yangilandi");
-          flashAdminButton("✅ Yangilandi");
-
-        }else{
-          const docRef = await addDoc(productsCol, {
-            ...payload,
-            createdAt: serverTimestamp()
-          });
-
-          remoteProducts.push({
-            id: docRef.id,
-            fromFirebase:true,
-            ...payload,
-            createdAt: { seconds: Date.now()/1000 }
-          });
-
-          rebuildProducts();
-          renderAdminCustomList();
-          showToast("✅ Mahsulot qo‘shildi va katalogda ko‘rinmoqda");
-          flashAdminButton("✅ Mahsulot qo‘shildi");
-        }
-
-        editingProductId = null;
-        adminNameEl.value = "";
-        adminPriceBaseEl.value = "";
-        adminPriceDiscountEl.value = "";
-        adminHasDiscountEl.checked = false;
-        adminTagEl.value = "";
-        adminDescriptionEl.value = "";
-        adminImagesEl.value = "";
-
-      }catch(e){
-        console.error("Mahsulot yozishda/tahrirlashda xato:", e);
-        showToast("❌ Xatolik: " + (e.message || "Firestore bilan ishlashda xato"));
-      }
-    }
-
-    async function deleteAnyProduct(id){
-      if(!confirm("Bu mahsulotni o‘chirishni xohlaysizmi? Hamma uchun o‘chadi.")) return;
-      try{
-        await deleteDoc(doc(db,"beauty_products",id));
-        remoteProducts = remoteProducts.filter(p=>p.id !== id);
-        rebuildProducts();
-        renderAdminCustomList();
-        showToast("🗑 Mahsulot o‘chirildi");
-      }catch(e){
-        console.error("O‘chirishda xato:", e);
-        showToast("⚠️ Firestore’dan o‘chirishda xato: " + (e.message || ""));
-      }
-    }
-
-    function renderAdminCustomList(){
-      if(!remoteProducts.length){
-        adminCustomListEl.innerHTML = "<p class='history-empty'>Hozircha Firestore’da admin qo‘shgan mahsulot yo‘q.</p>";
-        return;
-      }
-      adminCustomListEl.innerHTML = "";
-      remoteProducts
-        .slice()
-        .sort((a,b)=> (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
-        .forEach(p=>{
-          adminCustomListEl.innerHTML += `
-            <div class="admin-product-row">
-              <span>${p.name}</span>
-              <span>${formatPrice(p.price)} so‘m</span>
-              <button class="admin-edit-btn" onclick="editProduct('${p.id}')">✏️</button>
-              <button class="admin-delete-btn" onclick="deleteAnyProduct('${p.id}')">✕</button>
-            </div>
-          `;
-        });
-    }
-
-    function editProduct(id){
-      const p = remoteProducts.find(r => r.id === id);
-      if(!p) return;
-
-      editingProductId = id;
-
-      adminNameEl.value = p.name || "";
-      adminCategoryEl.value = p.category || "pomada";
-
-      if(p.oldPrice && p.oldPrice > p.price){
-        adminPriceBaseEl.value = p.oldPrice;
-        adminPriceDiscountEl.value = p.price;
-        adminHasDiscountEl.checked = true;
-      }else{
-        adminPriceBaseEl.value = p.price;
-        adminPriceDiscountEl.value = "";
-        adminHasDiscountEl.checked = false;
-      }
-
-      adminTagEl.value = p.tag || "";
-      adminDescriptionEl.value = p.description || "";
-      adminImagesEl.value = (p.images && p.images.length) ? p.images.join(", ") : "";
-
-      const btn = document.querySelector(".admin-btn");
-      if(btn){
-        btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
-      }
-
-      showToast("✏️ Tahrirlash rejimi: formani o‘zgartirib, saqlang");
-    }
-
-    // 🖼 DETAIL GALEREYA FUNKSIYALARI
-    function getDetailImages(){
-      if(detailIndex === null) return [RAW_PREFIX + "noimage.png"];
-      const p = products[detailIndex];
-      if(!p) return [RAW_PREFIX + "noimage.png"];
-      if(p.images && p.images.length) return p.images;
-      return [RAW_PREFIX + "noimage.png"];
-    }
-
-    function renderDetailImage(){
-      if(!detailImageEl) return;
-      const imgs = getDetailImages();
-      if(detailImageIndex >= imgs.length) detailImageIndex = 0;
-      if(detailImageIndex < 0) detailImageIndex = imgs.length - 1;
-      setImageWithPngJpgFallback(detailImageEl, imgs[detailImageIndex]);
-      if(detailImageIndexEl){
-        detailImageIndexEl.textContent = `${detailImageIndex + 1} / ${imgs.length}`;
-      }
-    }
-
-    function changeDetailImage(delta){
-      if(detailIndex === null) return;
-      const imgs = getDetailImages();
-      if(imgs.length <= 1) return;
-      detailImageIndex = (detailImageIndex + delta + imgs.length) % imgs.length;
-      renderDetailImage();
-    }
-
-    function updateDetailCountdownUI(){
-      if(!detailBackBtn) return;
-      detailBackBtn.textContent = `◀ Magaziniga qaytish (${detailCountdownRemaining} s)`;
-      if(detailCountdownRemaining <= 3){
-        detailBackBtn.style.color = "#ef4444";
-      } else {
-        detailBackBtn.style.color = "";
-      }
-    }
-
-    function clearDetailCountdown(){
-      if(detailCountdownTimer){
-        clearInterval(detailCountdownTimer);
-        detailCountdownTimer = null;
-      }
-      if(detailBackBtn){
-        detailBackBtn.style.color = "";
-        detailBackBtn.textContent = "◀ Magaziniga qaytish";
-      }
-    }
-
-    function startDetailCountdown(){
-      if(!detailBackBtn) return;
-      clearDetailCountdown();
-      detailCountdownRemaining = 5;
-      detailBackBtn.classList.remove("hidden");
-      updateDetailCountdownUI();
-      detailCountdownTimer = setInterval(()=>{
-        detailCountdownRemaining--;
-        if(detailCountdownRemaining <= 0){
-          clearDetailCountdown();
-          closeProductDetail();
-        }else{
-          updateDetailCountdownUI();
-        }
-      }, 1000);
-    }
-
-    function openProductDetail(index){
-      const p = products[index];
-      if(!p) return;
-      detailIndex = index;
-      detailImageIndex = 0;
-      detailQty = 1;
-      clearDetailCountdown();
-
-      const catLabel = categoryLabel[p.category] || p.category;
-
-      renderDetailImage();
-
-      detailCategoryEl.textContent = catLabel;
-      detailNameEl.textContent = p.name;
-      detailTagEl.textContent = p.tag ? "💡 " + p.tag : "";
-      detailDescEl.textContent =
-        p.description && p.description.trim().length
-          ? p.description
-          : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan. Admin paneldan batafsil tavsif yozib qo‘yishingiz mumkin.";
-      detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
-      if(p.oldPrice){
-        detailOldPriceEl.textContent = formatPrice(p.oldPrice) + " so‘m";
-        detailOldPriceEl.classList.remove("hidden");
-      }else{
-        detailOldPriceEl.classList.add("hidden");
-      }
-
-      if(detailQtyValue){
-        detailQtyValue.textContent = detailQty;
-      }
-
-      detailAddBtn.classList.remove("added");
-      detailAddBtn.textContent = "🛒 Savatga qo‘shish";
-
-      if(detailBackBtn){
-        detailBackBtn.classList.add("hidden");
-        detailBackBtn.style.color = "";
-        detailBackBtn.textContent = "◀ Magaziniga qaytish";
-      }
-
-      productDetailOverlay.classList.remove("hidden");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeProductDetail(){
-      clearDetailCountdown();
-      productDetailOverlay.classList.add("hidden");
-      document.body.style.overflow = "";
-      detailIndex = null;
-    }
-
-    if(detailAddBtn){
-      detailAddBtn.addEventListener("click", ()=>{
-        if(detailIndex === null) return;
-        addToCart(detailIndex, detailQty);
-        detailAddBtn.classList.add("added");
-        detailAddBtn.textContent = "✅ Savatga qo‘shildi";
-        if(detailBackBtn){
-          detailBackBtn.classList.remove("hidden");
-        }
-        startDetailCountdown();
-      });
-    }
-
-    if(detailBackBtn){
-      detailBackBtn.addEventListener("click", ()=>{
-        closeProductDetail();
-      });
-    }
-
-    productDetailOverlay.addEventListener("click",(e)=>{
-      if(e.target === productDetailOverlay){
-        closeProductDetail();
-      }
-    });
-
-    if(detailPrevBtn){
-      detailPrevBtn.addEventListener("click",(e)=>{
-        e.stopPropagation();
-        changeDetailImage(-1);
-      });
-    }
-    if(detailNextBtn){
-      detailNextBtn.addEventListener("click",(e)=>{
-        e.stopPropagation();
-        changeDetailImage(1);
-      });
-    }
-
-    if(detailQtyMinus){
-      detailQtyMinus.addEventListener("click",(e)=>{
-        e.stopPropagation();
-        if(detailQty > 1){
-          detailQty--;
-          if(detailQtyValue) detailQtyValue.textContent = detailQty;
-        }
-      });
-    }
-    if(detailQtyPlus){
-      detailQtyPlus.addEventListener("click",(e)=>{
-        e.stopPropagation();
-        detailQty++;
-        if(detailQtyValue) detailQtyValue.textContent = detailQty;
-      });
-    }
-
-    // INIT
-    (function init(){
-      const savedTheme = localStorage.getItem(THEME_KEY) || "light";
-      applyTheme(savedTheme);
-      isAdmin = false;
-      updateAdminUI();
-      rebuildProducts();
-      renderHistory();
-      subscribeProductsRealtime();
-    })();
-
-    // GLOBAL FUNCTIONS
-    window.addToCart = addToCart;
-    window.toggleCartSheet = toggleCartSheet;
-    window.changeQty = changeQty;
-    window.removeFromCart = removeFromCart;
-    window.sendOrder = sendOrder;
-    window.clearHistory = clearHistory;
-    window.openProductDetail = openProductDetail;
-    window.closeProductDetail = closeProductDetail;
-    window.deleteAnyProduct = deleteAnyProduct;
-    window.editProduct = editProduct;
-    window.addCustomProduct = addCustomProduct;
-    window.resetCustomerInfo = resetCustomerInfo;
-  </script>
+  <div class="toast" id="toast">
+    ✅ Savatga qo‘shildi
+  </div>
+
+  <!-- FIREBASE + APP JS -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
