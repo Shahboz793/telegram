@@ -515,7 +515,7 @@ function clearHistory(){
   }
 }
 
-// TELEGRAMGA BUYURTMA — HAR SAFAR MATN TAYYOR (cheksiz)
+// TELEGRAMGA BUYURTMA
 function sendOrder(){
   if(cart.length === 0){
     showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
@@ -551,11 +551,7 @@ function sendOrder(){
   text += "✍️ Iltimos, ushbu ma'lumotlarni to‘ldirib, xabarni yuboring.\n";
 
   const encoded = encodeURIComponent(text);
-
-  // 🔁 HAR SAFAR TELEGRAM SHARE OCHILADI — MATN 100% TAYYOR
-  // Foydalanuvchi ichidan @onatili_premium ni tanlab "Yuborish"ni bosadi.
-  const url = "https://t.me/share/url?url=&text=" + encoded;
-
+  const url = "https://t.me/onatili_premium?text=" + encoded + "&t=" + Date.now();
   const order = {
     date: new Date().toISOString(),
     totalPrice: totalPrice,
@@ -572,7 +568,7 @@ function sendOrder(){
   showToast("✅ Buyurtma matni Telegramga tayyorlandi.");
 }
 
-// THEME
+// THEMEa
 function applyTheme(theme){
   document.body.classList.toggle("theme-dark", theme === "dark");
   themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
