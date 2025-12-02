@@ -32,6 +32,7 @@ const productsCol = collection(db, "beauty_products");
 const STORAGE_HISTORY = "beauty_order_history";
 const THEME_KEY = "beauty_theme";
 const RAW_PREFIX = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
+
 const categoryEmoji = {
   "pomada":"💄",
   "krem":"🧴",
@@ -41,6 +42,7 @@ const categoryEmoji = {
   "tana":"🛁",
   "default":"💅"
 };
+
 const categoryLabel = {
   "pomada":"Pomada / lab uchun",
   "krem":"Krem / yuz uchun",
@@ -695,6 +697,7 @@ async function addCustomProduct(){
 
   try{
     if(editingProductId){
+      // ✏️ TAHRIRLASH
       await updateDoc(doc(db,"beauty_products",editingProductId), {
         ...payload,
         updatedAt: serverTimestamp()
@@ -710,15 +713,16 @@ async function addCustomProduct(){
       flashAdminButton("✅ Yangilandi");
 
     }else{
+      // ➕ YANGI MAHSULOT
       const docRef = await addDoc(productsCol, {
         ...payload,
         createdAt: serverTimestamp()
       });
 
       remoteProducts.push({
-        ...payload,
         id: docRef.id,
         fromFirebase:true,
+        ...payload,
         createdAt: { seconds: Date.now()/1000 }
       });
 
@@ -885,5 +889,4 @@ window.openProductDetail = openProductDetail;
 window.closeProductDetail = closeProductDetail;
 window.deleteAnyProduct = deleteAnyProduct;
 window.editProduct = editProduct;
-// ⭐ MUHIM FIX:
 window.addCustomProduct = addCustomProduct;
