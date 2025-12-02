@@ -26,14 +26,18 @@ const firebaseConfig = {
 // INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const productsCol = collection(db, "beauty_products");
+
+// 🔥 KOLLEKSIYALAR
+const productsCol   = collection(db, "beauty_products");
+const categoriesCol = collection(db, "beauty_categories"); // 🆕 kategoriyalar
 
 // KONSTANTALAR
-const STORAGE_HISTORY = "beauty_order_history";
-const THEME_KEY = "beauty_theme";
-const RAW_PREFIX = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
+const STORAGE_HISTORY  = "beauty_order_history";
 const STORAGE_CUSTOMER = "beauty_customer_info"; // 👤 ism + telefon + manzil
+const THEME_KEY        = "beauty_theme";
+const RAW_PREFIX       = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
 
+// DEFAULT EMOJI / LABEL (fallback uchun)
 const categoryEmoji = {
   "pomada":"💄",
   "krem":"🧴",
@@ -53,7 +57,7 @@ const categoryLabel = {
   "tana":"Tana / soch parvarishi"
 };
 
-// DEFAULT MAHSULOTLAR
+// DEFAULT MAHSULOTLAR (xohlasang keyin olib tashlashing mumkin)
 const defaultProducts = [
   {
     name:"Mat pomada Nude Lux",
@@ -137,6 +141,10 @@ let activeCategory = "all";
 let currentSearch = "";
 let isAdmin = false;
 
+// 🆕 KATEGORIYA STATE
+let categories = [];              // Firestore’dan kelgan
+let editingCategoryId = null;     // tahrirlash uchun
+
 // Detail oynasi uchun state
 let detailIndex = null;
 let detailImageIndex = 0;
@@ -145,53 +153,59 @@ let detailCountdownTimer = null;
 let detailCountdownRemaining = 0;
 
 // DOM
-const productsGrid = document.getElementById("productsGrid");
-const filterBar = document.getElementById("filterBar");
-const cartCountTopEl = document.getElementById("cartCountTop");
-const cartTotalTopEl = document.getElementById("cartTotalTop");
-const toastEl = document.getElementById("toast");
-const cartSheet = document.getElementById("cartSheet");
-const cartSheetOverlay = document.getElementById("cartSheetOverlay");
-const cartItemsEl = document.getElementById("cartItems");
-const cartSheetTotalEl = document.getElementById("cartSheetTotal");
-const themeToggleBtn = document.getElementById("themeToggleBtn");
-const tabsEl = document.getElementById("tabs");
-const historyListEl = document.getElementById("historyList");
-const adminCustomListEl = document.getElementById("adminCustomList");
-const adminAccessBtn = document.getElementById("adminAccessBtn");
-const adminTabBtn = document.getElementById("adminTabBtn");
-const searchInput = document.getElementById("searchInput");
+const productsGrid        = document.getElementById("productsGrid");
+const filterBar           = document.getElementById("filterBar");
+const cartCountTopEl      = document.getElementById("cartCountTop");
+const cartTotalTopEl      = document.getElementById("cartTotalTop");
+const toastEl             = document.getElementById("toast");
+const cartSheet           = document.getElementById("cartSheet");
+const cartSheetOverlay    = document.getElementById("cartSheetOverlay");
+const cartItemsEl         = document.getElementById("cartItems");
+const cartSheetTotalEl    = document.getElementById("cartSheetTotal");
+const themeToggleBtn      = document.getElementById("themeToggleBtn");
+const tabsEl              = document.getElementById("tabs");
+const historyListEl       = document.getElementById("historyList");
+const adminCustomListEl   = document.getElementById("adminCustomList");
+const adminAccessBtn      = document.getElementById("adminAccessBtn");
+const adminTabBtn         = document.getElementById("adminTabBtn");
+const searchInput         = document.getElementById("searchInput");
 
 const productDetailOverlay = document.getElementById("productDetailOverlay");
-const detailImageEl = document.getElementById("detailImage");
-const detailCategoryEl = document.getElementById("detailCategory");
-const detailNameEl = document.getElementById("detailName");
-const detailTagEl = document.getElementById("detailTag");
-const detailDescEl = document.getElementById("detailDesc");
-const detailPriceEl = document.getElementById("detailPrice");
-const detailOldPriceEl = document.getElementById("detailOldPrice");
-const detailAddBtn = document.getElementById("detailAddBtn");
-const detailBackBtn = document.getElementById("detailBackBtn");
+const detailImageEl        = document.getElementById("detailImage");
+const detailCategoryEl     = document.getElementById("detailCategory");
+const detailNameEl         = document.getElementById("detailName");
+const detailTagEl          = document.getElementById("detailTag");
+const detailDescEl         = document.getElementById("detailDesc");
+const detailPriceEl        = document.getElementById("detailPrice");
+const detailOldPriceEl     = document.getElementById("detailOldPrice");
+const detailAddBtn         = document.getElementById("detailAddBtn");
+const detailBackBtn        = document.getElementById("detailBackBtn");
 
 // 🖼 Galereya tugmalari + rasm raqami
-const detailPrevBtn = document.getElementById("detailPrevBtn");
-const detailNextBtn = document.getElementById("detailNextBtn");
+const detailPrevBtn      = document.getElementById("detailPrevBtn");
+const detailNextBtn      = document.getElementById("detailNextBtn");
 const detailImageIndexEl = document.getElementById("detailImageIndex");
 
 // 🔢 Miqdor tugmalari
 const detailQtyMinus = document.getElementById("detailQtyMinus");
-const detailQtyPlus = document.getElementById("detailQtyPlus");
+const detailQtyPlus  = document.getElementById("detailQtyPlus");
 const detailQtyValue = document.getElementById("detailQtyValue");
 
-// ADMIN FORM DOM
-const adminNameEl = document.getElementById("adminName");
-const adminCategoryEl = document.getElementById("adminCategory");
-const adminPriceBaseEl = document.getElementById("adminPriceBase");
-const adminHasDiscountEl = document.getElementById("adminHasDiscount");
+// ADMIN FORM DOM (mahsulot)
+const adminNameEl          = document.getElementById("adminName");
+const adminCategoryEl      = document.getElementById("adminCategory");
+const adminPriceBaseEl     = document.getElementById("adminPriceBase");
+const adminHasDiscountEl   = document.getElementById("adminHasDiscount");
 const adminPriceDiscountEl = document.getElementById("adminPriceDiscount");
-const adminTagEl = document.getElementById("adminTag");
-const adminDescriptionEl = document.getElementById("adminDescription");
-const adminImagesEl = document.getElementById("adminImages");
+const adminTagEl           = document.getElementById("adminTag");
+const adminDescriptionEl   = document.getElementById("adminDescription");
+const adminImagesEl        = document.getElementById("adminImages");
+
+// 🆕 ADMIN FORM DOM (kategoriyalar)
+const adminCatCodeEl      = document.getElementById("adminCatCode");
+const adminCatLabelEl     = document.getElementById("adminCatLabel");
+const adminCatEmojiEl     = document.getElementById("adminCatEmoji");
+const adminCategoryListEl = document.getElementById("adminCategoryList");
 
 // HELPERS
 function formatPrice(v){ return v.toLocaleString("uz-UZ"); }
@@ -238,17 +252,16 @@ function setImageWithPngJpgFallback(imgElement, url) {
 
 function matchesSearch(p){
   if(!currentSearch) return true;
-  const q = currentSearch;
-  const name = (p.name || "").toLowerCase();
+  const q   = currentSearch;
+  const name= (p.name || "").toLowerCase();
   const tag = (p.tag || "").toLowerCase();
-  const desc = (p.description || "").toLowerCase();
+  const desc= (p.description || "").toLowerCase();
   const cat = (p.category || "").toLowerCase();
   return name.includes(q) || tag.includes(q) || desc.includes(q) || cat.includes(q);
 }
 
-// 👤 MIJOZ MA'LUMOTLARI (ISM + TELEFON + MANZIL)
+/* ===================== 👤 MIJOZ MA'LUMOTLARI ===================== */
 
-// Yangi ma'lumotni so'rab, saqlaydigan funksiya
 function promptNewCustomerInfo() {
   const name = prompt("👤 Ismingizni kiriting (masalan, Shahboz):");
   if (!name) return null;
@@ -264,12 +277,10 @@ function promptNewCustomerInfo() {
     phone: phone.trim(),
     address: address.trim()
   };
-
   localStorage.setItem(STORAGE_CUSTOMER, JSON.stringify(info));
   return info;
 }
 
-// Har safar buyurtma berishda taklif qiluvchi funksiya
 function askCustomerInfo() {
   let info = null;
   try {
@@ -288,24 +299,22 @@ function askCustomerInfo() {
       "OK — Ha, shu ma'lumotlar bilan\n" +
       "Cancel — Yangi ma'lumot kiritaman"
     );
-
     if (ok) {
       return info;
     } else {
       return promptNewCustomerInfo();
     }
   }
-
   return promptNewCustomerInfo();
 }
 
-// Ma'lumotni tozalash (ixtiyoriy: HTML tugmadan chaqirish mumkin)
 function resetCustomerInfo() {
   localStorage.removeItem(STORAGE_CUSTOMER);
   showToast("👤 Mijoz ma'lumotlari o'chirildi. Keyingi buyurtmada qaytadan kiritasiz.");
 }
 
-// 🔄 REAL-TIME: FIRESTORE'DAN UZLUKSIZ O‘QISH
+/* ===================== 🔄 REAL-TIME FIRESTORE: MAHSULOTLAR ===================== */
+
 function subscribeProductsRealtime(){
   onSnapshot(
     productsCol,
@@ -338,7 +347,51 @@ function subscribeProductsRealtime(){
   );
 }
 
-// PRODUCTS
+/* ===================== 🔄 REAL-TIME FIRESTORE: KATEGORIYALAR ===================== */
+
+function subscribeCategoriesRealtime(){
+  onSnapshot(
+    categoriesCol,
+    (snap) => {
+      const list = [];
+      snap.forEach(d => {
+        const data = d.data() || {};
+        const code = (data.code || "").trim().toLowerCase();
+        if (!code) return;
+
+        const label = (data.label || code).trim();
+        const emoji = (data.emoji || categoryEmoji[code] || categoryEmoji.default).trim() || "💅";
+
+        list.push({
+          id: d.id,
+          code,
+          label,
+          emoji,
+          order: data.order ?? 0
+        });
+
+        // maplarni ham yangilab boramiz
+        categoryEmoji[code] = emoji;
+        categoryLabel[code] = label;
+      });
+
+      // tartiblash (order bo‘yicha)
+      list.sort((a,b) => (a.order || 0) - (b.order || 0));
+
+      categories = list;
+      renderCategoryFilter();
+      updateAdminCategorySelect();
+      renderCategoryAdminList();
+    },
+    (e) => {
+      console.error("Realtime kategoriya o‘qishda xato:", e);
+      showToast("⚠️ Kategoriyalarni o‘qishda xato: " + (e.message || ""));
+    }
+  );
+}
+
+/* ===================== PRODUCTS UI ===================== */
+
 function rebuildProducts(){
   products = [...defaultProducts, ...remoteProducts];
   renderProducts();
@@ -346,20 +399,24 @@ function rebuildProducts(){
 
 function renderProducts(){
   productsGrid.innerHTML = "";
+
   const filtered = products.filter(p =>
     (activeCategory === "all" ? true : p.category === activeCategory) &&
     matchesSearch(p)
   );
+
   if(!filtered.length){
     productsGrid.innerHTML = "<p class='history-empty'>Bu filtrlarda mahsulot topilmadi.</p>";
     return;
   }
+
   filtered.forEach(p=>{
     const index = products.indexOf(p);
     const discount = p.oldPrice && p.oldPrice > p.price
       ? (100 - Math.round(p.price*100/p.oldPrice))
       : null;
     const tag = p.tag || "Ommabop mahsulot";
+
     const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
     let imgHtml;
     if (firstImage.startsWith(RAW_PREFIX)) {
@@ -368,6 +425,7 @@ function renderProducts(){
     } else {
       imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
     }
+
     productsGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${index})">
         <div class="product-img-wrap">
@@ -400,7 +458,36 @@ function renderProducts(){
   });
 }
 
-// FILTER BAR
+/* ===================== KATEGORIYA FILTR KNOPKALARI ===================== */
+
+// 🔁 Filtr panelini kategoriyalar bo‘yicha yangilash
+function renderCategoryFilter(){
+  if(!filterBar) return;
+
+  // Agar Firestore’dan hech kategoriya kelmagan bo‘lsa,
+  // 4 ta default katalogni ishlatamiz
+  const list = categories.length ? categories : [
+    { code: "pomada", label: categoryLabel.pomada, emoji: categoryEmoji.pomada },
+    { code: "krem",   label: categoryLabel.krem,   emoji: categoryEmoji.krem },
+    { code: "parfyum",label: categoryLabel.parfyum,emoji: categoryEmoji.parfyum },
+    { code: "tana",   label: categoryLabel.tana,   emoji: categoryEmoji.tana },
+  ];
+
+  let html = "";
+  html += `<button class="chip ${activeCategory === "all" ? "active" : ""}" data-category="all">⭐ Barchasi</button>`;
+
+  list.forEach(cat=>{
+    html += `
+      <button class="chip ${activeCategory === cat.code ? "active" : ""}" data-category="${cat.code}">
+        ${cat.emoji} ${cat.label}
+      </button>
+    `;
+  });
+
+  filterBar.innerHTML = html;
+}
+
+// Filter bar click — avvalgidek ishlaydi
 filterBar.addEventListener("click", (e)=>{
   const btn = e.target.closest(".chip");
   if(!btn) return;
@@ -410,13 +497,15 @@ filterBar.addEventListener("click", (e)=>{
   renderProducts();
 });
 
-// SEARCH
+/* ===================== SEARCH ===================== */
+
 searchInput.addEventListener("input", ()=>{
   currentSearch = searchInput.value.trim().toLowerCase();
   renderProducts();
 });
 
-// CART
+/* ===================== CART ===================== */
+
 function addToCart(index, qty = 1){
   if(qty <= 0) return;
   const found = cart.find(c => c.index === index);
@@ -509,16 +598,13 @@ function removeFromCart(productIndex){
   renderCartItems();
 }
 
-// 🔁 TELEGRAMGA LINK OCHISH FUNKSIYASI — YANGI VARIANT
+// 🔁 TELEGRAMGA LINK OCHISH FUNKSIYASI
 function openTelegramLink(url){
   const tg = window.Telegram && window.Telegram.WebApp;
-
   try {
     if (tg && typeof tg.openTelegramLink === "function") {
-      // Agar Telegram Mini App ichida bo'lsang
       tg.openTelegramLink(url);
     } else {
-      // Oddiy brauzerda bo'lsang – shu tabning o'zida t.me ochiladi (popup emas)
       window.location.href = url;
     }
   } catch (e) {
@@ -526,7 +612,8 @@ function openTelegramLink(url){
   }
 }
 
-// HISTORY (LOCAL)
+/* ===================== HISTORY (LOCAL) ===================== */
+
 function saveOrderHistory(order){
   let list = [];
   try{
@@ -579,53 +666,44 @@ function clearHistory(){
   }
 }
 
-// 🔄 YANGI: TELEGRAMGA BUYURTMA — avtomatik chat ochish, savatni tozalash
+/* ===================== TELEGRAMGA BUYURTMA ===================== */
+
 function sendOrder(){
-  // 1) Savat bo'sh bo'lmasa davom etamiz
   if (cart.length === 0) {
     showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
     return;
   }
 
-  // 2) Mijoz ma'lumotlari (ism, telefon, manzil)
   const customer = askCustomerInfo();
   if (!customer) {
     showToast("❌ Ism, telefon yoki manzil kiritilmagani uchun buyurtma matni tayyorlanmadi.");
     return;
   }
 
-  // 3) Savatdagi mahsulotlardan matn yig'amiz
   let totalPrice = 0;
   let totalItems = 0;
   let lines = [];
-
   cart.forEach((c, i) => {
     const p = products[c.index];
     if (!p) return;
-
     const lineTotal = p.price * c.qty;
     totalPrice += lineTotal;
     totalItems += c.qty;
-
     const catEmoji = categoryEmoji[p.category] || p.emoji || categoryEmoji.default;
     const lineText =
       `${i + 1}) ${catEmoji} ${p.name} — ${c.qty} dona × ${formatPrice(p.price)} so‘m = ${formatPrice(lineTotal)} so‘m`;
-
     lines.push({ line: lineText, product: p });
   });
 
   const totalStr = formatPrice(totalPrice);
 
-  // 4) Yuboriladigan xabar matni
   let text = "";
   text += "💖 BEAUTY STORE — Onlayn buyurtma\n";
   text += "━━━━━━━━━━━━━━━━━━━━\n";
   text += "🧺 Savatimdagi mahsulotlar:\n\n";
-
   lines.forEach(l => {
     text += "• " + l.line + "\n";
   });
-
   text += "\n💰 Umumiy summa: " + totalStr + " so‘m\n";
   text += "📦 Buyurtma turi: Kosmetika mahsulotlari\n";
   text += "━━━━━━━━━━━━━━━━━━━━\n";
@@ -635,12 +713,10 @@ function sendOrder(){
   text += "✍️ Qo‘shimcha izoh: _______\n";
 
   const encoded = encodeURIComponent(text);
-
-  // ⚡ HAR SAFAR YANGI LINK: &t=Date.now() qo'shamiz
   const baseUrl = "https://t.me/onatili_premium";
   const url = `${baseUrl}?text=${encoded}&t=${Date.now()}`;
 
-  // Agar tarixni saqlamoqchi bo'lsang, quyidagi blokni ochiq qoldir:
+  // Tarixga yozmoqchi bo‘lsang, blokni yoqib qo‘y:
   /*
   const order = {
     date: new Date().toISOString(),
@@ -652,33 +728,32 @@ function sendOrder(){
   saveOrderHistory(order);
   */
 
-  // 6) Savatni buyurtmani yuborish tugmasini bosgan paytning o'zida tozalaymiz
   cart = [];
   updateCartUI();
   renderCartItems();
   toggleCartSheet(false);
 
-  // 7) Telegramni ochamiz (Mini App bo'lsa – WebApp, oddiy brauzer bo'lsa – t.me sahifasi)
   openTelegramLink(url);
-
-  // Xohlasang, qisqa eslatma:
-  // showToast("Telegram ochildi, xabarni jo'natishni unutmang 🙂");
 }
 
-// THEME
+/* ===================== THEME ===================== */
+
 function applyTheme(theme){
   document.body.classList.toggle("theme-dark", theme === "dark");
   themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
 }
+
 function toggleTheme(){
   const current = localStorage.getItem(THEME_KEY) || "light";
   const next = current === "dark" ? "light" : "dark";
   localStorage.setItem(THEME_KEY, next);
   applyTheme(next);
 }
+
 themeToggleBtn.addEventListener("click", toggleTheme);
 
-// TABS
+/* ===================== TABS ===================== */
+
 tabsEl.addEventListener("click", (e)=>{
   const btn = e.target.closest(".tab-btn");
   if(!btn) return;
@@ -697,10 +772,12 @@ tabsEl.addEventListener("click", (e)=>{
     renderHistory();
   }else if(pageId === "adminPage"){
     renderAdminCustomList();
+    renderCategoryAdminList();
   }
 });
 
-// ADMIN UI
+/* ===================== ADMIN UI ===================== */
+
 function updateAdminUI(){
   if(isAdmin){
     adminTabBtn.classList.remove("hidden");
@@ -722,6 +799,7 @@ async function askAdminCode(){
     document.getElementById("historyPage").classList.add("hidden");
     document.getElementById("adminPage").classList.remove("hidden");
     renderAdminCustomList();
+    renderCategoryAdminList();
     return;
   }
   const code = prompt("Admin uchun kirish kodi:");
@@ -756,9 +834,11 @@ async function askAdminCode(){
     showToast("⚠️ Admin kodi tekshiruvida xato: " + (e.message || ""));
   }
 }
+
 adminAccessBtn.addEventListener("click", askAdminCode);
 
-// ADMIN HELPER: TUGMANI "FLASH" QILISH
+/* ===================== ADMIN: MAHSULOTLAR ===================== */
+
 function flashAdminButton(text){
   const btn = document.querySelector(".admin-btn");
   if(!btn) return;
@@ -774,25 +854,24 @@ function flashAdminButton(text){
 
 let editingProductId = null;
 
-// ADMIN: FIRESTORE'GA MAHSULOT QO‘SHISH / TAHRIRLASH
 async function addCustomProduct(){
-  const name = adminNameEl.value.trim();
-  const category = adminCategoryEl.value;
-  const basePrice = parseInt(adminPriceBaseEl.value, 10);
-  const hasDiscount = adminHasDiscountEl.checked;
-  const discountPriceRaw = adminPriceDiscountEl.value ? parseInt(adminPriceDiscountEl.value, 10) : null;
-  const tag = adminTagEl.value.trim();
-  const description = adminDescriptionEl.value.trim();
+  const name         = adminNameEl.value.trim();
+  const category     = adminCategoryEl.value;
+  const basePrice    = parseInt(adminPriceBaseEl.value, 10);
+  const hasDiscount  = adminHasDiscountEl.checked;
+  const discountRaw  = adminPriceDiscountEl.value ? parseInt(adminPriceDiscountEl.value, 10) : null;
+  const tag          = adminTagEl.value.trim();
+  const description  = adminDescriptionEl.value.trim();
 
   if(!name || !basePrice || basePrice <= 0){
     showToast("❌ Nomi va narxini to‘g‘ri kiriting.");
     return;
   }
 
-  let price = basePrice;
+  let price    = basePrice;
   let oldPrice = null;
-  if(hasDiscount && discountPriceRaw && discountPriceRaw > 0 && discountPriceRaw < basePrice){
-    price = discountPriceRaw;
+  if(hasDiscount && discountRaw && discountRaw > 0 && discountRaw < basePrice){
+    price    = discountRaw;
     oldPrice = basePrice;
   }
 
@@ -802,6 +881,7 @@ async function addCustomProduct(){
   }
 
   const emoji = categoryEmoji[category] || categoryEmoji.default;
+
   const payload = {
     name,
     price,
@@ -815,7 +895,6 @@ async function addCustomProduct(){
 
   try{
     if(editingProductId){
-      // ✏️ TAHRIRLASH
       await updateDoc(doc(db,"beauty_products",editingProductId), {
         ...payload,
         updatedAt: serverTimestamp()
@@ -831,7 +910,6 @@ async function addCustomProduct(){
       flashAdminButton("✅ Yangilandi");
 
     }else{
-      // ➕ YANGI MAHSULOT
       const docRef = await addDoc(productsCol, {
         ...payload,
         createdAt: serverTimestamp()
@@ -850,15 +928,14 @@ async function addCustomProduct(){
       flashAdminButton("✅ Mahsulot qo‘shildi");
     }
 
-    // Formani tozalash
     editingProductId = null;
-    adminNameEl.value = "";
-    adminPriceBaseEl.value = "";
+    adminNameEl.value          = "";
+    adminPriceBaseEl.value     = "";
     adminPriceDiscountEl.value = "";
     adminHasDiscountEl.checked = false;
-    adminTagEl.value = "";
-    adminDescriptionEl.value = "";
-    adminImagesEl.value = "";
+    adminTagEl.value           = "";
+    adminDescriptionEl.value   = "";
+    adminImagesEl.value        = "";
 
   }catch(e){
     console.error("Mahsulot yozishda/tahrirlashda xato:", e);
@@ -907,22 +984,22 @@ function editProduct(id){
 
   editingProductId = id;
 
-  adminNameEl.value = p.name || "";
+  adminNameEl.value     = p.name || "";
   adminCategoryEl.value = p.category || "pomada";
 
   if(p.oldPrice && p.oldPrice > p.price){
-    adminPriceBaseEl.value = p.oldPrice;
+    adminPriceBaseEl.value     = p.oldPrice;
     adminPriceDiscountEl.value = p.price;
     adminHasDiscountEl.checked = true;
   }else{
-    adminPriceBaseEl.value = p.price;
+    adminPriceBaseEl.value     = p.price;
     adminPriceDiscountEl.value = "";
     adminHasDiscountEl.checked = false;
   }
 
-  adminTagEl.value = p.tag || "";
+  adminTagEl.value         = p.tag || "";
   adminDescriptionEl.value = p.description || "";
-  adminImagesEl.value = (p.images && p.images.length) ? p.images.join(", ") : "";
+  adminImagesEl.value      = (p.images && p.images.length) ? p.images.join(", ") : "";
 
   const btn = document.querySelector(".admin-btn");
   if(btn){
@@ -932,7 +1009,124 @@ function editProduct(id){
   showToast("✏️ Tahrirlash rejimi: formani o‘zgartirib, saqlang");
 }
 
-// 🖼 DETAIL GALEREYA FUNKSIYALARI
+/* ===================== ADMIN: KATEGORIYALAR ===================== */
+
+function updateAdminCategorySelect(){
+  if(!adminCategoryEl) return;
+
+  const current = adminCategoryEl.value;
+
+  // agar Firestore’da kategoriyalar bo‘lsa — ulardan to‘ldiramiz,
+  // bo‘lmasa default 4 tasini ishlatamiz
+  let list = categories.length ? categories : [
+    { code: "pomada", label: categoryLabel.pomada },
+    { code: "krem",   label: categoryLabel.krem },
+    { code: "parfyum",label: categoryLabel.parfyum },
+    { code: "tana",   label: categoryLabel.tana },
+  ];
+
+  adminCategoryEl.innerHTML = "";
+  list.forEach(cat=>{
+    const opt = document.createElement("option");
+    opt.value = cat.code;
+    opt.textContent = cat.label;
+    adminCategoryEl.appendChild(opt);
+  });
+
+  if(current && list.some(c=>c.code === current)){
+    adminCategoryEl.value = current;
+  }
+}
+
+function renderCategoryAdminList(){
+  if(!adminCategoryListEl) return;
+
+  if(!categories.length){
+    adminCategoryListEl.innerHTML = "<p class='history-empty'>Hozircha kategoriya qo‘shilmagan.</p>";
+    return;
+  }
+
+  adminCategoryListEl.innerHTML = "";
+  categories.forEach(cat=>{
+    adminCategoryListEl.innerHTML += `
+      <div class="admin-product-row">
+        <span>${cat.emoji} <b>${cat.label}</b> <small>(${cat.code})</small></span>
+        <button class="admin-edit-btn" onclick="editCategory('${cat.id}')">✏️</button>
+        <button class="admin-delete-btn" onclick="deleteCategory('${cat.id}')">✕</button>
+      </div>
+    `;
+  });
+}
+
+async function saveCategory(){
+  if(!adminCatCodeEl || !adminCatLabelEl) return;
+
+  const rawCode = adminCatCodeEl.value.trim();
+  const code    = rawCode.toLowerCase();
+  const label   = adminCatLabelEl.value.trim();
+  const emoji   = (adminCatEmojiEl.value.trim() || "💅");
+
+  if(!code || !label){
+    showToast("❌ Kategoriya kodi va nomini kiriting.");
+    return;
+  }
+
+  try{
+    const existing = categories.find(c=>c.code === code);
+    if(existing){
+      await updateDoc(doc(db,"beauty_categories", existing.id), {
+        code,
+        label,
+        emoji,
+        updatedAt: serverTimestamp()
+      });
+      showToast("✅ Kategoriya yangilandi");
+    }else{
+      await addDoc(categoriesCol, {
+        code,
+        label,
+        emoji,
+        order: categories.length,
+        createdAt: serverTimestamp()
+      });
+      showToast("✅ Kategoriya qo‘shildi");
+    }
+
+    adminCatCodeEl.value  = "";
+    adminCatLabelEl.value = "";
+    adminCatEmojiEl.value = "";
+
+  }catch(e){
+    console.error("Kategoriya saqlashda xato:", e);
+    showToast("⚠️ Kategoriya saqlashda xato: " + (e.message || ""));
+  }
+}
+
+function editCategory(id){
+  const cat = categories.find(c=>c.id === id);
+  if(!cat) return;
+
+  editingCategoryId      = id;
+  adminCatCodeEl.value   = cat.code;
+  adminCatLabelEl.value  = cat.label;
+  adminCatEmojiEl.value  = cat.emoji;
+
+  showToast("✏️ Kategoriya tahrirlash rejimi");
+}
+
+async function deleteCategory(id){
+  if(!confirm("Bu kategoriyani o‘chirishni xohlaysizmi? Hamma foydalanuvchilar uchun o‘chadi.")) return;
+  try{
+    await deleteDoc(doc(db,"beauty_categories",id));
+    showToast("🗑 Kategoriya o‘chirildi");
+  }catch(e){
+    console.error("Kategoriya o‘chirishda xato:", e);
+    showToast("⚠️ Kategoriya o‘chirishda xato: " + (e.message || ""));
+  }
+}
+
+/* ===================== PRODUCT DETAIL ===================== */
+
 function getDetailImages(){
   if(detailIndex === null) return [RAW_PREFIX + "noimage.png"];
   const p = products[detailIndex];
@@ -960,12 +1154,12 @@ function changeDetailImage(delta){
   renderDetailImage();
 }
 
-// ⏱ 5 SONIYALI QAYTISH COUNTDOWN (agar kerak bo'lsa, detailda ishlatiladi)
+// ⏱ 5 SONIYALI QAYTISH COUNTDOWN
 function updateDetailCountdownUI(){
   if(!detailBackBtn) return;
   detailBackBtn.textContent = `◀ Magaziniga qaytish (${detailCountdownRemaining} s)`;
   if(detailCountdownRemaining <= 3){
-    detailBackBtn.style.color = "#ef4444"; // qizil
+    detailBackBtn.style.color = "#ef4444";
   } else {
     detailBackBtn.style.color = "";
   }
@@ -999,10 +1193,10 @@ function startDetailCountdown(){
   }, 1000);
 }
 
-// PRODUCT DETAIL
 function openProductDetail(index){
   const p = products[index];
   if(!p) return;
+
   detailIndex = index;
   detailImageIndex = 0;
   detailQty = 1;
@@ -1013,8 +1207,8 @@ function openProductDetail(index){
   renderDetailImage();
 
   detailCategoryEl.textContent = catLabel;
-  detailNameEl.textContent = p.name;
-  detailTagEl.textContent = p.tag ? "💡 " + p.tag : "";
+  detailNameEl.textContent     = p.name;
+  detailTagEl.textContent      = p.tag ? "💡 " + p.tag : "";
   detailDescEl.textContent =
     p.description && p.description.trim().length
       ? p.description
@@ -1027,7 +1221,6 @@ function openProductDetail(index){
     detailOldPriceEl.classList.add("hidden");
   }
 
-  // Miqdor 1 dan boshlanadi
   if(detailQtyValue){
     detailQtyValue.textContent = detailQty;
   }
@@ -1062,7 +1255,6 @@ if(detailAddBtn){
     if(detailBackBtn){
       detailBackBtn.classList.remove("hidden");
     }
-    // ⏱ 5 soniyali countdown (istamasang, shu 2 qatorni olib tashlashing mumkin)
     startDetailCountdown();
   });
 }
@@ -1079,7 +1271,7 @@ productDetailOverlay.addEventListener("click",(e)=>{
   }
 });
 
-// 🖼 GALEREYA TUGMALARI EVENTLARI
+// GALEREYA TUGMALARI
 if(detailPrevBtn){
   detailPrevBtn.addEventListener("click",(e)=>{
     e.stopPropagation();
@@ -1093,7 +1285,7 @@ if(detailNextBtn){
   });
 }
 
-// 🔢 MIQDOR TUGMALARI
+// MIQDOR TUGMALARI
 if(detailQtyMinus){
   detailQtyMinus.addEventListener("click",(e)=>{
     e.stopPropagation();
@@ -1111,27 +1303,38 @@ if(detailQtyPlus){
   });
 }
 
-// INIT
+/* ===================== INIT ===================== */
+
 (function init(){
   const savedTheme = localStorage.getItem(THEME_KEY) || "light";
   applyTheme(savedTheme);
+
   isAdmin = false;
   updateAdminUI();
-  rebuildProducts();          // faqat default mahsulotlar
+
+  rebuildProducts();           // default mahsulotlar
   renderHistory();
-  subscribeProductsRealtime(); // 🔄 REAL-TIME FIRESTORE
+
+  subscribeProductsRealtime();   // mahsulotlar
+  subscribeCategoriesRealtime(); // 🆕 kategoriyalar
 })();
 
-// GLOBAL FUNCTIONS (onclick uchun)
-window.addToCart = addToCart;
-window.toggleCartSheet = toggleCartSheet;
-window.changeQty = changeQty;
-window.removeFromCart = removeFromCart;
-window.sendOrder = sendOrder;
-window.clearHistory = clearHistory;
-window.openProductDetail = openProductDetail;
-window.closeProductDetail = closeProductDetail;
+/* ===================== GLOBAL FUNKSIYALAR ===================== */
+
+window.addToCart        = addToCart;
+window.toggleCartSheet  = toggleCartSheet;
+window.changeQty        = changeQty;
+window.removeFromCart   = removeFromCart;
+window.sendOrder        = sendOrder;
+window.clearHistory     = clearHistory;
+window.openProductDetail= openProductDetail;
+window.closeProductDetail= closeProductDetail;
 window.deleteAnyProduct = deleteAnyProduct;
-window.editProduct = editProduct;
+window.editProduct      = editProduct;
 window.addCustomProduct = addCustomProduct;
-window.resetCustomerInfo = resetCustomerInfo;
+window.resetCustomerInfo= resetCustomerInfo;
+
+// 🆕 kategoriya uchun
+window.saveCategory     = saveCategory;
+window.deleteCategory   = deleteCategory;
+window.editCategory     = editCategory;
