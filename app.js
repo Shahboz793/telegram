@@ -636,7 +636,7 @@ function sendOrder(){
   const totalStr = formatPrice(totalPrice);
 
   let text = "";
-  text += "💖 BEAUTY STORE — Onlayn buyurtma\n";
+  text += "ONLINE MAGAZIN YANGIOBOD  — Onlayn buyurtma\n";
   text += "━━━━━━━━━━━━━━━━━━━━\n";
   text += "🧺 Savatimdagi mahsulotlar:\n\n";
   lines.forEach(l => {
