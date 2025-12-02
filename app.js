@@ -636,10 +636,9 @@ function sendOrder(){
 
   const encoded = encodeURIComponent(text);
 
-  // ❗ MUHIM:
-  // bu yerda faqat bitta link ishlatamiz (t parametrisiz),
-  // shu bilan har safar sening shaxsiy akkaunting ochiladi
-  const url = "https://t.me/onatili_premium?text=" + encoded;
+  // ⚡ HAR SAFAR YANGI LINK: &t=Date.now() qo'shamiz
+  const baseUrl = "https://t.me/onatili_premium";
+  const url = `${baseUrl}?text=${encoded}&t=${Date.now()}`;
 
   // Agar tarixni saqlamoqchi bo'lsang, quyidagi blokni ochiq qoldir:
   /*
