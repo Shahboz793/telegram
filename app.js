@@ -37,6 +37,101 @@ const STORAGE_CUSTOMER = "beauty_customer_info"; // 👤 ism + telefon + manzil
 const THEME_KEY        = "beauty_theme";
 const RAW_PREFIX       = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
 
+// DEFAULT EMOJI / LABEL (fallback uchun)
+const categoryEmoji = {
+  "pomada":"💄",
+  "krem":"🧴",
+  "parfyum":"🌸",
+  "niqob":"😷",
+  "ko‘z":"👁",
+  "tana":"🛁",
+  "default":"💅"
+};
+
+const categoryLabel = {
+  "pomada":"Pomada / lab uchun",
+  "krem":"Krem / yuz uchun",
+  "parfyum":"Parfyum",
+  "niqob":"Niqob / mask",
+  "ko‘z":"Ko‘z uchun",
+  "tana":"Tana / soch parvarishi"
+};
+
+// DEFAULT MAHSULOTLAR (xohlasang keyin olib tashlashing mumkin)
+const defaultProducts = [
+  {
+    name:"Mat pomada Nude Lux",
+    price:89000,
+    oldPrice:109000,
+    category:"pomada",
+    emoji:"💄",
+    tag:"Yangi kolleksiya",
+    description:"Mat efektli, kundalik foydalanish uchun mos nude pomada. Lablarni quritmaydi, uzoq vaqt saqlanadi.",
+    images:[
+      "https://images.pexels.com/photos/3373744/pexels-photo-3373744.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ]
+  },
+  {
+    name:"Qizil mat pomada Classic Red",
+    price:99000,
+    oldPrice:119000,
+    category:"pomada",
+    emoji:"💋",
+    tag:"Best seller",
+    description:"Klassik qizil rang, bayram va maxsus tadbirlar uchun juda mos.",
+    images:[
+      "https://images.pexels.com/photos/947301/pexels-photo-947301.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ]
+  },
+  {
+    name:"Gialuronli yuz kremi",
+    price:129000,
+    oldPrice:149000,
+    category:"krem",
+    emoji:"🧴",
+    tag:"Namlik 24 soat",
+    description:"Quruq va normal teri uchun. Kun bo‘yi namlikni ushlab turishga yordam beradi.",
+    images:[
+      "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ]
+  },
+  {
+    name:"Kunduzgi SPF 50 krem",
+    price:139000,
+    oldPrice:159000,
+    category:"krem",
+    emoji:"🌞",
+    tag:"Quyoshdan himoya",
+    description:"SPF50 bilan kunduzgi krem — quyosh nurlaridan himoya va namlantirish birgalikda.",
+    images:[
+      "https://images.pexels.com/photos/3738342/pexels-photo-3738342.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ]
+  },
+  {
+    name:"Gul hidli ayollar parfyumi",
+    price:199000,
+    oldPrice:229000,
+    category:"parfyum",
+    emoji:"🌸",
+    tag:"Eng ko‘p yoqadigan",
+    description:"Yengil, mayin floral hid. Har kuni foydalanish uchun mos.",
+    images:[
+      "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ]
+  },
+  {
+    name:"Maskara Waterproof",
+    price:93000,
+    oldPrice:109000,
+    category:"ko‘z",
+    emoji:"💧",
+    tag:"Suvga chidamli",
+    description:"Suvga chidamli maskara — ko‘z yoshlari va yomg‘irga ham chidamli.",
+    images:[
+      "https://images.pexels.com/photos/3738367/pexels-photo-3738367.jpeg?auto=compress&cs=tinysrgb&w=600"
+    ]
+  }
+];
 
 // STATE
 let products = [];
@@ -209,7 +304,6 @@ function askCustomerInfo() {
       return promptNewCustomerInfo();
     }
   }
-
   return promptNewCustomerInfo();
 }
 
@@ -261,8 +355,10 @@ function subscribeCategoriesRealtime(){
         const data = d.data() || {};
         const code = (data.code || "").trim().toLowerCase();
         if (!code) return;
+
         const label = (data.label || code).trim();
         const emoji = (data.emoji || categoryEmoji[code] || categoryEmoji.default).trim() || "💅";
+
         list.push({
           id: d.id,
           code,
@@ -277,6 +373,7 @@ function subscribeCategoriesRealtime(){
 
       list.sort((a,b) => (a.order || 0) - (b.order || 0));
       categories = list;
+
       renderCategoryFilter();
       updateAdminCategorySelect();
       renderCategoryAdminList();
@@ -290,8 +387,7 @@ function subscribeCategoriesRealtime(){
 
 /* ===================== PRODUCTS UI ===================== */
 function rebuildProducts(){
-  // ❗ Endi faqat Firestore’dan kelgan mahsulotlar
-  products = [...remoteProducts];
+  products = [...defaultProducts, ...remoteProducts];
   renderProducts();
 }
 
@@ -375,10 +471,10 @@ function renderCategoryFilter(){
       </button>
     `;
   });
-
   filterBar.innerHTML = html;
 }
 
+// Filter bar
 filterBar.addEventListener("click", (e)=>{
   const btn = e.target.closest(".chip");
   if(!btn) return;
@@ -570,6 +666,7 @@ function sendOrder(){
   let totalPrice = 0;
   let totalItems = 0;
   let lines = [];
+
   cart.forEach((c, i) => {
     const p = products[c.index];
     if (!p) return;
@@ -603,6 +700,17 @@ function sendOrder(){
   const baseUrl = "https://t.me/onatili_premium";
   const url = `${baseUrl}?text=${encoded}&t=${Date.now()}`;
 
+  // ✅ BUYURTMA TARIXINI LOCALSTORAGE'GA YOZISH
+  const order = {
+    date: new Date().toISOString(),
+    totalPrice: totalPrice,
+    totalFormatted: totalStr + " so‘m",
+    totalItems: totalItems,
+    items: lines,
+    customer: customer
+  };
+  saveOrderHistory(order);
+
   cart = [];
   updateCartUI();
   renderCartItems();
@@ -622,6 +730,7 @@ function toggleTheme(){
   localStorage.setItem(THEME_KEY, next);
   applyTheme(next);
 }
+
 themeToggleBtn.addEventListener("click", toggleTheme);
 
 /* ===================== TABS ===================== */
@@ -682,7 +791,6 @@ async function askAdminCode(){
   try{
     const settingsRef = doc(db, "beauty_admin_settings", "security");
     const snap = await getDoc(settingsRef);
-
     if(!snap.exists()){
       showToast("⚠️ Admin kodi Firestore’da hali sozlanmagan.");
       return;
@@ -690,7 +798,6 @@ async function askAdminCode(){
 
     const data = snap.data();
     const realCode = String(data.adminCode || data.code || "").trim();
-
     if(!realCode){
       showToast("⚠️ Admin kodi noto‘g‘ri sozlangan.");
       return;
@@ -708,6 +815,7 @@ async function askAdminCode(){
     showToast("⚠️ Admin kodi tekshiruvida xato: " + (e.message || ""));
   }
 }
+
 adminAccessBtn.addEventListener("click", askAdminCode);
 
 /* ===================== ADMIN: MAHSULOTLAR ===================== */
@@ -831,7 +939,6 @@ function renderAdminCustomList(){
     adminCustomListEl.innerHTML = "<p class='history-empty'>Hozircha Firestore’da admin qo‘shgan mahsulot yo‘q.</p>";
     return;
   }
-
   adminCustomListEl.innerHTML = "";
   remoteProducts
     .slice()
@@ -874,9 +981,21 @@ function editProduct(id){
   if(btn){
     btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
   }
+
   showToast("✏️ Tahrirlash rejimi: formani o‘zgartirib, saqlang");
 }
 
+/* ===================== ADMIN: KATEGORIYALAR ===================== */
+function updateAdminCategorySelect(){
+  if(!adminCategoryEl) return;
+  const current = adminCategoryEl.value;
+
+  let list = categories.length ? categories : [
+    { code: "pomada", label: categoryLabel.pomada },
+    { code: "krem",   label: categoryLabel.krem },
+    { code: "parfyum",label: categoryLabel.parfyum },
+    { code: "tana",   label: categoryLabel.tana },
+  ];
 
   adminCategoryEl.innerHTML = "";
   list.forEach(cat=>{
@@ -897,7 +1016,6 @@ function renderCategoryAdminList(){
     adminCategoryListEl.innerHTML = "<p class='history-empty'>Hozircha kategoriya qo‘shilmagan.</p>";
     return;
   }
-
   adminCategoryListEl.innerHTML = "";
   categories.forEach(cat=>{
     adminCategoryListEl.innerHTML += `
@@ -925,7 +1043,6 @@ async function saveCategory(){
 
   try{
     const existing = categories.find(c=>c.code === code);
-
     if(existing){
       await updateDoc(doc(db,"beauty_categories", existing.id), {
         code,
@@ -968,7 +1085,6 @@ function editCategory(id){
 
 async function deleteCategory(id){
   if(!confirm("Bu kategoriyani o‘chirishni xohlaysizmi? Hamma foydalanuvchilar uchun o‘chadi.")) return;
-
   try{
     await deleteDoc(doc(db,"beauty_categories",id));
     showToast("🗑 Kategoriya o‘chirildi");
@@ -1048,6 +1164,7 @@ function startDetailCountdown(){
 function openProductDetail(index){
   const p = products[index];
   if(!p) return;
+
   detailIndex = index;
   detailImageIndex = 0;
   detailQty = 1;
@@ -1064,6 +1181,7 @@ function openProductDetail(index){
     p.description && p.description.trim().length
       ? p.description
       : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan. Admin paneldan batafsil tavsif yozib qo‘yishingiz mumkin.";
+
   detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
   if(p.oldPrice){
     detailOldPriceEl.textContent = formatPrice(p.oldPrice) + " so‘m";
@@ -1162,11 +1280,10 @@ if(detailQtyPlus){
   applyTheme(savedTheme);
   isAdmin = false;
   updateAdminUI();
-
-  rebuildProducts();            // hozircha bo‘sh, keyin realtime to‘ldiradi
+  rebuildProducts();           // default mahsulotlar
   renderHistory();
   subscribeProductsRealtime();   // mahsulotlar
-  subscribeCategoriesRealtime(); // kategoriyalar
+  subscribeCategoriesRealtime(); // 🆕 kategoriyalar
 })();
 
 /* ===================== GLOBAL FUNKSIYALAR ===================== */
@@ -1183,7 +1300,7 @@ window.editProduct       = editProduct;
 window.addCustomProduct  = addCustomProduct;
 window.resetCustomerInfo = resetCustomerInfo;
 
-// kategoriya uchun
+// 🆕 kategoriya uchun
 window.saveCategory      = saveCategory;
 window.deleteCategory    = deleteCategory;
 window.editCategory      = editCategory;
