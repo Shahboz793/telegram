@@ -1107,7 +1107,7 @@ function changeDetailImage(delta){
 function updateDetailCountdownUI(){
   if(!detailBackBtn) return;
   detailBackBtn.textContent = `◀ Magaziniga qaytish (${detailCountdownRemaining} s)`;
-  if(detailCountdownRemaining <= 1){
+  if(detailCountdownRemaining <= 6){
     detailBackBtn.style.color = "#ef4444";
   } else {
     detailBackBtn.style.color = "";
@@ -1128,7 +1128,7 @@ function clearDetailCountdown(){
 function startDetailCountdown(){
   if(!detailBackBtn) return;
   clearDetailCountdown();
-  detailCountdownRemaining = 2;
+  detailCountdownRemaining = 12;
   detailBackBtn.classList.remove("hidden");
   updateDetailCountdownUI();
   detailCountdownTimer = setInterval(()=>{
