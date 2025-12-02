@@ -1,4 +1,12 @@
-*{box-sizing:border-box;margin:0;padding:0}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+/* =========================================
+   RANGLAR VA THEME
+========================================= */
 :root{
   --bg:#f3f4f6;
   --bg-soft:#e5e7eb;
@@ -11,6 +19,7 @@
   --border-soft:rgba(148,163,184,0.7);
   --danger:#dc2626;
 }
+
 body.theme-dark{
   --bg:#050816;
   --bg-soft:#0b1021;
@@ -23,6 +32,7 @@ body.theme-dark{
   --border-soft:rgba(148,163,184,0.4);
   --danger:#ef4444;
 }
+
 body{
   font-family:"Poppins",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:var(--bg);
@@ -30,12 +40,17 @@ body{
   min-height:100vh;
   padding-bottom:120px;
 }
-a{text-decoration:none;color:inherit}
-.hidden{display:none!important}
 
-/* HEADER */
+a{text-decoration:none;color:inherit}
+.hidden{display:none!important;}
+
+/* =========================================
+   HEADER
+========================================= */
 .header{
-  position:sticky;top:0;z-index:40;
+  position:sticky;
+  top:0;
+  z-index:40;
   backdrop-filter:blur(18px);
   background:linear-gradient(90deg,rgba(249,250,251,0.98),rgba(229,231,235,0.98));
   border-bottom:1px solid var(--border-soft);
@@ -44,21 +59,31 @@ a{text-decoration:none;color:inherit}
 body.theme-dark .header{
   background:linear-gradient(90deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
 }
+
 .header-row{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:8px;
 }
+
 .logo-wrap{
-  display:flex;align-items:center;gap:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
+
 .logo-circle{
-  width:38px;height:38px;border-radius:999px;
+  width:38px;
+  height:38px;
+  border-radius:999px;
   background:conic-gradient(from 140deg,#fb7185,#f97316,#ede9fe,#38bdf8,#fb7185);
-  display:flex;align-items:center;justify-content:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   box-shadow:0 0 18px rgba(248,113,113,0.6);
 }
+
 .logo-circle span{
   background:#020617;
   padding:3px 10px;
@@ -67,19 +92,21 @@ body.theme-dark .header{
   font-size:14px;
   color:#f9fafb;
 }
-body.theme-dark .logo-circle span{
-  background:#020617;
-  color:#f9fafb;
-}
+
 .logo-text{
-  display:flex;flex-direction:column;
+  display:flex;
+  flex-direction:column;
   line-height:1.1;
 }
 .logo-text strong{font-size:16px;}
 .logo-text small{font-size:11px;color:var(--muted);}
+
 .header-right{
-  display:flex;align-items:center;gap:6px;
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
+
 .theme-toggle{
   border:none;
   border-radius:999px;
@@ -88,12 +115,15 @@ body.theme-dark .logo-circle span{
   cursor:pointer;
   background:#e5e7eb;
   color:#111827;
-  display:flex;align-items:center;gap:4px;
+  display:flex;
+  align-items:center;
+  gap:4px;
 }
 body.theme-dark .theme-toggle{
   background:rgba(15,23,42,0.9);
   color:#e5e7eb;
 }
+
 .cart-icon-btn{
   border:none;
   border-radius:999px;
@@ -107,22 +137,16 @@ body.theme-dark .theme-toggle{
   box-shadow:0 6px 16px rgba(34,197,94,0.55);
   font-size:13px;
 }
-.cart-icon-left{
-  font-size:20px;
-}
+.cart-icon-left{font-size:20px;}
 .cart-icon-info{
   display:flex;
   flex-direction:column;
   align-items:flex-start;
   line-height:1.1;
 }
-.cart-icon-info strong{
-  font-size:13px;
-}
-.cart-icon-info small{
-  font-size:11px;
-  opacity:.9;
-}
+.cart-icon-info strong{font-size:13px;}
+.cart-icon-info small{font-size:11px;opacity:.9;}
+
 .admin-access{
   border-radius:999px;
   border:1px solid var(--border-soft);
@@ -141,7 +165,9 @@ body.theme-dark .admin-access{
   box-shadow:0 0 10px rgba(34,197,94,0.7);
 }
 
-/* TABS */
+/* =========================================
+   TABS
+========================================= */
 .tabs{
   display:flex;
   gap:6px;
@@ -171,7 +197,9 @@ body.theme-dark .tab-btn{
   box-shadow:0 0 14px rgba(248,113,113,0.5);
 }
 
-/* HERO */
+/* =========================================
+   HERO
+========================================= */
 .hero{
   padding:10px 14px 6px;
   background:var(--bg);
@@ -202,7 +230,9 @@ body.theme-dark .tab-btn{
   border-radius:999px;
   border:1px solid rgba(148,163,184,0.45);
   background:#ffffff;
-  display:flex;align-items:center;gap:4px;
+  display:flex;
+  align-items:center;
+  gap:4px;
   color:#111827;
 }
 body.theme-dark .badge{
@@ -226,7 +256,7 @@ body.theme-dark .badge{
   color:var(--muted);
 }
 
-/* SEARCH BAR */
+/* QIDIRUV */
 .search-bar{
   margin-top:10px;
   display:flex;
@@ -240,9 +270,7 @@ body.theme-dark .badge{
 body.theme-dark .search-bar{
   background:rgba(15,23,42,0.9);
 }
-.search-bar span{
-  font-size:16px;
-}
+.search-bar span{font-size:16px;}
 .search-bar input{
   border:none;
   outline:none;
@@ -251,11 +279,11 @@ body.theme-dark .search-bar{
   font-size:12px;
   color:var(--text);
 }
-.search-bar input::placeholder{
-  color:var(--muted);
-}
+.search-bar input::placeholder{color:var(--muted);}
 
-/* FILTERS */
+/* =========================================
+   FILTERLAR
+========================================= */
 .filters-wrapper{
   position:sticky;
   top:90px;
@@ -271,6 +299,7 @@ body.theme-dark .search-bar{
   scrollbar-width:none;
 }
 .filters::-webkit-scrollbar{display:none;}
+
 .chip{
   flex:0 0 auto;
   font-size:11px;
@@ -279,7 +308,9 @@ body.theme-dark .search-bar{
   border:1px solid rgba(148,163,184,0.5);
   background:#ffffff;
   color:#111827;
-  display:flex;align-items:center;gap:6px;
+  display:flex;
+  align-items:center;
+  gap:6px;
   cursor:pointer;
   white-space:nowrap;
   transition:0.18s ease;
@@ -296,7 +327,9 @@ body.theme-dark .chip{
   box-shadow:0 0 14px rgba(248,113,113,0.4);
 }
 
-/* PRODUCTS GRID */
+/* =========================================
+   PRODUCTS GRID
+========================================= */
 .products-wrap{
   padding:8px 10px 90px;
   background:var(--bg-soft);
@@ -316,6 +349,7 @@ body.theme-dark .chip{
     grid-template-columns:repeat(3,minmax(0,1fr));
   }
 }
+
 .product-card{
   background:var(--card);
   border-radius:18px;
@@ -331,6 +365,7 @@ body.theme-dark .product-card{
   border-color:rgba(31,41,55,0.9);
   box-shadow:0 10px 22px rgba(0,0,0,0.7);
 }
+
 .product-img-wrap{
   position:relative;
   width:100%;
@@ -348,18 +383,22 @@ body.theme-dark .product-card{
 }
 .product-img-tag{
   position:absolute;
-  left:8px;top:8px;
+  left:8px;
+  top:8px;
   font-size:9px;
   padding:3px 7px;
   border-radius:999px;
   background:rgba(15,23,42,0.9);
   border:1px solid rgba(148,163,184,0.7);
-  display:flex;align-items:center;gap:4px;
+  display:flex;
+  align-items:center;
+  gap:4px;
   color:#e5e7eb;
 }
 .product-sale{
   position:absolute;
-  right:8px;top:8px;
+  right:8px;
+  top:8px;
   background:linear-gradient(120deg,#f97316,#ec4899);
   padding:3px 10px;
   border-radius:999px;
@@ -367,6 +406,7 @@ body.theme-dark .product-card{
   font-weight:700;
   color:#111827;
 }
+
 .product-body{
   padding:8px 9px 10px;
   display:flex;
@@ -403,6 +443,7 @@ body.theme-dark .tag-mini{
   border-color:rgba(55,65,81,0.9);
   color:#e5e7eb;
 }
+
 .price-row{
   margin-top:6px;
   display:flex;
@@ -420,6 +461,7 @@ body.theme-dark .tag-mini{
   color:var(--muted);
   text-decoration:line-through;
 }
+
 .btn-add{
   border:none;
   border-radius:999px;
@@ -437,7 +479,9 @@ body.theme-dark .tag-mini{
 }
 .btn-add:active{transform:scale(.96);}
 
-/* BOTTOM ORDER BAR */
+/* =========================================
+   BOTTOM ORDER BAR
+========================================= */
 .cart-bar{
   position:fixed;
   left:10px;
@@ -455,6 +499,7 @@ body.theme-dark .cart-bar{
   background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(24,24,27,0.9));
   box-shadow:0 18px 40px rgba(0,0,0,0.8),0 0 0 1px rgba(15,23,42,0.8);
 }
+
 .cart-bar-note{
   font-size:10px;
   color:var(--muted);
@@ -467,6 +512,7 @@ body.theme-dark .cart-bar{
   content:"ℹ️";
   font-size:11px;
 }
+
 .cart-main-btn{
   width:100%;
   border:none;
@@ -504,7 +550,9 @@ body.theme-dark .cart-bar{
   font-size:20px;
 }
 
-/* CART SHEET */
+/* =========================================
+   CART SHEET
+========================================= */
 .sheet-overlay{
   position:fixed;
   inset:0;
@@ -518,9 +566,12 @@ body.theme-dark .cart-bar{
   opacity:1;
   pointer-events:auto;
 }
+
 .cart-sheet{
   position:fixed;
-  left:0;right:0;bottom:0;
+  left:0;
+  right:0;
+  bottom:0;
   background:radial-gradient(circle at top,#f9fafb,#e5e7eb);
   border-radius:22px 22px 0 0;
   border-top:1px solid var(--border-soft);
@@ -537,6 +588,7 @@ body.theme-dark .cart-sheet{
   box-shadow:0 -24px 36px rgba(0,0,0,0.9);
 }
 .cart-sheet.open{transform:translateY(0);}
+
 .cart-sheet-header{
   padding:10px 14px 8px;
   border-bottom:1px solid var(--border-soft);
@@ -555,7 +607,8 @@ body.theme-dark .cart-sheet{
   border:none;
   background:#e5e7eb;
   color:#111827;
-  width:26px;height:26px;
+  width:26px;
+  height:26px;
   border-radius:999px;
   cursor:pointer;
   font-size:14px;
@@ -567,11 +620,13 @@ body.theme-dark .cart-sheet-header button{
   background:rgba(15,23,42,0.85);
   color:#e5e7eb;
 }
+
 .cart-sheet-body{
   padding:6px 14px 4px;
   overflow-y:auto;
   max-height:48vh;
 }
+
 .cart-sheet-footer{
   padding:8px 14px 12px;
   border-top:1px solid var(--border-soft);
@@ -584,6 +639,7 @@ body.theme-dark .cart-sheet-footer{
   background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(30,64,175,0.9));
   color:#e5e7eb;
 }
+
 .cart-sheet-footer-top{
   display:flex;
   justify-content:space-between;
@@ -597,14 +653,14 @@ body.theme-dark .cart-sheet-footer{
 .cart-sheet-footer-top strong{
   font-size:14px;
 }
+
 .cart-info-text{
   font-size:10px;
   margin-bottom:6px;
   line-height:1.4;
 }
-.cart-info-text strong{
-  font-weight:600;
-}
+.cart-info-text strong{font-weight:600;}
+
 .cart-sheet-btn{
   width:100%;
   border:none;
@@ -620,12 +676,14 @@ body.theme-dark .cart-sheet-footer{
   text-transform:uppercase;
 }
 .cart-sheet-btn:active{transform:scale(.97);}
+
 .cart-empty{
   font-size:11px;
   color:var(--muted);
   text-align:center;
   padding:12px 0;
 }
+
 .cart-item-row{
   padding:7px 0;
   border-bottom:1px dashed rgba(75,85,99,0.6);
@@ -639,13 +697,12 @@ body.theme-dark .cart-sheet-footer{
   flex-direction:column;
   gap:1px;
 }
-.cart-item-name{
-  font-weight:600;
-}
+.cart-item-name{font-weight:600;}
 .cart-item-meta{
   font-size:10px;
   color:var(--muted);
 }
+
 .cart-item-actions{
   display:flex;
   align-items:center;
@@ -664,7 +721,8 @@ body.theme-dark .cart-sheet-footer{
   border:none;
   background:#e5e7eb;
   color:#111827;
-  width:22px;height:20px;
+  width:22px;
+  height:20px;
   cursor:pointer;
   font-size:13px;
 }
@@ -678,9 +736,7 @@ body.theme-dark .qty-control button{
   text-align:center;
   font-size:11px;
 }
-.cart-item-total{
-  font-weight:600;
-}
+.cart-item-total{font-weight:600;}
 .cart-remove{
   border:none;
   background:transparent;
@@ -689,7 +745,9 @@ body.theme-dark .qty-control button{
   font-size:16px;
 }
 
-/* TOAST */
+/* =========================================
+   TOAST
+========================================= */
 .toast{
   position:fixed;
   left:50%;
@@ -718,7 +776,9 @@ body.theme-dark .qty-control button{
   pointer-events:auto;
 }
 
-/* PAGE (history & admin) */
+/* =========================================
+   PAGE (tarix / admin)
+========================================= */
 .page{
   padding:10px 12px 80px;
 }
@@ -756,9 +816,7 @@ body.theme-dark .order-card{
   align-items:center;
   margin-bottom:4px;
 }
-.order-head strong{
-  font-size:12px;
-}
+.order-head strong{font-size:12px;}
 .order-meta{
   font-size:10px;
   color:var(--muted);
@@ -768,9 +826,7 @@ body.theme-dark .order-card{
   margin-top:4px;
   padding-left:10px;
 }
-.order-items li{
-  margin-bottom:2px;
-}
+.order-items li{margin-bottom:2px;}
 .clear-history-btn{
   border:none;
   background:transparent;
@@ -781,7 +837,9 @@ body.theme-dark .order-card{
   margin-bottom:6px;
 }
 
-/* ADMIN PAGE */
+/* =========================================
+   ADMIN
+========================================= */
 .admin-form{
   background:var(--card);
   border-radius:12px;
@@ -864,9 +922,7 @@ body.theme-dark .form-row select{
   align-items:center;
   gap:6px;
 }
-.admin-product-row span{
-  flex:1;
-}
+.admin-product-row span{flex:1;}
 .admin-delete-btn{
   border:none;
   background:transparent;
@@ -886,7 +942,9 @@ body.theme-dark .form-row select{
   box-shadow:0 0 0 1px rgba(34,197,94,0.7);
 }
 
-/* PRODUCT DETAIL */
+/* =========================================
+   PRODUCT DETAIL (UZUM STYLE)
+========================================= */
 .product-detail-overlay{
   position:fixed;
   inset:0;
@@ -919,8 +977,9 @@ body.theme-dark .form-row select{
 .product-detail-image-wrap{
   position:relative;
   width:100%;
-  padding-top:100%;
+  padding-top:80%; /* Uzum uslubida nisbatan pastroq */
   background:#020617;
+  overflow:hidden;
 }
 .product-detail-image-wrap img{
   position:absolute;
@@ -929,11 +988,51 @@ body.theme-dark .form-row select{
   height:100%;
   object-fit:cover;
 }
+
+/* Galereya tugmalari */
+.detail-gallery-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:32px;
+  height:32px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  background:rgba(15,23,42,0.7);
+  color:#f9fafb;
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter:blur(8px);
+}
+.detail-gallery-btn.left{left:8px;}
+.detail-gallery-btn.right{right:8px;}
+.detail-gallery-btn:active{
+  transform:translateY(-50%) scale(.95);
+}
+
+/* Rasm indexi (1 / N) */
+.detail-image-index{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  padding:3px 8px;
+  border-radius:999px;
+  font-size:10px;
+  background:rgba(15,23,42,0.85);
+  color:#e5e7eb;
+}
+
+/* Close tugma */
 .product-detail-close{
   position:absolute;
-  top:10px;right:10px;
+  top:10px;
+  right:10px;
   border:none;
-  width:32px;height:32px;
+  width:32px;
+  height:32px;
   border-radius:999px;
   background:rgba(15,23,42,0.85);
   color:#e5e7eb;
@@ -943,6 +1042,8 @@ body.theme-dark .form-row select{
   justify-content:center;
   font-size:18px;
 }
+
+/* Detail body */
 .product-detail-body{
   padding:12px 14px 16px;
 }
@@ -966,6 +1067,8 @@ body.theme-dark .form-row select{
   line-height:1.5;
   margin-bottom:10px;
 }
+
+/* Narxlar */
 .product-detail-prices{
   display:flex;
   align-items:baseline;
@@ -981,6 +1084,43 @@ body.theme-dark .form-row select{
   color:var(--muted);
   text-decoration:line-through;
 }
+
+/* Miqdor (qty) Uzum uslubida */
+.detail-qty-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+  font-size:12px;
+}
+.detail-qty-controls{
+  display:flex;
+  align-items:center;
+  border-radius:999px;
+  border:1px solid rgba(75,85,99,0.9);
+  overflow:hidden;
+}
+.detail-qty-controls button{
+  border:none;
+  background:#e5e7eb;
+  color:#111827;
+  width:28px;
+  height:24px;
+  cursor:pointer;
+  font-size:16px;
+}
+body.theme-dark .detail-qty-controls button{
+  background:rgba(15,23,42,0.95);
+  color:#e5e7eb;
+}
+.detail-qty-controls span{
+  padding:0 10px;
+  min-width:28px;
+  text-align:center;
+  font-size:12px;
+}
+
+/* Action tugmalar */
 .detail-actions{
   display:flex;
   flex-direction:column;
@@ -1008,6 +1148,8 @@ body.theme-dark .form-row select{
   box-shadow:0 12px 26px rgba(34,197,94,0.9);
   transform:translateY(-1px);
 }
+
+/* 5 soniyali qaytish tugmasi */
 .detail-back-btn{
   width:100%;
   border:none;
@@ -1021,4 +1163,11 @@ body.theme-dark .form-row select{
 body.theme-dark .detail-back-btn{
   background:rgba(15,23,42,0.9);
   color:#e5e7eb;
+}
+
+/* Countdown bo‘lganda qizil holat */
+.detail-back-btn.danger{
+  background:var(--danger);
+  color:#fef2f2;
+  font-weight:600;
 }
