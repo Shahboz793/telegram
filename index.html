@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="theme-color" content="#0f172a" />
 
-  <!-- Fonts -->
+  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Styles -->
@@ -21,14 +21,13 @@
         <div class="logo-circle"><span>YM</span></div>
         <div class="logo-text">
           <strong>ONLINE MAGAZIN YANGIOBOD</strong>
-          <small id="customerInfoText">Hozircha ism va telefon saqlanmagan. Buyurtmada so‘raladi.</small>
+          <small id="customerInfoText">Hozircha ism va telefon saqlanmagan.</small>
         </div>
       </div>
 
       <div class="header-right">
         <button class="theme-toggle" id="themeToggleBtn">🌙</button>
 
-        <!-- CART ICON -->
         <button class="cart-icon-btn" onclick="toggleCartSheet(true)">
           <div class="cart-icon-left">🛒</div>
           <div class="cart-icon-info">
@@ -37,12 +36,10 @@
           </div>
         </button>
 
-        <!-- ADMIN -->
-        <button class="admin-access" id="adminAccessBtn">👑 Admin uchun</button>
+        <button class="admin-access" id="adminAccessBtn">👑 Admin</button>
       </div>
     </div>
 
-    <!-- TABS -->
     <div class="tabs" id="tabs">
       <button class="tab-btn active" data-page="shopPage">🛍 Magazin</button>
       <button class="tab-btn" data-page="historyPage">📜 Buyurtmalar</button>
@@ -54,26 +51,19 @@
   <main id="shopPage">
     <section class="hero">
       <h1 class="hero-title">Telegram orqali <span>tezkor buyurtma</span></h1>
-      <p class="hero-sub">
-        Mahsulotlarni tanlang, savatga qo‘shing va Telegramga bitta bosishda yuboring.
-      </p>
+      <p class="hero-sub">Mahsulotlarni tanlang va Telegramga yuboring.</p>
 
       <div class="hero-badges">
-        <div class="badge">⚡ Tezkor buyurtma</div>
+        <div class="badge">⚡ Tezkor</div>
         <div class="badge">📦 Qulay savat</div>
-        <div class="badge">📲 WebApp integratsiya</div>
+        <div class="badge">📲 WebApp</div>
       </div>
 
-      <div class="hero-tag">🔔 Savatdagi mahsulotlar har safar alohida xabar bo‘lib Telegramga yuboriladi.</div>
+      <p class="hero-note">Ism va telefonni tahrirlash uchun yuqoridagi matnga bosing.</p>
 
-      <p class="hero-note">
-        Ism / telefonni o‘zgartirmoqchi bo‘lsangiz — yuqoridagi matnga bosing.
-      </p>
-
-      <!-- SEARCH -->
       <div class="search-bar">
         <span>🔍</span>
-        <input id="searchInput" type="text" placeholder="Mahsulot nomi, kategoriya yoki tavsifi..." />
+        <input id="searchInput" type="text" placeholder="Qidiruv..." />
       </div>
     </section>
 
@@ -88,10 +78,10 @@
     </section>
   </main>
 
-  <!-- HISTORY PAGE -->
+  <!-- HISTORY -->
   <section id="historyPage" class="page hidden">
     <h2 class="page-title">📜 Buyurtmalar tarixi</h2>
-    <p class="page-sub">Tarix saqlanmaydi. Har bir buyurtma Telegramga yuboriladi.</p>
+    <p class="page-sub">Tarix saqlanmaydi. Buyurtmalar faqat Telegramga ketadi.</p>
     <div id="historyList"></div>
   </section>
 
@@ -99,7 +89,6 @@
   <section id="adminPage" class="page hidden">
     <h2 class="page-title">⚙️ Admin panel</h2>
 
-    <!-- PRODUCT FORM -->
     <div class="admin-form">
       <h3>➕ Mahsulot qo‘shish / tahrirlash</h3>
 
@@ -120,7 +109,7 @@
 
       <div class="admin-check-row">
         <input id="adminHasDiscount" type="checkbox" />
-        <label>Chegirma narxi bor</label>
+        <label>Chegirma bor</label>
       </div>
 
       <div class="form-row">
@@ -139,20 +128,18 @@
       </div>
 
       <div class="form-row">
-        <label>Rasmlar (vergul bilan)</label>
+        <label>Rasm URL (vergul bilan)</label>
         <input id="adminImages" type="text" />
       </div>
 
-      <button class="admin-btn" onclick="addCustomProduct()">➕ Saqlash</button>
+      <button class="admin-btn" onclick="addCustomProduct()">💾 Saqlash</button>
     </div>
 
-    <!-- PRODUCT LIST -->
     <h3 class="admin-list-title">🧾 Mahsulotlar</h3>
     <div id="adminCustomList"></div>
 
-    <!-- CATEGORY FORM -->
     <div class="admin-form">
-      <h3>📂 Kategoriya qo‘shish / tahrirlash</h3>
+      <h3>📂 Kategoriya qo‘shish</h3>
 
       <div class="form-row">
         <label>Kategoriya kodi</label>
@@ -193,15 +180,11 @@
         <strong id="cartSheetTotal">0 so‘m</strong>
       </div>
 
-      <p class="cart-info-text">
-        Telegramga tasdiqlashni bosganingizda savatdagi barcha mahsulotlar bitta xabar bo‘lib yuboriladi.
-      </p>
-
-      <button class="cart-sheet-btn" onclick="sendOrder()">📲 Telegramda tasdiqlash</button>
+      <button class="cart-sheet-btn" onclick="sendOrder()">📲 Buyurtmani yuborish</button>
     </div>
   </div>
 
-  <!-- DETAIL MODAL -->
+  <!-- PRODUCT DETAIL -->
   <div class="product-detail-overlay hidden" id="productDetailOverlay">
     <div class="product-detail-card">
       <div class="product-detail-header">
@@ -243,13 +226,23 @@
   </div>
 
   <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast">Xabar</div>
 
-  <!-- Telegram API -->
+  <!-- Telegram WebApp -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Main JS -->
+  <!-- App JS -->
   <script type="module" src="app.js"></script>
+
+  <!-- AUTO UPDATE (WebApp yopilganda + ochilganda yangilanadi) -->
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      tg.onEvent("viewportChanged", () => location.reload());
+    }
+  </script>
 
 </body>
 </html>
