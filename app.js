@@ -1241,7 +1241,7 @@ if(detailQtyPlus){
   updateAdminUI();
 
   renderCustomerInfo();   // 👤 ism/telefonni chiqarish
-  renderCategoryFilter(); // boshida faqat ⭐ Barchasi (kategoriyalar kelganda yangilanadi)
+  renderCategoryFilter(); // boshida faqat ⭐ Barchasi (kategoriyalar kelganda yangilanadi.)
   renderProducts();       // hozircha "mahsulot yo‘q" degan yozuv
   renderHistory();        // endi faqat matn
 
