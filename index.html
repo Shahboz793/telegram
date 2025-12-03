@@ -5,29 +5,26 @@
   <title>ONLINE MAGAZIN YANGIOBOD</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="theme-color" content="#0f172a" />
-
-  <!-- Google Font -->
+  <!-- Google Fonts (ixtiyoriy) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- STYLE -->
+  <!-- Sening CSS’ing -->
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-
   <!-- HEADER -->
   <header class="header">
     <div class="header-row">
       <div class="logo-wrap">
-        <div class="logo-circle"><span>YM</span></div>
+        <div class="logo-circle">
+          <span>YM</span>
+        </div>
         <div class="logo-text">
           <strong>ONLINE MAGAZIN YANGIOBOD</strong>
-          <small id="customerInfoText">Hozircha ism va telefon saqlanmagan.</small>
+          <small id="customerInfoText">Hozircha ism va telefon saqlanmagan. Buyurtma berganingizda so‘raladi.</small>
         </div>
       </div>
-
       <div class="header-right">
         <button class="theme-toggle" id="themeToggleBtn">🌙</button>
 
@@ -39,183 +36,259 @@
           </div>
         </button>
 
-        <button class="admin-access" id="adminAccessBtn">👑 Admin</button>
+        <button class="admin-access" id="adminAccessBtn">
+          👑 Admin uchun
+        </button>
       </div>
     </div>
 
     <!-- TABS -->
     <div class="tabs" id="tabs">
       <button class="tab-btn active" data-page="shopPage">🛍 Magazin</button>
-      <button class="tab-btn" data-page="historyPage">📜 Tarix</button>
+      <button class="tab-btn" data-page="historyPage">📜 Buyurtmalar</button>
       <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">⚙️ Admin</button>
     </div>
   </header>
 
-
   <!-- SHOP PAGE -->
   <main id="shopPage">
     <section class="hero">
-      <h1 class="hero-title">Tezkor <span>Telegram buyurtma</span></h1>
-      <p class="hero-sub">Mahsulotlarni tanlang va barchasini Telegram orqali yuboring.</p>
+      <h1 class="hero-title">
+        Telegram orqali <span>tezkor buyurtma</span>
+      </h1>
+      <p class="hero-sub">
+        Mahsulotlarni tanlang, savatga qo‘shing va barchasini Telegram orqali bir marta bosish bilan yuboring.
+      </p>
 
       <div class="hero-badges">
-        <div class="badge">⚡ Tezkor</div>
-        <div class="badge">📦 Savat</div>
-        <div class="badge">📲 WebApp</div>
+        <div class="badge">⚡ Tezkor buyurtma</div>
+        <div class="badge">📦 Qulay savat</div>
+        <div class="badge">📲 Telegram WebApp</div>
       </div>
 
+      <div class="hero-tag">
+        🔔 Har safar savatdagi mahsulotlar alohida xabar sifatida Telegramga yuboriladi.
+      </div>
+
+      <p class="hero-note">
+        Agar ism / telefonni o‘zgartirmoqchi bo‘lsangiz — ism ustidagi matnga bosib tahrirlashingiz mumkin.
+      </p>
+
+      <!-- QIDIRUV -->
       <div class="search-bar">
         <span>🔍</span>
-        <input id="searchInput" type="text" placeholder="Qidiring..." />
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Mahsulot nomi, kategoriya yoki tavsifi bo‘yicha qidiring..."
+        />
       </div>
     </section>
 
-    <!-- FILTER -->
+    <!-- FILTERLAR -->
     <div class="filters-wrapper">
-      <div class="filters" id="filterBar"></div>
+      <div class="filters" id="filterBar">
+        <!-- JS orqali to‘ldiriladi: ⭐ Barchasi + Firestore kategoriyalar -->
+      </div>
     </div>
 
     <!-- PRODUCTS GRID -->
     <section class="products-wrap">
-      <div class="products-grid big" id="productsGrid">
-        <!-- JS bilan to‘ladi -->
+      <div class="products-grid" id="productsGrid">
+        <!-- JS orqali kartochkalar tushadi -->
       </div>
     </section>
   </main>
 
-
   <!-- HISTORY PAGE -->
   <section id="historyPage" class="page hidden">
     <h2 class="page-title">📜 Buyurtmalar tarixi</h2>
-    <p class="page-sub">Buyurtmalar tarixini saqlamaymiz.</p>
-    <button class="clear-history-btn" onclick="clearHistory()">Tarixni tozalash</button>
+    <p class="page-sub">
+      Hozircha buyurtmalar tarixi saqlanmaydi. Har bir buyurtma Telegramga alohida xabar bo‘lib yuboriladi.
+    </p>
+    <button class="clear-history-btn" onclick="clearHistory()">
+      Tarixni tozalash
+    </button>
     <div id="historyList"></div>
   </section>
-
 
   <!-- ADMIN PAGE -->
   <section id="adminPage" class="page hidden">
     <h2 class="page-title">⚙️ Admin panel</h2>
+    <p class="page-sub">
+      Firestore orqali mahsulot va kategoriyalarni boshqarish. Bu sahifaga faqat admin kodi bilan kirish mumkin.
+    </p>
 
-    <!-- PRODUCT FORM -->
+    <!-- MAHSULOT FORM -->
     <div class="admin-form">
       <h3>➕ Mahsulot qo‘shish / tahrirlash</h3>
+      <p class="admin-info">
+        Avval <strong>kategoriya</strong> qo‘shib oling, keyin mahsulotni shu kategoriyaga bog‘lab qo‘yasiz.
+      </p>
 
       <div class="form-row">
-        <label>Mahsulot nomi</label>
-        <input id="adminName" type="text" placeholder="Masalan: Parfyum X" />
+        <label for="adminName">Mahsulot nomi</label>
+        <input id="adminName" type="text" placeholder="Masalan: Parfyum X, Krem Y..." />
       </div>
 
       <div class="form-row">
-        <label>Kategoriya</label>
-        <select id="adminCategory"></select>
+        <label for="adminCategory">Kategoriya</label>
+        <select id="adminCategory">
+          <option value="">Avval kategoriyani qo‘shing</option>
+        </select>
       </div>
 
       <div class="form-row">
-        <label>Asosiy narx</label>
-        <input id="adminPriceBase" type="number" />
+        <label for="adminPriceBase">Asosiy narx (so‘m)</label>
+        <input id="adminPriceBase" type="number" inputmode="numeric" placeholder="Masalan: 99000" />
       </div>
 
       <div class="admin-check-row">
         <input id="adminHasDiscount" type="checkbox" />
-        <label>Chegirma bor</label>
+        <label for="adminHasDiscount">Chegirma narxi bor</label>
       </div>
 
       <div class="form-row">
-        <label>Chegirma narxi</label>
-        <input id="adminPriceDiscount" type="number" />
+        <label for="adminPriceDiscount">Chegirma narxi (ixtiyoriy)</label>
+        <input id="adminPriceDiscount" type="number" inputmode="numeric" placeholder="Masalan: 89000" />
       </div>
 
       <div class="form-row">
-        <label>Tag</label>
-        <input id="adminTag" type="text" placeholder="Yangi, Bestseller..." />
+        <label for="adminTag">Tag / stiker (ixtiyoriy)</label>
+        <input id="adminTag" type="text" placeholder="Masalan: Yangi, Bestseller, Chegirma..." />
       </div>
 
       <div class="form-row">
-        <label>Tavsif</label>
-        <textarea id="adminDescription"></textarea>
+        <label for="adminDescription">Tavsif</label>
+        <textarea id="adminDescription" rows="3" placeholder="Mahsulot haqida qisqacha tavsif..."></textarea>
       </div>
 
       <div class="form-row">
-        <label>Rasmlar (vergul bilan)</label>
-        <input id="adminImages" type="text" />
+        <label for="adminImages">Rasm URL (vergul bilan ajratib bir nechta)</label>
+        <input id="adminImages" type="text" placeholder="https://..., yoki faqat nomi (noimage, img1...)" />
       </div>
 
-      <button class="admin-btn" onclick="addCustomProduct()">💾 Saqlash</button>
+      <button class="admin-btn" onclick="addCustomProduct()">
+        ➕ Mahsulotni qo‘shish (Firestore)
+      </button>
     </div>
 
-    <h3 class="admin-list-title">🧾 Mahsulotlar</h3>
+    <!-- ADMIN: MAHSULOTLAR RO‘YXATI -->
+    <h3 class="admin-list-title">🧾 Firestore’dagi mahsulotlar</h3>
     <div id="adminCustomList"></div>
 
-    <h3 class="admin-list-title" style="margin-top:18px;">📁 Kategoriyalar</h3>
+    <!-- ADMIN: KATEGORIYA FORM -->
+    <div class="admin-form" style="margin-top:12px;">
+      <h3>📂 Kategoriya qo‘shish / tahrirlash</h3>
+      <div class="form-row">
+        <label for="adminCatCode">Kategoriya kodi (lotincha, kichik harf)</label>
+        <input id="adminCatCode" type="text" placeholder="masalan: parfyum, krem, soch, uy..." />
+      </div>
 
-    <div class="admin-form">
       <div class="form-row">
-        <label>Kod</label>
-        <input id="adminCatCode" type="text" />
+        <label for="adminCatLabel">Kategoriya nomi</label>
+        <input id="adminCatLabel" type="text" placeholder="masalan: Parfyumlar, Krem va losyonlar..." />
       </div>
+
       <div class="form-row">
-        <label>Nom</label>
-        <input id="adminCatLabel" type="text" />
+        <label for="adminCatEmoji">Emoji (ixtiyoriy)</label>
+        <input id="adminCatEmoji" type="text" placeholder="masalan: 🌸, 💄, 🧴 ..." />
       </div>
-      <div class="form-row">
-        <label>Emoji</label>
-        <input id="adminCatEmoji" type="text" />
-      </div>
-      <button class="admin-btn" onclick="saveCategory()">Saqlash</button>
+
+      <button class="admin-btn" onclick="saveCategory()">
+        💾 Kategoriya saqlash
+      </button>
     </div>
 
+    <!-- ADMIN: KATEGORIYALAR RO‘YXATI -->
+    <h3 class="admin-list-title">📁 Kategoriyalar ro‘yxati</h3>
     <div id="adminCategoryList"></div>
   </section>
 
+  <!-- BOTTOM CART BAR -->
+  <div class="cart-bar">
+    <div class="cart-bar-note">
+      Savatni ko‘rish va buyurtma yuborish uchun tugmani bosing.
+    </div>
+    <button class="cart-main-btn" onclick="toggleCartSheet(true)">
+      <div>
+        <div>🛒 Savatda: <span id="cartCountTopBottom">(<span id="cartCountTopMirror">0</span> ta)</span></div>
+        <span class="small">Mahsulotlarni tekshirib, keyin Telegramga yuboring</span>
+      </div>
+      <div>
+        <span id="cartTotalTopMirror">0 so‘m</span>
+      </div>
+    </button>
+  </div>
 
-  <!-- CART OVERLAY -->
+  <!-- CART SHEET OVERLAY -->
   <div class="sheet-overlay" id="cartSheetOverlay" onclick="toggleCartSheet(false)"></div>
 
+  <!-- CART SHEET -->
   <div class="cart-sheet" id="cartSheet">
     <div class="cart-sheet-header">
       <h3>Savat</h3>
       <button onclick="toggleCartSheet(false)">✕</button>
     </div>
-
-    <div class="cart-sheet-body" id="cartItems"></div>
-
+    <div class="cart-sheet-body" id="cartItems">
+      <!-- JS orqali savat elementlari -->
+    </div>
     <div class="cart-sheet-footer">
       <div class="cart-sheet-footer-top">
-        <span>Umumiy</span>
+        <span>Umumiy summa</span>
         <strong id="cartSheetTotal">0 so‘m</strong>
       </div>
-
-      <button class="cart-sheet-btn" onclick="sendOrder()">📲 Telegramda tasdiqlash</button>
+      <p class="cart-info-text">
+        🔔 “Telegramda tasdiqlash” bosilganda, savatdagi barcha mahsulotlar bitta xabar ko‘rinishida tanlangan Telegram akkauntga yuboriladi.
+      </p>
+      <button class="cart-sheet-btn" onclick="sendOrder()">
+        📲 Telegramda tasdiqlash
+      </button>
     </div>
   </div>
 
-
-  <!-- PRODUCT DETAIL -->
+  <!-- PRODUCT DETAIL OVERLAY (UZUM STYLE) -->
   <div class="product-detail-overlay hidden" id="productDetailOverlay">
     <div class="product-detail-card">
       <div class="product-detail-header">
-        <img id="detailImage" />
-
-        <button class="detail-gallery-btn left" id="detailPrevBtn">‹</button>
-        <button class="detail-gallery-btn right" id="detailNextBtn">›</button>
-
+        <div class="product-detail-image-wrap">
+          <img id="detailImage" src="" alt="Mahsulot rasmi" />
+          <button class="detail-gallery-btn left" id="detailPrevBtn">‹</button>
+          <button class="detail-gallery-btn right" id="detailNextBtn">›</button>
+          <div class="detail-image-index" id="detailImageIndex">1 / 1</div>
+        </div>
         <button class="product-detail-close" onclick="closeProductDetail()">✕</button>
       </div>
 
       <div class="product-detail-body">
-        <div id="detailCategory" class="product-detail-category"></div>
-        <div id="detailName" class="product-detail-name"></div>
-        <div id="detailTag" class="product-detail-tag"></div>
-        <div id="detailDesc" class="product-detail-desc"></div>
+        <div class="product-detail-category" id="detailCategory">Kategoriya</div>
+        <div class="product-detail-name" id="detailName">Mahsulot nomi</div>
+        <div class="product-detail-tag" id="detailTag"></div>
+        <div class="product-detail-desc" id="detailDesc">
+          Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan.
+        </div>
 
         <div class="product-detail-prices">
-          <div id="detailPrice" class="detail-price-main"></div>
-          <div id="detailOldPrice" class="detail-price-old hidden"></div>
+          <div class="detail-price-main" id="detailPrice">0 so‘m</div>
+          <div class="detail-price-old hidden" id="detailOldPrice">0 so‘m</div>
+        </div>
+
+        <div class="detail-qty-row">
+          <span>Miqdor:</span>
+          <div class="detail-qty-controls">
+            <button id="detailQtyMinus">-</button>
+            <span id="detailQtyValue">1</span>
+            <button id="detailQtyPlus">+</button>
+          </div>
         </div>
 
         <div class="detail-actions">
-          <button id="detailAddBtn" class="detail-add-btn">🛒 Savatga qo‘shish</button>
+          <button class="detail-add-btn" id="detailAddBtn">
+            🛒 Savatga qo‘shish
+          </button>
+          <button class="detail-back-btn hidden" id="detailBackBtn">
+            ◀ Magaziniga qaytish
+          </button>
         </div>
       </div>
     </div>
@@ -224,19 +297,43 @@
   <!-- TOAST -->
   <div class="toast" id="toast">Xabar</div>
 
-  <!-- Telegram WebApp -->
+  <!-- Telegram WebApp script -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- App JS -->
+  <!-- Sening asosiy JS fayling (oxirgi bergan app.js) -->
   <script type="module" src="app.js"></script>
 
-  <!-- Mirror bar helper -->
+  <!-- Cart bar mirrorga qiymat ko‘chirish (kichik helper) -->
   <script>
-    const cartCountTop = document.getElementById("cartCountTop");
-    const cartTotalTop = document.getElementById("cartTotalTop");
-    const cartCountTopMirror = document.getElementById("cartCountTopMirror");
-    const cartTotalTopMirror = document.getElementById("cartTotalTopMirror");
-  </script>
+    // Yuqoridagi JS'da faqat cartCountTop va cartTotalTop yangilanadi.
+    // Shu qiymatlarni pastdagi bar mirrori uchun yangilab turamiz.
+    const cartCountTop      = document.getElementById("cartCountTop");
+    const cartTotalTop      = document.getElementById("cartTotalTop");
+    const cartCountTopMirror= document.getElementById("cartCountTopMirror");
+    const cartTotalTopMirror= document.getElementById("cartTotalTopMirror");
 
+    const observer = new MutationObserver(() => {
+      if (cartCountTopMirror) cartCountTopMirror.textContent = cartCountTop.textContent;
+      if (cartTotalTopMirror) cartTotalTopMirror.textContent = cartTotalTop.textContent;
+    });
+
+    if (cartCountTop) {
+      observer.observe(cartCountTop, { childList: true, characterData: true, subtree: true });
+    }
+    if (cartTotalTop) {
+      observer.observe(cartTotalTop, { childList: true, characterData: true, subtree: true });
+    }
+
+    // Ism/telefon matniga bosilganda tahrirlash
+    const customerInfoEl = document.getElementById("customerInfoText");
+    if (customerInfoEl) {
+      customerInfoEl.style.cursor = "pointer";
+      customerInfoEl.addEventListener("click", () => {
+        if (window.editCustomerInfo) {
+          window.editCustomerInfo();
+        }
+      });
+    }
+  </script>
 </body>
 </html>
