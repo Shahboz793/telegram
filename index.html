@@ -6,7 +6,7 @@
 
   <title>Premium Beauty Store</title>
 
-  <!-- Google Font -->
+  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 
   <!-- STYLE -->
@@ -37,41 +37,35 @@
 <!-- ========================= CATEGORY FILTER ========================= -->
 <div id="filterBar" class="filter-bar"></div>
 
-<!-- ========================= PAGES ========================= -->
+<!-- ========================= TABS ========================= -->
 <div id="tabs" class="tabs">
   <button class="tab-btn active" data-page="shopPage">🛍 Magazin</button>
   <button class="tab-btn" data-page="historyPage">📦 Buyurtmalarim</button>
   <button class="tab-btn" id="adminTabBtn" data-page="adminPage">👑 Admin</button>
 </div>
 
-<!-- =============== SHOP PAGE =============== -->
+<!-- ========================= SHOP PAGE ========================= -->
 <div id="shopPage" class="page">
-
-  <div id="productsGrid" class="products-grid">
-    <!-- Mahsulotlar shu yerga JS orqali tushadi -->
-  </div>
-
+  <div id="productsGrid" class="products-grid"></div>
 </div>
 
-<!-- =============== HISTORY PAGE (Client Orders) =============== -->
+<!-- ========================= HISTORY PAGE ========================= -->
 <div id="historyPage" class="page hidden">
   <h2 class="page-title">Mening buyurtmalarim</h2>
   <p class="empty-note">Buyurtmalar hali yo‘q.</p>
 </div>
 
-<!-- =============== ADMIN PAGE =============== -->
+<!-- ========================= ADMIN PAGE ========================= -->
 <div id="adminPage" class="page hidden">
 
   <h2 class="page-title">👑 Admin Panel</h2>
 
-  <button id="adminAccessBtn" class="admin-access-btn">
-    Admin kirish
-  </button>
+  <button id="adminAccessBtn" class="admin-access-btn">Admin kirish</button>
 
   <!-- CATEGORY MANAGEMENT -->
   <h3 class="admin-section-title">📂 Kategoriyalar</h3>
   <div class="admin-inputs">
-    <input id="adminCatCode" placeholder="kod (masalan: pomada)">
+    <input id="adminCatCode" placeholder="kod (mas: pomada)">
     <input id="adminCatLabel" placeholder="nomi (Pomada)">
     <input id="adminCatEmoji" placeholder="emoji (💄)">
     <button onclick="saveCategory()" class="admin-save-btn">Saqlash</button>
@@ -121,9 +115,8 @@
 
 </div>
 
-<!-- ========================= DETAIL MODAL ========================= -->
+<!-- ========================= PRODUCT DETAIL MODAL ========================= -->
 <div id="productDetailOverlay" class="detail-modal">
-
   <div class="detail-content">
 
     <img id="detailImage" class="detail-img">
@@ -149,20 +142,19 @@
     <button id="detailBackBtn" class="detail-back-btn">◀ Ortga</button>
 
   </div>
-
 </div>
 
-<!-- ========================= JS FILES ========================= -->
+<!-- ========================= JS FILES (MODUL YO‘LLARI TO‘G‘RILANGAN) ========================= -->
 <script type="module">
-  import { initApp } from "./js/app.js";
-  import "./js/data.js";
-  import "./js/products.js";
-  import "./js/categories.js";
-  import "./js/cart.js";
-  import "./js/orders.js";
-  import "./js/admin.js";
+  import { initApp } from "./app.js";
 
-  // START APP
+  import "./data.js";
+  import "./products.js";
+  import "./categories.js";
+  import "./cart.js";
+  import "./order.js";      // ⚠️ Senda filename: order.js
+  import "./admin.js";
+
   window.addEventListener("DOMContentLoaded", () => {
     initApp();
   });
