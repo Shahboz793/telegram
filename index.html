@@ -2,338 +2,394 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <title>ONLINE MAGAZIN YANGIOBOD</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <meta name="theme-color" content="#0f172a" />
-  <!-- Google Fonts (ixtiyoriy) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <!-- Sening CSS’ing -->
-  <link rel="stylesheet" href="style.css" />
+  <title>Beauty Store — Kosmetika do‘koni</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- GOOGLE FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      font-family:'Poppins',sans-serif;
+      background:#f5f5f5;
+      color:#111;
+      overflow-x:hidden;
+    }
+    body.theme-dark{
+      background:#0a0a0a;
+      color:#e5e5e5;
+    }
+    .hidden{display:none!important;}
+    .page{padding-bottom:90px;}
+
+    /* HEADER */
+    header{
+      background:#fff;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:0 1px 3px rgba(0,0,0,0.1);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    body.theme-dark header{
+      background:#141414;
+      color:#fff;
+    }
+
+    #themeToggleBtn{
+      font-size:24px;
+      background:none;
+      border:none;
+      cursor:pointer;
+    }
+
+    #customerInfoText{
+      font-size:13px;
+      opacity:0.7;
+      margin-top:4px;
+    }
+
+    /* FILTER BAR */
+    #filterBar{
+      padding:10px;
+      white-space:nowrap;
+      overflow-x:auto;
+      display:flex;
+      gap:8px;
+    }
+    .chip{
+      padding:6px 12px;
+      background:#eee;
+      border-radius:16px;
+      cursor:pointer;
+      font-size:14px;
+      border:1px solid transparent;
+    }
+    .chip.active{
+      background:#ff3e92;
+      color:#fff;
+    }
+
+    /* GRID */
+    #productsGrid{
+      padding:12px;
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
+      gap:12px;
+    }
+    .product-card{
+      background:#fff;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 2px 5px rgba(0,0,0,0.08);
+      cursor:pointer;
+    }
+    body.theme-dark .product-card{
+      background:#161616;
+    }
+    .product-img-wrap img{
+      width:100%;
+      height:150px;
+      object-fit:cover;
+      display:block;
+    }
+    .product-name{
+      font-size:14px;
+      font-weight:600;
+      margin-bottom:4px;
+    }
+    .product-body{
+      padding:10px;
+    }
+    .product-meta{
+      font-size:12px;
+      opacity:0.7;
+      margin-bottom:6px;
+    }
+    .price-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .btn-add{
+      padding:4px 10px;
+      border-radius:8px;
+      border:none;
+      background:#ff3e92;
+      color:#fff;
+      cursor:pointer;
+      font-size:13px;
+    }
+
+    /* CART TOP */
+    .cart-top{
+      position:fixed;
+      bottom:0;
+      left:0;
+      width:100%;
+      background:#ff3e92;
+      color:#fff;
+      padding:14px;
+      display:flex;
+      justify-content:space-between;
+      font-size:16px;
+      z-index:99;
+      cursor:pointer;
+    }
+
+    /* CART SHEET */
+    #cartSheet{
+      position:fixed;
+      bottom:-110%;
+      left:0;right:0;
+      background:#fff;
+      border-radius:22px 22px 0 0;
+      box-shadow:0 -3px 8px rgba(0,0,0,0.2);
+      padding:16px;
+      height:65%;
+      overflow-y:auto;
+      transition:0.33s;
+      z-index:999;
+    }
+    #cartSheet.open{
+      bottom:0;
+    }
+    #cartSheetOverlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.35);
+      display:none;
+      z-index:998;
+    }
+    #cartSheetOverlay.show{
+      display:block;
+    }
+
+    /* DETAIL POPUP */
+    #productDetailOverlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.55);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:16px;
+      z-index:9999;
+    }
+    #productDetailOverlay.hidden{
+      display:none;
+    }
+    .detail-card{
+      background:#fff;
+      width:100%;
+      max-width:420px;
+      border-radius:16px;
+      overflow:hidden;
+      padding-bottom:16px;
+    }
+    body.theme-dark .detail-card{
+      background:#1b1b1b;
+      color:#eee;
+    }
+    .detail-img-box img{
+      width:100%;
+      height:240px;
+      object-fit:cover;
+    }
+    .detail-body{
+      padding:14px;
+    }
+    #detailAddBtn{
+      margin-top:12px;
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      border:none;
+      background:#ff3e92;
+      color:#fff;
+      font-size:16px;
+    }
+    #detailBackBtn{
+      width:100%;
+      margin-top:10px;
+      padding:10px;
+      background:#ddd;
+      border:none;
+      border-radius:10px;
+      font-size:14px;
+      cursor:pointer;
+    }
+
+    /* TABS */
+    #tabs{
+      display:flex;
+      border-top:1px solid #ddd;
+    }
+    .tab-btn{
+      flex:1;
+      text-align:center;
+      padding:12px;
+      background:#fff;
+      border-right:1px solid #eee;
+      cursor:pointer;
+    }
+    .tab-btn.active{
+      background:#ff3e92;
+      color:#fff;
+    }
+
+    /* ADMIN */
+    #adminPage{
+      padding:16px;
+    }
+    .admin-btn{
+      width:100%;
+      padding:12px;
+      background:#111;
+      color:#fff;
+      border-radius:10px;
+      margin-top:10px;
+      cursor:pointer;
+      border:none;
+    }
+    .admin-product-row{
+      background:#f2f2f2;
+      padding:10px;
+      border-radius:8px;
+      margin-bottom:6px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+  </style>
 </head>
 <body>
+
   <!-- HEADER -->
-  <header class="header">
-    <div class="header-row">
-      <div class="logo-wrap">
-        <div class="logo-circle">
-          <span>YM</span>
-        </div>
-        <div class="logo-text">
-          <strong>ONLINE MAGAZIN YANGIOBOD</strong>
-          <small id="customerInfoText">Hozircha ism va telefon saqlanmagan. Buyurtma berganingizda so‘raladi.</small>
-        </div>
-      </div>
-      <div class="header-right">
-        <button class="theme-toggle" id="themeToggleBtn">🌙</button>
-
-        <button class="cart-icon-btn" onclick="toggleCartSheet(true)">
-          <div class="cart-icon-left">🛒</div>
-          <div class="cart-icon-info">
-            <strong><span id="cartCountTop">0</span> ta</strong>
-            <small id="cartTotalTop">0 so‘m</small>
-          </div>
-        </button>
-
-        <button class="admin-access" id="adminAccessBtn">
-          👑 Admin uchun
-        </button>
-      </div>
+  <header>
+    <div>
+      <strong>Beauty Store</strong>
+      <div id="customerInfoText"></div>
     </div>
-
-    <!-- TABS -->
-    <div class="tabs" id="tabs">
-      <button class="tab-btn active" data-page="shopPage">🛍 Magazin</button>
-      <button class="tab-btn" data-page="historyPage">📜 Buyurtmalar</button>
-      <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">⚙️ Admin</button>
-    </div>
+    <button id="themeToggleBtn">🌙</button>
   </header>
 
+  <!-- SEARCH -->
+  <div style="padding:10px;">
+    <input id="searchInput" type="text" placeholder="Qidirish..." 
+           style="width:100%;padding:10px;border-radius:12px;border:1px solid #ccc;">
+  </div>
+
+  <!-- FILTER -->
+  <div id="filterBar"></div>
+
   <!-- SHOP PAGE -->
-  <main id="shopPage">
-    <section class="hero">
-      <h1 class="hero-title">
-        Telegram orqali <span>tezkor buyurtma</span>
-      </h1>
-      <p class="hero-sub">
-        Mahsulotlarni tanlang, savatga qo‘shing va barchasini Telegram orqali bir marta bosish bilan yuboring.
-      </p>
-
-      <div class="hero-badges">
-        <div class="badge">⚡ Tezkor buyurtma</div>
-        <div class="badge">📦 Qulay savat</div>
-        <div class="badge">📲 Telegram WebApp</div>
-      </div>
-
-      <div class="hero-tag">
-        🔔 Har safar savatdagi mahsulotlar alohida xabar sifatida Telegramga yuboriladi.
-      </div>
-
-      <p class="hero-note">
-        Agar ism / telefonni o‘zgartirmoqchi bo‘lsangiz — ism ustidagi matnga bosib tahrirlashingiz mumkin.
-      </p>
-
-      <!-- QIDIRUV -->
-      <div class="search-bar">
-        <span>🔍</span>
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="Mahsulot nomi, kategoriya yoki tavsifi bo‘yicha qidiring..."
-        />
-      </div>
-    </section>
-
-    <!-- FILTERLAR -->
-    <div class="filters-wrapper">
-      <div class="filters" id="filterBar">
-        <!-- JS orqali to‘ldiriladi: ⭐ Barchasi + Firestore kategoriyalar -->
-      </div>
-    </div>
-
-    <!-- PRODUCTS GRID -->
-    <section class="products-wrap">
-      <div class="products-grid" id="productsGrid">
-        <!-- JS orqali kartochkalar tushadi -->
-      </div>
-    </section>
-  </main>
+  <div id="shopPage" class="page">
+    <div id="productsGrid"></div>
+  </div>
 
   <!-- HISTORY PAGE -->
-  <section id="historyPage" class="page hidden">
-    <h2 class="page-title">📜 Buyurtmalar tarixi</h2>
-    <p class="page-sub">
-      Hozircha buyurtmalar tarixi saqlanmaydi. Har bir buyurtma Telegramga alohida xabar bo‘lib yuboriladi.
-    </p>
-    <button class="clear-history-btn" onclick="clearHistory()">
-      Tarixni tozalash
-    </button>
-    <div id="historyList"></div>
-  </section>
+  <div id="historyPage" class="page hidden">
+    <h3 style="padding:12px;">📜 Buyurtmalar tarixi</h3>
+    <div id="historyList" style="padding:12px;"></div>
+  </div>
 
   <!-- ADMIN PAGE -->
-  <section id="adminPage" class="page hidden">
-    <h2 class="page-title">⚙️ Admin panel</h2>
-    <p class="page-sub">
-      Firestore orqali mahsulot va kategoriyalarni boshqarish. Bu sahifaga faqat admin kodi bilan kirish mumkin.
-    </p>
+  <div id="adminPage" class="page hidden">
+    <h3>👑 Admin panel</h3>
 
-    <!-- MAHSULOT FORM -->
-    <div class="admin-form">
-      <h3>➕ Mahsulot qo‘shish / tahrirlash</h3>
-      <p class="admin-info">
-        Avval <strong>kategoriya</strong> qo‘shib oling, keyin mahsulotni shu kategoriyaga bog‘lab qo‘yasiz.
-      </p>
+    <h4>Mahsulot qo‘shish</h4>
+    <input id="adminName" placeholder="Nomi" style="width:100%;padding:8px;margin-bottom:6px;">
+    <select id="adminCategory" style="width:100%;padding:8px;margin-bottom:6px;"></select>
+    <input id="adminPriceBase" placeholder="Asl narx" type="number" style="width:100%;padding:8px;margin-bottom:6px;">
+    <label><input type="checkbox" id="adminHasDiscount"> Chegirma</label>
+    <input id="adminPriceDiscount" placeholder="Chegirma narx" type="number" style="width:100%;padding:8px;margin-bottom:6px;">
+    <input id="adminTag" placeholder="Tag" style="width:100%;padding:8px;margin-bottom:6px;">
+    <textarea id="adminDescription" placeholder="Tavsif" style="width:100%;padding:8px;margin-bottom:6px;"></textarea>
+    <input id="adminImages" placeholder="Rasmlar (vergul bilan)" style="width:100%;padding:8px;margin-bottom:10px;">
 
-      <div class="form-row">
-        <label for="adminName">Mahsulot nomi</label>
-        <input id="adminName" type="text" placeholder="Masalan: Parfyum X, Krem Y..." />
-      </div>
+    <button class="admin-btn" onclick="addCustomProduct()">➕ Mahsulotni qo‘shish</button>
 
-      <div class="form-row">
-        <label for="adminCategory">Kategoriya</label>
-        <select id="adminCategory">
-          <option value="">Avval kategoriyani qo‘shing</option>
-        </select>
-      </div>
-
-      <div class="form-row">
-        <label for="adminPriceBase">Asosiy narx (so‘m)</label>
-        <input id="adminPriceBase" type="number" inputmode="numeric" placeholder="Masalan: 99000" />
-      </div>
-
-      <div class="admin-check-row">
-        <input id="adminHasDiscount" type="checkbox" />
-        <label for="adminHasDiscount">Chegirma narxi bor</label>
-      </div>
-
-      <div class="form-row">
-        <label for="adminPriceDiscount">Chegirma narxi (ixtiyoriy)</label>
-        <input id="adminPriceDiscount" type="number" inputmode="numeric" placeholder="Masalan: 89000" />
-      </div>
-
-      <div class="form-row">
-        <label for="adminTag">Tag / stiker (ixtiyoriy)</label>
-        <input id="adminTag" type="text" placeholder="Masalan: Yangi, Bestseller, Chegirma..." />
-      </div>
-
-      <div class="form-row">
-        <label for="adminDescription">Tavsif</label>
-        <textarea id="adminDescription" rows="3" placeholder="Mahsulot haqida qisqacha tavsif..."></textarea>
-      </div>
-
-      <div class="form-row">
-        <label for="adminImages">Rasm URL (vergul bilan ajratib bir nechta)</label>
-        <input id="adminImages" type="text" placeholder="https://..., yoki faqat nomi (noimage, img1...)" />
-      </div>
-
-      <button class="admin-btn" onclick="addCustomProduct()">
-        ➕ Mahsulotni qo‘shish (Firestore)
-      </button>
-    </div>
-
-    <!-- ADMIN: MAHSULOTLAR RO‘YXATI -->
-    <h3 class="admin-list-title">🧾 Firestore’dagi mahsulotlar</h3>
+    <h4 style="margin-top:20px;">Mahsulotlar</h4>
     <div id="adminCustomList"></div>
 
-    <!-- ADMIN: KATEGORIYA FORM -->
-    <div class="admin-form" style="margin-top:12px;">
-      <h3>📂 Kategoriya qo‘shish / tahrirlash</h3>
-      <div class="form-row">
-        <label for="adminCatCode">Kategoriya kodi (lotincha, kichik harf)</label>
-        <input id="adminCatCode" type="text" placeholder="masalan: parfyum, krem, soch, uy..." />
-      </div>
+    <h4 style="margin-top:20px;">Kategoriyalar</h4>
+    <input id="adminCatCode" placeholder="kod (masalan: pomada)" style="width:100%;padding:8px;margin-bottom:6px;">
+    <input id="adminCatLabel" placeholder="nomi" style="width:100%;padding:8px;margin-bottom:6px;">
+    <input id="adminCatEmoji" placeholder="emoji (💄)" style="width:100%;padding:8px;margin-bottom:6px;">
+    <button class="admin-btn" onclick="saveCategory()">➕ Kategoriya</button>
 
-      <div class="form-row">
-        <label for="adminCatLabel">Kategoriya nomi</label>
-        <input id="adminCatLabel" type="text" placeholder="masalan: Parfyumlar, Krem va losyonlar..." />
-      </div>
-
-      <div class="form-row">
-        <label for="adminCatEmoji">Emoji (ixtiyoriy)</label>
-        <input id="adminCatEmoji" type="text" placeholder="masalan: 🌸, 💄, 🧴 ..." />
-      </div>
-
-      <button class="admin-btn" onclick="saveCategory()">
-        💾 Kategoriya saqlash
-      </button>
-    </div>
-
-    <!-- ADMIN: KATEGORIYALAR RO‘YXATI -->
-    <h3 class="admin-list-title">📁 Kategoriyalar ro‘yxati</h3>
-    <div id="adminCategoryList"></div>
-  </section>
-
-  <!-- BOTTOM CART BAR -->
-  <div class="cart-bar">
-    <div class="cart-bar-note">
-      Savatni ko‘rish va buyurtma yuborish uchun tugmani bosing.
-    </div>
-    <button class="cart-main-btn" onclick="toggleCartSheet(true)">
-      <div>
-        <div>🛒 Savatda: <span id="cartCountTopBottom">(<span id="cartCountTopMirror">0</span> ta)</span></div>
-        <span class="small">Mahsulotlarni tekshirib, keyin Telegramga yuboring</span>
-      </div>
-      <div>
-        <span id="cartTotalTopMirror">0 so‘m</span>
-      </div>
-    </button>
+    <div id="adminCategoryList" style="margin-top:12px;"></div>
   </div>
 
-  <!-- CART SHEET OVERLAY -->
-  <div class="sheet-overlay" id="cartSheetOverlay" onclick="toggleCartSheet(false)"></div>
+  <!-- CART TOP -->
+  <div class="cart-top" onclick="toggleCartSheet(true)">
+    <span>🧺 Savat: <span id="cartCountTop">0</span></span>
+    <span id="cartTotalTop">0 so‘m</span>
+  </div>
 
   <!-- CART SHEET -->
-  <div class="cart-sheet" id="cartSheet">
-    <div class="cart-sheet-header">
-      <h3>Savat</h3>
-      <button onclick="toggleCartSheet(false)">✕</button>
-    </div>
-    <div class="cart-sheet-body" id="cartItems">
-      <!-- JS orqali savat elementlari -->
-    </div>
-    <div class="cart-sheet-footer">
-      <div class="cart-sheet-footer-top">
-        <span>Umumiy summa</span>
-        <strong id="cartSheetTotal">0 so‘m</strong>
+  <div id="cartSheet">
+    <h3>Savat</h3>
+    <div id="cartItems" style="margin-top:12px;"></div>
+    <h3 style="margin-top:10px;">Jami: <span id="cartSheetTotal">0 so‘m</span></h3>
+
+    <button onclick="sendOrder()" style="width:100%;padding:12px;margin-top:12px;background:#ff3e92;color:#fff;border:none;border-radius:10px;">
+      ▶️ Buyurtma berish
+    </button>
+  </div>
+  <div id="cartSheetOverlay" onclick="toggleCartSheet(false)"></div>
+
+  <!-- DETAIL POPUP -->
+  <div id="productDetailOverlay" class="hidden">
+    <div class="detail-card">
+      <div class="detail-img-box">
+        <img id="detailImage">
       </div>
-      <p class="cart-info-text">
-        🔔 “Telegramda tasdiqlash” bosilganda, savatdagi barcha mahsulotlar bitta xabar ko‘rinishida tanlangan Telegram akkauntga yuboriladi.
-      </p>
-      <button class="cart-sheet-btn" onclick="sendOrder()">
-        📲 Telegramda tasdiqlash
-      </button>
+      <div class="detail-body">
+        <div id="detailCategory"></div>
+        <h2 id="detailName"></h2>
+        <div id="detailTag" style="margin-top:4px;font-size:13px;opacity:0.7;"></div>
+        <p id="detailDesc" style="margin-top:10px;"></p>
+
+        <div style="margin-top:10px;">
+          <span id="detailPrice" style="font-size:20px;font-weight:700;"></span>
+          <span id="detailOldPrice" style="font-size:14px;text-decoration:line-through;margin-left:8px;color:red;"></span>
+        </div>
+
+        <!-- ADD TO CART -->
+        <button id="detailAddBtn">🛒 Savatga qo‘shish</button>
+        <button id="detailBackBtn" class="hidden">◀ Magaziniga qaytish</button>
+      </div>
     </div>
   </div>
 
-  <!-- PRODUCT DETAIL OVERLAY (UZUM STYLE) -->
-  <div class="product-detail-overlay hidden" id="productDetailOverlay">
-    <div class="product-detail-card">
-      <div class="product-detail-header">
-        <div class="product-detail-image-wrap">
-          <img id="detailImage" src="" alt="Mahsulot rasmi" />
-          <button class="detail-gallery-btn left" id="detailPrevBtn">‹</button>
-          <button class="detail-gallery-btn right" id="detailNextBtn">›</button>
-          <div class="detail-image-index" id="detailImageIndex">1 / 1</div>
-        </div>
-        <button class="product-detail-close" onclick="closeProductDetail()">✕</button>
-      </div>
+  <!-- TABS -->
+  <div id="tabs">
+    <div class="tab-btn active" data-page="shopPage">🏪 Do‘kon</div>
+    <div class="tab-btn" data-page="historyPage">📜 Tarix</div>
+    <div class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">👑 Admin</div>
+    <div class="tab-btn" id="admin
 
-      <div class="product-detail-body">
-        <div class="product-detail-category" id="detailCategory">Kategoriya</div>
-        <div class="product-detail-name" id="detailName">Mahsulot nomi</div>
-        <div class="product-detail-tag" id="detailTag"></div>
-        <div class="product-detail-desc" id="detailDesc">
-          Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan.
-        </div>
+Oops, kesildi. Quyida to‘liq davomini beradi:
 
-        <div class="product-detail-prices">
-          <div class="detail-price-main" id="detailPrice">0 so‘m</div>
-          <div class="detail-price-old hidden" id="detailOldPrice">0 so‘m</div>
-        </div>
-
-        <div class="detail-qty-row">
-          <span>Miqdor:</span>
-          <div class="detail-qty-controls">
-            <button id="detailQtyMinus">-</button>
-            <span id="detailQtyValue">1</span>
-            <button id="detailQtyPlus">+</button>
-          </div>
-        </div>
-
-        <div class="detail-actions">
-          <button class="detail-add-btn" id="detailAddBtn">
-            🛒 Savatga qo‘shish
-          </button>
-          <button class="detail-back-btn hidden" id="detailBackBtn">
-            ◀ Magaziniga qaytish
-          </button>
-        </div>
-      </div>
-    </div>
+```html
+    <div class="tab-btn" id="adminAccessBtn">👑 Admin uchun</div>
   </div>
 
   <!-- TOAST -->
-  <div class="toast" id="toast">Xabar</div>
+  <div id="toast" style="
+      position:fixed;bottom:95px;left:50%;transform:translateX(-50%);
+      background:#111;color:#fff;padding:10px 18px;border-radius:10px;
+      font-size:14px;opacity:0;transition:0.3s;z-index:99999;">
+  </div>
 
-  <!-- Telegram WebApp script -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- Sening asosiy JS fayling (oxirgi bergan app.js) -->
+  <!-- APP JS -->
   <script type="module" src="app.js"></script>
 
-  <!-- Cart bar mirrorga qiymat ko‘chirish (kichik helper) -->
-  <script>
-    // Yuqoridagi JS'da faqat cartCountTop va cartTotalTop yangilanadi.
-    // Shu qiymatlarni pastdagi bar mirrori uchun yangilab turamiz.
-    const cartCountTop      = document.getElementById("cartCountTop");
-    const cartTotalTop      = document.getElementById("cartTotalTop");
-    const cartCountTopMirror= document.getElementById("cartCountTopMirror");
-    const cartTotalTopMirror= document.getElementById("cartTotalTopMirror");
-
-    const observer = new MutationObserver(() => {
-      if (cartCountTopMirror) cartCountTopMirror.textContent = cartCountTop.textContent;
-      if (cartTotalTopMirror) cartTotalTopMirror.textContent = cartTotalTop.textContent;
-    });
-
-    if (cartCountTop) {
-      observer.observe(cartCountTop, { childList: true, characterData: true, subtree: true });
-    }
-    if (cartTotalTop) {
-      observer.observe(cartTotalTop, { childList: true, characterData: true, subtree: true });
-    }
-
-    // Ism/telefon matniga bosilganda tahrirlash
-    const customerInfoEl = document.getElementById("customerInfoText");
-    if (customerInfoEl) {
-      customerInfoEl.style.cursor = "pointer";
-      customerInfoEl.addEventListener("click", () => {
-        if (window.editCustomerInfo) {
-          window.editCustomerInfo();
-        }
-      });
-    }
-  </script>
 </body>
 </html>
