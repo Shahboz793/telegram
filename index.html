@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Premium Beauty Store</title>
+  <title>Beauty Store — Premium Dark UI</title>
+  <meta name="color-scheme" content="dark light">
 
-  <!-- Font -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 
   <!-- STYLE -->
@@ -23,6 +24,7 @@
     <div id="customerInfoText" class="customer-info">Ismingiz aniqlanmoqda…</div>
 
     <button id="themeToggleBtn">🌙</button>
+
     <button onclick="toggleCartSheet(true)" class="cart-btn">
       🛒 <span id="cartCountTop">0</span>
     </button>
@@ -52,7 +54,9 @@
 <!-- ========================= HISTORY PAGE ========================= -->
 <div id="historyPage" class="page hidden">
   <h2 class="page-title">Mening buyurtmalarim</h2>
-  <p class="empty-note">Buyurtmalar hali yo‘q.</p>
+  <div id="historyList" class="history-list">
+    <p class="empty-note">Buyurtmalar hali yo‘q.</p>
+  </div>
 </div>
 
 <!-- ========================= ADMIN PAGE ========================= -->
@@ -62,22 +66,20 @@
 
   <button id="adminAccessBtn" class="admin-access-btn">Admin kirish</button>
 
-  <!-- CATEGORY MANAGEMENT -->
+  <!-- CATEGORY -->
   <h3 class="admin-section-title">📂 Kategoriyalar</h3>
   <div class="admin-inputs">
-    <input id="adminCatCode" placeholder="kod (mas: pomada)">
+    <input id="adminCatCode" placeholder="kod (masalan: pomada)">
     <input id="adminCatLabel" placeholder="nomi (Pomada)">
     <input id="adminCatEmoji" placeholder="emoji (💄)">
     <button onclick="saveCategory()" class="admin-save-btn">Saqlash</button>
   </div>
-
   <div id="adminCategoryList" class="admin-list"></div>
 
   <hr>
 
-  <!-- PRODUCT MANAGEMENT -->
+  <!-- PRODUCTS -->
   <h3 class="admin-section-title">📦 Mahsulotlar</h3>
-
   <div class="admin-inputs">
     <input id="adminName" placeholder="Mahsulot nomi">
     <input id="adminPrice" type="number" placeholder="Narx">
@@ -118,7 +120,6 @@
 <!-- ========================= PRODUCT DETAIL MODAL ========================= -->
 <div id="productDetailOverlay" class="detail-modal">
   <div class="detail-content">
-
     <img id="detailImage" class="detail-img">
 
     <h2 id="detailName" class="detail-name"></h2>
@@ -144,15 +145,14 @@
   </div>
 </div>
 
-<!-- ========================= JS FILES (MODUL YO‘LLARI TO‘G‘RILANGAN) ========================= -->
+<!-- ========================= JS FILES ========================= -->
 <script type="module">
   import { initApp } from "./app.js";
-
   import "./data.js";
   import "./products.js";
   import "./categories.js";
   import "./cart.js";
-  import "./order.js";      // ⚠️ Senda filename: order.js
+  import "./order.js";
   import "./admin.js";
 
   window.addEventListener("DOMContentLoaded", () => {
