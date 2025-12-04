@@ -16,6 +16,11 @@ html,body{
   overflow-x:hidden;
 }
 
+/* YASHIRISH UCHUN UNIVERSAL KLASS */
+.hidden{
+  display:none !important;
+}
+
 /* =========================================
    THEME COLORS
 ========================================= */
