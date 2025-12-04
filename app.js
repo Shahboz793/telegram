@@ -91,6 +91,7 @@ const adminAccessBtn     = document.getElementById("adminAccessBtn");
 const adminTabBtn        = document.getElementById("adminTabBtn");
 const searchInput        = document.getElementById("searchInput");
 const customerInfoTextEl = document.getElementById("customerInfoText");
+const quickOrderBtn      = document.getElementById("quickOrderBtn");
 
 const productDetailOverlay = document.getElementById("productDetailOverlay");
 const detailImageEl        = document.getElementById("detailImage");
@@ -535,8 +536,14 @@ function updateCartUI(){
     totalCount += c.qty;
     totalPrice += p.price*c.qty;
   });
-  cartCountTopEl.textContent = totalCount;
-  cartTotalTopEl.textContent = formatPrice(totalPrice)+" so‘m";
+  if(cartCountTopEl) cartCountTopEl.textContent = totalCount;
+  if(cartTotalTopEl) cartTotalTopEl.textContent = formatPrice(totalPrice)+" so‘m";
+
+  // Tezkor "Buyurtma berish" tugmasi: faqat savatda mahsulot bo‘lsa ko‘rinadi
+  if(quickOrderBtn){
+    quickOrderBtn.classList.toggle("hidden", totalCount === 0);
+  }
+
   if(cartSheet.classList.contains("open")) renderCartItems();
 }
 function toggleCartSheet(force){
@@ -862,7 +869,7 @@ function renderAdminOrders(){
         🧹 Barcha buyurtmalarni tozalash
       </button>
     </div>
-  ";
+  `;
 
   if(!visibleOrders.length){
     adminOrdersListEl.innerHTML += "<p class='cart-empty'>Tanlangan bo‘limda buyurtma yo‘q.</p>";
@@ -1493,6 +1500,9 @@ if(detailQtyPlus){
   subscribeProductsRealtime();
   subscribeCategoriesRealtime();
   subscribeClientOrders();
+
+  // Boshlanishida ham UI yangilansin
+  updateCartUI();
 })();
 
 /* GLOBAL EXPORTS */
