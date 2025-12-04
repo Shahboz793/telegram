@@ -31,7 +31,6 @@
     </div>
   </header>
 
-
   <!-- FILTER BAR -->
   <div id="filterBar" class="filter-bar"></div>
 
@@ -40,19 +39,17 @@
     <input type="text" id="searchInput" placeholder="Qidirish...">
   </div>
 
-
   <!-- =============== SHOP PAGE =============== -->
   <div id="shopPage" class="page">
     <div class="products-grid" id="productsGrid"></div>
   </div>
 
-
   <!-- =============== CUSTOMER ORDERS PAGE =============== -->
   <div id="customerOrdersPage" class="page hidden">
     <h2 class="page-title">Buyurtmalarim</h2>
-    <div id="customerOrdersList"></div>
+    <!-- app.js dagi ordersListEl bilan moslashtirildi -->
+    <div id="ordersList"></div>
   </div>
-
 
   <!-- =============== ADMIN PAGE =============== -->
   <div id="adminPage" class="page hidden">
@@ -99,7 +96,6 @@
 
   </div>
 
-
   <!-- =============== CART SHEET (BOTTOM PANEL) =============== -->
   <div id="cartSheetOverlay" class="sheet-overlay" onclick="toggleCartSheet(false)"></div>
 
@@ -120,12 +116,9 @@
     </div>
   </div>
 
-
   <!-- =============== PRODUCT DETAIL VIEW =============== -->
   <div id="productDetailOverlay" class="detail-overlay hidden">
-
     <div class="detail-card">
-
       <div class="detail-img-box">
         <img id="detailImage" src="">
         <button id="detailPrevBtn" class="nav-btn left">‹</button>
@@ -134,7 +127,6 @@
       </div>
 
       <div class="detail-body">
-
         <div id="detailCategory" class="detail-category"></div>
         <div id="detailName" class="detail-name"></div>
         <div id="detailTag" class="detail-tag"></div>
@@ -154,15 +146,12 @@
         <button id="detailAddBtn" class="btn-primary detail-add-btn">🛒 Savatga qo‘shish</button>
 
         <button id="detailBackBtn" class="btn-back hidden">◀ Magaziniga qaytish</button>
-
       </div>
     </div>
   </div>
 
-
   <!-- TOAST -->
   <div id="toast" class="toast"></div>
-
 
   <!-- BOTTOM TABS -->
   <div id="tabs" class="tabs">
@@ -171,8 +160,7 @@
     <button id="adminTabBtn" class="tab-btn hidden" data-page="adminPage">👑 Admin</button>
   </div>
 
-
   <!-- JAVASCRIPT -->
-  <script type="module" src="app.js"></script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
