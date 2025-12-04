@@ -232,7 +232,7 @@ body.theme-dark{
 }
 
 /* =========================================
-   SHOP PAGE
+   SHOP PAGE TOOLBAR
 ========================================= */
 .shop-toolbar{
   background:var(--panel);
@@ -254,26 +254,36 @@ body.theme-dark{
 }
 
 /* =========================================
-   CATEGORY CHIPS
+   CATEGORY GRID (4 ta qatorda)
 ========================================= */
 .chips-row{
-  display:flex;
-  overflow-x:auto;
-  gap:8px;
-  padding:8px 14px 10px;
   background:var(--panel);
   border-bottom:1px solid var(--border);
+  padding:10px 12px 12px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
 }
 
 .chip{
-  padding:6px 12px;
-  border-radius:999px;
-  font-size:13px;
-  white-space:nowrap;
+  padding:9px 4px;
+  border-radius:var(--radius);
+  font-size:11px;
   border:1px solid var(--border);
   cursor:pointer;
   background:var(--bg);
   color:var(--text);
+  text-align:center;
+  line-height:1.2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:46px;
+}
+
+.chip span{
+  display:block;
 }
 
 .chip.active{
@@ -282,27 +292,47 @@ body.theme-dark{
   border-color:var(--accent);
 }
 
+/* Kattaroq ekranlarda text biroz kattaroq */
+@media (min-width:480px){
+  .chip{
+    font-size:12px;
+    min-height:50px;
+  }
+}
+
 /* =========================================
-   PRODUCTS GRID
+   PRODUCTS LIST — WEBAPP STYLE
 ========================================= */
 .products-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
-  gap:14px;
-  padding:16px;
+  /* telefonda TAGMA-TAG (bitta ustun) */
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:12px;
+}
+
+/* katta ekranlarda gridga o‘tamiz */
+@media (min-width:768px){
+  .products-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:16px;
+    padding:16px;
+  }
 }
 
 .product-card{
   background:var(--card);
   border-radius:var(--radius-lg);
   box-shadow:var(--shadow);
-  padding:10px;
   cursor:pointer;
   display:flex;
   flex-direction:column;
   transition:transform .18s ease,box-shadow .18s ease;
+  overflow:hidden;
 }
 
+/* telefonda hover keraksiz, ammo qolaversin */
 .product-card:hover{
   transform:translateY(-4px);
   box-shadow:0 18px 40px rgba(0,0,0,0.35);
@@ -310,15 +340,22 @@ body.theme-dark{
 
 .product-img-wrap{
   position:relative;
-  border-radius:var(--radius);
+  width:100%;
   overflow:hidden;
 }
 
+/* RASM KATTA – EKRANNI YAXSHI TO‘LDIRADI */
 .product-img-wrap img{
   width:100%;
-  height:150px;
+  height:220px;
   object-fit:cover;
   display:block;
+}
+
+@media (min-width:768px){
+  .product-img-wrap img{
+    height:240px;
+  }
 }
 
 .product-img-tag{
@@ -349,8 +386,9 @@ body.theme-dark{
   font-weight:600;
 }
 
+/* CARD BODY TELEFON UCHUN */
 .product-body{
-  padding-top:10px;
+  padding:10px 12px 12px;
 }
 
 .product-name{
@@ -399,7 +437,7 @@ body.theme-dark{
   background:var(--accent);
   color:#fff;
   font-size:12px;
-  padding:6px 10px;
+  padding:7px 12px;
   border-radius:999px;
   cursor:pointer;
   white-space:nowrap;
@@ -495,6 +533,23 @@ body.theme-dark{
   gap:4px;
 }
 
+.qty-control{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.qty-control button{
+  width:22px;
+  height:22px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--bg);
+  color:var(--text);
+  font-size:14px;
+  cursor:pointer;
+}
+
 .cart-item-total{
   font-size:13px;
   font-weight:600;
@@ -537,7 +592,7 @@ body.theme-dark{
 }
 
 /* =========================================
-   ORDERS LIST
+   ORDERS LIST – TELEFON UCHUN KATTAROQ
 ========================================= */
 .section-title{
   font-size:18px;
@@ -557,7 +612,7 @@ body.theme-dark{
 
 .order-card{
   background:var(--card);
-  padding:14px;
+  padding:16px 14px;
   border-radius:var(--radius-lg);
   box-shadow:var(--shadow);
   margin-bottom:14px;
@@ -581,7 +636,7 @@ body.theme-dark{
 }
 
 .order-total{
-  font-size:17px;
+  font-size:18px;
   font-weight:700;
   color:var(--accent);
 }
@@ -592,7 +647,7 @@ body.theme-dark{
 
 .order-items{
   margin-top:6px;
-  font-size:13px;
+  font-size:14px;
 }
 
 .order-items ul{
@@ -838,7 +893,7 @@ body.theme-dark{
 }
 
 /* =========================================
-   PRODUCT DETAIL
+   PRODUCT DETAIL – FULLSCREEN WEBAPP
 ========================================= */
 .detail-overlay{
   position:fixed;
@@ -846,20 +901,22 @@ body.theme-dark{
   background:rgba(0,0,0,0.6);
   backdrop-filter:blur(2px);
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
-  padding:20px;
+  padding:0;
   z-index:100;
 }
 
 .detail-card{
   background:var(--card);
   width:100%;
-  max-width:420px;
-  border-radius:var(--radius-lg);
-  padding:16px;
+  max-width:480px;
+  height:100vh;
+  border-radius:0;
+  padding:10px 16px 16px;
   box-shadow:var(--shadow);
   position:relative;
+  overflow-y:auto;
 }
 
 .detail-close{
@@ -875,13 +932,13 @@ body.theme-dark{
 
 .detail-img-wrap{
   position:relative;
-  margin-top:10px;
+  margin-top:26px; /* yuqorida title + close uchun joy */
 }
 
 .detail-img-wrap img{
   width:100%;
   border-radius:var(--radius);
-  max-height:300px;
+  max-height:56vh;
   object-fit:cover;
 }
 
@@ -956,8 +1013,6 @@ body.theme-dark{
   font-size:12px;
   color:var(--muted);
 }
-
-/* qty-control already styled yuqorida */
 
 /* =========================================
    TOAST

@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <title>Beauty Store — Real-time Buyurtma Tizimi</title>
+  <title>Beauty Store — Onlayn do‘kon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
 
@@ -21,7 +21,7 @@
       <div class="logo-circle">BS</div>
       <div class="logo-text">
         <div class="logo-title">Beauty Store</div>
-        <div class="logo-sub">Real-time onlayn buyurtma</div>
+        <div class="logo-sub">Ayollar uchun onlayn do‘kon</div>
       </div>
     </div>
 
@@ -45,14 +45,23 @@
     <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">👑 Admin</button>
   </nav>
 
-  <!-- CUSTOMER INFO PANEL -->
+  <!-- CUSTOMER INFO + WELCOME PANEL -->
   <section class="customer-panel">
     <div class="customer-info">
+      <div style="font-weight:600; margin-bottom:4px;">
+        Xush kelibsiz bizning onlayn do‘konimizga! 💖
+      </div>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:6px;">
+        Nafis atirlar, lab bo‘yoqlar, parvarish vositalari va ko‘plab go‘zallik mahsulotlari siz uchun.
+      </div>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">
+        🕒 Ish vaqti: <strong>7/24</strong> • Hozirgi vaqt: <span id="liveClock">--:--</span>
+      </div>
       <div id="customerInfoText">Mijoz ma’lumotlari kiritilmagan.</div>
     </div>
     <div class="customer-actions">
-      <button class="btn-outline" onclick="editCustomerInfo()">✏️ O‘zgartirish</button>
-      <button class="btn-ghost" onclick="resetCustomerInfo()">🧹 Tozalash</button>
+      <button class="btn-outline" onclick="editCustomerInfo()">✏️ Ma’lumotlarni o‘zgartirish</button>
+      <button class="btn-ghost" onclick="resetCustomerInfo()">🧹 Ma’lumotlarni tozalash</button>
     </div>
   </section>
 
@@ -69,7 +78,7 @@
       <!-- CATEGORY FILTER BAR -->
       <div id="filterBar" class="chips-row"></div>
 
-      <!-- PRODUCTS GRID -->
+      <!-- PRODUCTS GRID / LIST -->
       <div id="productsGrid" class="products-grid"></div>
     </section>
 
@@ -200,7 +209,7 @@
     </footer>
   </aside>
 
-  <!-- PRODUCT DETAIL MODAL -->
+  <!-- PRODUCT DETAIL MODAL (ZOOM OLIB TASHLANGAN) -->
   <div id="productDetailOverlay" class="detail-overlay hidden">
     <div class="detail-card">
 
@@ -209,14 +218,8 @@
       <div class="detail-img-wrap">
         <button id="detailPrevBtn" class="detail-nav-btn">‹</button>
 
-        <div class="detail-img-inner">
-          <img id="detailImage" src="" alt="Mahsulot rasmi" />
-          <div class="detail-zoom-controls">
-            <button id="detailZoomOutBtn" type="button">−</button>
-            <span class="detail-zoom-label">Zoom</span>
-            <button id="detailZoomInBtn" type="button">+</button>
-          </div>
-        </div>
+        <!-- Faqat rasm, zoom tugmalari yo‘q -->
+        <img id="detailImage" src="" alt="Mahsulot rasmi" />
 
         <button id="detailNextBtn" class="detail-nav-btn">›</button>
 
@@ -260,5 +263,21 @@
 
   <!-- APP SCRIPT -->
   <script type="module" src="app.js"></script>
+
+  <!-- LIVE CLOCK SCRIPT -->
+  <script>
+    (function(){
+      const clockEl = document.getElementById("liveClock");
+      function updateClock(){
+        if(!clockEl) return;
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2,"0");
+        const mm = String(now.getMinutes()).padStart(2,"0");
+        clockEl.textContent = hh + ":" + mm;
+      }
+      updateClock();
+      setInterval(updateClock, 60000);
+    })();
+  </script>
 </body>
 </html>
