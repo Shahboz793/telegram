@@ -56,21 +56,20 @@ let isAdmin        = false;
 let editingProductId  = null;
 let editingCategoryId = null;
 
-// YANGI HOLATLAR
-let adminOrderFilter     = "all"; // "all" yoki "delivered"
-let clientOrderStatusMap = {};    // mijoz buyurtmalarining eski statuslari
+// ADMIN & CLIENT ORDER STATE
+let adminOrderFilter     = "all"; // "all" | "delivered"
+let clientOrderStatusMap = {};
+let clientId             = null;
+let clientOrders         = [];
+let adminOrders          = [];
 
 // DETAIL STATE
 let detailIndex              = null;
 let detailImageIndex         = 0;
 let detailQty                = 1;
+let detailZoom               = 1;
 let detailCountdownTimer     = null;
 let detailCountdownRemaining = 0;
-
-// CLIENT ORDER STATE
-let clientId       = null;
-let clientOrders   = [];
-let adminOrders    = [];
 
 // DOM
 const productsGrid       = document.getElementById("productsGrid");
@@ -103,6 +102,8 @@ const detailBackBtn        = document.getElementById("detailBackBtn");
 const detailPrevBtn      = document.getElementById("detailPrevBtn");
 const detailNextBtn      = document.getElementById("detailNextBtn");
 const detailImageIndexEl = document.getElementById("detailImageIndex");
+const detailZoomInBtn    = document.getElementById("detailZoomInBtn");
+const detailZoomOutBtn   = document.getElementById("detailZoomOutBtn");
 
 const detailQtyMinus = document.getElementById("detailQtyMinus");
 const detailQtyPlus  = document.getElementById("detailQtyPlus");
@@ -134,18 +135,12 @@ const notifySoundEl = document.getElementById("notifySound");
 /* HELPERS */
 function formatPrice(v){ return (v || 0).toLocaleString("uz-UZ"); }
 
-// universal toast (duration parametrli)
 function showToast(message, duration = 1800){
   if(!toastEl) return;
   toastEl.textContent = message;
   toastEl.classList.add("show");
-
-  if(showToast._timer){
-    clearTimeout(showToast._timer);
-  }
-  showToast._timer = setTimeout(()=>{
-    toastEl.classList.remove("show");
-  }, duration);
+  if(showToast._timer) clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=>toastEl.classList.remove("show"), duration);
 }
 
 function normalizeImagesInput(raw){
@@ -555,7 +550,7 @@ function renderProgressHTML(status){
   `;
 }
 
-/* SOUND PLAY (ding.mp3) */
+/* SOUND */
 function playNotify(){
   if(!notifySoundEl) return;
   try{
@@ -579,7 +574,7 @@ function clientStatusMessage(status){
 
 function notifyClientStatus(status){
   const msg = clientStatusMessage(status);
-  showToast(msg, 3000); // 3 soniya
+  showToast(msg, 3000);
   playNotify();
 }
 
@@ -590,12 +585,11 @@ function checkDeliveredThankYou(){
   }
 }
 
-/* REAL-TIME ORDERS (CLIENT) */
+/* REAL-TIME ORDERS (CLIENT) – INDEX TALAB QILMASIN DEB ORDERBY NI OLIB TASHLADIK */
 function subscribeClientOrders(){
   const qClient = query(
     ordersCol,
-    where("clientId","==", clientId),
-    orderBy("createdAt","desc")
+    where("clientId","==", clientId)
   );
   onSnapshot(qClient, snap=>{
     let hasStatusChange   = false;
@@ -617,12 +611,14 @@ function subscribeClientOrders(){
       list.push({ id, ...data });
     });
 
+    // bu yerda JS ichida sort qilamiz (eng oxirgi yuqorida turadi)
+    list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+
     clientOrders = list;
     renderClientOrders();
     checkDeliveredThankYou();
 
     if(hasStatusChange && lastChangedStatus){
-      // 2–3 ta bo‘lsa ham faqat bitta xabar + ding
       notifyClientStatus(lastChangedStatus);
     }
   },err=>{
@@ -630,6 +626,7 @@ function subscribeClientOrders(){
     showToast("⚠️ Buyurtmalarni o‘qishda xato.");
   });
 }
+
 function renderClientOrders(){
   if(!clientOrdersListEl) return;
   if(!clientOrders.length){
@@ -699,7 +696,7 @@ function subscribeAdminOrders(){
 }
 
 function setAdminOrderFilter(filter){
-  adminOrderFilter = filter; // "all" yoki "delivered"
+  adminOrderFilter = filter;
   renderAdminOrders();
 }
 
@@ -710,10 +707,7 @@ function renderAdminOrders(){
     ? adminOrders.filter(o => o.status === "delivered")
     : adminOrders;
 
-  adminOrdersListEl.innerHTML = "";
-
-  // Filtr tugmalari
-  adminOrdersListEl.innerHTML += `
+  adminOrdersListEl.innerHTML = `
     <div class="admin-order-filters">
       <button
         class="btn-xs ${adminOrderFilter === "all" ? "btn-xs-primary" : "btn-xs-secondary"}"
@@ -726,7 +720,7 @@ function renderAdminOrders(){
         Yetkazilganlar
       </button>
     </div>
- `;
+  `;
 
   if(!visibleOrders.length){
     adminOrdersListEl.innerHTML += "<p class='cart-empty'>Tanlangan bo‘limda buyurtma yo‘q.</p>";
@@ -786,19 +780,17 @@ async function updateOrderStatus(orderId, newStatus){
     });
     showToast("✅ Buyurtma statusi yangilandi.");
 
-    // Admin "Yetkazildi" bosganida avtomatik yetkazilganlar bo‘limiga o‘tish
     if(isAdmin && newStatus === "delivered"){
       adminOrderFilter = "delivered";
       renderAdminOrders();
     }
-
   }catch(e){
     console.error("Status yangilash xato:", e);
     showToast("⚠️ Status yangilashda xato.");
   }
 }
 
-/* SEND ORDER (FIRESTOREGA) */
+/* SEND ORDER */
 async function sendOrder(){
   if(cart.length===0){
     showToast("Savat bo‘sh. Avval mahsulot tanlang.");
@@ -911,7 +903,7 @@ async function askAdminCode(){
     if(code===realCode){
       isAdmin = true;
       updateAdminUI();
-      subscribeAdminOrders(); // faqat admin bo‘lganda
+      subscribeAdminOrders();
       showToast("✅ Admin sifatida kirdingiz.");
     }else{
       showToast("❌ Noto‘g‘ri kod.");
@@ -958,8 +950,10 @@ function renderCategoryAdminList(){
     adminCategoryListEl.innerHTML += `
       <div class="admin-product-row">
         <span>${cat.emoji} <b>${cat.label}</b> <small>(${cat.code})</small></span>
-        <button class="admin-edit-btn" onclick="editCategory('${cat.id}')">✏️</button>
-        <button class="admin-delete-btn" onclick="deleteCategory('${cat.id}')">✕</button>
+        <div>
+          <button class="admin-edit-btn" onclick="editCategory('${cat.id}')">✏️</button>
+          <button class="admin-delete-btn" onclick="deleteCategory('${cat.id}')">✕</button>
+        </div>
       </div>
     `;
   });
@@ -1125,8 +1119,10 @@ function renderAdminCustomList(){
         <div class="admin-product-row">
           <span>${p.name}</span>
           <span>${formatPrice(p.price)} so‘m</span>
-          <button class="admin-edit-btn" onclick="editProduct('${p.id}')">✏️</button>
-          <button class="admin-delete-btn" onclick="deleteAnyProduct('${p.id}')">✕</button>
+          <div>
+            <button class="admin-edit-btn" onclick="editProduct('${p.id}')">✏️</button>
+            <button class="admin-delete-btn" onclick="deleteAnyProduct('${p.id}')">✕</button>
+          </div>
         </div>
       `;
     });
@@ -1154,13 +1150,18 @@ function editProduct(id){
   showToast("✏️ Tahrirlash rejimi.");
 }
 
-/* PRODUCT DETAIL */
+/* PRODUCT DETAIL + ZOOM */
 function getDetailImages(){
   if(detailIndex===null) return [RAW_PREFIX + "noimage.png"];
   const p = products[detailIndex];
   if(!p) return [RAW_PREFIX + "noimage.png"];
   if(p.images && p.images.length) return p.images;
   return [RAW_PREFIX + "noimage.png"];
+}
+function applyDetailZoom(){
+  if(!detailImageEl) return;
+  detailImageEl.style.transform = `scale(${detailZoom})`;
+  detailImageEl.style.transformOrigin = "center top";
 }
 function renderDetailImage(){
   if(!detailImageEl) return;
@@ -1172,6 +1173,7 @@ function renderDetailImage(){
   if(detailImageIndexEl){
     detailImageIndexEl.textContent = `${detailImageIndex+1} / ${imgs.length}`;
   }
+  applyDetailZoom();
 }
 function changeDetailImage(delta){
   if(detailIndex===null) return;
@@ -1197,6 +1199,7 @@ function openProductDetail(index){
   detailIndex      = index;
   detailImageIndex = 0;
   detailQty        = 1;
+  detailZoom       = 1;
   clearDetailCountdown();
 
   const catLbl = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
@@ -1276,6 +1279,21 @@ if(detailQtyPlus){
     e.stopPropagation();
     detailQty++;
     detailQtyValue.textContent = detailQty;
+  });
+}
+
+if(detailZoomInBtn){
+  detailZoomInBtn.addEventListener("click", e=>{
+    e.stopPropagation();
+    detailZoom = Math.min(detailZoom + 0.2, 2.5);
+    applyDetailZoom();
+  });
+}
+if(detailZoomOutBtn){
+  detailZoomOutBtn.addEventListener("click", e=>{
+    e.stopPropagation();
+    detailZoom = Math.max(detailZoom - 0.2, 1);
+    applyDetailZoom();
   });
 }
 
