@@ -605,9 +605,17 @@ function renderClientOrders(){
 }
 
 /* REAL-TIME ORDERS (ADMIN) */
+/* ====== NOTIFY SOUND (Admin uchun yangi buyurtma ovozi) ====== */
 function playNotify(){
   if(!notifySoundEl) return;
-  try{ notifySoundEl.currentTime = 0; notifySoundEl.play(); }catch(e){}
+  try{
+    notifySoundEl.pause();          // to‘xtat
+    notifySoundEl.currentTime = 0;  // boshiga qaytar
+    notifySoundEl.volume = 1.0;     // ovoz balandligi
+    notifySoundEl.play().catch(()=>{});
+  }catch(e){
+    console.warn("Ovoz chalishda xato:", e);
+  }
 }
 function subscribeAdminOrders(){
   const qAdmin = query(ordersCol, orderBy("createdAt","desc"));
