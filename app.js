@@ -67,7 +67,7 @@ let adminOrders          = [];
 let detailIndex              = null;
 let detailImageIndex         = 0;
 let detailQty                = 1;
-let detailZoom               = 1;
+// ZOOM OLIB TASHLANDI: detailZoom endi yo‘q
 let detailCountdownTimer     = null;
 let detailCountdownRemaining = 0;
 
@@ -102,8 +102,9 @@ const detailBackBtn        = document.getElementById("detailBackBtn");
 const detailPrevBtn      = document.getElementById("detailPrevBtn");
 const detailNextBtn      = document.getElementById("detailNextBtn");
 const detailImageIndexEl = document.getElementById("detailImageIndex");
-const detailZoomInBtn    = document.getElementById("detailZoomInBtn");
-const detailZoomOutBtn   = document.getElementById("detailZoomOutBtn");
+// ZOOM TUGMALARI DOMDAN HAM OLIB TASHLANDI
+// const detailZoomInBtn    = document.getElementById("detailZoomInBtn");
+// const detailZoomOutBtn   = document.getElementById("detailZoomOutBtn");
 
 const detailQtyMinus = document.getElementById("detailQtyMinus");
 const detailQtyPlus  = document.getElementById("detailQtyPlus");
@@ -585,7 +586,7 @@ function checkDeliveredThankYou(){
   }
 }
 
-/* REAL-TIME ORDERS (CLIENT) – INDEX TALAB QILMASIN DEB ORDERBY NI OLIB TASHLADIK */
+/* REAL-TIME ORDERS (CLIENT) */
 function subscribeClientOrders(){
   const qClient = query(
     ordersCol,
@@ -611,7 +612,6 @@ function subscribeClientOrders(){
       list.push({ id, ...data });
     });
 
-    // bu yerda JS ichida sort qilamiz (eng oxirgi yuqorida turadi)
     list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
 
     clientOrders = list;
@@ -1150,7 +1150,7 @@ function editProduct(id){
   showToast("✏️ Tahrirlash rejimi.");
 }
 
-/* PRODUCT DETAIL + ZOOM */
+/* PRODUCT DETAIL (ZOOM YO‘Q) */
 function getDetailImages(){
   if(detailIndex===null) return [RAW_PREFIX + "noimage.png"];
   const p = products[detailIndex];
@@ -1158,11 +1158,7 @@ function getDetailImages(){
   if(p.images && p.images.length) return p.images;
   return [RAW_PREFIX + "noimage.png"];
 }
-function applyDetailZoom(){
-  if(!detailImageEl) return;
-  detailImageEl.style.transform = `scale(${detailZoom})`;
-  detailImageEl.style.transformOrigin = "center top";
-}
+
 function renderDetailImage(){
   if(!detailImageEl) return;
   const imgs = getDetailImages();
@@ -1173,7 +1169,7 @@ function renderDetailImage(){
   if(detailImageIndexEl){
     detailImageIndexEl.textContent = `${detailImageIndex+1} / ${imgs.length}`;
   }
-  applyDetailZoom();
+  // ZOOM ENDI YO‘Q, transform qo‘llanmaydi
 }
 function changeDetailImage(delta){
   if(detailIndex===null) return;
@@ -1199,7 +1195,6 @@ function openProductDetail(index){
   detailIndex      = index;
   detailImageIndex = 0;
   detailQty        = 1;
-  detailZoom       = 1;
   clearDetailCountdown();
 
   const catLbl = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
@@ -1282,20 +1277,9 @@ if(detailQtyPlus){
   });
 }
 
-if(detailZoomInBtn){
-  detailZoomInBtn.addEventListener("click", e=>{
-    e.stopPropagation();
-    detailZoom = Math.min(detailZoom + 0.2, 2.5);
-    applyDetailZoom();
-  });
-}
-if(detailZoomOutBtn){
-  detailZoomOutBtn.addEventListener("click", e=>{
-    e.stopPropagation();
-    detailZoom = Math.max(detailZoom - 0.2, 1);
-    applyDetailZoom();
-  });
-}
+// ZOOM TUGMALARI LISTENERLARI HAM OLIB TASHLANDI
+// if(detailZoomInBtn){ ... }
+// if(detailZoomOutBtn){ ... }
 
 /* INIT */
 (function init(){
