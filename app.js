@@ -128,7 +128,7 @@ const adminCategoryListEl = document.getElementById("adminCategoryList");
 const clientOrdersListEl = document.getElementById("clientOrdersList");
 const adminOrdersListEl  = document.getElementById("adminOrdersList");
 
-// SOUND
+// SOUND (ding.mp3 index bilan bir papkada)
 const notifySoundEl = document.getElementById("notifySound");
 
 /* HELPERS */
@@ -555,7 +555,7 @@ function renderProgressHTML(status){
   `;
 }
 
-/* SOUND PLAY */
+/* SOUND PLAY (ding.mp3) */
 function playNotify(){
   if(!notifySoundEl) return;
   try{
@@ -622,6 +622,7 @@ function subscribeClientOrders(){
     checkDeliveredThankYou();
 
     if(hasStatusChange && lastChangedStatus){
+      // 2–3 ta bo‘lsa ham faqat bitta xabar + ding
       notifyClientStatus(lastChangedStatus);
     }
   },err=>{
@@ -725,7 +726,7 @@ function renderAdminOrders(){
         Yetkazilganlar
       </button>
     </div>
-  `;
+ `;
 
   if(!visibleOrders.length){
     adminOrdersListEl.innerHTML += "<p class='cart-empty'>Tanlangan bo‘limda buyurtma yo‘q.</p>";
@@ -797,7 +798,7 @@ async function updateOrderStatus(orderId, newStatus){
   }
 }
 
-/* SEND ORDER (ENDI FIRESTOREGA) */
+/* SEND ORDER (FIRESTOREGA) */
 async function sendOrder(){
   if(cart.length===0){
     showToast("Savat bo‘sh. Avval mahsulot tanlang.");
@@ -1298,24 +1299,24 @@ if(detailQtyPlus){
 })();
 
 /* GLOBAL EXPORTS */
-window.addToCart          = addToCart;
-window.toggleCartSheet    = toggleCartSheet;
-window.changeQty          = changeQty;
-window.removeFromCart     = removeFromCart;
-window.sendOrder          = sendOrder;
-window.openProductDetail  = openProductDetail;
-window.closeProductDetail = closeProductDetail;
+window.addToCart           = addToCart;
+window.toggleCartSheet     = toggleCartSheet;
+window.changeQty           = changeQty;
+window.removeFromCart      = removeFromCart;
+window.sendOrder           = sendOrder;
+window.openProductDetail   = openProductDetail;
+window.closeProductDetail  = closeProductDetail;
 
-window.resetCustomerInfo  = resetCustomerInfo;
-window.editCustomerInfo   = editCustomerInfo;
+window.resetCustomerInfo   = resetCustomerInfo;
+window.editCustomerInfo    = editCustomerInfo;
 
-window.saveCategory       = saveCategory;
-window.deleteCategory     = deleteCategory;
-window.editCategory       = editCategory;
+window.saveCategory        = saveCategory;
+window.deleteCategory      = deleteCategory;
+window.editCategory        = editCategory;
 
-window.addCustomProduct   = addCustomProduct;
-window.deleteAnyProduct   = deleteAnyProduct;
-window.editProduct        = editProduct;
+window.addCustomProduct    = addCustomProduct;
+window.deleteAnyProduct    = deleteAnyProduct;
+window.editProduct         = editProduct;
 
-window.updateOrderStatus  = updateOrderStatus;
+window.updateOrderStatus   = updateOrderStatus;
 window.setAdminOrderFilter = setAdminOrderFilter;
