@@ -605,17 +605,12 @@ function renderClientOrders(){
 }
 
 /* REAL-TIME ORDERS (ADMIN) */
-/* ====== NOTIFY SOUND (Admin uchun yangi buyurtma ovozi) ====== */
 function playNotify(){
   if(!notifySoundEl) return;
   try{
-    notifySoundEl.pause();          // to‘xtat
-    notifySoundEl.currentTime = 0;  // boshiga qaytar
-    notifySoundEl.volume = 1.0;     // ovoz balandligi
-    notifySoundEl.play().catch(()=>{});
-  }catch(e){
-    console.warn("Ovoz chalishda xato:", e);
-  }
+    notifySoundEl.currentTime = 0;
+    notifySoundEl.play();
+  }catch(e){}
 }
 function subscribeAdminOrders(){
   const qAdmin = query(ordersCol, orderBy("createdAt","desc"));
@@ -629,6 +624,7 @@ function subscribeAdminOrders(){
     });
     adminOrders = snap.docs.map(d=>({id:d.id, ...d.data()}));
     renderAdminOrders();
+    // Faqat admin kirgan bo‘lsa va yangi buyurtma qo‘shilsa — ding-ding
     if(isAdmin && hasNew){
       playNotify();
       showToast("🔔 Yangi buyurtma keldi!");
