@@ -12,7 +12,8 @@ import {
   onSnapshot,
   query,
   where,
-  orderBy
+  orderBy,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // SENING KONFIGING
@@ -36,10 +37,12 @@ const categoriesCol = collection(db, "beauty_categories");
 const ordersCol     = collection(db, "orders");
 
 // CONSTANTS
-const STORAGE_CUSTOMER = "beauty_customer_info";
-const THEME_KEY        = "beauty_theme";
-const CLIENT_ID_KEY    = "beauty_client_id";
-const RAW_PREFIX       = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
+const STORAGE_CUSTOMER        = "beauty_customer_info";
+const STORAGE_LOCATION        = "beauty_customer_location";
+const THEME_KEY               = "beauty_theme";
+const CLIENT_ID_KEY           = "beauty_client_id";
+const RAW_PREFIX              = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
+const LOCAL_ORDERS_BACKUP_KEY = "beauty_orders_history";
 
 // CATEGORY DICTS
 const categoryEmoji = { default: "💅" };
@@ -57,7 +60,8 @@ let editingProductId  = null;
 let editingCategoryId = null;
 
 // ADMIN & CLIENT ORDER STATE
-let adminOrderFilter     = "all"; // "all" | "delivered"
+// "all" | "delivered" | "courier" | "rejected"
+let adminOrderFilter     = "all";
 let clientOrderStatusMap = {};
 let clientId             = null;
 let clientOrders         = [];
@@ -67,7 +71,7 @@ let adminOrders          = [];
 let detailIndex              = null;
 let detailImageIndex         = 0;
 let detailQty                = 1;
-// ZOOM OLIB TASHLANDI: detailZoom endi yo‘q
+// ZOOM OLIB TASHLANDI
 let detailCountdownTimer     = null;
 let detailCountdownRemaining = 0;
 
@@ -102,9 +106,6 @@ const detailBackBtn        = document.getElementById("detailBackBtn");
 const detailPrevBtn      = document.getElementById("detailPrevBtn");
 const detailNextBtn      = document.getElementById("detailNextBtn");
 const detailImageIndexEl = document.getElementById("detailImageIndex");
-// ZOOM TUGMALARI DOMDAN HAM OLIB TASHLANDI
-// const detailZoomInBtn    = document.getElementById("detailZoomInBtn");
-// const detailZoomOutBtn   = document.getElementById("detailZoomOutBtn");
 
 const detailQtyMinus = document.getElementById("detailQtyMinus");
 const detailQtyPlus  = document.getElementById("detailQtyPlus");
@@ -144,6 +145,92 @@ function showToast(message, duration = 1800){
   showToast._timer = setTimeout(()=>toastEl.classList.remove("show"), duration);
 }
 
+/* GEOLOCATION — JOYLASHUV */
+function loadSavedLocation(){
+  try{
+    const raw = localStorage.getItem(STORAGE_LOCATION);
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    if(typeof obj.lat === "number" && typeof obj.lng === "number") return obj;
+    return null;
+  }catch(e){
+    return null;
+  }
+}
+
+function saveLocation(loc){
+  try{
+    localStorage.setItem(STORAGE_LOCATION, JSON.stringify(loc));
+  }catch(e){}
+}
+
+function startLocationCountdown(seconds){
+  let remain = seconds;
+  showToast(`📍 Joylashuv aniqlanmoqda... ${remain} s`, 1000);
+  const timer = setInterval(()=>{
+    remain--;
+    if(remain > 0){
+      showToast(`📍 Joylashuv aniqlanmoqda... ${remain} s`, 1000);
+    }else{
+      clearInterval(timer);
+    }
+  },1000);
+}
+
+function getBrowserLocation(timeoutMs = 7000){
+  return new Promise((resolve,reject)=>{
+    if(!navigator.geolocation){
+      reject(new Error("Geolocation qo‘llab-quvvatlanmaydi."));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos=>{
+        const { latitude, longitude, accuracy } = pos.coords;
+        resolve({
+          lat: latitude,
+          lng: longitude,
+          accuracy: accuracy || null,
+          ts: Date.now()
+        });
+      },
+      err=>reject(err),
+      { enableHighAccuracy:true, timeout:timeoutMs }
+    );
+  });
+}
+
+async function getOrAskLocation(){
+  let saved = loadSavedLocation();
+  if(saved){
+    const ok = confirm(
+      "📍 Oldingi joylashuvingiz saqlangan.\n\n" +
+      "Lat: " + saved.lat.toFixed(5) + "\n" +
+      "Lng: " + saved.lng.toFixed(5) + "\n\n" +
+      "Shu joylashuvdan foydalanilsinmi?"
+    );
+    if(ok) return saved;
+  }
+
+  const allow = confirm(
+    "📍 Joylashuvingiz aniqlansinmi?\n" +
+    "Bu ma’lumot kuryerga aniq marshrut tuzish uchun kerak bo‘ladi."
+  );
+  if(!allow) return null;
+
+  startLocationCountdown(7);
+  try{
+    const loc = await getBrowserLocation(7000);
+    saveLocation(loc);
+    showToast("📍 Joylashuv aniqlandi.", 2000);
+    return loc;
+  }catch(e){
+    console.error("Joylashuv aniqlanmadi:", e);
+    showToast("⚠️ Joylashuv aniqlanmadi. Manzil matn ko‘rinishida ishlatiladi.", 2500);
+    return null;
+  }
+}
+
+/* RASM URLLARI */
 function normalizeImagesInput(raw){
   if(!raw) return [];
   return raw
@@ -615,6 +702,12 @@ function subscribeClientOrders(){
     list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
 
     clientOrders = list;
+
+    // Telefon xotirasiga tarix sifatida saqlab qo‘yamiz
+    try{
+      localStorage.setItem(LOCAL_ORDERS_BACKUP_KEY, JSON.stringify(list));
+    }catch(e){}
+
     renderClientOrders();
     checkDeliveredThankYou();
 
@@ -629,47 +722,70 @@ function subscribeClientOrders(){
 
 function renderClientOrders(){
   if(!clientOrdersListEl) return;
-  if(!clientOrders.length){
-    clientOrdersListEl.innerHTML = "<p class='cart-empty'>Hozircha buyurtmangiz yo‘q.</p>";
+
+  function renderList(list, asHistory){
+    if(!list.length){
+      clientOrdersListEl.innerHTML = "<p class='cart-empty'>Hozircha buyurtmangiz yo‘q.</p>";
+      return;
+    }
+    clientOrdersListEl.innerHTML = "";
+    if(asHistory){
+      clientOrdersListEl.innerHTML += "<p class='section-sub'>Telefon xotirasidagi buyurtmalar tarixi:</p>";
+    }
+    list.forEach(o=>{
+      const created = o.createdAt?.seconds
+        ? new Date(o.createdAt.seconds*1000)
+        : null;
+      const dateStr = created
+        ? created.toLocaleString("uz-UZ",{hour12:false})
+        : "";
+      const itemsHtml = (o.items || []).map(i=>
+        `<li>${i.name} — ${i.qty} dona × ${formatPrice(i.price)} so‘m</li>`
+      ).join("");
+      clientOrdersListEl.innerHTML += `
+        <article class="order-card">
+          <header class="order-header">
+            <div>
+              <div class="order-id">ID: ${o.id.slice(0,8)}...</div>
+              ${dateStr ? `<div class="order-date">${dateStr}</div>` : ""}
+            </div>
+            <div class="order-total">${formatPrice(o.totalPrice)} so‘m</div>
+          </header>
+          <div class="order-status-row">
+            <span class="${statusClass(o.status)}">${statusLabel(o.status)}</span>
+          </div>
+          ${renderProgressHTML(o.status)}
+          <section class="order-items">
+            <strong>Mahsulotlar:</strong>
+            <ul>${itemsHtml}</ul>
+          </section>
+          <footer class="order-footer">
+            <span>Holat: ${statusLabel(o.status)}</span>
+            <span>${o.status==="delivered" ? "✅ Yakunlandi" :
+                    o.status==="rejected" ? "❌ Bekor qilingan" :
+                    "⏳ Jarayonda"}</span>
+          </footer>
+        </article>
+      `;
+    });
+  }
+
+  if(clientOrders.length){
+    renderList(clientOrders,false);
     return;
   }
-  clientOrdersListEl.innerHTML = "";
-  clientOrders.forEach(o=>{
-    const created = o.createdAt?.seconds
-      ? new Date(o.createdAt.seconds*1000)
-      : null;
-    const dateStr = created
-      ? created.toLocaleString("uz-UZ",{hour12:false})
-      : "";
-    const itemsHtml = (o.items || []).map(i=>
-      `<li>${i.name} — ${i.qty} dona × ${formatPrice(i.price)} so‘m</li>`
-    ).join("");
-    clientOrdersListEl.innerHTML += `
-      <article class="order-card">
-        <header class="order-header">
-          <div>
-            <div class="order-id">ID: ${o.id.slice(0,8)}...</div>
-            ${dateStr ? `<div class="order-date">${dateStr}</div>` : ""}
-          </div>
-          <div class="order-total">${formatPrice(o.totalPrice)} so‘m</div>
-        </header>
-        <div class="order-status-row">
-          <span class="${statusClass(o.status)}">${statusLabel(o.status)}</span>
-        </div>
-        ${renderProgressHTML(o.status)}
-        <section class="order-items">
-          <strong>Mahsulotlar:</strong>
-          <ul>${itemsHtml}</ul>
-        </section>
-        <footer class="order-footer">
-          <span>Holat: ${statusLabel(o.status)}</span>
-          <span>${o.status==="delivered" ? "✅ Yakunlandi" :
-                  o.status==="rejected" ? "❌ Bekor qilingan" :
-                  "⏳ Jarayonda"}</span>
-        </footer>
-      </article>
-    `;
-  });
+
+  // Firestore bo‘sh bo‘lsa, lokal tarixni ko‘rsatamiz
+  let backup = null;
+  try{
+    backup = JSON.parse(localStorage.getItem(LOCAL_ORDERS_BACKUP_KEY) || "null");
+  }catch(e){ backup = null; }
+
+  if(backup && backup.length){
+    renderList(backup,true);
+  }else{
+    renderList([],false);
+  }
 }
 
 /* REAL-TIME ORDERS (ADMIN) */
@@ -703,24 +819,50 @@ function setAdminOrderFilter(filter){
 function renderAdminOrders(){
   if(!adminOrdersListEl) return;
 
-  const visibleOrders = adminOrderFilter === "delivered"
-    ? adminOrders.filter(o => o.status === "delivered")
-    : adminOrders;
+  let visibleOrders;
+  switch(adminOrderFilter){
+    case "courier":
+      visibleOrders = adminOrders.filter(o => o.status === "courier");
+      break;
+    case "delivered":
+      visibleOrders = adminOrders.filter(o => o.status === "delivered");
+      break;
+    case "rejected":
+      visibleOrders = adminOrders.filter(o => o.status === "rejected");
+      break;
+    default:
+      visibleOrders = adminOrders;
+  }
 
   adminOrdersListEl.innerHTML = `
     <div class="admin-order-filters">
       <button
         class="btn-xs ${adminOrderFilter === "all" ? "btn-xs-primary" : "btn-xs-secondary"}"
         onclick="setAdminOrderFilter('all')">
-        Barcha buyurtmalar
+        Barcha
+      </button>
+      <button
+        class="btn-xs ${adminOrderFilter === "courier" ? "btn-xs-primary" : "btn-xs-secondary"}"
+        onclick="setAdminOrderFilter('courier')">
+        Kuryerda
       </button>
       <button
         class="btn-xs ${adminOrderFilter === "delivered" ? "btn-xs-primary" : "btn-xs-secondary"}"
         onclick="setAdminOrderFilter('delivered')">
         Yetkazilganlar
       </button>
+      <button
+        class="btn-xs ${adminOrderFilter === "rejected" ? "btn-xs-primary" : "btn-xs-secondary"}"
+        onclick="setAdminOrderFilter('rejected')">
+        Bekor qilinganlar
+      </button>
+      <button
+        class="btn-xs btn-xs-danger"
+        onclick="clearAllOrders()">
+        🧹 Barcha buyurtmalarni tozalash
+      </button>
     </div>
-  `;
+  ";
 
   if(!visibleOrders.length){
     adminOrdersListEl.innerHTML += "<p class='cart-empty'>Tanlangan bo‘limda buyurtma yo‘q.</p>";
@@ -738,6 +880,8 @@ function renderAdminOrders(){
       `<li>${i.name} — ${i.qty} dona × ${formatPrice(i.price)} so‘m</li>`
     ).join("");
     const customer = o.customer || {};
+    const hasLoc   = o.location && typeof o.location.lat === "number" && typeof o.location.lng === "number";
+
     adminOrdersListEl.innerHTML += `
       <article class="order-card">
         <header class="order-header">
@@ -750,6 +894,11 @@ function renderAdminOrders(){
             <div class="order-customer">
               📍 ${customer.address || "-"}
             </div>
+            ${hasLoc ? `
+              <div class="order-customer">
+                📍 GPS joylashuv mavjud
+              </div>
+            ` : ""}
           </div>
           <div class="order-total">${formatPrice(o.totalPrice)} so‘m</div>
         </header>
@@ -766,6 +915,12 @@ function renderAdminOrders(){
           <button class="btn-xs btn-xs-danger"    onclick="updateOrderStatus('${o.id}','rejected')">Bekor qilish</button>
           <button class="btn-xs btn-xs-secondary" onclick="updateOrderStatus('${o.id}','courier')">Kuryer oldi</button>
           <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','delivered')">Yetkazildi</button>
+          ${hasLoc ? `
+            <button class="btn-xs btn-xs-secondary"
+              onclick="openOrderLocation(${o.location.lat},${o.location.lng})">
+              📍 Marshrut
+            </button>
+          ` : ""}
         </div>
       </article>
     `;
@@ -790,6 +945,38 @@ async function updateOrderStatus(orderId, newStatus){
   }
 }
 
+/* ADMIN: BARCHA BUYURTMALARNI TOZALASH */
+async function clearAllOrders(){
+  const ok = confirm(
+    "🧹 Barcha buyurtmalarni Firestore’dan o‘chirishni xohlaysizmi?\n" +
+    "Bu amal barcha statusdagi buyurtmalarni tozalaydi."
+  );
+  if(!ok) return;
+
+  try{
+    const snap = await getDocs(ordersCol);
+    const promises = [];
+    snap.forEach(d=>{
+      promises.push(deleteDoc(d.ref));
+    });
+    await Promise.all(promises);
+    showToast("🧹 Barcha buyurtmalar o‘chirildi.");
+  }catch(e){
+    console.error("Barcha buyurtmalarni o‘chirish xato:", e);
+    showToast("⚠️ Buyurtmalarni tozalashda xato.");
+  }
+}
+
+/* GOOGLE MAPS — MARSHRUT OCHISH */
+function openOrderLocation(lat,lng){
+  if(typeof lat !== "number" || typeof lng !== "number"){
+    showToast("📍 Joylashuv ma’lumoti topilmadi.");
+    return;
+  }
+  const url = "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lng;
+  window.open(url, "_blank");
+}
+
 /* SEND ORDER */
 async function sendOrder(){
   if(cart.length===0){
@@ -801,6 +988,9 @@ async function sendOrder(){
     showToast("❌ Mijoz ma’lumoti kiritilmadi.");
     return;
   }
+
+  // Joylashuvni so‘raymiz (bir marta, keyingi zakazlarda saqlanganidan foydalanadi)
+  const location = await getOrAskLocation();
 
   let totalPrice = 0;
   const items = cart.map(c=>{
@@ -817,7 +1007,7 @@ async function sendOrder(){
   }).filter(Boolean);
 
   try{
-    const docRef = await addDoc(ordersCol,{
+    const payload = {
       clientId,
       customer,
       items,
@@ -825,7 +1015,17 @@ async function sendOrder(){
       status:"pending",
       createdAt:serverTimestamp(),
       updatedAt:serverTimestamp()
-    });
+    };
+    if(location){
+      payload.location = {
+        lat: location.lat,
+        lng: location.lng,
+        accuracy: location.accuracy || null,
+        ts: location.ts || Date.now()
+      };
+    }
+
+    const docRef = await addDoc(ordersCol, payload);
 
     showToast("✅ Buyurtma qabul qilindi. Holatini 'Buyurtmalarim' bo‘limidan ko‘rasiz.");
     cart = [];
@@ -1169,7 +1369,6 @@ function renderDetailImage(){
   if(detailImageIndexEl){
     detailImageIndexEl.textContent = `${detailImageIndex+1} / ${imgs.length}`;
   }
-  // ZOOM ENDI YO‘Q, transform qo‘llanmaydi
 }
 function changeDetailImage(delta){
   if(detailIndex===null) return;
@@ -1277,10 +1476,6 @@ if(detailQtyPlus){
   });
 }
 
-// ZOOM TUGMALARI LISTENERLARI HAM OLIB TASHLANDI
-// if(detailZoomInBtn){ ... }
-// if(detailZoomOutBtn){ ... }
-
 /* INIT */
 (function init(){
   const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
@@ -1322,3 +1517,5 @@ window.editProduct         = editProduct;
 
 window.updateOrderStatus   = updateOrderStatus;
 window.setAdminOrderFilter = setAdminOrderFilter;
+window.clearAllOrders      = clearAllOrders;
+window.openOrderLocation   = openOrderLocation;

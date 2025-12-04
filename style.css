@@ -4,47 +4,37 @@
   padding:0;
   box-sizing:border-box;
 }
-
 body{
   font-family:"Poppins",sans-serif;
   background:var(--bg);
   color:var(--text);
-  transition:background .25s ease,color .25s ease;
   -webkit-tap-highlight-color:transparent;
+  transition:background .25s ease,color .25s ease;
 }
-
 a{
   color:inherit;
   text-decoration:none;
 }
-
 .hidden{display:none!important}
 
-/* =========================================
-   THEME VARIABLES
-========================================= */
+/* THEME */
 :root{
-  --bg:#f3f4f6;
+  --bg:#f5f3f7;
   --bg-soft:#e5e7eb;
   --panel:#ffffff;
   --card:#ffffff;
-  --text:#0f172a;
+  --text:#111827;
   --muted:#6b7280;
-
   --accent:#ec4899;
   --accent-soft:#fbcfe8;
-
   --border:rgba(0,0,0,0.08);
-  --shadow:0 2px 12px rgba(0,0,0,0.08);
-
+  --shadow:0 4px 18px rgba(15,23,42,.12);
   --radius:12px;
-  --radius-lg:20px;
-
+  --radius-lg:22px;
   --danger:#ef4444;
   --ok:#22c55e;
   --warning:#f59e0b;
 }
-
 body.theme-dark{
   --bg:#050816;
   --bg-soft:#0b1020;
@@ -52,28 +42,23 @@ body.theme-dark{
   --card:#111827;
   --text:#f9fafb;
   --muted:#9ca3af;
-
   --accent:#ec4899;
   --accent-soft:#9d174d;
-
-  --border:rgba(148,163,184,0.35);
-  --shadow:0 16px 40px rgba(0,0,0,0.45);
+  --border:rgba(148,163,184,.35);
+  --shadow:0 16px 40px rgba(0,0,0,.55);
 }
 
-/* =========================================
-   LAYOUT
-========================================= */
+/* LAYOUT */
 .page{
   min-height:100vh;
-  background:radial-gradient(circle at top,#1e293b 0,transparent 50%),var(--bg);
+  background:radial-gradient(circle at top,#1e293b 0,transparent 55%),var(--bg);
 }
 
-/* =========================================
-   HEADER
-========================================= */
+/* HEADER */
 .app-header{
   position:sticky;
   top:0;
+  z-index:50;
   background:var(--panel);
   padding:10px 16px;
   display:flex;
@@ -81,18 +66,15 @@ body.theme-dark{
   justify-content:space-between;
   border-bottom:1px solid var(--border);
   box-shadow:var(--shadow);
-  z-index:50;
 }
-
 .logo-wrap{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
 }
-
 .logo-circle{
-  width:44px;
-  height:44px;
+  width:46px;
+  height:46px;
   border-radius:50%;
   background:var(--accent);
   display:flex;
@@ -101,218 +83,168 @@ body.theme-dark{
   color:#fff;
   font-size:18px;
   font-weight:600;
-  box-shadow:0 4px 10px rgba(0,0,0,0.25);
 }
-
-.logo-text .logo-title{
+.logo-title{
   font-size:18px;
   font-weight:600;
 }
-
-.logo-text .logo-sub{
+.logo-sub{
   font-size:12px;
   color:var(--muted);
-  margin-top:-2px;
 }
-
 .header-right{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
 }
-
 .icon-btn{
   background:var(--panel);
   border:1px solid var(--border);
+  border-radius:999px;
   padding:7px 10px;
-  border-radius:var(--radius);
   cursor:pointer;
-  font-size:17px;
-  color:var(--text);
+  font-size:16px;
 }
-
 .cart-top-btn{
   background:var(--accent);
   border:none;
-  color:#fff;
-  padding:8px 14px;
-  font-size:14px;
   border-radius:999px;
-  cursor:pointer;
+  color:#fff;
+  padding:7px 12px;
   display:flex;
   align-items:center;
   gap:6px;
+  font-size:13px;
 }
-
 .pill{
-  background:rgba(255,255,255,0.18);
-  padding:2px 8px;
+  background:rgba(255,255,255,.2);
   border-radius:999px;
-  font-size:12px;
+  padding:2px 8px;
+  font-size:11px;
 }
-
 .cart-top-total{
+  font-size:13px;
   font-weight:600;
   color:var(--accent);
 }
 
-/* =========================================
-   TABS
-========================================= */
+/* TABS */
 .tabs{
-  display:flex;
-  gap:4px;
-  background:var(--bg-soft);
-  padding:6px;
-  border-bottom:1px solid var(--border);
   position:sticky;
   top:64px;
   z-index:45;
+  background:var(--bg-soft);
+  padding:6px;
+  display:flex;
+  gap:4px;
+  border-bottom:1px solid var(--border);
 }
-
 .tab-btn{
   flex:1;
-  background:none;
   border:none;
-  padding:10px 8px;
-  font-size:14px;
-  cursor:pointer;
+  background:transparent;
   border-radius:999px;
+  padding:9px 6px;
+  font-size:13px;
+  cursor:pointer;
   color:var(--muted);
 }
-
 .tab-btn.active{
   background:var(--accent);
   color:#fff;
 }
-
-/* Admin active indikator */
 .admin-active{
   border-color:var(--accent);
   color:var(--accent);
 }
 
-/* =========================================
-   CUSTOMER PANEL
-========================================= */
+/* CUSTOMER PANEL */
 .customer-panel{
-  padding:12px 16px;
   background:var(--panel);
   border-bottom:1px solid var(--border);
+  padding:10px 16px;
 }
-
 .customer-info{
+  font-size:13px;
   margin-bottom:8px;
-  font-size:14px;
 }
-
 .customer-actions{
   display:flex;
   gap:8px;
 }
-
-.btn-outline{
-  background:none;
-  border:1px solid var(--accent);
-  color:var(--accent);
-  padding:6px 12px;
-  border-radius:999px;
-  font-size:13px;
-  cursor:pointer;
-}
-
+.btn-outline,
 .btn-ghost{
-  background:none;
-  border:1px solid var(--border);
-  color:var(--text);
-  padding:6px 12px;
   border-radius:999px;
-  font-size:13px;
+  padding:6px 12px;
+  border:1px solid var(--border);
+  font-size:12px;
+  background:transparent;
   cursor:pointer;
 }
+.btn-outline{
+  border-color:var(--accent);
+  color:var(--accent);
+}
 
-/* =========================================
-   SHOP PAGE TOOLBAR
-========================================= */
+/* SHOP TOOLBAR */
 .shop-toolbar{
   background:var(--panel);
-  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  padding:10px 16px;
   display:flex;
   align-items:center;
-  gap:10px;
-  border-bottom:1px solid var(--border);
+  gap:8px;
 }
-
 .search-input{
   flex:1;
-  padding:8px 14px;
   border-radius:999px;
   border:1px solid var(--border);
+  padding:8px 12px;
   background:var(--bg);
-  color:var(--text);
-  font-size:14px;
+  font-size:13px;
 }
 
-/* =========================================
-   CATEGORY GRID (4 ta qatorda)
-========================================= */
+/* CATEGORY GRID (4 ta) */
 .chips-row{
   background:var(--panel);
   border-bottom:1px solid var(--border);
-  padding:10px 12px 12px;
+  padding:10px 10px 12px;
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:8px;
 }
-
 .chip{
-  padding:9px 4px;
   border-radius:var(--radius);
-  font-size:11px;
   border:1px solid var(--border);
-  cursor:pointer;
   background:var(--bg);
-  color:var(--text);
+  padding:9px 4px;
+  font-size:11px;
   text-align:center;
-  line-height:1.2;
+  cursor:pointer;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  min-height:46px;
+  min-height:44px;
 }
-
-.chip span{
-  display:block;
-}
-
+.chip span{display:block;}
 .chip.active{
   background:var(--accent);
   color:#fff;
   border-color:var(--accent);
 }
-
-/* Kattaroq ekranlarda text biroz kattaroq */
-@media (min-width:480px){
-  .chip{
-    font-size:12px;
-    min-height:50px;
-  }
+@media(min-width:480px){
+  .chip{font-size:12px;min-height:50px;}
 }
 
-/* =========================================
-   PRODUCTS LIST — WEBAPP STYLE
-========================================= */
+/* PRODUCTS – KATTA KARTOCHKA */
 .products-grid{
-  /* telefonda TAGMA-TAG (bitta ustun) */
   display:flex;
   flex-direction:column;
   gap:12px;
   padding:12px;
 }
-
-/* katta ekranlarda gridga o‘tamiz */
-@media (min-width:768px){
+@media(min-width:768px){
   .products-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
@@ -320,149 +252,115 @@ body.theme-dark{
     padding:16px;
   }
 }
-
 .product-card{
   background:var(--card);
   border-radius:var(--radius-lg);
   box-shadow:var(--shadow);
+  overflow:hidden;
   cursor:pointer;
   display:flex;
   flex-direction:column;
-  transition:transform .18s ease,box-shadow .18s ease;
-  overflow:hidden;
+  transition:transform .18s,box-shadow .18s;
 }
-
-/* telefonda hover keraksiz, ammo qolaversin */
 .product-card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 18px 40px rgba(0,0,0,0.35);
+  transform:translateY(-3px);
 }
-
 .product-img-wrap{
   position:relative;
   width:100%;
-  overflow:hidden;
 }
-
-/* RASM KATTA – EKRANNI YAXSHI TO‘LDIRADI */
 .product-img-wrap img{
   width:100%;
-  height:220px;
+  height:240px;
   object-fit:cover;
   display:block;
 }
-
-@media (min-width:768px){
-  .product-img-wrap img{
-    height:240px;
-  }
+@media(min-width:768px){
+  .product-img-wrap img{height:260px;}
 }
-
 .product-img-tag{
   position:absolute;
-  top:6px;
-  left:6px;
+  top:6px; left:6px;
   display:flex;
   gap:4px;
-  font-size:11px;
+  font-size:10px;
 }
-
 .product-img-tag span{
   padding:2px 6px;
   border-radius:999px;
-  background:rgba(0,0,0,0.6);
+  background:rgba(0,0,0,.55);
   color:#f9fafb;
 }
-
 .product-sale{
   position:absolute;
-  right:6px;
-  top:6px;
-  padding:4px 8px;
+  right:6px; top:6px;
+  padding:3px 7px;
   border-radius:999px;
   font-size:11px;
   background:var(--danger);
   color:#fff;
   font-weight:600;
 }
-
-/* CARD BODY TELEFON UCHUN */
 .product-body{
   padding:10px 12px 12px;
 }
-
 .product-name{
-  font-size:14px;
+  font-size:15px;
   font-weight:600;
 }
-
 .product-meta{
   font-size:12px;
   color:var(--muted);
   margin-top:2px;
 }
-
 .tag-mini{
   margin-top:6px;
   font-size:11px;
   color:var(--accent);
-  background:rgba(236,72,153,0.08);
+  background:rgba(236,72,153,.08);
   padding:3px 7px;
   border-radius:999px;
   display:inline-block;
 }
-
 .price-row{
   margin-top:8px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:8px;
 }
-
 .price-main{
-  font-size:15px;
+  font-size:16px;
   font-weight:700;
   color:var(--accent);
 }
-
 .price-old{
   font-size:11px;
   text-decoration:line-through;
   color:var(--muted);
 }
-
 .btn-add{
   border:none;
+  border-radius:999px;
   background:var(--accent);
   color:#fff;
   font-size:12px;
   padding:7px 12px;
-  border-radius:999px;
   cursor:pointer;
-  white-space:nowrap;
 }
 
-/* =========================================
-   CART SHEET (BOTTOM SHEET)
-========================================= */
+/* CART BOTTOM SHEET */
 .overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,.5);
   backdrop-filter:blur(3px);
-  z-index:90;
   display:none;
+  z-index:90;
 }
-
-.overlay.show{
-  display:block;
-}
-
+.overlay.show{display:block;}
 .cart-sheet{
   position:fixed;
-  left:0;
-  right:0;
+  left:0; right:0;
   bottom:-100%;
   background:var(--panel);
   max-height:80%;
@@ -473,361 +371,221 @@ body.theme-dark{
   transition:bottom .3s ease;
   z-index:100;
 }
-
-.cart-sheet.open{
-  bottom:0;
-}
-
+.cart-sheet.open{bottom:0;}
 .cart-sheet header{
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  margin-bottom:12px;
-}
-
-.cart-sheet header h2{
-  font-size:18px;
-}
-
-.cart-sheet footer{
-  margin-top:12px;
-}
-
-.cart-sheet-total-row{
-  font-size:16px;
+  align-items:center;
   margin-bottom:10px;
 }
-
-/* CART ITEMS */
-.cart-empty{
-  font-size:14px;
-  color:var(--muted);
-}
-
+.cart-sheet-total-row{font-size:15px;margin-bottom:8px;}
+.cart-empty{font-size:14px;color:var(--muted);}
 .cart-item-row{
   display:flex;
   justify-content:space-between;
   gap:10px;
-  padding:8px 0;
+  padding:7px 0;
   border-bottom:1px solid var(--border);
 }
-
-.cart-item-main{
-  flex:1;
-}
-
-.cart-item-name{
-  font-size:14px;
-  font-weight:500;
-}
-
-.cart-item-meta{
-  font-size:12px;
-  color:var(--muted);
-}
-
+.cart-item-main{flex:1;}
+.cart-item-name{font-size:14px;font-weight:500;}
+.cart-item-meta{font-size:12px;color:var(--muted);}
 .cart-item-actions{
   display:flex;
   flex-direction:column;
   align-items:flex-end;
   gap:4px;
 }
-
 .qty-control{
   display:flex;
   align-items:center;
   gap:4px;
 }
-
 .qty-control button{
   width:22px;
   height:22px;
   border-radius:999px;
   border:1px solid var(--border);
   background:var(--bg);
-  color:var(--text);
-  font-size:14px;
+  font-size:13px;
   cursor:pointer;
 }
-
-.cart-item-total{
-  font-size:13px;
-  font-weight:600;
-}
-
+.cart-item-total{font-size:13px;font-weight:600;}
 .cart-remove{
   border:none;
   background:none;
   color:var(--danger);
-  font-size:14px;
+  font-size:13px;
   cursor:pointer;
 }
 
-/* =========================================
-   GENERAL BUTTONS
-========================================= */
+/* BUTTONS */
 .btn-primary{
+  border:none;
+  border-radius:999px;
   background:var(--accent);
   color:#fff;
-  border:none;
   padding:9px 14px;
-  border-radius:999px;
-  cursor:pointer;
   font-size:14px;
+  cursor:pointer;
 }
+.btn-full{width:100%;}
+.btn-primary.admin-btn{font-size:13px;margin-top:8px;}
+.admin-btn-success{background:var(--ok);}
 
-.btn-full{
-  width:100%;
-  padding:11px 14px;
-  font-size:15px;
-}
-
-.btn-primary.admin-btn{
-  font-size:13px;
-  margin-top:10px;
-}
-
-.admin-btn-success{
-  background:var(--ok);
-}
-
-/* =========================================
-   ORDERS LIST – TELEFON UCHUN KATTAROQ
-========================================= */
+/* ORDERS */
 .section-title{
   font-size:18px;
   font-weight:600;
   margin:14px 16px 0;
 }
-
 .section-sub{
   font-size:13px;
   color:var(--muted);
   margin:4px 16px 8px;
 }
-
 .orders-list{
   padding:10px 16px 20px;
 }
-
 .order-card{
   background:var(--card);
-  padding:16px 14px;
   border-radius:var(--radius-lg);
   box-shadow:var(--shadow);
-  margin-bottom:14px;
+  padding:14px;
+  margin-bottom:12px;
 }
-
 .order-header{
   display:flex;
   justify-content:space-between;
   gap:10px;
-  margin-bottom:8px;
+  margin-bottom:6px;
 }
-
-.order-id{
+.order-id,
+.order-date,
+.order-customer{
   font-size:12px;
   color:var(--muted);
 }
-
-.order-date{
-  font-size:12px;
-  color:var(--muted);
-}
-
 .order-total{
   font-size:18px;
   font-weight:700;
   color:var(--accent);
 }
-
-.order-status-row{
-  margin:8px 0;
-}
-
 .order-items{
   margin-top:6px;
-  font-size:14px;
+  font-size:13px;
 }
-
 .order-items ul{
+  margin-top:3px;
   margin-left:16px;
-  margin-top:4px;
 }
-
-.order-items li{
-  margin-bottom:2px;
-}
-
 .order-footer{
-  margin-top:8px;
+  margin-top:6px;
   font-size:12px;
   display:flex;
   justify-content:space-between;
   color:var(--muted);
 }
 
-.order-customer{
-  font-size:12px;
-  color:var(--muted);
-}
-
-/* =========================================
-   STATUS BADGE + PROGRESS
-========================================= */
+/* STATUS + PROGRESS */
 .status-pill{
   display:inline-block;
-  padding:4px 10px;
+  padding:3px 9px;
   border-radius:999px;
-  font-size:12px;
+  font-size:11px;
   font-weight:600;
 }
+.status-pending{background:var(--bg-soft);color:var(--muted);}
+.status-confirmed{background:var(--accent-soft);color:var(--accent);}
+.status-courier{background:var(--warning);color:#fff;}
+.status-delivered{background:var(--ok);color:#fff;}
+.status-rejected{background:var(--danger);color:#fff;}
 
-.status-pending{
-  background:var(--bg-soft);
-  color:var(--muted);
-}
-.status-confirmed{
-  background:var(--accent-soft);
-  color:var(--accent);
-}
-.status-courier{
-  background:var(--warning);
-  color:#fff;
-}
-.status-delivered{
-  background:var(--ok);
-  color:#fff;
-}
-.status-rejected{
-  background:var(--danger);
-  color:#fff;
-}
-
-/* PROGRESS */
-.progress-wrap{
-  margin-top:6px;
-  margin-bottom:6px;
-}
-
+.progress-wrap{margin:6px 0;}
 .progress-label{
-  font-size:12px;
+  font-size:11px;
   color:var(--muted);
-  margin-bottom:4px;
+  margin-bottom:3px;
 }
-
 .progress-line{
-  height:5px;
+  height:4px;
   border-radius:999px;
   background:var(--bg-soft);
   overflow:hidden;
 }
-
 .progress-fill{
   height:100%;
   background:var(--accent);
   width:0;
-  transition:width .25s ease;
 }
-
 .progress-steps{
   display:flex;
   justify-content:space-between;
-  margin-top:4px;
-}
-
-.progress-step{
-  font-size:11px;
+  margin-top:3px;
+  font-size:10px;
   color:var(--muted);
 }
-
 .progress-step.active{
   color:var(--accent);
   font-weight:600;
 }
 
-/* =========================================
-   ADMIN PANEL
-========================================= */
-.admin-page{
-  padding-top:8px;
-}
-
+/* ADMIN */
+.admin-page{padding-top:8px;}
 .admin-cols{
   padding:0 16px 16px;
   display:flex;
   flex-direction:column;
   gap:16px;
 }
-
-@media (min-width:900px){
+@media(min-width:900px){
   .admin-cols{
     flex-direction:row;
     align-items:flex-start;
   }
 }
-
-.admin-col{
-  flex:1;
-}
-
+.admin-col{flex:1;}
 .card{
   background:var(--card);
   border-radius:var(--radius-lg);
   box-shadow:var(--shadow);
-  padding:14px;
+  padding:12px;
 }
-
-.admin-card{
-  margin-bottom:16px;
-}
-
 .card-title{
   font-size:15px;
   font-weight:600;
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
-
 .form-grid{
   display:grid;
   grid-template-columns:1fr;
-  gap:8px;
+  gap:7px;
   font-size:13px;
 }
-
 .form-grid label{
   display:flex;
   flex-direction:column;
   gap:4px;
 }
-
 .form-grid input,
 .form-grid select,
 .form-grid textarea{
   border-radius:var(--radius);
   border:1px solid var(--border);
-  padding:6px 10px;
+  padding:6px 9px;
   background:var(--bg);
-  color:var(--text);
   font-size:13px;
 }
-
 .form-grid textarea{
   min-height:60px;
   resize:vertical;
 }
-
 .checkbox-row{
   flex-direction:row;
   align-items:center;
   gap:6px;
 }
-
-.admin-list{
-  margin-top:10px;
-}
-
-/* Admin product/category rows */
+.admin-list{margin-top:8px;}
 .admin-product-row{
   display:flex;
   justify-content:space-between;
@@ -836,7 +594,6 @@ body.theme-dark{
   border-bottom:1px solid var(--border);
   font-size:13px;
 }
-
 .admin-edit-btn,
 .admin-delete-btn{
   border:none;
@@ -844,22 +601,14 @@ body.theme-dark{
   cursor:pointer;
   font-size:14px;
 }
+.admin-edit-btn{color:var(--accent);}
+.admin-delete-btn{color:var(--danger);}
 
-.admin-edit-btn{
-  color:var(--accent);
-}
-
-.admin-delete-btn{
-  color:var(--danger);
-}
-
-/* ADMIN ORDER FILTERS & ACTIONS */
 .admin-order-filters{
   display:flex;
   gap:8px;
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
-
 .btn-xs{
   padding:5px 9px;
   font-size:11px;
@@ -867,185 +616,153 @@ body.theme-dark{
   border:1px solid var(--border);
   cursor:pointer;
 }
-
 .btn-xs-primary{
   background:var(--accent);
   color:#fff;
   border-color:var(--accent);
 }
-
 .btn-xs-secondary{
   background:var(--panel);
   color:var(--text);
 }
-
 .btn-xs-danger{
   background:var(--danger);
   color:#fff;
   border-color:var(--danger);
 }
-
 .admin-order-actions{
-  margin-top:10px;
+  margin-top:8px;
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
+  gap:6px;
 }
 
-/* =========================================
-   PRODUCT DETAIL – FULLSCREEN WEBAPP
-========================================= */
+/* PRODUCT DETAIL (MODAL) */
 .detail-overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.6);
-  backdrop-filter:blur(2px);
+  background:rgba(0,0,0,.6);
   display:flex;
-  align-items:flex-start;
   justify-content:center;
+  align-items:flex-start;
   padding:0;
   z-index:100;
 }
-
 .detail-card{
   background:var(--card);
   width:100%;
   max-width:480px;
   height:100vh;
   border-radius:0;
-  padding:10px 16px 16px;
+  padding:12px 16px 16px;
   box-shadow:var(--shadow);
   position:relative;
   overflow-y:auto;
 }
-
 .detail-close{
   position:absolute;
   right:10px;
   top:10px;
-  background:none;
   border:none;
+  background:none;
   font-size:18px;
-  color:var(--text);
   cursor:pointer;
 }
-
 .detail-img-wrap{
+  margin-top:28px;
   position:relative;
-  margin-top:26px; /* yuqorida title + close uchun joy */
 }
-
 .detail-img-wrap img{
   width:100%;
-  border-radius:var(--radius);
   max-height:56vh;
+  border-radius:var(--radius);
   object-fit:cover;
 }
-
 .detail-nav-btn{
   position:absolute;
   top:50%;
   transform:translateY(-50%);
-  background:rgba(0,0,0,0.45);
   border:none;
+  background:rgba(0,0,0,.45);
   color:#fff;
-  font-size:22px;
+  font-size:20px;
   padding:4px 9px;
   cursor:pointer;
 }
-
 #detailPrevBtn{left:6px;}
 #detailNextBtn{right:6px;}
-
 .detail-img-index{
   position:absolute;
   bottom:6px;
   right:10px;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,.55);
   color:#fff;
-  padding:3px 8px;
   border-radius:999px;
-  font-size:12px;
+  padding:3px 8px;
+  font-size:11px;
 }
-
-.detail-body{
-  margin-top:14px;
-}
-
+.detail-body{margin-top:14px;}
 .detail-category{
   font-size:12px;
   color:var(--accent);
 }
-
 .detail-name{
   font-size:18px;
   font-weight:600;
-  margin:4px 0;
 }
-
 .detail-desc{
   font-size:13px;
   color:var(--muted);
   margin-top:4px;
 }
-
 .detail-tag{
   font-size:12px;
-  margin-top:4px;
   color:var(--accent);
+  margin-top:4px;
 }
-
 .detail-price-row{
-  margin-top:12px;
+  margin-top:10px;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
-
 .detail-price-main{
   font-size:20px;
   font-weight:700;
   color:var(--accent);
 }
-
 .detail-price-old{
-  text-decoration:line-through;
   font-size:12px;
+  text-decoration:line-through;
   color:var(--muted);
 }
 
-/* =========================================
-   TOAST
-========================================= */
+/* TOAST */
 .toast{
   position:fixed;
-  bottom:20px;
+  bottom:18px;
   left:50%;
   transform:translateX(-50%) translateY(130%);
   background:var(--accent);
   color:#fff;
-  padding:10px 16px;
+  padding:9px 14px;
   border-radius:999px;
-  font-size:14px;
+  font-size:13px;
   box-shadow:var(--shadow);
   opacity:0;
   transition:opacity .25s,transform .25s;
   z-index:200;
 }
-
 .toast.show{
   opacity:1;
   transform:translateX(-50%) translateY(0);
 }
 
-/* =========================================
-   SCROLLBAR
-========================================= */
+/* SCROLLBAR */
 ::-webkit-scrollbar{
-  height:5px;
   width:5px;
+  height:5px;
 }
-
 ::-webkit-scrollbar-thumb{
   background:var(--accent);
   border-radius:999px;
