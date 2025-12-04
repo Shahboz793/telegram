@@ -27,7 +27,7 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const db   = getFirestore(app);
 
-// 🔥 KOLLEKSIYALAR
+// KOLLEKSIYALAR
 const productsCol   = collection(db, "beauty_products");
 const categoriesCol = collection(db, "beauty_categories");
 
@@ -37,13 +37,9 @@ const STORAGE_CUSTOMER = "beauty_customer_info";
 const THEME_KEY        = "beauty_theme";
 const RAW_PREFIX       = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
 
-// DEFAULT EMOJI / LABEL (fallback uchun)
-const categoryEmoji = {
-  "default": "💅"
-};
+// DEFAULT EMOJI / LABEL
+const categoryEmoji = { "default": "💅" };
 const categoryLabel = {};
-
-// DEFAULT MAHSULOTLAR
 const defaultProducts = [];
 
 // STATE
@@ -53,7 +49,7 @@ let cart           = [];
 let activeCategory = "all";
 let currentSearch  = "";
 let isAdmin        = false;
-let orderJustSent  = false;  // 🔁 Buyurtma hozirgina yuborildimi?
+let orderJustSent  = false;
 
 // KATEGORIYA STATE
 let categories         = [];
@@ -97,12 +93,10 @@ const detailOldPriceEl     = document.getElementById("detailOldPrice");
 const detailAddBtn         = document.getElementById("detailAddBtn");
 const detailBackBtn        = document.getElementById("detailBackBtn");
 
-// Galereya tugmalari
 const detailPrevBtn      = document.getElementById("detailPrevBtn");
 const detailNextBtn      = document.getElementById("detailNextBtn");
 const detailImageIndexEl = document.getElementById("detailImageIndex");
 
-// Miqdor tugmalari
 const detailQtyMinus = document.getElementById("detailQtyMinus");
 const detailQtyPlus  = document.getElementById("detailQtyPlus");
 const detailQtyValue = document.getElementById("detailQtyValue");
@@ -142,9 +136,7 @@ function normalizeImagesInput(raw) {
     .map(s => s.trim())
     .filter(Boolean)
     .map(token => {
-      if (/^https?:\/\//i.test(token)) {
-        return token;
-      }
+      if (/^https?:\/\//i.test(token)) return token;
       const name = token.replace(/\.(png|jpg|jpeg)$/i, "");
       return RAW_PREFIX + name + ".png";
     });
@@ -234,11 +226,8 @@ function askCustomerInfo() {
       "OK — Ha, shu ma'lumotlar bilan\n" +
       "Cancel — Yangi ma'lumot kiritaman"
     );
-    if (ok) {
-      return info;
-    } else {
-      return promptNewCustomerInfo();
-    }
+    if (ok) return info;
+    return promptNewCustomerInfo();
   }
 
   return promptNewCustomerInfo();
@@ -247,7 +236,7 @@ function askCustomerInfo() {
 function resetCustomerInfo() {
   localStorage.removeItem(STORAGE_CUSTOMER);
   renderCustomerInfo();
-  showToast("👤 Mijoz ma'lumotlari o'chirildi. Keyingi buyurtmada qaytadan kiritasiz.");
+  showToast("👤 Mijoz ma'lumotlari o'chirildi.");
 }
 
 function editCustomerInfo() {
@@ -435,12 +424,6 @@ if (searchInput) {
 function addToCart(index, qty = 1) {
   if (qty <= 0) return;
 
-  // Eski buyurtma hozirgina yuborilgan bo‘lsa, yangi mahsulot qo‘shishda savatni tozalaymiz
-  if (orderJustSent) {
-    cart = [];
-    orderJustSent = false;
-  }
-
   const found = cart.find(c => c.index === index);
   if (found) {
     found.qty += qty;
@@ -475,9 +458,7 @@ function toggleCartSheet(force) {
   const next   = typeof force === "boolean" ? force : !isOpen;
   cartSheet.classList.toggle("open", next);
   cartSheetOverlay.classList.toggle("show", next);
-  if (next) {
-    renderCartItems();
-  }
+  if (next) renderCartItems();
 }
 
 function renderCartItems() {
@@ -554,25 +535,20 @@ function openTelegramUrl(url) {
   } catch (e) {
     window.location.href = url;
   }
-  // tg.close() yo‘q – WebApp yopilmaydi
 }
 
 /* HISTORY (LOCAL) – SAQLANMAYDI */
-function saveOrderHistory(order) {
-  // bo‘sh
-}
-
+function saveOrderHistory(order) { }
 function renderHistory() {
   if (!historyListEl) return;
   historyListEl.innerHTML =
     "<p class='history-empty'>Buyurtmalar tarixi hozircha saqlanmaydi. Har bir buyurtma alohida yuboriladi.</p>";
 }
-
 function clearHistory() {
   showToast("Tarix saqlanmaydi, tozalashga hojat yo‘q 🙂");
 }
 
-/* TELEGRAMGA BUYURTMA */
+/* TELEGRAMGA BUYURTMA — 1 MARTA, BOTGA, SAVATNI TOZALAB WEBAPP YOPADI */
 function sendOrder() {
   if (cart.length === 0) {
     showToast("Savat bo‘sh. Avval mahsulot tanlang 🙂");
@@ -605,9 +581,7 @@ function sendOrder() {
   text += "ONLINE MAGAZIN YANGIOBOD — Onlayn buyurtma\n";
   text += "━━━━━━━━━━━━━━━━━━━━\n";
   text += "🧺 Savatimdagi mahsulotlar:\n\n";
-  lines.forEach(l => {
-    text += "• " + l + "\n";
-  });
+  lines.forEach(l => { text += "• " + l + "\n"; });
   text += "\n💰 Umumiy summa: " + totalStr + " so‘m\n";
   text += "📦 Buyurtma turi: Kosmetika mahsulotlari\n";
   text += "━━━━━━━━━━━━━━━━━━━━\n";
@@ -617,20 +591,31 @@ function sendOrder() {
   text += "✍️ Qo‘shimcha izoh: _______\n";
 
   const encoded = encodeURIComponent(text);
-
-  // Faqat shu botga yuborish:
   const baseUrl = "https://t.me/Kitobchiqarishxizmati_bot";
+  const url     = `${baseUrl}?text=${encoded}&t=${Date.now()}`;
 
-  // Bir xil bo‘lsa ham qayta-qayta yuborish uchun har safar yangi URL:
-  const url = `${baseUrl}?text=${encoded}&t=${Date.now()}`;
+  const tg = window.Telegram && window.Telegram.WebApp;
 
+  // 1) Bot chatini ochamiz
   openTelegramUrl(url);
 
-  // Savatni ichidan tozalamaymiz, faqat oynani yashiramiz
-  toggleCartSheet(false);
+  // 2) Biroz kutib, hamma narsani tozalaymiz va WebAppni yopamiz
+  setTimeout(() => {
+    cart = [];
+    updateCartUI();
+    renderCartItems();
+    toggleCartSheet(false);
 
-  // Keyingi addToCart chaqirilganda eski savat avtomatik 0 qilinadi
-  orderJustSent = true;
+    // mijoz ma'lumotlarini ham eslab qolmasin
+    localStorage.removeItem(STORAGE_CUSTOMER);
+    renderCustomerInfo();
+
+    orderJustSent = false;
+
+    if (tg && typeof tg.close === "function") {
+      try { tg.close(); } catch (e) {}
+    }
+  }, 600);
 
   showToast("✅ Buyurtma matni tayyorlandi. Telegramda 'Yuborish' tugmasini bosing.");
 }
@@ -788,22 +773,11 @@ async function addCustomProduct() {
   }
 
   let images = normalizeImagesInput(adminImagesEl.value.trim());
-  if (!images.length) {
-    images = [RAW_PREFIX + "noimage.png"];
-  }
+  if (!images.length) images = [RAW_PREFIX + "noimage.png"];
 
   const emoji = categoryEmoji[category] || "💅";
 
-  const payload = {
-    name,
-    price,
-    oldPrice,
-    category,
-    emoji,
-    tag,
-    description,
-    images,
-  };
+  const payload = { name, price, oldPrice, category, emoji, tag, description, images };
 
   try {
     if (editingProductId) {
@@ -915,9 +889,7 @@ function editProduct(id) {
   adminImagesEl.value      = (p.images && p.images.length) ? p.images.join(", ") : "";
 
   const btn = document.querySelector(".admin-btn");
-  if (btn) {
-    btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
-  }
+  if (btn) btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
 
   showToast("✏️ Tahrirlash rejimi: formani o‘zgartirib, saqlang");
 }
@@ -1065,11 +1037,7 @@ function changeDetailImage(delta) {
 function updateDetailCountdownUI() {
   if (!detailBackBtn) return;
   detailBackBtn.textContent = `◀ Magaziniga qaytish (${detailCountdownRemaining} s)`;
-  if (detailCountdownRemaining <= 6) {
-    detailBackBtn.style.color = "#ef4444";
-  } else {
-    detailBackBtn.style.color = "";
-  }
+  detailBackBtn.style.color = (detailCountdownRemaining <= 6) ? "#ef4444" : "";
 }
 
 function clearDetailCountdown() {
@@ -1131,9 +1099,7 @@ function openProductDetail(index) {
     detailOldPriceEl.classList.add("hidden");
   }
 
-  if (detailQtyValue) {
-    detailQtyValue.textContent = detailQty;
-  }
+  if (detailQtyValue) detailQtyValue.textContent = detailQty;
 
   detailAddBtn.classList.remove("added");
   detailAddBtn.textContent = "🛒 Savatga qo‘shish";
@@ -1168,10 +1134,7 @@ if (detailAddBtn) {
     detailAddBtn.classList.add("added");
     detailAddBtn.textContent = "⬅️ Magaziniga qaytish";
 
-    if (detailBackBtn) {
-      detailBackBtn.classList.remove("hidden");
-    }
-
+    if (detailBackBtn) detailBackBtn.classList.remove("hidden");
     startDetailCountdown();
   });
 }
@@ -1184,9 +1147,7 @@ if (detailBackBtn) {
 
 if (productDetailOverlay) {
   productDetailOverlay.addEventListener("click", (e) => {
-    if (e.target === productDetailOverlay) {
-      closeProductDetail();
-    }
+    if (e.target === productDetailOverlay) closeProductDetail();
   });
 }
 
