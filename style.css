@@ -87,12 +87,19 @@ body.theme-dark{
   font-weight:700;
   font-size:20px;
 }
-.hdr-right{
+
+/* eski nomlar bilan birga, yangi .header-right ham ishlasin */
+.hdr-right,
+.header-right{
   display:flex;
   gap:10px;
 }
+
+/* theme tugma + savat tugmasi */
 .hdr-btn,
-.cart-btn{
+.cart-btn,
+.theme-btn,
+.cart-top{
   padding:8px 12px;
   font-size:18px;
   border:none;
@@ -100,9 +107,17 @@ body.theme-dark{
   color:var(--text);
   border-radius:var(--radius);
   cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
-.cart-btn span{
+.cart-btn span,
+.cart-top span{
   font-weight:600;
+}
+.cart-top small{
+  font-size:12px;
+  color:var(--muted);
 }
 
 /* =========================================
@@ -133,11 +148,16 @@ body.theme-dark{
 /* =========================================
    SEARCH
 ========================================= */
-.search-wrap{
+/* eski .search-wrap bilan birga .search-box ham */
+.search-wrap,
+.search-box{
   padding:12px;
   background:var(--panel);
 }
-.search-input{
+
+/* input uchun ham .search-input, ham #searchInput ishlasin */
+.search-input,
+#searchInput{
   width:100%;
   padding:12px 15px;
   font-size:16px;
@@ -785,7 +805,8 @@ body.theme-dark{
   padding:16px;
 }
 
-#customerOrdersList{
+/* bu yerda id ni ordersList ga mosladik */
+#ordersList{
   padding:14px;
   display:flex;
   flex-direction:column;
