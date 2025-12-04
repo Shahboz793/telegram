@@ -6,15 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="theme-color" content="#0f172a" />
 
-  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <!-- HEADER -->
   <header class="header">
     <div class="header-row">
       <div class="logo-wrap">
@@ -47,7 +44,6 @@
     </div>
   </header>
 
-  <!-- SHOP PAGE -->
   <main id="shopPage">
     <section class="hero">
       <h1 class="hero-title">Telegram orqali <span>tezkor buyurtma</span></h1>
@@ -67,25 +63,21 @@
       </div>
     </section>
 
-    <!-- FILTER -->
     <div class="filters-wrapper">
       <div class="filters" id="filterBar"></div>
     </div>
 
-    <!-- PRODUCTS -->
     <section class="products-wrap">
       <div class="products-grid" id="productsGrid"></div>
     </section>
   </main>
 
-  <!-- HISTORY -->
   <section id="historyPage" class="page hidden">
     <h2 class="page-title">📜 Buyurtmalar tarixi</h2>
     <p class="page-sub">Tarix saqlanmaydi. Buyurtmalar faqat Telegramga ketadi.</p>
     <div id="historyList"></div>
   </section>
 
-  <!-- ADMIN PAGE -->
   <section id="adminPage" class="page hidden">
     <h2 class="page-title">⚙️ Admin panel</h2>
 
@@ -163,7 +155,6 @@
     <div id="adminCategoryList"></div>
   </section>
 
-  <!-- CART OVERLAY -->
   <div class="sheet-overlay" id="cartSheetOverlay" onclick="toggleCartSheet(false)"></div>
 
   <div class="cart-sheet" id="cartSheet">
@@ -184,7 +175,6 @@
     </div>
   </div>
 
-  <!-- PRODUCT DETAIL -->
   <div class="product-detail-overlay hidden" id="productDetailOverlay">
     <div class="product-detail-card">
       <div class="product-detail-header">
@@ -225,24 +215,25 @@
     </div>
   </div>
 
-  <!-- TOAST -->
   <div class="toast" id="toast">Xabar</div>
 
-  <!-- Telegram WebApp -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- App JS -->
   <script type="module" src="app.js"></script>
 
-  <!-- AUTO UPDATE (WebApp yopilganda + ochilganda yangilanadi) -->
+  <!-- ONE-TIME AUTO RELOAD -->
   <script>
     const tg = window.Telegram && window.Telegram.WebApp;
+
     if (tg) {
       tg.ready();
       tg.expand();
-      tg.onEvent("viewportChanged", () => location.reload());
+
+      if (localStorage.getItem("force_reload") === "1") {
+        localStorage.removeItem("force_reload");
+        setTimeout(() => location.reload(), 150);
+      }
     }
   </script>
-
 </body>
 </html>
