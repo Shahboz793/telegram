@@ -56,6 +56,10 @@ let isAdmin        = false;
 let editingProductId  = null;
 let editingCategoryId = null;
 
+// YANGI HOLATLAR
+let adminOrderFilter     = "all"; // "all" yoki "delivered"
+let clientOrderStatusMap = {};    // mijoz buyurtmalarining eski statuslari
+
 // DETAIL STATE
 let detailIndex              = null;
 let detailImageIndex         = 0;
@@ -130,11 +134,18 @@ const notifySoundEl = document.getElementById("notifySound");
 /* HELPERS */
 function formatPrice(v){ return (v || 0).toLocaleString("uz-UZ"); }
 
-function showToast(message){
+// universal toast (duration parametrli)
+function showToast(message, duration = 1800){
   if(!toastEl) return;
   toastEl.textContent = message;
   toastEl.classList.add("show");
-  setTimeout(()=> toastEl.classList.remove("show"), 1800);
+
+  if(showToast._timer){
+    clearTimeout(showToast._timer);
+  }
+  showToast._timer = setTimeout(()=>{
+    toastEl.classList.remove("show");
+  }, duration);
 }
 
 function normalizeImagesInput(raw){
@@ -544,6 +555,41 @@ function renderProgressHTML(status){
   `;
 }
 
+/* SOUND PLAY */
+function playNotify(){
+  if(!notifySoundEl) return;
+  try{
+    notifySoundEl.currentTime = 0;
+    notifySoundEl.play().catch(()=>{});
+  }catch(e){
+    console.error("Ding ijro xato:", e);
+  }
+}
+
+/* MIJOZGA STATUS XABARLARI */
+function clientStatusMessage(status){
+  switch(status){
+    case "confirmed": return "✅ Buyurtmangiz tasdiqlandi.";
+    case "courier":   return "🚚 Buyurtmangiz kuryerga topshirildi.";
+    case "delivered": return "🎉 Buyurtma yetkazildi. Bizni tanlaganingiz uchun rahmat!";
+    case "rejected":  return "❌ Buyurtmangiz bekor qilindi.";
+    default:          return "ℹ️ Buyurtma holati yangilandi.";
+  }
+}
+
+function notifyClientStatus(status){
+  const msg = clientStatusMessage(status);
+  showToast(msg, 3000); // 3 soniya
+  playNotify();
+}
+
+function checkDeliveredThankYou(){
+  const hasDelivered = clientOrders.some(o => o.status === "delivered");
+  if(hasDelivered){
+    showToast("🎉 Buyurtmani qabul qilganingiz uchun rahmat!", 3000);
+  }
+}
+
 /* REAL-TIME ORDERS (CLIENT) */
 function subscribeClientOrders(){
   const qClient = query(
@@ -552,8 +598,32 @@ function subscribeClientOrders(){
     orderBy("createdAt","desc")
   );
   onSnapshot(qClient, snap=>{
-    clientOrders = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    let hasStatusChange   = false;
+    let lastChangedStatus = null;
+
+    const list = [];
+    snap.forEach(d=>{
+      const data   = d.data();
+      const id     = d.id;
+      const status = data.status || "pending";
+
+      const prevStatus = clientOrderStatusMap[id];
+      if(prevStatus && prevStatus !== status){
+        hasStatusChange   = true;
+        lastChangedStatus = status;
+      }
+      clientOrderStatusMap[id] = status;
+
+      list.push({ id, ...data });
+    });
+
+    clientOrders = list;
     renderClientOrders();
+    checkDeliveredThankYou();
+
+    if(hasStatusChange && lastChangedStatus){
+      notifyClientStatus(lastChangedStatus);
+    }
   },err=>{
     console.error("Client orders xato:", err);
     showToast("⚠️ Buyurtmalarni o‘qishda xato.");
@@ -605,13 +675,6 @@ function renderClientOrders(){
 }
 
 /* REAL-TIME ORDERS (ADMIN) */
-function playNotify(){
-  if(!notifySoundEl) return;
-  try{
-    notifySoundEl.currentTime = 0;
-    notifySoundEl.play();
-  }catch(e){}
-}
 function subscribeAdminOrders(){
   const qAdmin = query(ordersCol, orderBy("createdAt","desc"));
   onSnapshot(qAdmin, snap=>{
@@ -624,7 +687,6 @@ function subscribeAdminOrders(){
     });
     adminOrders = snap.docs.map(d=>({id:d.id, ...d.data()}));
     renderAdminOrders();
-    // Faqat admin kirgan bo‘lsa va yangi buyurtma qo‘shilsa — ding-ding
     if(isAdmin && hasNew){
       playNotify();
       showToast("🔔 Yangi buyurtma keldi!");
@@ -634,14 +696,43 @@ function subscribeAdminOrders(){
     showToast("⚠️ Buyurtmalar (admin) xato.");
   });
 }
+
+function setAdminOrderFilter(filter){
+  adminOrderFilter = filter; // "all" yoki "delivered"
+  renderAdminOrders();
+}
+
 function renderAdminOrders(){
   if(!adminOrdersListEl) return;
-  if(!adminOrders.length){
-    adminOrdersListEl.innerHTML = "<p class='cart-empty'>Hozircha buyurtma yo‘q.</p>";
+
+  const visibleOrders = adminOrderFilter === "delivered"
+    ? adminOrders.filter(o => o.status === "delivered")
+    : adminOrders;
+
+  adminOrdersListEl.innerHTML = "";
+
+  // Filtr tugmalari
+  adminOrdersListEl.innerHTML += `
+    <div class="admin-order-filters">
+      <button
+        class="btn-xs ${adminOrderFilter === "all" ? "btn-xs-primary" : "btn-xs-secondary"}"
+        onclick="setAdminOrderFilter('all')">
+        Barcha buyurtmalar
+      </button>
+      <button
+        class="btn-xs ${adminOrderFilter === "delivered" ? "btn-xs-primary" : "btn-xs-secondary"}"
+        onclick="setAdminOrderFilter('delivered')">
+        Yetkazilganlar
+      </button>
+    </div>
+  `;
+
+  if(!visibleOrders.length){
+    adminOrdersListEl.innerHTML += "<p class='cart-empty'>Tanlangan bo‘limda buyurtma yo‘q.</p>";
     return;
   }
-  adminOrdersListEl.innerHTML = "";
-  adminOrders.forEach(o=>{
+
+  visibleOrders.forEach(o=>{
     const created = o.createdAt?.seconds
       ? new Date(o.createdAt.seconds*1000)
       : null;
@@ -676,15 +767,16 @@ function renderAdminOrders(){
           <ul>${itemsHtml}</ul>
         </section>
         <div class="admin-order-actions">
-          <button class="btn-xs btn-xs-primary" onclick="updateOrderStatus('${o.id}','confirmed')">Tasdiqlash</button>
-          <button class="btn-xs btn-xs-danger" onclick="updateOrderStatus('${o.id}','rejected')">Bekor qilish</button>
+          <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','confirmed')">Tasdiqlash</button>
+          <button class="btn-xs btn-xs-danger"    onclick="updateOrderStatus('${o.id}','rejected')">Bekor qilish</button>
           <button class="btn-xs btn-xs-secondary" onclick="updateOrderStatus('${o.id}','courier')">Kuryer oldi</button>
-          <button class="btn-xs btn-xs-primary" onclick="updateOrderStatus('${o.id}','delivered')">Yetkazildi</button>
+          <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','delivered')">Yetkazildi</button>
         </div>
       </article>
     `;
   });
 }
+
 async function updateOrderStatus(orderId, newStatus){
   try{
     await updateDoc(doc(db,"orders",orderId),{
@@ -692,6 +784,13 @@ async function updateOrderStatus(orderId, newStatus){
       updatedAt:serverTimestamp()
     });
     showToast("✅ Buyurtma statusi yangilandi.");
+
+    // Admin "Yetkazildi" bosganida avtomatik yetkazilganlar bo‘limiga o‘tish
+    if(isAdmin && newStatus === "delivered"){
+      adminOrderFilter = "delivered";
+      renderAdminOrders();
+    }
+
   }catch(e){
     console.error("Status yangilash xato:", e);
     showToast("⚠️ Status yangilashda xato.");
@@ -1219,3 +1318,4 @@ window.deleteAnyProduct   = deleteAnyProduct;
 window.editProduct        = editProduct;
 
 window.updateOrderStatus  = updateOrderStatus;
+window.setAdminOrderFilter = setAdminOrderFilter;
