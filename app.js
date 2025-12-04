@@ -1,22 +1,21 @@
-/* =========================================
-   FIREBASE INIT
-========================================= */
-import { 
-  initializeApp 
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+// FIREBASE MODULLARI CDN ORQALI
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
   getFirestore,
   collection,
   addDoc,
-  doc,
-  getDoc,
-  getDocs,
-  updateDoc,
   deleteDoc,
+  doc,
+  serverTimestamp,
+  getDoc,
+  updateDoc,
   onSnapshot,
-  serverTimestamp
+  query,
+  where,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+// SENING KONFIGING
 const firebaseConfig = {
   apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
   authDomain: "shahboz-5d0a3.firebaseapp.com",
@@ -27,1024 +26,1192 @@ const firebaseConfig = {
   measurementId: "G-J8KFW5ED77"
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+// INIT
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
 
-/* =========================================
-   COLLECTIONS
-========================================= */
+// COLLECTIONS
 const productsCol   = collection(db, "beauty_products");
 const categoriesCol = collection(db, "beauty_categories");
-const ordersCol     = collection(db, "beauty_orders");
-const adminSettings = doc(db, "beauty_admin_settings", "security");
+const ordersCol     = collection(db, "orders");
 
-/* =========================================
-   APP STATE
-========================================= */
+// CONSTANTS
+const STORAGE_CUSTOMER = "beauty_customer_info";
+const THEME_KEY        = "beauty_theme";
+const CLIENT_ID_KEY    = "beauty_client_id";
+const RAW_PREFIX       = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
+
+// CATEGORY DICTS
+const categoryEmoji = { default: "💅" };
+const categoryLabel = {};
+
+// STATE
 let products       = [];
+let remoteProducts = [];
 let categories     = [];
 let cart           = [];
-let isAdmin        = false;
 let activeCategory = "all";
-let searchQuery    = "";
-let customerInfo   = null;   // {name, phone, address}
-let currentUserId  = null;   // mijozni aniqlash uchun
+let currentSearch  = "";
+let isAdmin        = false;
+let editingProductId  = null;
+let editingCategoryId = null;
 
-/* =========================================
-   UI ELEMENTS
-========================================= */
+// DETAIL STATE
+let detailIndex              = null;
+let detailImageIndex         = 0;
+let detailQty                = 1;
+let detailCountdownTimer     = null;
+let detailCountdownRemaining = 0;
+
+// CLIENT ORDER STATE
+let clientId       = null;
+let clientOrders   = [];
+let adminOrders    = [];
+
+// DOM
 const productsGrid       = document.getElementById("productsGrid");
 const filterBar          = document.getElementById("filterBar");
-const searchInput        = document.getElementById("searchInput");
-const customerInfoTextEl = document.getElementById("customerInfoText");
 const cartCountTopEl     = document.getElementById("cartCountTop");
+const cartTotalTopEl     = document.getElementById("cartTotalTop");
+const toastEl            = document.getElementById("toast");
 const cartSheet          = document.getElementById("cartSheet");
 const cartSheetOverlay   = document.getElementById("cartSheetOverlay");
 const cartItemsEl        = document.getElementById("cartItems");
 const cartSheetTotalEl   = document.getElementById("cartSheetTotal");
+const themeToggleBtn     = document.getElementById("themeToggleBtn");
 const tabsEl             = document.getElementById("tabs");
-const ordersListEl       = document.getElementById("customerOrdersList");
-const adminTabBtn        = document.getElementById("adminTabBtn");
 const adminAccessBtn     = document.getElementById("adminAccessBtn");
-const adminOrdersListEl  = document.getElementById("adminOrdersList");
+const adminTabBtn        = document.getElementById("adminTabBtn");
+const searchInput        = document.getElementById("searchInput");
+const customerInfoTextEl = document.getElementById("customerInfoText");
 
-/* PRODUCT DETAIL */
 const productDetailOverlay = document.getElementById("productDetailOverlay");
 const detailImageEl        = document.getElementById("detailImage");
-const detailNameEl         = document.getElementById("detailName");
 const detailCategoryEl     = document.getElementById("detailCategory");
+const detailNameEl         = document.getElementById("detailName");
 const detailTagEl          = document.getElementById("detailTag");
 const detailDescEl         = document.getElementById("detailDesc");
 const detailPriceEl        = document.getElementById("detailPrice");
 const detailOldPriceEl     = document.getElementById("detailOldPrice");
-const detailBackBtn        = document.getElementById("detailBackBtn");
 const detailAddBtn         = document.getElementById("detailAddBtn");
-const detailPrevBtn        = document.getElementById("detailPrevBtn");
-const detailNextBtn        = document.getElementById("detailNextBtn");
-const detailImageIndexEl   = document.getElementById("detailImageIndex");
-const detailQtyMinus       = document.getElementById("detailQtyMinus");
-const detailQtyPlus        = document.getElementById("detailQtyPlus");
-const detailQtyValue       = document.getElementById("detailQtyValue");
+const detailBackBtn        = document.getElementById("detailBackBtn");
 
-/* AUDIO */
-const sNewOrder    = document.getElementById("soundNewOrder");
-const sConfirmed   = document.getElementById("soundConfirmed");
-const sCourier     = document.getElementById("soundCourier");
-const sDelivered   = document.getElementById("soundDelivered");
-const sRejected    = document.getElementById("soundRejected");
-const sUserConfirm = document.getElementById("soundCustomerConfirm");
+const detailPrevBtn      = document.getElementById("detailPrevBtn");
+const detailNextBtn      = document.getElementById("detailNextBtn");
+const detailImageIndexEl = document.getElementById("detailImageIndex");
 
-/* TELEGRAM WEBAPP (ixtiyoriy) */
-const tg = window.Telegram ? window.Telegram.WebApp : null;
+const detailQtyMinus = document.getElementById("detailQtyMinus");
+const detailQtyPlus  = document.getElementById("detailQtyPlus");
+const detailQtyValue = document.getElementById("detailQtyValue");
 
-/* =========================================
-   AUDIO HELPERS
-========================================= */
-function play(sound) {
-  try { 
-    if (!sound) return;
-    sound.currentTime = 0; 
-    sound.play(); 
-  } catch (e) {}
-}
+// ADMIN FORM DOM
+const adminNameEl          = document.getElementById("adminName");
+const adminCategoryEl      = document.getElementById("adminCategory");
+const adminPriceBaseEl     = document.getElementById("adminPriceBase");
+const adminHasDiscountEl   = document.getElementById("adminHasDiscount");
+const adminPriceDiscountEl = document.getElementById("adminPriceDiscount");
+const adminTagEl           = document.getElementById("adminTag");
+const adminDescriptionEl   = document.getElementById("adminDescription");
+const adminImagesEl        = document.getElementById("adminImages");
 
-/* =========================================
-   TOAST
-========================================= */
-const toastEl = document.getElementById("toast");
-function showToast(msg) {
-  if (!toastEl) return;
-  toastEl.textContent = msg;
+// ADMIN CATEGORY FORM
+const adminCatCodeEl      = document.getElementById("adminCatCode");
+const adminCatLabelEl     = document.getElementById("adminCatLabel");
+const adminCatEmojiEl     = document.getElementById("adminCatEmoji");
+const adminCategoryListEl = document.getElementById("adminCategoryList");
+
+// ORDERS DOM
+const clientOrdersListEl = document.getElementById("clientOrdersList");
+const adminOrdersListEl  = document.getElementById("adminOrdersList");
+
+// SOUND
+const notifySoundEl = document.getElementById("notifySound");
+
+/* HELPERS */
+function formatPrice(v){ return (v || 0).toLocaleString("uz-UZ"); }
+
+function showToast(message){
+  if(!toastEl) return;
+  toastEl.textContent = message;
   toastEl.classList.add("show");
-  setTimeout(() => toastEl.classList.remove("show"), 1500);
+  setTimeout(()=> toastEl.classList.remove("show"), 1800);
 }
 
-/* =========================================
-   THEME
-========================================= */
-const themeKey = "beauty_theme";
-
-function applyTheme(t) {
-  document.body.classList.toggle("theme-dark", t === "dark");
+function normalizeImagesInput(raw){
+  if(!raw) return [];
+  return raw
+    .split(",")
+    .map(s=>s.trim())
+    .filter(Boolean)
+    .map(token=>{
+      if(/^https?:\/\//i.test(token)) return token;
+      const name = token.replace(/\.(png|jpg|jpeg)$/i,"");
+      return RAW_PREFIX + name + ".png";
+    });
 }
 
-function toggleTheme() {
-  const current = localStorage.getItem(themeKey) || "dark";
-  const next = current === "dark" ? "light" : "dark";
-  localStorage.setItem(themeKey, next);
-  applyTheme(next);
-}
-
-document.getElementById("themeToggleBtn")?.addEventListener("click", toggleTheme);
-
-/* =========================================
-   CUSTOMER INFO
-========================================= */
-const STORAGE_CUSTOMER = "beauty_customer_info";
-
-function loadCustomerInfo() {
-  try {
-    customerInfo = JSON.parse(localStorage.getItem(STORAGE_CUSTOMER) || "null");
-  } catch (_) {
-    customerInfo = null;
+function setImageWithPngJpgFallback(imgElement,url){
+  if(!imgElement) return;
+  if(!url){
+    imgElement.onerror = null;
+    imgElement.src = RAW_PREFIX + "noimage.png";
+    return;
+  }
+  if(url.startsWith(RAW_PREFIX)){
+    const base = url.replace(/\.(png|jpg|jpeg)$/i,"");
+    imgElement.onerror = function(){
+      this.onerror=null;
+      this.src = base + ".jpg";
+    };
+    imgElement.src = base + ".png";
+  }else{
+    imgElement.onerror = null;
+    imgElement.src = url;
   }
 }
 
-function saveCustomerInfo() {
-  localStorage.setItem(STORAGE_CUSTOMER, JSON.stringify(customerInfo));
+function matchesSearch(p){
+  if(!currentSearch) return true;
+  const q    = currentSearch;
+  const name = (p.name || "").toLowerCase();
+  const tag  = (p.tag || "").toLowerCase();
+  const desc = (p.description || "").toLowerCase();
+  const cat  = (p.category || "").toLowerCase();
+  return name.includes(q) || tag.includes(q) || desc.includes(q) || cat.includes(q);
 }
 
-function promptCustomerInfo() {
-  const name = prompt("Ismingiz:");
-  if (!name) return null;
+/* CLIENT ID */
+function getOrCreateClientId(){
+  let cid = localStorage.getItem(CLIENT_ID_KEY);
+  if(!cid){
+    cid = "c_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem(CLIENT_ID_KEY, cid);
+  }
+  return cid;
+}
 
-  const phone = prompt("Telefon:");
-  if (!phone) return null;
+/* CUSTOMER INFO */
+function renderCustomerInfo(){
+  if(!customerInfoTextEl) return;
+  let info = null;
+  try{
+    info = JSON.parse(localStorage.getItem(STORAGE_CUSTOMER) || "null");
+  }catch(e){ info = null; }
+  if(info && info.name && info.phone){
+    customerInfoTextEl.textContent =
+      "👤 " + info.name +
+      " • 📱 " + info.phone +
+      (info.address ? " • 📍 " + info.address : "");
+  }else{
+    customerInfoTextEl.textContent =
+      "Mijoz ma’lumotlari saqlanmagan. Buyurtma berganingizda ism va telefon so‘raladi.";
+  }
+}
 
-  const address = prompt("Manzil:");
-  if (!address) return null;
+function promptNewCustomerInfo(){
+  const name = prompt("👤 Ismingizni kiriting (masalan, Shahboz):");
+  if(!name) return null;
+  const phone = prompt("📱 Telefon raqamingizni kiriting (masalan, +99890 123 45 67):");
+  if(!phone) return null;
+  const address = prompt("📍 Manzilingizni kiriting (shahar, tuman, ko‘cha, uy):");
+  if(!address) return null;
 
-  const info = { name, phone, address };
-  customerInfo = info;
-  saveCustomerInfo();
+  const info = {
+    name: name.trim(),
+    phone: phone.trim(),
+    address: address.trim()
+  };
+  localStorage.setItem(STORAGE_CUSTOMER, JSON.stringify(info));
   renderCustomerInfo();
   return info;
 }
 
-function getCustomerInfo() {
-  if (!customerInfo) return promptCustomerInfo();
-  return customerInfo;
-}
+function askCustomerInfo(){
+  let info = null;
+  try{
+    info = JSON.parse(localStorage.getItem(STORAGE_CUSTOMER) || "null");
+  }catch(e){ info = null; }
 
-function renderCustomerInfo() {
-  if (!customerInfoTextEl) return;
-
-  if (!customerInfo) {
-    customerInfoTextEl.textContent = "Ism va telefon hali kiritilmagan.";
-  } else {
-    customerInfoTextEl.textContent =
-      `👤 ${customerInfo.name} • 📱 ${customerInfo.phone} • 📍 ${customerInfo.address}`;
-  }
-}
-
-/* =========================================
-   PRODUCTS + CATEGORIES REALTIME
-========================================= */
-function subscribeProducts() {
-  onSnapshot(productsCol, snap => {
-    products = [];
-    snap.forEach(d => {
-      const data = d.data();
-      products.push({
-        id: d.id,
-        name: data.name,
-        price: data.price,
-        oldPrice: data.oldPrice || null,
-        category: data.category,
-        tag: data.tag || "",
-        description: data.description || "",
-        images: data.images || []
-      });
-    });
-    renderProducts();
-  });
-}
-
-function subscribeCategories() {
-  onSnapshot(categoriesCol, snap => {
-    categories = [];
-    snap.forEach(d => {
-      const data = d.data();
-      categories.push({
-        id: d.id,
-        code: data.code,
-        label: data.label,
-        emoji: data.emoji
-      });
-    });
-    renderCategoryBar();
-  });
-}
-
-/* =========================================
-   CATEGORY BAR RENDER
-========================================= */
-function renderCategoryBar() {
-  if (!filterBar) return;
-
-  let html = "";
-  html += `<button class="chip ${activeCategory==="all" ? "active" : ""}" data-code="all">⭐ Barchasi</button>`;
-
-  categories.forEach(c => {
-    html += `
-      <button class="chip ${activeCategory===c.code ? "active" : ""}" data-code="${c.code}">
-        ${c.emoji} ${c.label}
-      </button>`;
-  });
-
-  filterBar.innerHTML = html;
-
-  filterBar.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      activeCategory = btn.dataset.code;
-      renderProducts();
-    });
-  });
-}
-
-/* =========================================
-   PRODUCTS RENDER
-========================================= */
-function renderProducts() {
-  if (!productsGrid) return;
-
-  let list = products;
-
-  if (activeCategory !== "all") {
-    list = list.filter(p => p.category === activeCategory);
-  }
-
-  if (searchQuery) {
-    list = list.filter(p => 
-      p.name.toLowerCase().includes(searchQuery) ||
-      p.tag.toLowerCase().includes(searchQuery)
+  if(info && info.name && info.phone && info.address){
+    const ok = confirm(
+      "📦 Oldingi buyurtma ma’lumotlari:\n\n" +
+      "👤 Ism: " + info.name + "\n" +
+      "📱 Telefon: " + info.phone + "\n" +
+      "📍 Manzil: " + info.address + "\n\n" +
+      "Shu ma’lumotlar bilan yuborilsinmi?"
     );
+    if(ok) return info;
+    return promptNewCustomerInfo();
   }
+  return promptNewCustomerInfo();
+}
 
-  if (!list.length) {
-    productsGrid.innerHTML = `
-      <p style="padding:20px;text-align:center;color:#94a3b8;">
-        Mahsulot topilmadi
-      </p>`;
+function resetCustomerInfo(){
+  localStorage.removeItem(STORAGE_CUSTOMER);
+  renderCustomerInfo();
+  showToast("👤 Mijoz ma’lumotlari o‘chirildi.");
+}
+
+function editCustomerInfo(){
+  promptNewCustomerInfo();
+}
+
+/* THEME */
+function applyTheme(theme){
+  document.body.classList.toggle("theme-light", theme === "light");
+  document.body.classList.toggle("theme-dark", theme === "dark");
+  if(themeToggleBtn){
+    themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
+  }
+}
+function toggleTheme(){
+  const current = localStorage.getItem(THEME_KEY) || "dark";
+  const next    = current === "dark" ? "light" : "dark";
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+}
+if(themeToggleBtn){
+  themeToggleBtn.addEventListener("click", toggleTheme);
+}
+
+/* PRODUCTS REAL-TIME */
+function rebuildProducts(){
+  products = [...remoteProducts];
+  renderProducts();
+}
+function renderProducts(){
+  productsGrid.innerHTML = "";
+  const filtered = products.filter(p =>
+    (activeCategory === "all" ? true : p.category === activeCategory) &&
+    matchesSearch(p)
+  );
+  if(!filtered.length){
+    productsGrid.innerHTML = "<p class='cart-empty'>Hozircha mahsulot qo‘shilmagan.</p>";
     return;
   }
+  filtered.forEach(p=>{
+    const index    = products.indexOf(p);
+    const discount = p.oldPrice && p.oldPrice > p.price
+      ? (100 - Math.round(p.price*100/p.oldPrice))
+      : null;
+    const tag        = p.tag || "Ommabop mahsulot";
+    const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
+    let imgHtml;
+    if(firstImage.startsWith(RAW_PREFIX)){
+      const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
+      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
+    }else{
+      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
+    }
+    const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
 
-  let html = "";
-  list.forEach((p, i) => {
-    const firstImg = p.images?.[0] || "";
-    html += `
-      <div class="product-card" onclick="openProductDetail(${i})">
+    productsGrid.innerHTML += `
+      <article class="product-card" onclick="openProductDetail(${index})">
         <div class="product-img-wrap">
-          <img src="${firstImg}" />
+          ${imgHtml}
+          <div class="product-img-tag">
+            <span>Beauty</span><span>Pro</span>
+          </div>
+          ${discount ? `<div class="product-sale">-${discount}%</div>` : ``}
         </div>
         <div class="product-body">
           <div class="product-name">${p.name}</div>
-          <div class="product-meta">${p.category} • ${p.tag}</div>
+          <div class="product-meta">${catLabel} • ${tag}</div>
+          <div class="tag-mini">💡 ${tag}</div>
           <div class="price-row">
             <div>
-              <div class="price-main">${p.price} so‘m</div>
-              ${p.oldPrice ? `<div class="price-old">${p.oldPrice} so‘m</div>` : ""}
+              <div class="price-main">${formatPrice(p.price)} so‘m</div>
+              ${p.oldPrice ? `<div class="price-old">${formatPrice(p.oldPrice)} so‘m</div>` : ``}
             </div>
-            <button class="btn-add" onclick="event.stopPropagation(); addToCart(${i});">
+            <button class="btn-add" onclick="event.stopPropagation(); addToCart(${index});">
               ➕ Savatga
             </button>
           </div>
         </div>
-      </div>`;
+      </article>
+    `;
   });
-
-  productsGrid.innerHTML = html;
 }
 
-/* =========================================
-   SEARCH INPUT
-========================================= */
-if (searchInput) {
-  searchInput.addEventListener("input", () => {
-    searchQuery = searchInput.value.trim().toLowerCase();
+function subscribeProductsRealtime(){
+  onSnapshot(productsCol, snap=>{
+    const list = [];
+    snap.forEach(d=>{
+      const data = d.data();
+      list.push({
+        id: d.id,
+        fromFirebase: true,
+        name: data.name || "",
+        price: data.price || 0,
+        oldPrice: data.oldPrice || null,
+        category: data.category || "",
+        emoji: data.emoji || categoryEmoji[data.category] || categoryEmoji.default,
+        tag: data.tag || "",
+        description: data.description || "",
+        images: Array.isArray(data.images) ? data.images : [],
+        createdAt: data.createdAt || null
+      });
+    });
+    remoteProducts = list;
+    rebuildProducts();
+    renderAdminCustomList();
+  }, err=>{
+    console.error("Mahsulot realtime xato:", err);
+    showToast("⚠️ Mahsulotlarni o‘qishda xato.");
+  });
+}
+
+/* CATEGORIES */
+function renderCategoryFilter(){
+  if(!filterBar) return;
+  let html = "";
+  html += `<button class="chip ${activeCategory==="all"?"active":""}" data-category="all">⭐ Barchasi</button>`;
+  categories.forEach(cat=>{
+    html += `
+      <button class="chip ${activeCategory===cat.code?"active":""}" data-category="${cat.code}">
+        ${cat.emoji} ${cat.label}
+      </button>
+    `;
+  });
+  filterBar.innerHTML = html;
+}
+function subscribeCategoriesRealtime(){
+  onSnapshot(categoriesCol, snap=>{
+    const list = [];
+    snap.forEach(d=>{
+      const data = d.data() || {};
+      const code = (data.code || "").trim().toLowerCase();
+      if(!code) return;
+      const label = (data.label || code).trim();
+      const emoji = (data.emoji || "💅").trim() || "💅";
+      list.push({
+        id:d.id,
+        code,
+        label,
+        emoji,
+        order:data.order ?? 0
+      });
+      categoryEmoji[code] = emoji;
+      categoryLabel[code] = label;
+    });
+    list.sort((a,b)=>(a.order||0)-(b.order||0));
+    categories = list;
+    renderCategoryFilter();
+    updateAdminCategorySelect();
+    renderCategoryAdminList();
+  },err=>{
+    console.error("Kategoriya realtime xato:", err);
+    showToast("⚠️ Kategoriyalarni o‘qishda xato.");
+  });
+}
+
+if(filterBar){
+  filterBar.addEventListener("click", e=>{
+    const btn = e.target.closest(".chip");
+    if(!btn) return;
+    document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+    btn.classList.add("active");
+    activeCategory = btn.dataset.category;
     renderProducts();
   });
 }
 
-/* =========================================
-   SAVAT TIZIMI
-========================================= */
-function addToCart(index) {
-  const p = products[index];
-  if (!p) return;
-
-  const found = cart.find(c => c.id === p.id);
-  if (found) {
-    found.qty++;
-  } else {
-    cart.push({ id: p.id, qty: 1 });
-  }
-  updateCartUI();
-  showToast("Savatga qo‘shildi!");
-}
-
-function changeQty(productId, delta) {
-  const item = cart.find(c => c.id === productId);
-  if (!item) return;
-
-  item.qty += delta;
-  if (item.qty <= 0) {
-    cart = cart.filter(c => c.id !== productId);
-  }
-  updateCartUI();
-}
-
-function removeFromCart(productId) {
-  cart = cart.filter(c => c.id !== productId);
-  updateCartUI();
-}
-
-function calculateCartTotals() {
-  let totalQty = 0;
-  let totalSum = 0;
-
-  cart.forEach(c => {
-    const p = products.find(p => p.id === c.id);
-    if (!p) return;
-    totalQty += c.qty;
-    totalSum += p.price * c.qty;
+/* SEARCH */
+if(searchInput){
+  searchInput.addEventListener("input", ()=>{
+    currentSearch = searchInput.value.trim().toLowerCase();
+    renderProducts();
   });
-
-  return { totalQty, totalSum };
 }
 
-function updateCartUI() {
-  const { totalQty, totalSum } = calculateCartTotals();
-
-  if (cartCountTopEl) {
-    cartCountTopEl.textContent = totalQty;
-  }
-
-  if (cartSheetTotalEl) {
-    cartSheetTotalEl.textContent = `${totalSum.toLocaleString()} so‘m`;
-  }
-
-  renderCartItems();
+/* CART */
+function addToCart(index, qty=1){
+  if(qty<=0) return;
+  const found = cart.find(c=>c.index===index);
+  if(found) found.qty += qty;
+  else cart.push({index,qty});
+  updateCartUI();
+  showToast("Savatga qo‘shildi.");
 }
-
-/* =========================================
-   CART SHEET
-========================================= */
-function toggleCartSheet(force = null) {
-  if (!cartSheet || !cartSheetOverlay) return;
-
+function updateCartUI(){
+  let totalCount=0,totalPrice=0;
+  cart.forEach(c=>{
+    const p = products[c.index];
+    if(!p) return;
+    totalCount += c.qty;
+    totalPrice += p.price*c.qty;
+  });
+  cartCountTopEl.textContent = totalCount;
+  cartTotalTopEl.textContent = formatPrice(totalPrice)+" so‘m";
+  if(cartSheet.classList.contains("open")) renderCartItems();
+}
+function toggleCartSheet(force){
   const isOpen = cartSheet.classList.contains("open");
-  const next = force !== null ? force : !isOpen;
-
+  const next   = typeof force==="boolean" ? force : !isOpen;
   cartSheet.classList.toggle("open", next);
   cartSheetOverlay.classList.toggle("show", next);
-
-  if (next) {
-    lockBody();
-  } else {
-    unlockBody();
-  }
+  if(next) renderCartItems();
 }
-
-if (cartSheetOverlay) {
-  cartSheetOverlay.addEventListener("click", () => toggleCartSheet(false));
-}
-
-function renderCartItems() {
-  if (!cartItemsEl) return;
-
-  if (!cart.length) {
-    cartItemsEl.innerHTML = `<p class="cart-empty">Savat bo‘sh 🙂</p>`;
+function renderCartItems(){
+  if(cart.length===0){
+    cartItemsEl.innerHTML = "<p class='cart-empty'>Savat hozircha bo‘sh 🙂</p>";
+    cartSheetTotalEl.textContent = "0 so‘m";
     return;
   }
-
-  let html = "";
-  cart.forEach(item => {
-    const p = products.find(pp => pp.id === item.id);
-    if (!p) return;
+  let html="",total=0;
+  cart.forEach(c=>{
+    const p = products[c.index];
+    if(!p) return;
+    const lineTotal = p.price*c.qty;
+    total += lineTotal;
+    const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     html += `
       <div class="cart-item-row">
         <div class="cart-item-main">
           <div class="cart-item-name">${p.name}</div>
-          <div class="cart-item-meta">${p.price} so‘m</div>
+          <div class="cart-item-meta">${formatPrice(p.price)} so‘m • ${catLabel}</div>
         </div>
         <div class="cart-item-actions">
           <div class="qty-control">
-            <button onclick="changeQty('${item.id}', -1)">-</button>
-            <span>${item.qty}</span>
-            <button onclick="changeQty('${item.id}', 1)">+</button>
+            <button onclick="changeQty(${c.index},-1)">-</button>
+            <span>${c.qty}</span>
+            <button onclick="changeQty(${c.index},1)">+</button>
           </div>
-          <div class="cart-item-total">${(p.price * item.qty).toLocaleString()} so‘m</div>
-          <button class="cart-remove" onclick="removeFromCart('${item.id}')">✕</button>
+          <div class="cart-item-total">${formatPrice(lineTotal)} so‘m</div>
+          <button class="cart-remove" onclick="removeFromCart(${c.index})">✕</button>
         </div>
-      </div>`;
+      </div>
+    `;
   });
-
   cartItemsEl.innerHTML = html;
+  cartSheetTotalEl.textContent = formatPrice(total)+" so‘m";
+}
+function changeQty(idx,delta){
+  const item = cart.find(c=>c.index===idx);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty<=0) cart = cart.filter(c=>c.index!==idx);
+  updateCartUI();
+  renderCartItems();
+}
+function removeFromCart(idx){
+  cart = cart.filter(c=>c.index!==idx);
+  updateCartUI();
+  renderCartItems();
 }
 
-/* =========================================
-   PRODUCT DETAIL — OVERLAY
-========================================= */
-let detailIndex      = null;
-let detailQty        = 1;
-let detailImageIndex = 0;
-
-function openProductDetail(i) {
-  detailIndex      = i;
-  detailQty        = 1;
-  detailImageIndex = 0;
-
-  const p = products[i];
-  if (!p || !productDetailOverlay) return;
-
-  renderDetailImage();
-
-  if (detailNameEl)     detailNameEl.textContent     = p.name;
-  if (detailCategoryEl) detailCategoryEl.textContent = p.category;
-  if (detailTagEl)      detailTagEl.textContent      = p.tag;
-  if (detailDescEl)     detailDescEl.textContent     = p.description || "Tavsif mavjud emas";
-  if (detailPriceEl)    detailPriceEl.textContent    = `${p.price.toLocaleString()} so‘m`;
-
-  if (detailOldPriceEl) {
-    if (p.oldPrice) {
-      detailOldPriceEl.classList.remove("hidden");
-      detailOldPriceEl.textContent = `${p.oldPrice.toLocaleString()} so‘m`;
-    } else {
-      detailOldPriceEl.classList.add("hidden");
-    }
+/* ORDER STATUS HELPERS */
+const ORDER_STEPS = ["pending","confirmed","courier","delivered"];
+function statusLabel(status){
+  switch(status){
+    case "pending":   return "Tasdiqlash kutilmoqda";
+    case "confirmed": return "Admin tasdiqladi";
+    case "courier":   return "Kuryerga berildi";
+    case "delivered": return "Yetkazildi";
+    case "rejected":  return "Bekor qilindi";
+    default:          return status;
   }
+}
+function statusClass(status){
+  return `status-pill status-${status}`;
+}
+function progressPercent(status){
+  if(status==="rejected") return 0;
+  const idx = ORDER_STEPS.indexOf(status);
+  if(idx<0) return 0;
+  return ((idx+1)/ORDER_STEPS.length)*100;
+}
+function renderProgressHTML(status){
+  const pct   = progressPercent(status);
+  const steps = ORDER_STEPS;
+  return `
+    <div class="progress-wrap">
+      <div class="progress-label">${statusLabel(status)}</div>
+      <div class="progress-line">
+        <div class="progress-fill" style="width:${pct}%;"></div>
+      </div>
+      <div class="progress-steps">
+        ${steps.map(s=>`
+          <span class="progress-step ${ORDER_STEPS.indexOf(s)<=ORDER_STEPS.indexOf(status) ? "active":""}">
+            ${s==="pending"?"Yuborildi":
+              s==="confirmed"?"Tasdiq":
+              s==="courier"?"Kuryer":
+              "Yetdi"}
+          </span>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
 
-  if (detailQtyValue) {
-    detailQtyValue.textContent = "1";
+/* REAL-TIME ORDERS (CLIENT) */
+function subscribeClientOrders(){
+  const qClient = query(
+    ordersCol,
+    where("clientId","==", clientId),
+    orderBy("createdAt","desc")
+  );
+  onSnapshot(qClient, snap=>{
+    clientOrders = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    renderClientOrders();
+  },err=>{
+    console.error("Client orders xato:", err);
+    showToast("⚠️ Buyurtmalarni o‘qishda xato.");
+  });
+}
+function renderClientOrders(){
+  if(!clientOrdersListEl) return;
+  if(!clientOrders.length){
+    clientOrdersListEl.innerHTML = "<p class='cart-empty'>Hozircha buyurtmangiz yo‘q.</p>";
+    return;
   }
-  if (detailAddBtn) {
-    detailAddBtn.textContent = "🛒 Savatga qo‘shish";
-    detailAddBtn.classList.remove("added");
+  clientOrdersListEl.innerHTML = "";
+  clientOrders.forEach(o=>{
+    const created = o.createdAt?.seconds
+      ? new Date(o.createdAt.seconds*1000)
+      : null;
+    const dateStr = created
+      ? created.toLocaleString("uz-UZ",{hour12:false})
+      : "";
+    const itemsHtml = (o.items || []).map(i=>
+      `<li>${i.name} — ${i.qty} dona × ${formatPrice(i.price)} so‘m</li>`
+    ).join("");
+    clientOrdersListEl.innerHTML += `
+      <article class="order-card">
+        <header class="order-header">
+          <div>
+            <div class="order-id">ID: ${o.id.slice(0,8)}...</div>
+            ${dateStr ? `<div class="order-date">${dateStr}</div>` : ""}
+          </div>
+          <div class="order-total">${formatPrice(o.totalPrice)} so‘m</div>
+        </header>
+        <div class="order-status-row">
+          <span class="${statusClass(o.status)}">${statusLabel(o.status)}</span>
+        </div>
+        ${renderProgressHTML(o.status)}
+        <section class="order-items">
+          <strong>Mahsulotlar:</strong>
+          <ul>${itemsHtml}</ul>
+        </section>
+        <footer class="order-footer">
+          <span>Holat: ${statusLabel(o.status)}</span>
+          <span>${o.status==="delivered" ? "✅ Yakunlandi" :
+                  o.status==="rejected" ? "❌ Bekor qilingan" :
+                  "⏳ Jarayonda"}</span>
+        </footer>
+      </article>
+    `;
+  });
+}
+
+/* REAL-TIME ORDERS (ADMIN) */
+function playNotify(){
+  if(!notifySoundEl) return;
+  try{ notifySoundEl.currentTime = 0; notifySoundEl.play(); }catch(e){}
+}
+function subscribeAdminOrders(){
+  const qAdmin = query(ordersCol, orderBy("createdAt","desc"));
+  onSnapshot(qAdmin, snap=>{
+    const changes = snap.docChanges();
+    let hasNew = false;
+    changes.forEach(ch=>{
+      if(ch.type==="added"){
+        hasNew = true;
+      }
+    });
+    adminOrders = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    renderAdminOrders();
+    if(isAdmin && hasNew){
+      playNotify();
+      showToast("🔔 Yangi buyurtma keldi!");
+    }
+  },err=>{
+    console.error("Admin orders xato:", err);
+    showToast("⚠️ Buyurtmalar (admin) xato.");
+  });
+}
+function renderAdminOrders(){
+  if(!adminOrdersListEl) return;
+  if(!adminOrders.length){
+    adminOrdersListEl.innerHTML = "<p class='cart-empty'>Hozircha buyurtma yo‘q.</p>";
+    return;
   }
-
-  productDetailOverlay.classList.remove("hidden");
-  lockBody();
-}
-
-function closeProductDetail() {
-  if (!productDetailOverlay) return;
-  productDetailOverlay.classList.add("hidden");
-  unlockBody();
-}
-
-if (productDetailOverlay) {
-  productDetailOverlay.addEventListener("click", e => {
-    if (e.target === productDetailOverlay) closeProductDetail();
+  adminOrdersListEl.innerHTML = "";
+  adminOrders.forEach(o=>{
+    const created = o.createdAt?.seconds
+      ? new Date(o.createdAt.seconds*1000)
+      : null;
+    const dateStr = created
+      ? created.toLocaleString("uz-UZ",{hour12:false})
+      : "";
+    const itemsHtml = (o.items || []).map(i=>
+      `<li>${i.name} — ${i.qty} dona × ${formatPrice(i.price)} so‘m</li>`
+    ).join("");
+    const customer = o.customer || {};
+    adminOrdersListEl.innerHTML += `
+      <article class="order-card">
+        <header class="order-header">
+          <div>
+            <div class="order-id">ID: ${o.id}</div>
+            ${dateStr ? `<div class="order-date">${dateStr}</div>` : ""}
+            <div class="order-customer">
+              👤 ${customer.name || "-"} • 📱 ${customer.phone || "-"}
+            </div>
+            <div class="order-customer">
+              📍 ${customer.address || "-"}
+            </div>
+          </div>
+          <div class="order-total">${formatPrice(o.totalPrice)} so‘m</div>
+        </header>
+        <div class="order-status-row">
+          <span class="${statusClass(o.status)}">${statusLabel(o.status)}</span>
+        </div>
+        ${renderProgressHTML(o.status)}
+        <section class="order-items">
+          <strong>Mahsulotlar:</strong>
+          <ul>${itemsHtml}</ul>
+        </section>
+        <div class="admin-order-actions">
+          <button class="btn-xs btn-xs-primary" onclick="updateOrderStatus('${o.id}','confirmed')">Tasdiqlash</button>
+          <button class="btn-xs btn-xs-danger" onclick="updateOrderStatus('${o.id}','rejected')">Bekor qilish</button>
+          <button class="btn-xs btn-xs-secondary" onclick="updateOrderStatus('${o.id}','courier')">Kuryer oldi</button>
+          <button class="btn-xs btn-xs-primary" onclick="updateOrderStatus('${o.id}','delivered')">Yetkazildi</button>
+        </div>
+      </article>
+    `;
   });
 }
-
-if (detailBackBtn) {
-  detailBackBtn.addEventListener("click", closeProductDetail);
+async function updateOrderStatus(orderId, newStatus){
+  try{
+    await updateDoc(doc(db,"orders",orderId),{
+      status:newStatus,
+      updatedAt:serverTimestamp()
+    });
+    showToast("✅ Buyurtma statusi yangilandi.");
+  }catch(e){
+    console.error("Status yangilash xato:", e);
+    showToast("⚠️ Status yangilashda xato.");
+  }
 }
 
-/* =========================================
-   DETAIL GALLERY
-========================================= */
-function getDetailImages() {
-  const p = products[detailIndex];
-  return p?.images?.length ? p.images : [];
-}
-
-function renderDetailImage() {
-  const imgs = getDetailImages();
-  if (!imgs.length || !detailImageEl || !detailImageIndexEl) return;
-
-  if (detailImageIndex < 0)             detailImageIndex = imgs.length - 1;
-  if (detailImageIndex >= imgs.length)  detailImageIndex = 0;
-
-  detailImageEl.src = imgs[detailImageIndex];
-  detailImageIndexEl.textContent = `${detailImageIndex + 1} / ${imgs.length}`;
-}
-
-if (detailPrevBtn) {
-  detailPrevBtn.addEventListener("click", e => {
-    e.stopPropagation();
-    detailImageIndex--;
-    renderDetailImage();
-  });
-}
-
-if (detailNextBtn) {
-  detailNextBtn.addEventListener("click", e => {
-    e.stopPropagation();
-    detailImageIndex++;
-    renderDetailImage();
-  });
-}
-
-/* =========================================
-   DETAIL QTY
-========================================= */
-if (detailQtyMinus) {
-  detailQtyMinus.addEventListener("click", e => {
-    e.stopPropagation();
-    if (detailQty > 1) {
-      detailQty--;
-      if (detailQtyValue) detailQtyValue.textContent = detailQty;
-    }
-  });
-}
-
-if (detailQtyPlus) {
-  detailQtyPlus.addEventListener("click", e => {
-    e.stopPropagation();
-    detailQty++;
-    if (detailQtyValue) detailQtyValue.textContent = detailQty;
-  });
-}
-
-/* =========================================
-   DETAIL — ADD TO CART
-========================================= */
-if (detailAddBtn) {
-  detailAddBtn.addEventListener("click", () => {
-    const p = products[detailIndex];
-    if (!p) return;
-
-    // allaqachon qo‘shilgan bo‘lsa → magazinga qaytish
-    if (detailAddBtn.classList.contains("added")) {
-      closeProductDetail();
-      return;
-    }
-
-    const found = cart.find(c => c.id === p.id);
-    if (found) {
-      found.qty += detailQty;
-    } else {
-      cart.push({ id: p.id, qty: detailQty });
-    }
-
-    updateCartUI();
-    detailAddBtn.classList.add("added");
-    detailAddBtn.textContent = "⬅️ Magaziniga qaytish";
-  });
-}
-
-/* =========================================
-   BUYURTMA YARATISH (MIJOZ)
-========================================= */
-async function sendOrder() {
-  if (!cart.length) {
-    showToast("Savat bo‘sh");
+/* SEND ORDER (ENDI FIRESTOREGA) */
+async function sendOrder(){
+  if(cart.length===0){
+    showToast("Savat bo‘sh. Avval mahsulot tanlang.");
+    return;
+  }
+  const customer = askCustomerInfo();
+  if(!customer){
+    showToast("❌ Mijoz ma’lumoti kiritilmadi.");
     return;
   }
 
-  const info = getCustomerInfo();
-  if (!info) {
-    showToast("Ma'lumot to‘liq emas");
-    return;
-  }
-
-  const orderItems = cart.map(c => {
-    const p = products.find(pp => pp.id === c.id);
-    if (!p) return null;
+  let totalPrice = 0;
+  const items = cart.map(c=>{
+    const p = products[c.index];
+    if(!p) return null;
+    const lineTotal = p.price*c.qty;
+    totalPrice += lineTotal;
     return {
-      productId: p.id,
-      name: p.name,
-      price: p.price,
-      qty: c.qty
+      name:p.name || "",
+      qty:c.qty,
+      price:p.price || 0,
+      category:p.category || ""
     };
   }).filter(Boolean);
 
-  const total = orderItems.reduce((a, c) => a + c.price * c.qty, 0);
-
-  try {
-    await addDoc(ordersCol, {
-      userId: currentUserId,
-      customer: info,
-      items: orderItems,
-      total,
-      status: "pending",
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      deliverTime: null,
-      payment: "unpaid"
+  try{
+    const docRef = await addDoc(ordersCol,{
+      clientId,
+      customer,
+      items,
+      totalPrice,
+      status:"pending",
+      createdAt:serverTimestamp(),
+      updatedAt:serverTimestamp()
     });
-    showToast("Buyurtma yuborildi!");
-    play(sNewOrder);
+
+    showToast("✅ Buyurtma qabul qilindi. Holatini 'Buyurtmalarim' bo‘limidan ko‘rasiz.");
     cart = [];
     updateCartUI();
+    renderCartItems();
     toggleCartSheet(false);
-  } catch (e) {
-    console.error(e);
-    showToast("Xatolik: buyurtma yuborilmadi");
+
+    localStorage.setItem("beauty_last_order_id", docRef.id);
+  }catch(e){
+    console.error("Order yozish xato:", e);
+    showToast("⚠️ Buyurtma saqlashda xato.");
   }
 }
 
-/* =========================================
-   MIJOZ BUYURTMALARI REAL-TIME
-========================================= */
-function subscribeMyOrders() {
-  if (!currentUserId || !ordersListEl) return;
+/* TABS */
+if(tabsEl){
+  tabsEl.addEventListener("click", e=>{
+    const btn = e.target.closest(".tab-btn");
+    if(!btn) return;
+    const pageId = btn.dataset.page;
 
-  onSnapshot(ordersCol, snap => {
-    let list = [];
-    snap.forEach(d => {
-      const data = d.data();
-      if (data.userId === currentUserId) {
-        list.push({
-          id: d.id,
-          ...data
-        });
-      }
-    });
-    renderMyOrders(list);
+    if(pageId==="adminPage" && !isAdmin){
+      showToast("👑 Avval admin kodini kiriting.");
+      return;
+    }
+
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+
+    document.getElementById("shopPage").classList.add("hidden");
+    document.getElementById("ordersPage").classList.add("hidden");
+    document.getElementById("adminPage").classList.add("hidden");
+
+    document.getElementById(pageId).classList.remove("hidden");
   });
 }
 
-function renderMyOrders(list) {
-  if (!ordersListEl) return;
-
-  if (!list.length) {
-    ordersListEl.innerHTML = `
-      <p style="text-align:center;color:#94a3b8;padding:20px">
-        Buyurtmalar yo‘q
-      </p>`;
+/* ADMIN LOGIN */
+function updateAdminUI(){
+  if(isAdmin){
+    adminTabBtn.classList.remove("hidden");
+    adminAccessBtn.classList.add("admin-active");
+    adminAccessBtn.textContent = "👑 Admin (kirdingiz)";
+  }else{
+    adminTabBtn.classList.add("hidden");
+    adminAccessBtn.classList.remove("admin-active");
+    adminAccessBtn.textContent = "👑 Admin uchun";
+  }
+}
+async function askAdminCode(){
+  if(isAdmin){
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    adminTabBtn.classList.add("active");
+    document.getElementById("shopPage").classList.add("hidden");
+    document.getElementById("ordersPage").classList.add("hidden");
+    document.getElementById("adminPage").classList.remove("hidden");
     return;
   }
+  const code = prompt("Admin uchun kirish kodi:");
+  if(code===null) return;
 
-  let html = "";
-  list.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
-  list.forEach(o => {
-    let statusColor = "status-pending";
-    if (o.status === "confirmed") statusColor = "status-confirmed";
-    if (o.status === "courier")   statusColor = "status-courier";
-    if (o.status === "delivered") statusColor = "status-delivered";
-    if (o.status === "finished")  statusColor = "status-delivered";
-    if (o.status === "rejected")  statusColor = "status-rejected";
-
-    html += `
-      <div class="order-card ${o.status === "finished" ? "order-completed" : ""}">
-        <div><b>№${o.id.slice(-5)}</b> — ${o.total.toLocaleString()} so‘m</div>
-        <div class="order-status ${statusColor}">
-          ${renderStatusText(o.status)}
-        </div>
-        <div style="margin-top:10px;font-size:13px;color:#94a3b8">
-          ${o.items.length} ta mahsulot
-        </div>
-        ${o.status === "delivered" ? `
-          <button class="confirm-btn" onclick="confirmReceived('${o.id}')">
-            Tasdiqlayman — buyurtma oldim
-          </button>
-        ` : ""}
-      </div>`;
-  });
-
-  ordersListEl.innerHTML = html;
-}
-
-function renderStatusText(s) {
-  return {
-    pending:   "⏳ Admin tasdiqlashi kutilmoqda",
-    confirmed: "🧾 Buyurtma tasdiqlandi",
-    courier:   "🚚 Kuryer yo‘lda",
-    delivered: "📦 Yetkazib berildi — mijoz tasdiqlashi kerak",
-    finished:  "✅ Buyurtma yakunlandi",
-    rejected:  "❌ Bekor qilindi"
-  }[s] || "Holat noma'lum";
-}
-
-async function confirmReceived(id) {
-  try {
-    await updateDoc(doc(db,"beauty_orders",id), {
-      status: "finished",
-      updatedAt: serverTimestamp()
-    });
-    play(sUserConfirm);
-    showToast("Rahmat! Buyurtma yakunlandi.");
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-/* =========================================
-   ADMIN LOGIN
-========================================= */
-adminAccessBtn?.addEventListener("click", async () => {
-  const code = prompt("Admin kodi:");
-  if (!code) return;
-
-  try {
-    const snap = await getDoc(adminSettings);
-    const data = snap.data();
-    if (data?.code === code) {
+  try{
+    const settingsRef = doc(db,"beauty_admin_settings","security");
+    const snap        = await getDoc(settingsRef);
+    if(!snap.exists()){
+      showToast("⚠️ Admin kodi Firestore’da hali sozlanmagan.");
+      return;
+    }
+    const data     = snap.data();
+    const realCode = String(data.adminCode || data.code || "").trim();
+    if(!realCode){
+      showToast("⚠️ Admin kodi noto‘g‘ri sozlangan.");
+      return;
+    }
+    if(code===realCode){
       isAdmin = true;
-      showToast("Admin rejimiga o'tildi");
-      adminTabBtn?.classList.remove("hidden");
-      const adminTab = tabsEl?.querySelector("[data-page='adminPage']");
-      adminTab?.click();
-      subscribeAdminOrders();
-    } else {
-      showToast("Noto‘g‘ri kod");
+      updateAdminUI();
+      subscribeAdminOrders(); // faqat admin bo‘lganda
+      showToast("✅ Admin sifatida kirdingiz.");
+    }else{
+      showToast("❌ Noto‘g‘ri kod.");
     }
-  } catch (e) {
-    console.error(e);
+  }catch(e){
+    console.error("Admin kod xato:", e);
+    showToast("⚠️ Admin kodi tekshiruvida xato.");
   }
-});
-
-/* =========================================
-   ADMIN ORDERS REAL-TIME LISTENER
-========================================= */
-function subscribeAdminOrders() {
-  if (!adminOrdersListEl) return;
-
-  onSnapshot(ordersCol, snap => {
-    let list = [];
-    snap.forEach(d => {
-      list.push({
-        id: d.id,
-        ...d.data()
-      });
-    });
-    list.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-    renderAdminOrders(list);
-  });
+}
+if(adminAccessBtn){
+  adminAccessBtn.addEventListener("click", askAdminCode);
 }
 
-/* =========================================
-   ADMIN RENDER BUYURTMALAR
-========================================= */
-function renderAdminOrders(list) {
-  if (!adminOrdersListEl) return;
-
-  if (!list.length) {
-    adminOrdersListEl.innerHTML = `
-      <p style="text-align:center;padding:20px;color:#94a3b8">
-        Buyurtmalar yo‘q
-      </p>`;
+/* ADMIN: CATEGORY */
+function updateAdminCategorySelect(){
+  if(!adminCategoryEl) return;
+  const current = adminCategoryEl.value;
+  adminCategoryEl.innerHTML = "";
+  if(!categories.length){
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Avval kategoriyani qo‘shing";
+    adminCategoryEl.appendChild(opt);
     return;
   }
-
-  let html = "";
-  list.forEach(o => {
-    let statusColor = "status-pending";
-    if (o.status === "confirmed") statusColor = "status-confirmed";
-    if (o.status === "courier")   statusColor = "status-courier";
-    if (o.status === "delivered") statusColor = "status-delivered";
-    if (o.status === "finished")  statusColor = "status-delivered";
-    if (o.status === "rejected")  statusColor = "status-rejected";
-
-    html += `
-      <div class="order-card admin-order ${o.status === "finished" ? "order-completed" : ""}">
-        <div class="order-head">
-          <div><b>№${o.id.slice(-5)}</b></div>
-          <div>${o.total.toLocaleString()} so‘m</div>
-        </div>
-        <div class="order-customer">
-          👤 ${o.customer.name}<br>
-          📱 ${o.customer.phone}<br>
-          📍 ${o.customer.address}
-        </div>
-        <div class="order-status ${statusColor}">
-          ${renderStatusText(o.status)}
-        </div>
-        <div class="order-items">
-          ${renderAdminOrderItems(o.items)}
-        </div>
-        <div class="order-actions">
-          ${renderAdminButtons(o)}
-        </div>
-      </div>`;
+  categories.forEach(cat=>{
+    const opt = document.createElement("option");
+    opt.value = cat.code;
+    opt.textContent = cat.label;
+    adminCategoryEl.appendChild(opt);
   });
-
-  adminOrdersListEl.innerHTML = html;
+  if(current && categories.some(c=>c.code===current)){
+    adminCategoryEl.value = current;
+  }
 }
-
-/* =========================================
-   ADMIN ORDER ITEMS
-========================================= */
-function renderAdminOrderItems(items) {
-  return items.map(i => `
-    <div class="admin-item-row">
-      <div>${i.name}</div>
-      <div>${i.qty} × ${i.price}</div>
-    </div>
-  `).join("");
+function renderCategoryAdminList(){
+  if(!adminCategoryListEl) return;
+  if(!categories.length){
+    adminCategoryListEl.innerHTML = "<p class='cart-empty'>Hozircha kategoriya yo‘q.</p>";
+    return;
+  }
+  adminCategoryListEl.innerHTML = "";
+  categories.forEach(cat=>{
+    adminCategoryListEl.innerHTML += `
+      <div class="admin-product-row">
+        <span>${cat.emoji} <b>${cat.label}</b> <small>(${cat.code})</small></span>
+        <button class="admin-edit-btn" onclick="editCategory('${cat.id}')">✏️</button>
+        <button class="admin-delete-btn" onclick="deleteCategory('${cat.id}')">✕</button>
+      </div>
+    `;
+  });
 }
-
-/* =========================================
-   ADMIN STATUS BUTTONS
-========================================= */
-function renderAdminButtons(o) {
-  if (o.status === "pending") {
-    return `
-      <button class="btn-ok" onclick="adminConfirm('${o.id}')">Tasdiqlash</button>
-      <button class="btn-reject" onclick="adminReject('${o.id}')">Bekor qilish</button>
-    `;
+async function saveCategory(){
+  if(!adminCatCodeEl || !adminCatLabelEl) return;
+  const rawCode = adminCatCodeEl.value.trim();
+  const code    = rawCode.toLowerCase();
+  const label   = adminCatLabelEl.value.trim();
+  const emoji   = (adminCatEmojiEl.value.trim() || "💅");
+  if(!code || !label){
+    showToast("❌ Kategoriya kodi va nomini kiriting.");
+    return;
   }
-  if (o.status === "confirmed") {
-    return `
-      <button class="btn-ok" onclick="adminCourier('${o.id}')">Kuryerga berish</button>
-    `;
-  }
-  if (o.status === "courier") {
-    return `
-      <button class="btn-delivered" onclick="adminDelivered('${o.id}')">Yetkazildi</button>
-    `;
-  }
-  if (o.status === "delivered") {
-    return `
-      <p class="wait-text">Mijoz tasdiqlashi kutilmoqda...</p>
-    `;
-  }
-  if (o.status === "finished") {
-    return `
-      <p class="done-text">Buyurtma yakunlandi</p>
-    `;
-  }
-  if (o.status === "rejected") {
-    return `
-      <p class="reject-text">Bekor qilingan</p>
-    `;
-  }
-  return "";
-}
-
-/* =========================================
-   ADMIN STATUS FUNKSIYALAR
-========================================= */
-async function adminConfirm(id) {
-  await updateOrderStatus(id, "confirmed");
-  play(sConfirmed);
-}
-
-async function adminCourier(id) {
-  await updateOrderStatus(id, "courier");
-  play(sCourier);
-  const time = prompt("Kuryer necha daqiqada yetkazadi?");
-  if (time) {
-    try {
-      await updateDoc(doc(db,"beauty_orders",id), {
-        deliverTime: time
+  try{
+    const existing = categories.find(c=>c.code===code);
+    if(existing){
+      await updateDoc(doc(db,"beauty_categories",existing.id),{
+        code,label,emoji,updatedAt:serverTimestamp()
       });
-    } catch (e) {
-      console.error(e);
+      showToast("✅ Kategoriya yangilandi.");
+    }else{
+      await addDoc(categoriesCol,{
+        code,label,emoji,order:categories.length,createdAt:serverTimestamp()
+      });
+      showToast("✅ Kategoriya qo‘shildi.");
     }
+    adminCatCodeEl.value  = "";
+    adminCatLabelEl.value = "";
+    adminCatEmojiEl.value = "";
+  }catch(e){
+    console.error("Kategoriya saqlash xato:", e);
+    showToast("⚠️ Kategoriya saqlashda xato.");
+  }
+}
+function editCategory(id){
+  const cat = categories.find(c=>c.id===id);
+  if(!cat) return;
+  editingCategoryId     = id;
+  adminCatCodeEl.value  = cat.code;
+  adminCatLabelEl.value = cat.label;
+  adminCatEmojiEl.value = cat.emoji;
+  showToast("✏️ Kategoriya tahrirlash rejimi.");
+}
+async function deleteCategory(id){
+  if(!confirm("Bu kategoriyani o‘chirishni xohlaysizmi?")) return;
+  try{
+    await deleteDoc(doc(db,"beauty_categories",id));
+    showToast("🗑 Kategoriya o‘chirildi.");
+  }catch(e){
+    console.error("Kategoriya o‘chirish xato:", e);
+    showToast("⚠️ Kategoriya o‘chirishda xato.");
   }
 }
 
-async function adminDelivered(id) {
-  await updateOrderStatus(id, "delivered");
-  play(sDelivered);
+/* ADMIN: PRODUCTS */
+function flashAdminButton(text){
+  const btn = document.querySelector(".admin-btn");
+  if(!btn) return;
+  btn.textContent = text;
+  btn.classList.add("admin-btn-success");
+  setTimeout(()=>{
+    btn.classList.remove("admin-btn-success");
+    btn.textContent = editingProductId
+      ? "💾 Mahsulotni saqlash (tahrirlash)"
+      : "➕ Mahsulotni qo‘shish (Firestore)";
+  }, 1500);
 }
+async function addCustomProduct(){
+  const name        = adminNameEl.value.trim();
+  const category    = adminCategoryEl.value;
+  const basePrice   = parseInt(adminPriceBaseEl.value || "0",10);
+  const hasDiscount = adminHasDiscountEl.checked;
+  const discountRaw = adminPriceDiscountEl.value
+    ? parseInt(adminPriceDiscountEl.value || "0",10)
+    : null;
+  const tag         = adminTagEl.value.trim();
+  const description = adminDescriptionEl.value.trim();
 
-async function adminReject(id) {
-  await updateOrderStatus(id, "rejected");
-  play(sRejected);
+  if(!name || !basePrice || basePrice<=0){
+    showToast("❌ Nomi va narxini to‘g‘ri kiriting.");
+    return;
+  }
+  if(!category){
+    showToast("❌ Kategoriya tanlang.");
+    return;
+  }
+
+  let price = basePrice;
+  let oldPrice = null;
+  if(hasDiscount && discountRaw && discountRaw>0 && discountRaw<basePrice){
+    price    = discountRaw;
+    oldPrice = basePrice;
+  }
+
+  let images = normalizeImagesInput(adminImagesEl.value.trim());
+  if(!images.length) images = [RAW_PREFIX + "noimage.png"];
+
+  const emoji = categoryEmoji[category] || "💅";
+  const payload = { name,price,oldPrice,category,emoji,tag,description,images };
+
+  try{
+    if(editingProductId){
+      await updateDoc(doc(db,"beauty_products",editingProductId),{
+        ...payload,updatedAt:serverTimestamp()
+      });
+      remoteProducts = remoteProducts.map(p=>p.id===editingProductId?{...p,...payload}:p);
+      rebuildProducts();
+      renderAdminCustomList();
+      showToast("✅ Mahsulot yangilandi.");
+      flashAdminButton("✅ Yangilandi");
+    }else{
+      const docRef = await addDoc(productsCol,{
+        ...payload,createdAt:serverTimestamp()
+      });
+      remoteProducts.push({
+        id:docRef.id,fromFirebase:true,...payload,createdAt:{seconds:Date.now()/1000}
+      });
+      rebuildProducts();
+      renderAdminCustomList();
+      showToast("✅ Mahsulot qo‘shildi.");
+      flashAdminButton("✅ Qo‘shildi");
+    }
+    editingProductId             = null;
+    adminNameEl.value           = "";
+    adminPriceBaseEl.value      = "";
+    adminPriceDiscountEl.value  = "";
+    adminHasDiscountEl.checked  = false;
+    adminTagEl.value            = "";
+    adminDescriptionEl.value    = "";
+    adminImagesEl.value         = "";
+  }catch(e){
+    console.error("Mahsulot saqlash xato:", e);
+    showToast("⚠️ Mahsulot saqlashda xato.");
+  }
 }
-
-async function updateOrderStatus(id, status) {
-  try {
-    await updateDoc(doc(db,"beauty_orders",id), {
-      status,
-      updatedAt: serverTimestamp()
+async function deleteAnyProduct(id){
+  if(!confirm("Bu mahsulotni o‘chirishni xohlaysizmi?")) return;
+  try{
+    await deleteDoc(doc(db,"beauty_products",id));
+    remoteProducts = remoteProducts.filter(p=>p.id!==id);
+    rebuildProducts();
+    renderAdminCustomList();
+    showToast("🗑 Mahsulot o‘chirildi.");
+  }catch(e){
+    console.error("Mahsulot o‘chirish xato:", e);
+    showToast("⚠️ Mahsulot o‘chirishda xato.");
+  }
+}
+function renderAdminCustomList(){
+  const adminCustomListEl = document.getElementById("adminCustomList");
+  if(!adminCustomListEl) return;
+  if(!remoteProducts.length){
+    adminCustomListEl.innerHTML = "<p class='cart-empty'>Hozircha mahsulot yo‘q.</p>";
+    return;
+  }
+  adminCustomListEl.innerHTML = "";
+  remoteProducts
+    .slice()
+    .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))
+    .forEach(p=>{
+      adminCustomListEl.innerHTML += `
+        <div class="admin-product-row">
+          <span>${p.name}</span>
+          <span>${formatPrice(p.price)} so‘m</span>
+          <button class="admin-edit-btn" onclick="editProduct('${p.id}')">✏️</button>
+          <button class="admin-delete-btn" onclick="deleteAnyProduct('${p.id}')">✕</button>
+        </div>
+      `;
     });
-  } catch (e) {
-    console.error(e);
+}
+function editProduct(id){
+  const p = remoteProducts.find(r=>r.id===id);
+  if(!p) return;
+  editingProductId = id;
+  adminNameEl.value     = p.name || "";
+  adminCategoryEl.value = p.category || "";
+  if(p.oldPrice && p.oldPrice>p.price){
+    adminPriceBaseEl.value      = p.oldPrice;
+    adminPriceDiscountEl.value  = p.price;
+    adminHasDiscountEl.checked  = true;
+  }else{
+    adminPriceBaseEl.value      = p.price;
+    adminPriceDiscountEl.value  = "";
+    adminHasDiscountEl.checked  = false;
   }
+  adminTagEl.value         = p.tag || "";
+  adminDescriptionEl.value = p.description || "";
+  adminImagesEl.value      = (p.images && p.images.length) ? p.images.join(", ") : "";
+  const btn = document.querySelector(".admin-btn");
+  if(btn) btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
+  showToast("✏️ Tahrirlash rejimi.");
 }
 
-/* =========================================
-   ADMIN MAHSULOT QO‘SHISH
-========================================= */
-async function addCustomProduct() {
-  const name          = document.getElementById("adminName")?.value.trim();
-  const priceBase     = Number(document.getElementById("adminPriceBase")?.value);
-  const hasDiscount   = document.getElementById("adminHasDiscount")?.checked;
-  const priceDiscount = Number(document.getElementById("adminPriceDiscount")?.value);
-  const category      = document.getElementById("adminCategory")?.value.trim();
-  const tag           = document.getElementById("adminTag")?.value.trim();
-  const description   = document.getElementById("adminDescription")?.value.trim();
-  const imagesRaw     = document.getElementById("adminImages")?.value.trim();
-
-  if (!name || !priceBase || !category) {
-    showToast("Maydonlar to‘liq emas");
-    return;
-  }
-
-  const imgs = (imagesRaw || "")
-    .split(",")
-    .map(a => a.trim())
-    .filter(Boolean);
-
-  try {
-    await addDoc(productsCol, {
-      name,
-      price: hasDiscount ? priceDiscount : priceBase,
-      oldPrice: hasDiscount ? priceBase : null,
-      category,
-      tag,
-      description,
-      images: imgs
-    });
-    showToast("Mahsulot qo‘shildi!");
-  } catch (e) {
-    console.error(e);
+/* PRODUCT DETAIL */
+function getDetailImages(){
+  if(detailIndex===null) return [RAW_PREFIX + "noimage.png"];
+  const p = products[detailIndex];
+  if(!p) return [RAW_PREFIX + "noimage.png"];
+  if(p.images && p.images.length) return p.images;
+  return [RAW_PREFIX + "noimage.png"];
+}
+function renderDetailImage(){
+  if(!detailImageEl) return;
+  const imgs = getDetailImages();
+  if(!imgs.length) return;
+  if(detailImageIndex>=imgs.length) detailImageIndex=0;
+  if(detailImageIndex<0) detailImageIndex=imgs.length-1;
+  setImageWithPngJpgFallback(detailImageEl, imgs[detailImageIndex]);
+  if(detailImageIndexEl){
+    detailImageIndexEl.textContent = `${detailImageIndex+1} / ${imgs.length}`;
   }
 }
-
-/* =========================================
-   ADMIN CATEGORY CRUD
-========================================= */
-async function saveCategory() {
-  const code  = document.getElementById("adminCatCode")?.value.trim();
-  const label = document.getElementById("adminCatLabel")?.value.trim();
-  const emoji = document.getElementById("adminCatEmoji")?.value.trim();
-
-  if (!code || !label) {
-    showToast("Maydonlar to‘liq emas");
-    return;
+function changeDetailImage(delta){
+  if(detailIndex===null) return;
+  const imgs = getDetailImages();
+  if(imgs.length<=1) return;
+  detailImageIndex = (detailImageIndex+delta+imgs.length)%imgs.length;
+  renderDetailImage();
+}
+function clearDetailCountdown(){
+  if(detailCountdownTimer){
+    clearInterval(detailCountdownTimer);
+    detailCountdownTimer=null;
   }
-
-  try {
-    await addDoc(categoriesCol, { code, label, emoji });
-    showToast("Kategoriya qo‘shildi!");
-  } catch (e) {
-    console.error(e);
+  if(detailBackBtn){
+    detailBackBtn.classList.add("hidden");
+    detailBackBtn.textContent = "◀ Magaziniga qaytish";
+    detailBackBtn.style.color = "";
   }
 }
+function openProductDetail(index){
+  const p = products[index];
+  if(!p) return;
+  detailIndex      = index;
+  detailImageIndex = 0;
+  detailQty        = 1;
+  clearDetailCountdown();
 
-/* =========================================
-   TAB NAVIGATION
-========================================= */
-tabsEl?.addEventListener("click", (e) => {
-  const btn = e.target.closest(".tab-btn");
-  if (!btn) return;
-
-  const page = btn.dataset.page;
-
-  // Admin bo‘limiga faqat admin kira oladi
-  if (page === "adminPage" && !isAdmin) {
-    showToast("Admin kodini kiriting");
-    return;
+  const catLbl = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
+  renderDetailImage();
+  detailCategoryEl.textContent = catLbl;
+  detailNameEl.textContent     = p.name;
+  detailTagEl.textContent      = p.tag ? "💡 " + p.tag : "";
+  detailDescEl.textContent =
+    p.description && p.description.trim().length
+      ? p.description
+      : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan.";
+  detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
+  if(p.oldPrice){
+    detailOldPriceEl.classList.remove("hidden");
+    detailOldPriceEl.textContent = formatPrice(p.oldPrice)+" so‘m";
+  }else{
+    detailOldPriceEl.classList.add("hidden");
   }
+  detailQtyValue.textContent = detailQty;
+  detailAddBtn.classList.remove("added");
+  detailAddBtn.textContent   = "🛒 Savatga qo‘shish";
 
-  document.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
-  btn.classList.add("active");
-
-  document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
-  const pageEl = document.getElementById(page);
-  pageEl?.classList.remove("hidden");
-
-  if (page === "customerOrdersPage") {
-    subscribeMyOrders();
-  }
-});
-
-/* =========================================
-   TELEGRAM WebApp BACK / CLOSE EVENTS
-========================================= */
-if (tg) {
-  tg.onEvent("backButtonClicked", () => {
-    closeProductDetail();
-  });
-  tg.BackButton.show();
-}
-
-/* =========================================
-   BODY SCROLL LOCK HELPERS
-========================================= */
-function lockBody() {
+  productDetailOverlay.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 }
-
-function unlockBody() {
+function closeProductDetail(){
+  clearDetailCountdown();
+  productDetailOverlay.classList.add("hidden");
   document.body.style.overflow = "";
+  detailIndex = null;
 }
 
-/* =========================================
-   WINDOW EXPORT (GLOBAL)
-========================================= */
-window.sendOrder         = sendOrder;
-window.openProductDetail = openProductDetail;
-window.closeProductDetail= closeProductDetail;
-window.adminConfirm      = adminConfirm;
-window.adminReject       = adminReject;
-window.adminCourier      = adminCourier;
-window.adminDelivered    = adminDelivered;
-window.addCustomProduct  = addCustomProduct;
-window.saveCategory      = saveCategory;
-window.addToCart         = addToCart;
-window.changeQty         = changeQty;
-window.removeFromCart    = removeFromCart;
-window.toggleCartSheet   = toggleCartSheet;
-window.confirmReceived   = confirmReceived;
+if(detailAddBtn){
+  detailAddBtn.addEventListener("click", ()=>{
+    if(detailIndex===null) return;
+    if(detailAddBtn.classList.contains("added")){
+      closeProductDetail();
+      return;
+    }
+    addToCart(detailIndex, detailQty);
+    detailAddBtn.classList.add("added");
+    detailAddBtn.textContent = "⬅️ Magaziniga qaytish";
+    if(detailBackBtn) detailBackBtn.classList.remove("hidden");
+  });
+}
+if(detailBackBtn){
+  detailBackBtn.addEventListener("click", closeProductDetail);
+}
+if(productDetailOverlay){
+  productDetailOverlay.addEventListener("click", e=>{
+    if(e.target===productDetailOverlay) closeProductDetail();
+  });
+}
+if(detailPrevBtn){
+  detailPrevBtn.addEventListener("click", e=>{
+    e.stopPropagation();
+    changeDetailImage(-1);
+  });
+}
+if(detailNextBtn){
+  detailNextBtn.addEventListener("click", e=>{
+    e.stopPropagation();
+    changeDetailImage(1);
+  });
+}
+if(detailQtyMinus){
+  detailQtyMinus.addEventListener("click", e=>{
+    e.stopPropagation();
+    if(detailQty>1){
+      detailQty--;
+      detailQtyValue.textContent = detailQty;
+    }
+  });
+}
+if(detailQtyPlus){
+  detailQtyPlus.addEventListener("click", e=>{
+    e.stopPropagation();
+    detailQty++;
+    detailQtyValue.textContent = detailQty;
+  });
+}
 
-/* =========================================
-   INIT — START SYSTEM
-========================================= */
-(function init() {
-  const savedTheme = localStorage.getItem(themeKey) || "dark";
+/* INIT */
+(function init(){
+  const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
   applyTheme(savedTheme);
 
-  loadCustomerInfo();
+  clientId = getOrCreateClientId();
   renderCustomerInfo();
 
-  // Unikal foydalanuvchi ID
-  currentUserId = localStorage.getItem("beautyUserId");
-  if (!currentUserId) {
-    currentUserId = "U" + Math.random().toString(36).slice(2);
-    localStorage.setItem("beautyUserId", currentUserId);
-  }
+  isAdmin = false;
+  updateAdminUI();
 
-  subscribeProducts();
-  subscribeCategories();
-  subscribeMyOrders();
+  renderCategoryFilter();
+  renderProducts();
+
+  subscribeProductsRealtime();
+  subscribeCategoriesRealtime();
+  subscribeClientOrders();
 })();
+
+/* GLOBAL EXPORTS */
+window.addToCart          = addToCart;
+window.toggleCartSheet    = toggleCartSheet;
+window.changeQty          = changeQty;
+window.removeFromCart     = removeFromCart;
+window.sendOrder          = sendOrder;
+window.openProductDetail  = openProductDetail;
+window.closeProductDetail = closeProductDetail;
+
+window.resetCustomerInfo  = resetCustomerInfo;
+window.editCustomerInfo   = editCustomerInfo;
+
+window.saveCategory       = saveCategory;
+window.deleteCategory     = deleteCategory;
+window.editCategory       = editCategory;
+
+window.addCustomProduct   = addCustomProduct;
+window.deleteAnyProduct   = deleteAnyProduct;
+window.editProduct        = editProduct;
+
+window.updateOrderStatus  = updateOrderStatus;
