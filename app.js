@@ -599,19 +599,21 @@ function sendOrder() {
   // 1) Bot chatini ochamiz
   openTelegramUrl(url);
 
-  // 2) Biroz kutib, hamma narsani tozalaymiz va WebAppni yopamiz
+  // 2) Biroz kutib, faqat savatni tozalaymiz va WebAppni yopamiz
   setTimeout(() => {
+    // ✅ Savatni butunlay tozalash
     cart = [];
     updateCartUI();
     renderCartItems();
     toggleCartSheet(false);
 
-    // mijoz ma'lumotlarini ham eslab qolmasin
-    localStorage.removeItem(STORAGE_CUSTOMER);
-    renderCustomerInfo();
+    // ❌ mijoz ma'lumotini endi O‘CHIRMAYMIZ
+    // localStorage.removeItem(STORAGE_CUSTOMER);  // BU QATOR OLIB TASHLANDI
+    // renderCustomerInfo();                       // xohlasang qoldirsang ham bo‘ladi, lekin shart emas
 
     orderJustSent = false;
 
+    // WebApp’ni yopish
     if (tg && typeof tg.close === "function") {
       try { tg.close(); } catch (e) {}
     }
@@ -619,6 +621,7 @@ function sendOrder() {
 
   showToast("✅ Buyurtma matni tayyorlandi. Telegramda 'Yuborish' tugmasini bosing.");
 }
+
 
 /* THEME */
 function applyTheme(theme) {
