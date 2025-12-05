@@ -75,6 +75,17 @@ let detailCountdownTimer     = null;
 let detailCountdownRemaining = 0;
 let isImageFullscreen        = false; // FULLSCREEN HOLATI
 
+// TOUCH / SWIPE / PINCH STATE (detail rasm uchun)
+let touchStartX   = 0;
+let touchStartY   = 0;
+let touchStartTime = 0;
+let isSwiping     = false;
+
+let pinchStartDist  = 0;
+let pinchBaseScale  = 1;
+let currentScale    = 1;
+let isPinching      = false;
+
 // COURIER STATE
 let courierSelectedOrderId = null;
 
@@ -115,7 +126,7 @@ const detailQtyMinus = document.getElementById("detailQtyMinus");
 const detailQtyPlus  = document.getElementById("detailQtyPlus");
 const detailQtyValue = document.getElementById("detailQtyValue");
 
-// detail rasm konteyneri (fullscreen uchun)
+// detail rasm konteyneri (swipe / pinch uchun)
 const detailImgWrap = document.querySelector(".detail-img-wrap");
 
 // ADMIN FORM DOM
@@ -147,7 +158,9 @@ const courierInfoEl      = document.getElementById("courierInfo");
 const notifySoundEl = document.getElementById("notifySound");
 
 /* HELPERS */
-function formatPrice(v){ return (v || 0).toLocaleString("uz-UZ"); }
+function formatPrice(v){
+  return (v || 0).toLocaleString("uz-UZ");
+}
 
 function showToast(message, duration = 1800){
   if(!toastEl) return;
@@ -323,8 +336,8 @@ function promptNewCustomerInfo(){
   const address = prompt("📍 Asosiy manzil (shahar, tuman, ko‘cha, uy):");
   if(!address) return null;
 
-  const landmark = prompt("🧭 Mo‘ljal (masalan, bozor oldi, maktab yonida) — ixtiyoriy:") || "";
-  const secondPhone = prompt("📞 Qo‘shimcha telefon raqam (ixtiyoriy):") || "";
+  const landmark      = prompt("🧭 Mo‘ljal (masalan, bozor oldi, maktab yonida) — ixtiyoriy:") || "";
+  const secondPhone   = prompt("📞 Qo‘shimcha telefon raqam (ixtiyoriy):") || "";
   const preferredTime = prompt("⏰ Buyurtmani qaysi vaqtda qabul qilishni xohlaysiz? (ixtiyoriy):") || "";
 
   const info = {
@@ -686,13 +699,11 @@ function clientStatusMessage(status){
     default:          return "ℹ️ Buyurtma holati yangilandi.";
   }
 }
-
 function notifyClientStatus(status){
   const msg = clientStatusMessage(status);
   showToast(msg, 3000);
   playNotify();
 }
-
 function checkDeliveredThankYou(){
   const hasDelivered = clientOrders.some(o => o.status === "delivered");
   if(hasDelivered){
@@ -1416,7 +1427,7 @@ function setImageFullscreen(on){
   card.classList.toggle("image-fullscreen", isImageFullscreen);
 }
 
-// toggle
+// toggle (hozircha ishlatilmaydi, lekin qoldiramiz)
 function toggleImageFullscreen(){
   setImageFullscreen(!isImageFullscreen);
 }
@@ -1547,11 +1558,118 @@ if(detailQtyPlus){
     detailQtyValue.textContent = detailQty;
   });
 }
-// rasmga bosganda fullscreen / qaytish
-if(detailImgWrap){
-  detailImgWrap.addEventListener("click", e=>{
+
+/* 📷 DETAIL RASM: CLICK, SWIPE, PINCH ZOOM */
+if (detailImgWrap && detailImageEl) {
+
+  // ikki touch orasidagi masofa
+  function distance(t1, t2) {
+    const dx = t1.clientX - t2.clientX;
+    const dy = t1.clientY - t2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  // click: chap / o‘ng tomonga bosilganda rasm almashtirish
+  detailImgWrap.addEventListener("click", (e) => {
     e.stopPropagation();
-    toggleImageFullscreen();
+    const rect = detailImgWrap.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (!rect.width) return;
+
+    if (x < rect.width / 2) {
+      // chap tomon → oldingi rasm
+      changeDetailImage(-1);
+    } else {
+      // o‘ng tomon → keyingi rasm
+      changeDetailImage(1);
+    }
+  });
+
+  // touchstart
+  detailImgWrap.addEventListener(
+    "touchstart",
+    (e) => {
+      if (e.touches.length === 1) {
+        // SWIPE
+        isSwiping = true;
+        isPinching = false;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+      } else if (e.touches.length === 2) {
+        // PINCH ZOOM
+        isSwiping = false;
+        isPinching = true;
+        pinchStartDist = distance(e.touches[0], e.touches[1]);
+        pinchBaseScale = currentScale || 1;
+        detailImageEl.style.transition = "none";
+      }
+    },
+    { passive: true }
+  );
+
+  // touchmove – pinch zoom
+  detailImgWrap.addEventListener(
+    "touchmove",
+    (e) => {
+      if (isPinching && e.touches.length === 2) {
+        e.preventDefault();
+        const dist = distance(e.touches[0], e.touches[1]);
+        if (!pinchStartDist) return;
+
+        let scale = (dist / pinchStartDist) * pinchBaseScale;
+        // 1x–3x orasida cheklaymiz
+        scale = Math.max(1, Math.min(scale, 3));
+        currentScale = scale;
+
+        detailImageEl.style.transform = `scale(${scale})`;
+        detailImageEl.style.transformOrigin = "center center";
+      }
+    },
+    { passive: false }
+  );
+
+  // touchend – swipe va pinch yakunlash
+  detailImgWrap.addEventListener("touchend", (e) => {
+    // PINCH tugadi → avtomatik 1x ga qaytadi
+    if (isPinching && e.touches.length < 2) {
+      isPinching = false;
+      currentScale = 1;
+      detailImageEl.style.transition = "transform .25s ease-out";
+      detailImageEl.style.transform = "scale(1)";
+    }
+
+    // SWIPE tugadi
+    if (isSwiping) {
+      const dt = Date.now() - touchStartTime;
+      const touch = e.changedTouches[0];
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+
+      // tez gorizontal harakat bo‘lsa – rasm almashadi
+      if (dt < 600 && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) {
+          // chapga surdi → keyingi rasm
+          changeDetailImage(1);
+        } else {
+          // o‘ngga surdi → oldingi rasm
+          changeDetailImage(-1);
+        }
+      }
+    }
+
+    isSwiping = false;
+  });
+
+  // touchcancel – zoomni ham reset qiladi
+  detailImgWrap.addEventListener("touchcancel", () => {
+    if (isPinching) {
+      isPinching = false;
+      currentScale = 1;
+      detailImageEl.style.transition = "transform .25s ease-out";
+      detailImageEl.style.transform = "scale(1)";
+    }
+    isSwiping = false;
   });
 }
 
