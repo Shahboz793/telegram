@@ -23,29 +23,39 @@ a{
 }
 .hidden{display:none!important}
 
-/* THEME TOKENS */
+/* ================================
+   THEME – KUNDUZ (LIGHT) QIZIL/YASHIL
+================================ */
 :root{
-  --bg:#f5f3f7;
+  --bg:#f4f4f5;
   --bg-soft:#e5e7eb;
   --panel:#ffffff;
   --card:#ffffff;
-  --text:#111827;
-  --muted:#6b7280;
+  --text:#111111;
+  --muted:#475569;
 
-  /* QIZIL / QORA USLUB */
-  --accent:#ef4444;          /* asosiy qizil */
+  /* QIZIL / YASHIL USLUB */
+  --accent:#dc2626;          /* asosiy qizil */
   --accent-soft:#fee2e2;     /* yumshoq qizil */
-  --accent-strong:#b91c1c;   /* to‘q qizil */
+  --accent-strong:#991b1b;   /* to‘q qizil */
 
-  --border:rgba(0,0,0,0.08);
+  --ok:#16a34a;              /* yutuq – yashil */
+  --ok-soft:#dcfce7;
+  --ok-strong:#0f5f2e;
+
+  --warning:#f59e0b;
+  --danger:#ef4444;
+
+  --border:rgba(0,0,0,0.12);
   --shadow:0 18px 40px rgba(15,23,42,.18);
   --radius:12px;
   --radius-lg:22px;
-  --danger:#ef4444;
-  --ok:#22c55e;
-  --warning:#f59e0b;
-  --chip-bg:#111827;
+  --chip-bg:#ffffff;
 }
+
+/* ================================
+   THEME – TUNGI (DARK) QORA/QIZIL/YASHIL
+================================ */
 body.theme-dark{
   --bg:#020617;
   --bg-soft:#020617;
@@ -54,10 +64,16 @@ body.theme-dark{
   --text:#f9fafb;
   --muted:#9ca3af;
 
-  /* dark rejimda binafsha + qizil aralash */
-  --accent:#7000ff;
-  --accent-soft:#f2edff;
-  --accent-strong:#4c1d95;
+  --accent:#ef4444;          /* neon qizil */
+  --accent-soft:#7f1d1d;
+  --accent-strong:#b91c1c;
+
+  --ok:#22c55e;              /* neon yashil */
+  --ok-soft:#14532d;
+  --ok-strong:#15803d;
+
+  --warning:#facc15;
+  --danger:#ef4444;
 
   --border:rgba(148,163,184,.35);
   --shadow:0 22px 50px rgba(0,0,0,.65);
@@ -74,13 +90,13 @@ body.theme-dark{
   position:sticky;
   top:0;
   z-index:50;
-  background:linear-gradient(90deg,#ff0f7b,#f97316);
+  background:linear-gradient(90deg,#dc2626,#16a34a);
   padding:10px 16px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   border-bottom:1px solid rgba(248,250,252,.25);
-  box-shadow:0 18px 40px rgba(15,23,42,.7);
+  box-shadow:0 18px 40px rgba(0,0,0,.7);
 }
 .logo-wrap{
   display:flex;
@@ -119,8 +135,8 @@ body.theme-dark{
   gap:8px;
 }
 .icon-btn{
-  background:rgba(15,23,42,.4);
-  border:1px solid rgba(248,250,252,.5);
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(248,250,252,.6);
   border-radius:999px;
   padding:7px 10px;
   cursor:pointer;
@@ -129,12 +145,13 @@ body.theme-dark{
   display:flex;
   align-items:center;
   justify-content:center;
+  box-shadow:0 10px 22px rgba(0,0,0,.55);
 }
 .icon-btn:hover{
   border-color:#fff;
 }
 .cart-top-btn{
-  background:linear-gradient(135deg,#7000ff,#4c1d95);
+  background:linear-gradient(135deg,#dc2626,#b91c1c);
   border:none;
   border-radius:999px;
   color:#fff;
@@ -144,14 +161,15 @@ body.theme-dark{
   gap:6px;
   font-size:13px;
   cursor:pointer;
-  box-shadow:0 10px 25px rgba(112,0,255,.7);
+  box-shadow:0 10px 25px rgba(0,0,0,.7);
 }
 .cart-top-btn.hidden{display:none;}
 .pill{
-  background:rgba(0,0,0,.3);
+  background:rgba(0,0,0,.35);
   border-radius:999px;
   padding:2px 8px;
   font-size:11px;
+  color:#e5e7eb;
 }
 .cart-top-total{
   font-size:13px;
@@ -180,11 +198,13 @@ body.theme-dark{
   font-size:13px;
   cursor:pointer;
   color:#9ca3af;
+  transition:background .2s,box-shadow .2s,color .2s,transform .15s;
 }
 .tab-btn.active{
-  background:linear-gradient(135deg,#7000ff,#4c1d95);
+  background:linear-gradient(135deg,#dc2626,#16a34a);
   color:#fff;
-  box-shadow:0 10px 25px rgba(112,0,255,.7);
+  box-shadow:0 10px 25px rgba(0,0,0,.7);
+  transform:translateY(-1px);
 }
 .admin-active{
   border-color:var(--accent);
@@ -217,9 +237,9 @@ body.theme-dark{
   color:#e5e7eb;
 }
 .btn-outline{
-  border-color:#7000ff;
-  color:#e0e7ff;
-  background:rgba(24,24,27,.9);
+  border-color:#22c55e;
+  color:#bbf7d0;
+  background:rgba(12,20,12,.9);
 }
 
 /* SHOP TOOLBAR */
@@ -236,16 +256,20 @@ body.theme-dark{
   border-radius:999px;
   border:1px solid var(--border);
   padding:8px 12px;
-  background:var(--bg);
+  background:var(--bg-soft);
   font-size:13px;
   outline:none;
+  color:var(--text);
 }
+.search-input::placeholder{color:var(--muted);}
 .search-input:focus{
-  border-color:#7000ff;
-  box-shadow:0 0 0 1px rgba(112,0,255,.35);
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px rgba(220,38,38,.35);
 }
 
-/* CATEGORY GRID (4 ta) */
+/* ==========================
+   KATEGORIYA CHIP – 3D EFFEKT
+========================== */
 .chips-row{
   background:var(--panel);
   border-bottom:1px solid var(--border);
@@ -267,15 +291,25 @@ body.theme-dark{
   align-items:center;
   justify-content:center;
   min-height:52px;
-  color:#e5e7eb;
-  box-shadow:0 8px 18px rgba(15,23,42,.55);
+  color:var(--text);
+  box-shadow:0 8px 18px rgba(0,0,0,.35);
+  transform:translateY(0);
+  transition:transform .15s ease, box-shadow .15s ease, background .15s, color .15s, border-color .15s;
 }
 .chip span{display:block;}
+.chip:hover{
+  transform:translateY(-3px);
+  box-shadow:0 14px 26px rgba(0,0,0,.5);
+}
+.chip:active{
+  transform:translateY(1px) scale(.98);
+  box-shadow:0 6px 12px rgba(0,0,0,.4);
+}
 .chip.active{
-  background:linear-gradient(135deg,#7000ff,#4c1d95);
+  background:linear-gradient(135deg,#dc2626,#16a34a);
   color:#fff;
   border-color:transparent;
-  box-shadow:0 12px 26px rgba(112,0,255,.7);
+  box-shadow:0 14px 30px rgba(0,0,0,.75);
 }
 @media(min-width:480px){
   .chip{font-size:12px;min-height:56px;}
@@ -365,8 +399,8 @@ body.theme-dark{
 .tag-mini{
   margin-top:7px;
   font-size:11px;
-  color:var(--accent-soft);
-  background:rgba(112,0,255,.12);
+  color:var(--accent-strong);
+  background:var(--accent-soft);
   padding:3px 7px;
   border-radius:999px;
   display:inline-block;
@@ -399,7 +433,7 @@ body.theme-dark{
   border:1px solid rgba(148,163,184,.6);
 }
 .btn-add:hover{
-  border-color:#7000ff;
+  border-color:var(--accent);
 }
 
 /* CART BOTTOM SHEET */
@@ -481,16 +515,19 @@ body.theme-dark{
 .btn-primary{
   border:none;
   border-radius:999px;
-  background:linear-gradient(135deg,#7000ff,#4c1d95);
+  background:linear-gradient(135deg,#dc2626,#b91c1c);
   color:#fff;
   padding:9px 14px;
   font-size:14px;
   cursor:pointer;
-  box-shadow:0 14px 32px rgba(112,0,255,.6);
+  box-shadow:0 14px 32px rgba(0,0,0,.55);
 }
 .btn-full{width:100%;}
 .btn-primary.admin-btn{font-size:13px;margin-top:8px;}
-.admin-btn-success{background:var(--ok);box-shadow:0 14px 32px rgba(34,197,94,.6);}
+.admin-btn-success{
+  background:var(--ok);
+  box-shadow:0 14px 32px rgba(34,197,94,.6);
+}
 .btn-xs{
   padding:5px 9px;
   font-size:11px;
@@ -550,7 +587,7 @@ body.theme-dark{
 .order-total{
   font-size:18px;
   font-weight:700;
-  color:#a855f7;
+  color:#22c55e;
 }
 .order-items{
   margin-top:6px;
@@ -597,7 +634,7 @@ body.theme-dark{
 }
 .progress-fill{
   height:100%;
-  background:linear-gradient(90deg,#7000ff,#4c1d95);
+  background:linear-gradient(90deg,#dc2626,#16a34a);
   width:0;
 }
 .progress-steps{
@@ -697,7 +734,9 @@ body.theme-dark{
   margin-bottom:8px;
 }
 
-/* === PRODUCT DETAIL (MODAL) – UZUM STYLE === */
+/* ==============================
+   PRODUCT DETAIL (MODAL) + ZOOM
+============================== */
 .detail-overlay{
   position:fixed;
   inset:0;
@@ -716,7 +755,7 @@ body.theme-dark{
   box-shadow:var(--shadow);
   position:relative;
   overflow-y:auto;
-  background:linear-gradient(180deg,#ff0f7b 0%,#ffffff 18%,#faf5ff 100%);
+  background:linear-gradient(180deg,#dc2626 0%,#ffffff 18%,#faf5ff 100%);
   padding-bottom:24px;
 }
 .detail-close{
@@ -732,9 +771,9 @@ body.theme-dark{
   z-index:3;
 }
 
-/* rasm bloki – katta kartochka */
+/* rasm bloki */
 .detail-img-wrap{
-  margin-top:44px; /* yopish tugmasi ostida */
+  margin-top:44px;
   position:relative;
   padding:16px;
 }
@@ -745,10 +784,25 @@ body.theme-dark{
   object-fit:cover;
   box-shadow:0 22px 40px rgba(0,0,0,.5);
   background:#000;
+  transform:scale(1);
+  transition:transform .28s ease-out, box-shadow .28s ease-out;
 }
 @media(min-width:480px){
   .detail-img-wrap img{height:300px;}
 }
+
+/* ZOOM ANIMATSIYA – fullscreen holatga o'tganda */
+@keyframes detailZoomIn{
+  from{
+    transform:scale(.9);
+    opacity:.5;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
 .detail-img-index{
   position:absolute;
   bottom:24px;
@@ -782,7 +836,7 @@ body.theme-dark{
 }
 .detail-category{
   font-size:12px;
-  color:#6b21a8;
+  color:#b91c1c;
   text-transform:uppercase;
   letter-spacing:.04em;
   margin-bottom:4px;
@@ -799,7 +853,7 @@ body.theme-dark{
 }
 .detail-tag{
   font-size:13px;
-  color:#2563eb;
+  color:#16a34a;
   margin-top:4px;
 }
 
@@ -814,7 +868,7 @@ body.theme-dark{
 .detail-price-main{
   font-size:24px;
   font-weight:700;
-  color:#4c1d95;
+  color:#b91c1c;
 }
 .detail-price-old{
   font-size:13px;
@@ -833,12 +887,12 @@ body.theme-dark{
   height:34px;
   border-radius:999px;
   border:none;
-  background:linear-gradient(135deg,#ef4444,#b91c1c);
+  background:linear-gradient(135deg,#dc2626,#991b1b);
   color:#fff;
   font-size:18px;
   font-weight:600;
   cursor:pointer;
-  box-shadow:0 14px 30px rgba(239,68,68,.7);
+  box-shadow:0 14px 30px rgba(220,38,38,.7);
 }
 .detail-price-row .qty-control span{
   min-width:24px;
@@ -856,15 +910,17 @@ body.theme-dark{
   padding:14px 20px;
   font-size:15px;
   font-weight:600;
-  background:linear-gradient(90deg,#7000ff,#4c1d95);
-  box-shadow:0 24px 50px rgba(112,0,255,.6);
+  background:linear-gradient(90deg,#16a34a,#22c55e);
+  box-shadow:0 24px 50px rgba(34,197,94,.6);
   display:flex;
   align-items:center;
   justify-content:center;
   gap:8px;
+  border:none;
+  color:#fff;
 }
 #detailAddBtn.added{
-  background:linear-gradient(90deg,#16a34a,#22c55e);
+  background:linear-gradient(90deg,#4b5563,#0f172a);
 }
 #detailBackBtn{
   margin-top:10px;
@@ -876,7 +932,7 @@ body.theme-dark{
   background:rgba(248,250,252,.9);
 }
 
-/* RASMGA BOSGANDA TO‘LIQ EKRAN HOLAT */
+/* FULLSCREEN HOLAT – kitobcha ko‘rinish, zoom bilan */
 .detail-card.image-fullscreen{
   background:#000;
   padding:0;
@@ -890,7 +946,8 @@ body.theme-dark{
 }
 .detail-card.image-fullscreen .detail-img-wrap img{
   width:100%;
-  height:100vh;
+  height:100vh
+
   border-radius:0;
   object-fit:contain;
   box-shadow:none;
