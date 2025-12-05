@@ -71,7 +71,6 @@ let adminOrders          = [];
 let detailIndex              = null;
 let detailImageIndex         = 0;
 let detailQty                = 1;
-// ZOOM OLIB TASHLANDI
 let detailCountdownTimer     = null;
 let detailCountdownRemaining = 0;
 
@@ -132,8 +131,12 @@ const adminCategoryListEl = document.getElementById("adminCategoryList");
 const clientOrdersListEl = document.getElementById("clientOrdersList");
 const adminOrdersListEl  = document.getElementById("adminOrdersList");
 
-// SOUND (ding.mp3 index bilan bir papkada)
+// SOUND (ding.mp3)
 const notifySoundEl = document.getElementById("notifySound");
+
+// KURYER XARITASI (ilova ichidagi iframe uchun)
+const courierMapBox   = document.getElementById("courierMapBox");   // <div>
+const courierMapFrame = document.getElementById("courierMapFrame"); // <iframe>
 
 /* HELPERS */
 function formatPrice(v){ return (v || 0).toLocaleString("uz-UZ"); }
@@ -539,7 +542,6 @@ function updateCartUI(){
   if(cartCountTopEl) cartCountTopEl.textContent = totalCount;
   if(cartTotalTopEl) cartTotalTopEl.textContent = formatPrice(totalPrice)+" so‘m";
 
-  // Tezkor "Buyurtma berish" tugmasi: faqat savatda mahsulot bo‘lsa ko‘rinadi
   if(quickOrderBtn){
     quickOrderBtn.classList.toggle("hidden", totalCount === 0);
   }
@@ -603,6 +605,7 @@ function removeFromCart(idx){
 
 /* ORDER STATUS HELPERS */
 const ORDER_STEPS = ["pending","confirmed","courier","delivered"];
+
 function statusLabel(status){
   switch(status){
     case "pending":   return "Tasdiqlash kutilmoqda";
@@ -662,7 +665,7 @@ function clientStatusMessage(status){
     case "confirmed": return "✅ Buyurtmangiz tasdiqlandi.";
     case "courier":   return "🚚 Buyurtmangiz kuryerga topshirildi.";
     case "delivered": return "🎉 Buyurtma yetkazildi. Bizni tanlaganingiz uchun rahmat!";
-    case "rejected":  return "❌ Buyurtmangiz bekor qilindi.";
+    case "rejected":  return "❌ Afsus, ushbu buyurtma mahsulot tugaganligi sababli bekor qilindi.";
     default:          return "ℹ️ Buyurtma holati yangilandi.";
   }
 }
@@ -710,7 +713,6 @@ function subscribeClientOrders(){
 
     clientOrders = list;
 
-    // Telefon xotirasiga tarix sifatida saqlab qo‘yamiz
     try{
       localStorage.setItem(LOCAL_ORDERS_BACKUP_KEY, JSON.stringify(list));
     }catch(e){}
@@ -777,8 +779,11 @@ function renderClientOrders(){
     });
   }
 
-  if(clientOrders.length){
-    renderList(clientOrders,false);
+  // Rejected buyurtmalar mijoz ro‘yxatidan yashiriladi
+  const visible = (clientOrders || []).filter(o => o.status !== "rejected");
+
+  if(visible.length){
+    renderList(visible,false);
     return;
   }
 
@@ -789,7 +794,8 @@ function renderClientOrders(){
   }catch(e){ backup = null; }
 
   if(backup && backup.length){
-    renderList(backup,true);
+    const backupVisible = backup.filter(o => o.status !== "rejected");
+    renderList(backupVisible,true);
   }else{
     renderList([],false);
   }
@@ -837,8 +843,10 @@ function renderAdminOrders(){
     case "rejected":
       visibleOrders = adminOrders.filter(o => o.status === "rejected");
       break;
-    default:
-      visibleOrders = adminOrders;
+    default: // "all" — faqat jarayondagi (pending/confirmed/courier) buyurtmalar
+      visibleOrders = adminOrders.filter(o =>
+        o.status !== "delivered" && o.status !== "rejected"
+      );
   }
 
   adminOrdersListEl.innerHTML = `
@@ -846,7 +854,7 @@ function renderAdminOrders(){
       <button
         class="btn-xs ${adminOrderFilter === "all" ? "btn-xs-primary" : "btn-xs-secondary"}"
         onclick="setAdminOrderFilter('all')">
-        Barcha
+        Barcha (jarayonda)
       </button>
       <button
         class="btn-xs ${adminOrderFilter === "courier" ? "btn-xs-primary" : "btn-xs-secondary"}"
@@ -903,7 +911,7 @@ function renderAdminOrders(){
             </div>
             ${hasLoc ? `
               <div class="order-customer">
-                📍 GPS joylashuv mavjud
+                📍 GPS joylashuv mavjud (kuryer uchun)
               </div>
             ` : ""}
           </div>
@@ -918,14 +926,26 @@ function renderAdminOrders(){
           <ul>${itemsHtml}</ul>
         </section>
         <div class="admin-order-actions">
-          <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','confirmed')">Tasdiqlash</button>
-          <button class="btn-xs btn-xs-danger"    onclick="updateOrderStatus('${o.id}','rejected')">Bekor qilish</button>
-          <button class="btn-xs btn-xs-secondary" onclick="updateOrderStatus('${o.id}','courier')">Kuryer oldi</button>
-          <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','delivered')">Yetkazildi</button>
+          <button class="btn-xs btn-xs-primary"
+            onclick="updateOrderStatus('${o.id}','confirmed')">
+            Tasdiqlash
+          </button>
+          <button class="btn-xs btn-xs-secondary"
+            onclick="updateOrderStatus('${o.id}','courier')">
+            🚚 Kuryerga berish
+          </button>
+          <button class="btn-xs btn-xs-primary"
+            onclick="updateOrderStatus('${o.id}','delivered')">
+            ✅ Yetkazildi
+          </button>
+          <button class="btn-xs btn-xs-danger"
+            onclick="updateOrderStatus('${o.id}','rejected')">
+            ❌ Bekor qilish
+          </button>
           ${hasLoc ? `
             <button class="btn-xs btn-xs-secondary"
               onclick="openOrderLocation(${o.location.lat},${o.location.lng})">
-              📍 Marshrut
+              🚀 Ketdik (Maps)
             </button>
           ` : ""}
         </div>
@@ -934,18 +954,59 @@ function renderAdminOrders(){
   });
 }
 
+/* STATUS O‘ZGARTIRISH – ORQAGA QAYTMASLIK QOIDASI */
+function canChangeStatus(currentStatus, newStatus){
+  if(currentStatus === newStatus) return false;
+
+  // Yakunlangan yoki bekor qilingan buyurtma o‘zgarmaydi
+  if(currentStatus === "delivered" || currentStatus === "rejected") return false;
+
+  // "pending"ga qaytish taqiqlanadi
+  if(newStatus === "pending") return false;
+
+  // "rejected" har qanday vaqtda (delivered bo‘lmaguncha) mumkin
+  if(newStatus === "rejected") return true;
+
+  const currentIdx = ORDER_STEPS.indexOf(currentStatus);
+  const newIdx     = ORDER_STEPS.indexOf(newStatus);
+
+  if(currentIdx === -1 || newIdx === -1) return true;
+
+  // faqat oldinga (>=) o‘tish mumkin
+  return newIdx >= currentIdx;
+}
+
 async function updateOrderStatus(orderId, newStatus){
   try{
+    const currentOrder = adminOrders.find(o => o.id === orderId);
+    const currentStatus = currentOrder?.status || "pending";
+
+    if(!canChangeStatus(currentStatus, newStatus)){
+      if(currentStatus === "delivered" || currentStatus === "rejected"){
+        showToast("Bu buyurtma yakunlangan. Statusni o‘zgartirib bo‘lmaydi.");
+      }else{
+        showToast("Statusni orqaga qaytarish yoki bir xil statusni qayta bosish mumkin emas.");
+      }
+      return;
+    }
+
     await updateDoc(doc(db,"orders",orderId),{
       status:newStatus,
       updatedAt:serverTimestamp()
     });
     showToast("✅ Buyurtma statusi yangilandi.");
 
-    if(isAdmin && newStatus === "delivered"){
+    // Avtomatik ravishda tegishli bo‘limga o‘tkazamiz
+    if(newStatus === "courier"){
+      adminOrderFilter = "courier";
+    }else if(newStatus === "delivered"){
       adminOrderFilter = "delivered";
-      renderAdminOrders();
+    }else if(newStatus === "rejected"){
+      adminOrderFilter = "rejected";
+    }else{
+      adminOrderFilter = "all";
     }
+    renderAdminOrders();
   }catch(e){
     console.error("Status yangilash xato:", e);
     showToast("⚠️ Status yangilashda xato.");
@@ -974,14 +1035,24 @@ async function clearAllOrders(){
   }
 }
 
-/* GOOGLE MAPS — MARSHRUT OCHISH */
+/* GOOGLE MAPS — MARSHRUT OCHISH VA ILOVA ICHIDA XARITA */
 function openOrderLocation(lat,lng){
   if(typeof lat !== "number" || typeof lng !== "number"){
     showToast("📍 Joylashuv ma’lumoti topilmadi.");
     return;
   }
+
+  // Kuryer uchun tashqi Google Maps marshruti
   const url = "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lng;
   window.open(url, "_blank");
+
+  // Ilova ichida xarita (qizil nuqta bilan) – agar iframe bor bo‘lsa
+  if(courierMapFrame && courierMapBox){
+    // marker bilan embed
+    courierMapFrame.src =
+      "https://www.google.com/maps?q=" + lat + "," + lng + "&z=16&output=embed";
+    courierMapBox.classList.remove("hidden");
+  }
 }
 
 /* SEND ORDER */
@@ -1501,7 +1572,6 @@ if(detailQtyPlus){
   subscribeCategoriesRealtime();
   subscribeClientOrders();
 
-  // Boshlanishida ham UI yangilansin
   updateCartUI();
 })();
 
