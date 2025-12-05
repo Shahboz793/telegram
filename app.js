@@ -74,6 +74,9 @@ let detailQty                = 1;
 let detailCountdownTimer     = null;
 let detailCountdownRemaining = 0;
 
+// COURIER STATE
+let courierSelectedOrderId = null;
+
 // DOM
 const productsGrid       = document.getElementById("productsGrid");
 const filterBar          = document.getElementById("filterBar");
@@ -131,12 +134,13 @@ const adminCategoryListEl = document.getElementById("adminCategoryList");
 const clientOrdersListEl = document.getElementById("clientOrdersList");
 const adminOrdersListEl  = document.getElementById("adminOrdersList");
 
-// SOUND (ding.mp3)
-const notifySoundEl = document.getElementById("notifySound");
+// COURIER DOM
+const courierOrderSelect = document.getElementById("courierOrderSelect");
+const courierMapFrame    = document.getElementById("courierMapFrame");
+const courierInfoEl      = document.getElementById("courierInfo");
 
-// KURYER XARITASI (ilova ichidagi iframe uchun)
-const courierMapBox   = document.getElementById("courierMapBox");   // <div>
-const courierMapFrame = document.getElementById("courierMapFrame"); // <iframe>
+// SOUND
+const notifySoundEl = document.getElementById("notifySound");
 
 /* HELPERS */
 function formatPrice(v){ return (v || 0).toLocaleString("uz-UZ"); }
@@ -217,7 +221,8 @@ async function getOrAskLocation(){
 
   const allow = confirm(
     "📍 Joylashuvingiz aniqlansinmi?\n" +
-    "Bu ma’lumot kuryerga aniq marshrut tuzish uchun kerak bo‘ladi."
+    "Bu ma’lumot kuryerga aniq marshrut tuzish uchun kerak bo‘ladi.\n\n" +
+    "Telefon sozlamalaridan GPS (Location) yoqilgan bo‘lishi kerak."
   );
   if(!allow) return null;
 
@@ -229,7 +234,7 @@ async function getOrAskLocation(){
     return loc;
   }catch(e){
     console.error("Joylashuv aniqlanmadi:", e);
-    showToast("⚠️ Joylashuv aniqlanmadi. Manzil matn ko‘rinishida ishlatiladi.", 2500);
+    showToast("⚠️ Joylashuv aniqlanmadi. Telefon sozlamalaridan GPS ni yoqing yoki manzilni matn ko‘rinishida yozing.", 3500);
     return null;
   }
 }
@@ -311,13 +316,20 @@ function promptNewCustomerInfo(){
   if(!name) return null;
   const phone = prompt("📱 Telefon raqamingizni kiriting (masalan, +99890 123 45 67):");
   if(!phone) return null;
-  const address = prompt("📍 Manzilingizni kiriting (shahar, tuman, ko‘cha, uy):");
+  const address = prompt("📍 Asosiy manzil (shahar, tuman, ko‘cha, uy):");
   if(!address) return null;
+
+  const landmark = prompt("🧭 Mo‘ljal (masalan, bozor oldi, maktab yonida) — ixtiyoriy:") || "";
+  const secondPhone = prompt("📞 Qo‘shimcha telefon raqam (ixtiyoriy):") || "";
+  const preferredTime = prompt("⏰ Buyurtmani qaysi vaqtda qabul qilishni xohlaysiz? (ixtiyoriy):") || "";
 
   const info = {
     name: name.trim(),
     phone: phone.trim(),
-    address: address.trim()
+    address: address.trim(),
+    landmark: landmark.trim(),
+    secondPhone: secondPhone.trim(),
+    preferredTime: preferredTime.trim()
   };
   localStorage.setItem(STORAGE_CUSTOMER, JSON.stringify(info));
   renderCustomerInfo();
@@ -335,8 +347,10 @@ function askCustomerInfo(){
       "📦 Oldingi buyurtma ma’lumotlari:\n\n" +
       "👤 Ism: " + info.name + "\n" +
       "📱 Telefon: " + info.phone + "\n" +
-      "📍 Manzil: " + info.address + "\n\n" +
-      "Shu ma’lumotlar bilan yuborilsinmi?"
+      "📍 Manzil: " + info.address + "\n" +
+      (info.landmark ? "🧭 Mo‘ljal: " + info.landmark + "\n" : "") +
+      (info.preferredTime ? "⏰ Yetkazish vaqti: " + info.preferredTime + "\n" : "") +
+      "\nShu ma’lumotlar bilan yuborilsinmi?"
     );
     if(ok) return info;
     return promptNewCustomerInfo();
@@ -463,11 +477,11 @@ function subscribeProductsRealtime(){
 function renderCategoryFilter(){
   if(!filterBar) return;
   let html = "";
-  html += `<button class="chip ${activeCategory==="all"?"active":""}" data-category="all">⭐ Barchasi</button>`;
+  html += `<button class="chip ${activeCategory==="all"?"active":""}" data-category="all"><span>⭐</span><span>Barchasi</span></button>`;
   categories.forEach(cat=>{
     html += `
       <button class="chip ${activeCategory===cat.code?"active":""}" data-category="${cat.code}">
-        ${cat.emoji} ${cat.label}
+        <span>${cat.emoji}</span><span>${cat.label}</span>
       </button>
     `;
   });
@@ -605,7 +619,6 @@ function removeFromCart(idx){
 
 /* ORDER STATUS HELPERS */
 const ORDER_STEPS = ["pending","confirmed","courier","delivered"];
-
 function statusLabel(status){
   switch(status){
     case "pending":   return "Tasdiqlash kutilmoqda";
@@ -665,7 +678,7 @@ function clientStatusMessage(status){
     case "confirmed": return "✅ Buyurtmangiz tasdiqlandi.";
     case "courier":   return "🚚 Buyurtmangiz kuryerga topshirildi.";
     case "delivered": return "🎉 Buyurtma yetkazildi. Bizni tanlaganingiz uchun rahmat!";
-    case "rejected":  return "❌ Afsus, ushbu buyurtma mahsulot tugaganligi sababli bekor qilindi.";
+    case "rejected":  return "❌ Buyurtmangiz bekor qilindi. Mahsulot tugagan bo‘lishi mumkin.";
     default:          return "ℹ️ Buyurtma holati yangilandi.";
   }
 }
@@ -779,23 +792,18 @@ function renderClientOrders(){
     });
   }
 
-  // Rejected buyurtmalar mijoz ro‘yxatidan yashiriladi
-  const visible = (clientOrders || []).filter(o => o.status !== "rejected");
-
-  if(visible.length){
-    renderList(visible,false);
+  if(clientOrders.length){
+    renderList(clientOrders,false);
     return;
   }
 
-  // Firestore bo‘sh bo‘lsa, lokal tarixni ko‘rsatamiz
   let backup = null;
   try{
     backup = JSON.parse(localStorage.getItem(LOCAL_ORDERS_BACKUP_KEY) || "null");
   }catch(e){ backup = null; }
 
   if(backup && backup.length){
-    const backupVisible = backup.filter(o => o.status !== "rejected");
-    renderList(backupVisible,true);
+    renderList(backup,true);
   }else{
     renderList([],false);
   }
@@ -843,7 +851,8 @@ function renderAdminOrders(){
     case "rejected":
       visibleOrders = adminOrders.filter(o => o.status === "rejected");
       break;
-    default: // "all" — faqat jarayondagi (pending/confirmed/courier) buyurtmalar
+    default:
+      // "Barcha" faqat faol buyurtmalar (pending/confirmed/courier)
       visibleOrders = adminOrders.filter(o =>
         o.status !== "delivered" && o.status !== "rejected"
       );
@@ -854,7 +863,7 @@ function renderAdminOrders(){
       <button
         class="btn-xs ${adminOrderFilter === "all" ? "btn-xs-primary" : "btn-xs-secondary"}"
         onclick="setAdminOrderFilter('all')">
-        Barcha (jarayonda)
+        Faol
       </button>
       <button
         class="btn-xs ${adminOrderFilter === "courier" ? "btn-xs-primary" : "btn-xs-secondary"}"
@@ -881,6 +890,8 @@ function renderAdminOrders(){
 
   if(!visibleOrders.length){
     adminOrdersListEl.innerHTML += "<p class='cart-empty'>Tanlangan bo‘limda buyurtma yo‘q.</p>";
+    // kuryer panelini ham yangilab qo‘yamiz
+    refreshCourierPanel();
     return;
   }
 
@@ -897,6 +908,12 @@ function renderAdminOrders(){
     const customer = o.customer || {};
     const hasLoc   = o.location && typeof o.location.lat === "number" && typeof o.location.lng === "number";
 
+    const extraLines = [];
+    if(customer.secondPhone)   extraLines.push(`📞 Qo‘shimcha raqam: ${customer.secondPhone}`);
+    if(customer.landmark)      extraLines.push(`🧭 Mo‘ljal: ${customer.landmark}`);
+    if(customer.preferredTime) extraLines.push(`⏰ Vaqt: ${customer.preferredTime}`);
+    if(customer.comment)       extraLines.push(`✏️ Izoh: ${customer.comment}`);
+
     adminOrdersListEl.innerHTML += `
       <article class="order-card">
         <header class="order-header">
@@ -909,9 +926,14 @@ function renderAdminOrders(){
             <div class="order-customer">
               📍 ${customer.address || "-"}
             </div>
+            ${extraLines.length ? `
+              <div class="order-customer">
+                ${extraLines.join("<br>")}
+              </div>
+            ` : ""}
             ${hasLoc ? `
               <div class="order-customer">
-                📍 GPS joylashuv mavjud (kuryer uchun)
+                📍 GPS joylashuv mavjud
               </div>
             ` : ""}
           </div>
@@ -926,68 +948,34 @@ function renderAdminOrders(){
           <ul>${itemsHtml}</ul>
         </section>
         <div class="admin-order-actions">
-          <button class="btn-xs btn-xs-primary"
-            onclick="updateOrderStatus('${o.id}','confirmed')">
-            Tasdiqlash
-          </button>
-          <button class="btn-xs btn-xs-secondary"
-            onclick="updateOrderStatus('${o.id}','courier')">
-            🚚 Kuryerga berish
-          </button>
-          <button class="btn-xs btn-xs-primary"
-            onclick="updateOrderStatus('${o.id}','delivered')">
-            ✅ Yetkazildi
-          </button>
-          <button class="btn-xs btn-xs-danger"
-            onclick="updateOrderStatus('${o.id}','rejected')">
-            ❌ Bekor qilish
-          </button>
+          <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','confirmed')">Tasdiqlash</button>
+          <button class="btn-xs btn-xs-danger"    onclick="updateOrderStatus('${o.id}','rejected')">Bekor qilish</button>
+          <button class="btn-xs btn-xs-secondary" onclick="updateOrderStatus('${o.id}','courier')">Kuryer oldi</button>
+          <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','delivered')">Yetkazildi</button>
           ${hasLoc ? `
             <button class="btn-xs btn-xs-secondary"
               onclick="openOrderLocation(${o.location.lat},${o.location.lng})">
-              🚀 Ketdik (Maps)
+              📍 Marshrut
             </button>
           ` : ""}
         </div>
       </article>
     `;
   });
-}
 
-/* STATUS O‘ZGARTIRISH – ORQAGA QAYTMASLIK QOIDASI */
-function canChangeStatus(currentStatus, newStatus){
-  if(currentStatus === newStatus) return false;
-
-  // Yakunlangan yoki bekor qilingan buyurtma o‘zgarmaydi
-  if(currentStatus === "delivered" || currentStatus === "rejected") return false;
-
-  // "pending"ga qaytish taqiqlanadi
-  if(newStatus === "pending") return false;
-
-  // "rejected" har qanday vaqtda (delivered bo‘lmaguncha) mumkin
-  if(newStatus === "rejected") return true;
-
-  const currentIdx = ORDER_STEPS.indexOf(currentStatus);
-  const newIdx     = ORDER_STEPS.indexOf(newStatus);
-
-  if(currentIdx === -1 || newIdx === -1) return true;
-
-  // faqat oldinga (>=) o‘tish mumkin
-  return newIdx >= currentIdx;
+  // Kuryer panelini yangilash
+  refreshCourierPanel();
 }
 
 async function updateOrderStatus(orderId, newStatus){
   try{
-    const currentOrder = adminOrders.find(o => o.id === orderId);
-    const currentStatus = currentOrder?.status || "pending";
-
-    if(!canChangeStatus(currentStatus, newStatus)){
-      if(currentStatus === "delivered" || currentStatus === "rejected"){
-        showToast("Bu buyurtma yakunlangan. Statusni o‘zgartirib bo‘lmaydi.");
-      }else{
-        showToast("Statusni orqaga qaytarish yoki bir xil statusni qayta bosish mumkin emas.");
+    const current = adminOrders.find(o=>o.id===orderId);
+    if(current){
+      const curStatus = current.status || "pending";
+      if(curStatus === "delivered" || curStatus === "rejected"){
+        showToast("Bu buyurtma yakunlangan, statusni o‘zgartirib bo‘lmaydi.");
+        return;
       }
-      return;
     }
 
     await updateDoc(doc(db,"orders",orderId),{
@@ -996,17 +984,13 @@ async function updateOrderStatus(orderId, newStatus){
     });
     showToast("✅ Buyurtma statusi yangilandi.");
 
-    // Avtomatik ravishda tegishli bo‘limga o‘tkazamiz
-    if(newStatus === "courier"){
-      adminOrderFilter = "courier";
-    }else if(newStatus === "delivered"){
+    if(isAdmin && newStatus === "delivered"){
       adminOrderFilter = "delivered";
-    }else if(newStatus === "rejected"){
-      adminOrderFilter = "rejected";
+      renderAdminOrders();
     }else{
-      adminOrderFilter = "all";
+      // kuryer panelini ham yangilash
+      refreshCourierPanel();
     }
-    renderAdminOrders();
   }catch(e){
     console.error("Status yangilash xato:", e);
     showToast("⚠️ Status yangilashda xato.");
@@ -1035,24 +1019,14 @@ async function clearAllOrders(){
   }
 }
 
-/* GOOGLE MAPS — MARSHRUT OCHISH VA ILOVA ICHIDA XARITA */
+/* GOOGLE MAPS — MARSHRUT OCHISH (ADMIN) */
 function openOrderLocation(lat,lng){
   if(typeof lat !== "number" || typeof lng !== "number"){
     showToast("📍 Joylashuv ma’lumoti topilmadi.");
     return;
   }
-
-  // Kuryer uchun tashqi Google Maps marshruti
   const url = "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lng;
   window.open(url, "_blank");
-
-  // Ilova ichida xarita (qizil nuqta bilan) – agar iframe bor bo‘lsa
-  if(courierMapFrame && courierMapBox){
-    // marker bilan embed
-    courierMapFrame.src =
-      "https://www.google.com/maps?q=" + lat + "," + lng + "&z=16&output=embed";
-    courierMapBox.classList.remove("hidden");
-  }
 }
 
 /* SEND ORDER */
@@ -1067,7 +1041,11 @@ async function sendOrder(){
     return;
   }
 
-  // Joylashuvni so‘raymiz (bir marta, keyingi zakazlarda saqlanganidan foydalanadi)
+  const extraComment = prompt("Buyurtmangizga qo‘shimcha izoh (ixtiyoriy):\nMasalan, eshik kod, pod’ezd, bolalar uxlayapti va h.k.") || "";
+  if(extraComment.trim()){
+    customer.comment = extraComment.trim();
+  }
+
   const location = await getOrAskLocation();
 
   let totalPrice = 0;
@@ -1428,7 +1406,7 @@ function editProduct(id){
   showToast("✏️ Tahrirlash rejimi.");
 }
 
-/* PRODUCT DETAIL (ZOOM YO‘Q) */
+/* PRODUCT DETAIL */
 function getDetailImages(){
   if(detailIndex===null) return [RAW_PREFIX + "noimage.png"];
   const p = products[detailIndex];
@@ -1554,6 +1532,132 @@ if(detailQtyPlus){
   });
 }
 
+/* 🚚 COURIER PANEL LOGIC */
+function refreshCourierPanel(){
+  if(!courierOrderSelect || !courierMapFrame || !courierInfoEl) return;
+
+  const courierOrders = adminOrders.filter(o =>
+    o.status === "courier" &&
+    o.location &&
+    typeof o.location.lat === "number" &&
+    typeof o.location.lng === "number"
+  );
+
+  courierOrderSelect.innerHTML = "";
+
+  if(!courierOrders.length){
+    courierOrderSelect.innerHTML = `<option value="">Kuryerda buyurtma yo‘q</option>`;
+    courierMapFrame.src = "";
+    courierInfoEl.innerHTML = "Kuryerga berilgan va GPS bilan saqlangan buyurtma topilmadi.";
+    courierSelectedOrderId = null;
+    return;
+  }
+
+  courierOrders.forEach(o=>{
+    const customer = o.customer || {};
+    const label = `${o.id.slice(0,6)} • ${customer.name || "Mijoz"} • ${formatPrice(o.totalPrice)} so‘m`;
+    const opt = document.createElement("option");
+    opt.value = o.id;
+    opt.textContent = label;
+    courierOrderSelect.appendChild(opt);
+  });
+
+  const firstId = courierSelectedOrderId && courierOrders.some(o=>o.id===courierSelectedOrderId)
+    ? courierSelectedOrderId
+    : courierOrders[0].id;
+
+  courierSelectedOrderId = firstId;
+  courierOrderSelect.value = firstId;
+
+  updateCourierMapFromSelect();
+}
+
+function updateCourierMapFromSelect(){
+  if(!courierOrderSelect || !courierMapFrame || !courierInfoEl) return;
+  const id = courierOrderSelect.value;
+  if(!id){
+    courierMapFrame.src = "";
+    courierInfoEl.innerHTML = "Kuryerga berilgan buyurtmani tanlang.";
+    courierSelectedOrderId = null;
+    return;
+  }
+  courierSelectedOrderId = id;
+  const order = adminOrders.find(o=>o.id===id);
+  if(!order || !order.location){
+    courierMapFrame.src = "";
+    courierInfoEl.innerHTML = "Bu buyurtma uchun GPS saqlanmagan.";
+    return;
+  }
+  const {lat,lng} = order.location;
+  const customer = order.customer || {};
+
+  const url = `https://www.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
+  courierMapFrame.src = url;
+
+  const lines = [];
+  lines.push(`👤 ${customer.name || "-"}`);
+  lines.push(`📱 ${customer.phone || "-"}`);
+  if(customer.secondPhone)   lines.push(`📞 Qo‘shimcha raqam: ${customer.secondPhone}`);
+  lines.push(`📍 Manzil: ${customer.address || "-"}`);
+  if(customer.landmark)      lines.push(`🧭 Mo‘ljal: ${customer.landmark}`);
+  if(customer.preferredTime) lines.push(`⏰ Vaqt: ${customer.preferredTime}`);
+  if(customer.comment)       lines.push(`✏️ Izoh: ${customer.comment}`);
+
+  courierInfoEl.innerHTML = lines.join("<br>");
+}
+
+if(courierOrderSelect){
+  courierOrderSelect.addEventListener("change", updateCourierMapFromSelect);
+}
+
+function openSelectedCourierExternal(){
+  if(!courierSelectedOrderId){
+    showToast("Kuryerda buyurtmani tanlang.");
+    return;
+  }
+  const order = adminOrders.find(o=>o.id===courierSelectedOrderId);
+  if(!order || !order.location){
+    showToast("📍 Bu buyurtma uchun GPS topilmadi.");
+    return;
+  }
+  openOrderLocation(order.location.lat, order.location.lng);
+}
+
+function centerToCourier(){
+  if(!courierSelectedOrderId){
+    showToast("Avval kuryerda buyurtmani tanlang.");
+    return;
+  }
+  const order = adminOrders.find(o=>o.id===courierSelectedOrderId);
+  if(!order || !order.location){
+    showToast("📍 Bu buyurtma uchun GPS topilmadi.");
+    return;
+  }
+  const {lat,lng} = order.location;
+
+  if(!navigator.geolocation){
+    showToast("Telefoningiz GPS ni qo‘llamaydi. Google Maps orqali oching.");
+    openOrderLocation(lat,lng);
+    return;
+  }
+
+  showToast("📍 Joylashuvingiz olinmoqda...", 2500);
+
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      const myLat = pos.coords.latitude;
+      const myLng = pos.coords.longitude;
+      const url = `https://www.google.com/maps/dir/?api=1&origin=${myLat},${myLng}&destination=${lat},${lng}`;
+      window.open(url,"_blank");
+    },
+    err=>{
+      console.error("Courier GPS xato:", err);
+      showToast("⚠️ Joylashuvga ruxsat berilmadi. Telefon sozlamalaridan GPS ni yoqing.");
+    },
+    { enableHighAccuracy:true, timeout:8000 }
+  );
+}
+
 /* INIT */
 (function init(){
   const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
@@ -1576,26 +1680,30 @@ if(detailQtyPlus){
 })();
 
 /* GLOBAL EXPORTS */
-window.addToCart           = addToCart;
-window.toggleCartSheet     = toggleCartSheet;
-window.changeQty           = changeQty;
-window.removeFromCart      = removeFromCart;
-window.sendOrder           = sendOrder;
-window.openProductDetail   = openProductDetail;
-window.closeProductDetail  = closeProductDetail;
+window.addToCart                   = addToCart;
+window.toggleCartSheet             = toggleCartSheet;
+window.changeQty                   = changeQty;
+window.removeFromCart              = removeFromCart;
+window.sendOrder                   = sendOrder;
+window.openProductDetail           = openProductDetail;
+window.closeProductDetail          = closeProductDetail;
 
-window.resetCustomerInfo   = resetCustomerInfo;
-window.editCustomerInfo    = editCustomerInfo;
+window.resetCustomerInfo           = resetCustomerInfo;
+window.editCustomerInfo            = editCustomerInfo;
 
-window.saveCategory        = saveCategory;
-window.deleteCategory      = deleteCategory;
-window.editCategory        = editCategory;
+window.saveCategory                = saveCategory;
+window.deleteCategory              = deleteCategory;
+window.editCategory                = editCategory;
 
-window.addCustomProduct    = addCustomProduct;
-window.deleteAnyProduct    = deleteAnyProduct;
-window.editProduct         = editProduct;
+window.addCustomProduct            = addCustomProduct;
+window.deleteAnyProduct            = deleteAnyProduct;
+window.editProduct                 = editProduct;
 
-window.updateOrderStatus   = updateOrderStatus;
-window.setAdminOrderFilter = setAdminOrderFilter;
-window.clearAllOrders      = clearAllOrders;
-window.openOrderLocation   = openOrderLocation;
+window.updateOrderStatus           = updateOrderStatus;
+window.setAdminOrderFilter         = setAdminOrderFilter;
+window.clearAllOrders              = clearAllOrders;
+window.openOrderLocation           = openOrderLocation;
+
+// Courier globals
+window.openSelectedCourierExternal = openSelectedCourierExternal;
+window.centerToCourier             = centerToCourier;

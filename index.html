@@ -6,70 +6,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
 
-  <!-- FONT -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- FONT: ROBOTO -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
 
   <!-- STYLE -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="theme-dark">
-  <main class="page"><!-- CSS’dagi .page fonini ishlatish uchun -->
 
-    <!-- HEADER -->
-    <header class="app-header">
-      <div class="logo-wrap">
-        <div class="logo-circle">BS</div>
-        <div class="logo-text">
-          <div class="logo-title">Beauty Store</div>
-          <div class="logo-sub">Ayollar uchun onlayn do‘kon</div>
-        </div>
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="logo-wrap">
+      <div class="logo-circle">BS</div>
+      <div class="logo-text">
+        <div class="logo-title">Beauty Store</div>
+        <div class="logo-sub">Ayollar uchun onlayn do‘kon</div>
       </div>
+    </div>
 
-      <div class="header-right">
-        <button id="themeToggleBtn" class="icon-btn" type="button">☀️</button>
+    <div class="header-right">
+      <button id="themeToggleBtn" class="icon-btn" type="button">☀️</button>
 
-        <!-- Tezkor buyurtma tugmasi: faqat savatda mahsulot bo‘lsa ko‘rinadi (app.js boshqaradi) -->
-        <button id="quickOrderBtn" class="cart-top-btn hidden" type="button" onclick="sendOrder()">
-          📦 Buyurtma berish
-        </button>
+      <!-- Tezkor buyurtma tugmasi: faqat savatda mahsulot bo‘lsa ko‘rinadi -->
+      <button id="quickOrderBtn" class="cart-top-btn hidden" type="button" onclick="sendOrder()">
+        📦 Buyurtma berish
+      </button>
 
-        <button class="cart-top-btn" type="button" onclick="toggleCartSheet(true)">
-          🧺 Savat <span id="cartCountTop" class="pill">0</span>
-        </button>
+      <button class="cart-top-btn" type="button" onclick="toggleCartSheet(true)">
+        🧺 Savat <span id="cartCountTop" class="pill">0</span>
+      </button>
 
-        <div class="cart-top-total">
-          <span id="cartTotalTop">0 so‘m</span>
-        </div>
+      <div class="cart-top-total">
+        <span id="cartTotalTop">0 so‘m</span>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- TABS -->
-    <nav id="tabs" class="tabs">
-      <button class="tab-btn active" data-page="shopPage">🛍 Magazin</button>
-      <button class="tab-btn" data-page="ordersPage">📦 Buyurtmalarim</button>
-      <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">👑 Admin</button>
-    </nav>
+  <!-- TABS -->
+  <nav id="tabs" class="tabs">
+    <button class="tab-btn active" data-page="shopPage">🛍 Magazin</button>
+    <button class="tab-btn" data-page="ordersPage">📦 Buyurtmalarim</button>
+    <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">👑 Admin</button>
+  </nav>
 
-    <!-- CUSTOMER INFO + WELCOME PANEL -->
-    <section class="customer-panel">
-      <div class="customer-info">
-        <div style="font-weight:600; margin-bottom:4px;">
-          Xush kelibsiz bizning onlayn do‘konimizga! 💖
-        </div>
-        <div style="font-size:13px; color:var(--muted); margin-bottom:6px;">
-          Nafis atirlar, lab bo‘yoqlar, parvarish vositalari va ko‘plab go‘zallik mahsulotlari siz uchun.
-        </div>
-        <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">
-          🕒 Ish vaqti: <strong>7/24</strong> • Hozirgi vaqt: <span id="liveClock">--:--</span>
-        </div>
-        <div id="customerInfoText">Mijoz ma’lumotlari kiritilmagan.</div>
+  <!-- CUSTOMER INFO + WELCOME PANEL -->
+  <section class="customer-panel">
+    <div class="customer-info">
+      <div style="font-weight:600; margin-bottom:4px;">
+        Xush kelibsiz bizning onlayn do‘konimizga! 💖
       </div>
-      <div class="customer-actions">
-        <button class="btn-outline" type="button" onclick="editCustomerInfo()">✏️ Ma’lumotlarni o‘zgartirish</button>
-        <button class="btn-ghost" type="button" onclick="resetCustomerInfo()">🧹 Ma’lumotlarni tozalash</button>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:6px;">
+        Nafis atirlar, lab bo‘yoqlar, parvarish vositalari va ko‘plab go‘zallik mahsulotlari siz uchun.
       </div>
-    </section>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">
+        🕒 Ish vaqti: <strong>7/24</strong> • Hozirgi vaqt: <span id="liveClock">--:--</span>
+      </div>
+      <div id="customerInfoText">Mijoz ma’lumotlari kiritilmagan.</div>
+    </div>
+    <div class="customer-actions">
+      <button class="btn-outline" type="button" onclick="editCustomerInfo()">✏️ Ma’lumotlarni o‘zgartirish</button>
+      <button class="btn-ghost" type="button" onclick="resetCustomerInfo()">🧹 Ma’lumotlarni tozalash</button>
+    </div>
+  </section>
+
+  <!-- PAGE WRAP -->
+  <main class="page-wrap">
 
     <!-- SHOP PAGE -->
     <section id="shopPage">
@@ -104,28 +106,52 @@
         <div class="admin-col">
           <h2 class="section-title">👑 Admin — Buyurtmalar</h2>
           <p class="section-sub">
-            Yangi buyurtma kelganda ovoz avtomatik yangraydi. Kuryerga berilgan buyurtmalar bo‘yicha
-            marshrutni Google Maps orqali ochishingiz mumkin.
+            Yangi buyurtma kelganda ovoz avtomatik yangraydi. Kuryerga berilgan buyurtmalarni pastdagi paneldan kuzating.
           </p>
 
           <div id="adminOrdersList" class="orders-list admin-orders-list"></div>
 
-          <!-- KURYER XARITASI (keyin app.js ichida ishlatish uchun tayyor) -->
-          <div id="courierMapBox" class="card hidden" style="margin:8px 16px 0;">
-            <h3 class="card-title">🚚 Kuryer xaritasi</h3>
-            <p class="section-sub">
-              Tanlangan buyurtma manzili xaritada qizil nuqta bilan ko‘rsatiladi.
-            </p>
-            <div style="border-radius:12px;overflow:hidden;height:320px;">
+          <!-- 🚚 KURYER PANELI -->
+          <div class="card courier-card">
+            <h3 class="card-title">🚚 Kuryer paneli</h3>
+
+            <div class="courier-map-toolbar">
+              <select id="courierOrderSelect">
+                <option value="">Kuryerda buyurtma yo‘q</option>
+              </select>
+              <button
+                class="btn-xs btn-xs-secondary"
+                type="button"
+                onclick="openSelectedCourierExternal()">
+                🌐 Google Maps’da ochish
+              </button>
+              <button
+                class="btn-xs btn-xs-primary"
+                type="button"
+                onclick="centerToCourier()">
+                📍 Mening joylashuvim
+              </button>
+            </div>
+
+            <div class="courier-map-frame-wrap">
               <iframe
                 id="courierMapFrame"
-                width="100%"
-                height="320"
-                style="border:0;"
                 loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                allowfullscreen>
+                referrerpolicy="no-referrer-when-downgrade">
               </iframe>
+            </div>
+
+            <div id="courierInfo" class="courier-info">
+              Kuryerga berilgan buyurtma tanlang — mijoz manzili, telefon raqamlar va mo‘ljal shu yerda ko‘rinadi.
+            </div>
+
+            <div class="courier-gps-hint">
+              📌 Agar xarita joylashuvni ko‘rsatmasa:
+              <ul>
+                <li>Telefon sozlamalaridan <strong>Joylashuv (GPS)</strong>ni yoqing.</li>
+                <li>Brauzerga joylashuvga ruxsat bering (Allow / Разрешить).</li>
+                <li>Agar baribir ishlamasa, <strong>“Google Maps’da ochish”</strong> tugmasini bosing.</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -214,76 +240,76 @@
       </div>
     </section>
 
-    <!-- CART SHEET -->
-    <div id="cartSheetOverlay" class="overlay"></div>
-    <aside id="cartSheet" class="cart-sheet">
-      <header>
-        <h2>🧺 Savat</h2>
-        <button type="button" onclick="toggleCartSheet(false)" class="icon-btn">✕</button>
-      </header>
+  </main>
 
-      <div id="cartItems"></div>
+  <!-- CART SHEET -->
+  <div id="cartSheetOverlay" class="overlay"></div>
+  <aside id="cartSheet" class="cart-sheet">
+    <header>
+      <h2>🧺 Savat</h2>
+      <button type="button" onclick="toggleCartSheet(false)" class="icon-btn">✕</button>
+    </header>
 
-      <footer>
-        <div class="cart-sheet-total-row">
-          Jami: <strong id="cartSheetTotal">0 so‘m</strong>
-        </div>
-        <button class="btn-primary btn-full" type="button" onclick="sendOrder()">📦 Buyurtma berish</button>
-      </footer>
-    </aside>
+    <div id="cartItems"></div>
 
-    <!-- PRODUCT DETAIL MODAL -->
-    <div id="productDetailOverlay" class="detail-overlay hidden">
-      <div class="detail-card">
+    <footer>
+      <div class="cart-sheet-total-row">
+        Jami: <strong id="cartSheetTotal">0 so‘m</strong>
+      </div>
+      <button class="btn-primary btn-full" type="button" onclick="sendOrder()">📦 Buyurtma berish</button>
+    </footer>
+  </aside>
 
-        <button class="detail-close" type="button" onclick="closeProductDetail()">✕</button>
+  <!-- PRODUCT DETAIL MODAL -->
+  <div id="productDetailOverlay" class="detail-overlay hidden">
+    <div class="detail-card">
 
-        <div class="detail-img-wrap">
-          <button id="detailPrevBtn" class="detail-nav-btn" type="button">‹</button>
+      <button class="detail-close" type="button" onclick="closeProductDetail()">✕</button>
 
-          <img id="detailImage" src="" alt="Mahsulot rasmi" />
+      <div class="detail-img-wrap">
+        <button id="detailPrevBtn" class="detail-nav-btn" type="button">‹</button>
 
-          <button id="detailNextBtn" class="detail-nav-btn" type="button">›</button>
+        <img id="detailImage" src="" alt="Mahsulot rasmi" />
 
-          <div id="detailImageIndex" class="detail-img-index"></div>
-        </div>
+        <button id="detailNextBtn" class="detail-nav-btn" type="button">›</button>
 
-        <div class="detail-body">
-          <div id="detailCategory" class="detail-category"></div>
-          <h3 id="detailName" class="detail-name"></h3>
-          <p id="detailTag" class="detail-tag"></p>
-          <p id="detailDesc" class="detail-desc"></p>
+        <div id="detailImageIndex" class="detail-img-index"></div>
+      </div>
 
-          <div class="detail-price-row">
-            <div>
-              <div id="detailPrice" class="detail-price-main"></div>
-              <div id="detailOldPrice" class="detail-price-old hidden"></div>
-            </div>
+      <div class="detail-body">
+        <div id="detailCategory" class="detail-category"></div>
+        <h3 id="detailName" class="detail-name"></h3>
+        <p id="detailTag" class="detail-tag"></p>
+        <p id="detailDesc" class="detail-desc"></p>
 
-            <div class="qty-control">
-              <button id="detailQtyMinus" type="button">-</button>
-              <span id="detailQtyValue">1</span>
-              <button id="detailQtyPlus" type="button">+</button>
-            </div>
+        <div class="detail-price-row">
+          <div>
+            <div id="detailPrice" class="detail-price-main"></div>
+            <div id="detailOldPrice" class="detail-price-old hidden"></div>
           </div>
 
-          <button id="detailAddBtn" class="btn-primary btn-full" type="button">
-            🛒 Savatga qo‘shish
-          </button>
-          <button id="detailBackBtn" class="btn-ghost hidden" type="button">
-            ◀ Magaziniga qaytish
-          </button>
+          <div class="qty-control">
+            <button id="detailQtyMinus" type="button">-</button>
+            <span id="detailQtyValue">1</span>
+            <button id="detailQtyPlus" type="button">+</button>
+          </div>
         </div>
+
+        <button id="detailAddBtn" class="btn-primary btn-full" type="button">
+          🛒 Savatga qo‘shish
+        </button>
+        <button id="detailBackBtn" class="btn-ghost hidden" type="button">
+          ◀ Magaziniga qaytish
+        </button>
       </div>
     </div>
+  </div>
 
-    <!-- TOAST -->
-    <div id="toast" class="toast"></div>
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
 
-    <!-- NOTIFICATION SOUND (ding.mp3 index bilan bir papkada turishi kerak) -->
-    <audio id="notifySound" src="ding.mp3" preload="auto"></audio>
-
-  </main>
+  <!-- NOTIFICATION SOUND -->
+  <audio id="notifySound" src="ding.mp3" preload="auto"></audio>
 
   <!-- APP SCRIPT -->
   <script type="module" src="app.js"></script>
