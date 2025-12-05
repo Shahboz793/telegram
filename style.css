@@ -1,6 +1,4 @@
-/* ===============================
-   RESET
-================================ */
+/* RESET */
 *{
   margin:0;
   padding:0;
@@ -10,10 +8,10 @@ html,body{
   height:100%;
 }
 body{
-  font-family:"Roboto",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-family:"Roboto","Poppins",sans-serif;
   background:
-    radial-gradient(circle at top,#E4DDFF 0,transparent 55%),
-    radial-gradient(circle at bottom,#D7F3FF 0,transparent 60%),
+    radial-gradient(circle at top,#111827 0,transparent 55%),
+    radial-gradient(circle at bottom,#7f1d1d 0,transparent 55%),
     var(--bg);
   color:var(--text);
   -webkit-tap-highlight-color:transparent;
@@ -25,110 +23,82 @@ a{
 }
 .hidden{display:none!important}
 
-/* ===============================
-   THEME TOKENS
-================================ */
+/* THEME TOKENS */
 :root{
-  /* Asosiy brend ranglar (Uzum-style, lekin binafsha) */
-  --primary:#7000FF;        /* birlamchi binafsha */
-  --primary-strong:#4B00BF; /* to‘q binafsha */
-  --primary-soft:#F2EDFF;   /* juda yumshoq binafsha fon */
+  --bg:#f5f3f7;
+  --bg-soft:#e5e7eb;
+  --panel:#ffffff;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
 
-  /* Neytral fonlar */
-  --bg:#F7F7F7;
-  --bg-soft:#FAFAFA;
+  /* QIZIL / QORA USLUB */
+  --accent:#ef4444;          /* asosiy qizil */
+  --accent-soft:#fee2e2;     /* yumshoq qizil */
+  --accent-strong:#b91c1c;   /* to‘q qizil */
 
-  /* Panel / kartalar */
-  --panel:#FFFFFF;
-  --card:#FFFFFF;
-
-  /* Matn */
-  --text:#111111;
-  --muted:#444444;
-
-  /* Chegaralar / soya */
-  --border:rgba(0,0,0,0.06);
-  --shadow-soft:0 10px 30px rgba(15,23,42,.08);
-  --shadow-strong:0 22px 60px rgba(15,23,42,.12);
-
-  /* Status ranglar */
-  --danger:#EF4444;
-  --ok:#16A34A;
-  --warning:#F59E0B;
-  --info:#0EA5E9;
-
-  /* Radiuslar */
+  --border:rgba(0,0,0,0.08);
+  --shadow:0 18px 40px rgba(15,23,42,.18);
   --radius:12px;
-  --radius-lg:16px;
-
-  /* Chip / tag fonlari */
-  --chip-bg:#F2EDFF;
+  --radius-lg:22px;
+  --danger:#ef4444;
+  --ok:#22c55e;
+  --warning:#f59e0b;
+  --chip-bg:#111827;
 }
 body.theme-dark{
-  --bg:#050617;
-  --bg-soft:#050617;
-  --panel:#08091A;
-  --card:#0B1024;
+  --bg:#020617;
+  --bg-soft:#020617;
+  --panel:#020617;
+  --card:#020617;
+  --text:#f9fafb;
+  --muted:#9ca3af;
 
-  --text:#F9FAFB;
-  --muted:#9CA3AF;
-
-  --primary:#A855FF;
-  --primary-strong:#7C3AED;
-  --primary-soft:rgba(124,58,237,0.18);
+  /* dark rejimda binafsha + qizil aralash */
+  --accent:#7000ff;
+  --accent-soft:#f2edff;
+  --accent-strong:#4c1d95;
 
   --border:rgba(148,163,184,.35);
-  --shadow-soft:0 18px 45px rgba(0,0,0,.55);
-  --shadow-strong:0 28px 70px rgba(0,0,0,.75);
-
-  --chip-bg:rgba(15,23,42,0.9);
+  --shadow:0 22px 50px rgba(0,0,0,.65);
+  --chip-bg:#020617;
 }
 
-/* ===============================
-   LAYOUT / CONTAINER
-================================ */
+/* LAYOUT */
 .page-wrap{
   min-height:calc(100vh - 60px);
-  max-width:1240px;
-  margin:0 auto 32px;
 }
 
-/* ===============================
-   HEADER
-================================ */
+/* HEADER */
 .app-header{
   position:sticky;
   top:0;
   z-index:50;
-  background:
-    linear-gradient(90deg,rgba(15,23,42,.98),rgba(24,17,56,.98));
-  padding:10px 18px;
+  background:linear-gradient(90deg,#ff0f7b,#f97316);
+  padding:10px 16px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  border-bottom:1px solid rgba(148,163,184,.4);
-  box-shadow:0 18px 40px rgba(15,23,42,.65);
+  border-bottom:1px solid rgba(248,250,252,.25);
+  box-shadow:0 18px 40px rgba(15,23,42,.7);
 }
 .logo-wrap{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
 }
 .logo-circle{
   width:48px;
   height:48px;
-  border-radius:16px;
-  background:
-    radial-gradient(circle at 20% 10%,#FFFFFF,#C4B5FD);
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 10%,#f9fafb,#b91c1c);
   display:flex;
   align-items:center;
   justify-content:center;
-  color:#1F2937;
+  color:#fff;
   font-size:18px;
   font-weight:700;
-  box-shadow:
-    0 0 0 2px rgba(248,250,252,.2),
-    0 16px 32px rgba(15,23,42,.7);
+  box-shadow:0 0 0 2px rgba(248,250,252,.25),0 14px 30px rgba(0,0,0,.55);
 }
 .logo-text{
   display:flex;
@@ -137,12 +107,11 @@ body.theme-dark{
 .logo-title{
   font-size:18px;
   font-weight:600;
-  color:#F9FAFB;
-  letter-spacing:0.01em;
+  color:#f9fafb;
 }
 .logo-sub{
   font-size:12px;
-  color:#E5E7EB;
+  color:#fee2e2;
 }
 .header-right{
   display:flex;
@@ -150,25 +119,22 @@ body.theme-dark{
   gap:8px;
 }
 .icon-btn{
-  background:rgba(17,24,39,.9);
-  border:1px solid rgba(148,163,184,.7);
+  background:rgba(15,23,42,.4);
+  border:1px solid rgba(248,250,252,.5);
   border-radius:999px;
   padding:7px 10px;
   cursor:pointer;
   font-size:16px;
-  color:#E5E7EB;
+  color:#f9fafb;
   display:flex;
   align-items:center;
   justify-content:center;
-  transition:border-color .18s,background .18s,transform .12s;
 }
 .icon-btn:hover{
-  border-color:var(--primary);
-  background:rgba(15,23,42,1);
-  transform:translateY(-1px);
+  border-color:#fff;
 }
 .cart-top-btn{
-  background:linear-gradient(135deg,var(--primary),var(--primary-strong));
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
   border:none;
   border-radius:999px;
   color:#fff;
@@ -178,17 +144,11 @@ body.theme-dark{
   gap:6px;
   font-size:13px;
   cursor:pointer;
-  box-shadow:0 10px 26px rgba(55,48,163,.8);
-  transition:transform .12s,box-shadow .18s,filter .12s;
+  box-shadow:0 10px 25px rgba(112,0,255,.7);
 }
 .cart-top-btn.hidden{display:none;}
-.cart-top-btn:hover{
-  transform:translateY(-1px);
-  box-shadow:0 16px 36px rgba(55,48,163,.9);
-  filter:brightness(1.05);
-}
 .pill{
-  background:rgba(0,0,0,.25);
+  background:rgba(0,0,0,.3);
   border-radius:999px;
   padding:2px 8px;
   font-size:11px;
@@ -196,21 +156,19 @@ body.theme-dark{
 .cart-top-total{
   font-size:13px;
   font-weight:600;
-  color:#E5E7EB;
+  color:#fee2e2;
 }
 
-/* ===============================
-   TABS
-================================ */
+/* TABS */
 .tabs{
   position:sticky;
   top:64px;
   z-index:45;
-  background:rgba(15,23,42,.96);
+  background:rgba(15,23,42,.98);
   padding:6px;
   display:flex;
   gap:4px;
-  border-bottom:1px solid rgba(148,163,184,.35);
+  border-bottom:1px solid rgba(148,163,184,.3);
   backdrop-filter:blur(16px);
 }
 .tab-btn{
@@ -221,36 +179,31 @@ body.theme-dark{
   padding:9px 6px;
   font-size:13px;
   cursor:pointer;
-  color:#9CA3AF;
-  transition:background .18s,color .18s,box-shadow .18s,transform .1s;
+  color:#9ca3af;
 }
 .tab-btn.active{
-  background:linear-gradient(135deg,var(--primary),var(--primary-strong));
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
   color:#fff;
-  box-shadow:0 10px 26px rgba(55,48,163,.8);
-  transform:translateY(-1px);
+  box-shadow:0 10px 25px rgba(112,0,255,.7);
 }
 .admin-active{
-  border-color:var(--primary);
-  color:var(--primary);
+  border-color:var(--accent);
+  color:var(--accent);
 }
 
-/* ===============================
-   CUSTOMER PANEL
-================================ */
+/* CUSTOMER PANEL */
 .customer-panel{
   background:rgba(15,23,42,.96);
   border-bottom:1px solid rgba(148,163,184,.3);
-  padding:12px 18px 14px;
+  padding:10px 16px 12px;
 }
 .customer-info{
   font-size:13px;
   margin-bottom:8px;
-  color:#E5E7EB;
+  color:#e5e7eb;
 }
 .customer-actions{
   display:flex;
-  flex-wrap:wrap;
   gap:8px;
 }
 .btn-outline,
@@ -259,71 +212,51 @@ body.theme-dark{
   padding:6px 12px;
   border:1px solid rgba(148,163,184,.5);
   font-size:12px;
-  background:rgba(15,23,42,.8);
+  background:rgba(15,23,42,.7);
   cursor:pointer;
-  color:#E5E7EB;
-  display:inline-flex;
-  align-items:center;
-  gap:4px;
-  transition:background .18s,border-color .18s,transform .1s;
+  color:#e5e7eb;
 }
 .btn-outline{
-  border-color:var(--primary-soft);
-  color:var(--primary-soft);
+  border-color:#7000ff;
+  color:#e0e7ff;
   background:rgba(24,24,27,.9);
 }
-.btn-outline:hover,
-.btn-ghost:hover{
-  border-color:var(--primary);
-  transform:translateY(-1px);
-}
 
-/* ===============================
-   SHOP TOOLBAR
-================================ */
+/* SHOP TOOLBAR */
 .shop-toolbar{
   background:var(--panel);
   border-bottom:1px solid var(--border);
-  padding:10px 18px;
+  padding:10px 16px;
   display:flex;
   align-items:center;
   gap:8px;
-  box-shadow:0 10px 25px rgba(15,23,42,.04);
 }
 .search-input{
   flex:1;
   border-radius:999px;
   border:1px solid var(--border);
   padding:8px 12px;
-  background:var(--bg-soft);
+  background:var(--bg);
   font-size:13px;
   outline:none;
-  color:var(--text);
-  transition:border-color .18s,box-shadow .18s,background .18s;
-}
-.search-input::placeholder{
-  color:rgba(148,163,184,.9);
 }
 .search-input:focus{
-  border-color:var(--primary);
-  box-shadow:0 0 0 2px rgba(112,0,255,.13);
-  background:#FFFFFF;
+  border-color:#7000ff;
+  box-shadow:0 0 0 1px rgba(112,0,255,.35);
 }
 
-/* ===============================
-   CATEGORY GRID (4 ta)
-================================ */
+/* CATEGORY GRID (4 ta) */
 .chips-row{
   background:var(--panel);
   border-bottom:1px solid var(--border);
-  padding:10px 10px 14px;
+  padding:10px 10px 12px;
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:8px;
 }
 .chip{
   border-radius:var(--radius);
-  border:1px solid rgba(148,163,184,.4);
+  border:1px solid rgba(148,163,184,.6);
   background:var(--chip-bg);
   padding:9px 4px;
   font-size:11px;
@@ -334,25 +267,21 @@ body.theme-dark{
   align-items:center;
   justify-content:center;
   min-height:52px;
-  color:var(--text);
-  box-shadow:var(--shadow-soft);
-  transition:transform .12s,box-shadow .18s,border-color .18s,background .18s;
+  color:#e5e7eb;
+  box-shadow:0 8px 18px rgba(15,23,42,.55);
 }
 .chip span{display:block;}
 .chip.active{
-  background:linear-gradient(135deg,var(--primary),var(--primary-strong));
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
   color:#fff;
   border-color:transparent;
-  box-shadow:var(--shadow-strong);
-  transform:translateY(-2px);
+  box-shadow:0 12px 26px rgba(112,0,255,.7);
 }
 @media(min-width:480px){
   .chip{font-size:12px;min-height:56px;}
 }
 
-/* ===============================
-   PRODUCTS – YIRIK KARTOCHKALAR
-================================ */
+/* PRODUCTS – KATTA KARTOCHKA, KATTA RASM */
 .products-grid{
   display:flex;
   flex-direction:column;
@@ -368,21 +297,20 @@ body.theme-dark{
   }
 }
 .product-card{
-  background:var(--card);
+  background:radial-gradient(circle at top,#111827,var(--card));
   border-radius:var(--radius-lg);
-  box-shadow:var(--shadow-soft);
+  box-shadow:var(--shadow);
   overflow:hidden;
   cursor:pointer;
   display:flex;
   flex-direction:column;
-  transition:transform .18s,box-shadow .18s,filter .18s,border-color .18s;
-  border:1px solid rgba(148,163,184,.18);
+  transition:transform .18s,box-shadow .18s,filter .18s;
+  border:1px solid rgba(148,163,184,.3);
 }
 .product-card:hover{
-  transform:translateY(-4px);
-  box-shadow:var(--shadow-strong);
-  filter:saturate(1.07);
-  border-color:rgba(112,0,255,.45);
+  transform:translateY(-4px) scale(1.01);
+  box-shadow:0 26px 60px rgba(0,0,0,.75);
+  filter:saturate(1.1);
 }
 .product-img-wrap{
   position:relative;
@@ -390,12 +318,12 @@ body.theme-dark{
 }
 .product-img-wrap img{
   width:100%;
-  height:260px;
+  height:270px;
   object-fit:cover;
   display:block;
 }
 @media(min-width:768px){
-  .product-img-wrap img{height:300px;}
+  .product-img-wrap img{height:310px;}
 }
 .product-img-tag{
   position:absolute;
@@ -407,8 +335,8 @@ body.theme-dark{
 .product-img-tag span{
   padding:2px 6px;
   border-radius:999px;
-  background:rgba(15,23,42,.75);
-  color:#F9FAFB;
+  background:rgba(0,0,0,.65);
+  color:#f9fafb;
 }
 .product-sale{
   position:absolute;
@@ -425,21 +353,20 @@ body.theme-dark{
   padding:11px 13px 13px;
 }
 .product-name{
-  font-size:15px;
+  font-size:16px;
   font-weight:600;
-  color:var(--text);
-  letter-spacing:0.01em;
+  color:#f9fafb;
 }
 .product-meta{
   font-size:12px;
-  color:var(--muted);
-  margin-top:3px;
+  color:#9ca3af;
+  margin-top:2px;
 }
 .tag-mini{
   margin-top:7px;
   font-size:11px;
-  color:var(--primary-strong);
-  background:var(--primary-soft);
+  color:var(--accent-soft);
+  background:rgba(112,0,255,.12);
   padding:3px 7px;
   border-radius:999px;
   display:inline-block;
@@ -451,41 +378,36 @@ body.theme-dark{
   align-items:center;
 }
 .price-main{
-  font-size:17px;
+  font-size:18px;
   font-weight:700;
-  color:var(--primary-strong);
+  color:#fee2e2;
 }
 .price-old{
   font-size:11px;
   text-decoration:line-through;
-  color:#9CA3AF;
+  color:#9ca3af;
 }
 .btn-add{
   border:none;
   border-radius:999px;
-  background:linear-gradient(135deg,var(--primary),var(--primary-strong));
+  background:linear-gradient(135deg,#111827,#020617);
   color:#fff;
   font-size:12px;
   padding:7px 14px;
   cursor:pointer;
-  box-shadow:0 10px 24px rgba(55,48,163,.8);
-  border:1px solid rgba(129,140,248,.7);
-  transition:transform .12s,box-shadow .18s,filter .12s;
+  box-shadow:0 10px 24px rgba(15,23,42,.8);
+  border:1px solid rgba(148,163,184,.6);
 }
 .btn-add:hover{
-  transform:translateY(-1px);
-  box-shadow:0 14px 32px rgba(55,48,163,.95);
-  filter:brightness(1.03);
+  border-color:#7000ff;
 }
 
-/* ===============================
-   CART BOTTOM SHEET
-================================ */
+/* CART BOTTOM SHEET */
 .overlay{
   position:fixed;
   inset:0;
-  background:rgba(15,23,42,.45);
-  backdrop-filter:blur(4px);
+  background:rgba(0,0,0,.5);
+  backdrop-filter:blur(3px);
   display:none;
   z-index:90;
 }
@@ -496,10 +418,10 @@ body.theme-dark{
   bottom:-100%;
   background:var(--panel);
   max-height:80%;
-  border-top-left-radius:24px;
-  border-top-right-radius:24px;
+  border-top-left-radius:var(--radius-lg);
+  border-top-right-radius:var(--radius-lg);
   padding:16px;
-  box-shadow:0 -16px 40px rgba(15,23,42,.45);
+  box-shadow:var(--shadow);
   transition:bottom .3s ease;
   z-index:100;
 }
@@ -542,7 +464,7 @@ body.theme-dark{
   height:22px;
   border-radius:999px;
   border:1px solid var(--border);
-  background:var(--bg-soft);
+  background:var(--bg);
   font-size:13px;
   cursor:pointer;
 }
@@ -555,31 +477,20 @@ body.theme-dark{
   cursor:pointer;
 }
 
-/* ===============================
-   BUTTONS (GLOBAL)
-================================ */
+/* BUTTONS */
 .btn-primary{
   border:none;
   border-radius:999px;
-  background:linear-gradient(135deg,var(--primary),var(--primary-strong));
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
   color:#fff;
   padding:9px 14px;
   font-size:14px;
   cursor:pointer;
-  box-shadow:0 14px 32px rgba(55,48,163,.8);
-  transition:transform .12s,box-shadow .18s,filter .12s;
-}
-.btn-primary:hover{
-  transform:translateY(-1px);
-  box-shadow:0 18px 40px rgba(55,48,163,.9);
-  filter:brightness(1.04);
+  box-shadow:0 14px 32px rgba(112,0,255,.6);
 }
 .btn-full{width:100%;}
 .btn-primary.admin-btn{font-size:13px;margin-top:8px;}
-.admin-btn-success{
-  background:linear-gradient(135deg,var(--ok),#22C55E);
-  box-shadow:0 14px 32px rgba(34,197,94,.65);
-}
+.admin-btn-success{background:var(--ok);box-shadow:0 14px 32px rgba(34,197,94,.6);}
 .btn-xs{
   padding:5px 9px;
   font-size:11px;
@@ -588,14 +499,13 @@ body.theme-dark{
   cursor:pointer;
 }
 .btn-xs-primary{
-  background:var(--primary);
+  background:var(--accent);
   color:#fff;
-  border-color:var(--primary);
+  border-color:var(--accent);
 }
 .btn-xs-secondary{
-  background:var(--primary-soft);
-  color:var(--primary-strong);
-  border-color:transparent;
+  background:#111827;
+  color:#e5e7eb;
 }
 .btn-xs-danger{
   background:var(--danger);
@@ -603,29 +513,27 @@ body.theme-dark{
   border-color:var(--danger);
 }
 
-/* ===============================
-   ORDERS (CLIENT + ADMIN)
-================================ */
+/* ORDERS */
 .section-title{
   font-size:18px;
   font-weight:600;
-  margin:14px 18px 0;
+  margin:14px 16px 0;
 }
 .section-sub{
   font-size:13px;
   color:var(--muted);
-  margin:4px 18px 8px;
+  margin:4px 16px 8px;
 }
 .orders-list{
-  padding:10px 18px 20px;
+  padding:10px 16px 20px;
 }
 .order-card{
-  background:var(--card);
+  background:radial-gradient(circle at top,#020617,var(--card));
   border-radius:var(--radius-lg);
-  box-shadow:var(--shadow-soft);
+  box-shadow:var(--shadow);
   padding:14px;
   margin-bottom:12px;
-  border:1px solid rgba(148,163,184,.24);
+  border:1px solid rgba(148,163,184,.4);
 }
 .order-header{
   display:flex;
@@ -642,12 +550,12 @@ body.theme-dark{
 .order-total{
   font-size:18px;
   font-weight:700;
-  color:var(--primary-strong);
+  color:#a855f7;
 }
 .order-items{
   margin-top:6px;
   font-size:13px;
-  color:var(--text);
+  color:#e5e7eb;
 }
 .order-items ul{
   margin-top:3px;
@@ -670,10 +578,10 @@ body.theme-dark{
   font-weight:600;
 }
 .status-pending{background:var(--bg-soft);color:var(--muted);}
-.status-confirmed{background:var(--primary-soft);color:var(--primary-strong);}
-.status-courier{background:#FEF3C7;color:#92400E;}
-.status-delivered{background:#DCFCE7;color:#166534;}
-.status-rejected{background:#FEE2E2;color:#991B1B;}
+.status-confirmed{background:var(--accent-soft);color:var(--accent-strong);}
+.status-courier{background:var(--warning);color:#111827;}
+.status-delivered{background:var(--ok);color:#fff;}
+.status-rejected{background:var(--danger);color:#fff;}
 
 .progress-wrap{margin:6px 0;}
 .progress-label{
@@ -689,7 +597,7 @@ body.theme-dark{
 }
 .progress-fill{
   height:100%;
-  background:linear-gradient(90deg,var(--primary),var(--primary-soft));
+  background:linear-gradient(90deg,#7000ff,#4c1d95);
   width:0;
 }
 .progress-steps{
@@ -700,16 +608,14 @@ body.theme-dark{
   color:var(--muted);
 }
 .progress-step.active{
-  color:var(--primary-strong);
+  color:#e0e7ff;
   font-weight:600;
 }
 
-/* ===============================
-   ADMIN LAYOUT
-================================ */
+/* ADMIN */
 .admin-page{padding-top:8px;}
 .admin-cols{
-  padding:0 18px 18px;
+  padding:0 16px 16px;
   display:flex;
   flex-direction:column;
   gap:16px;
@@ -722,11 +628,11 @@ body.theme-dark{
 }
 .admin-col{flex:1;}
 .card{
-  background:var(--card);
+  background:radial-gradient(circle at top,#020617,var(--card));
   border-radius:var(--radius-lg);
-  box-shadow:var(--shadow-soft);
+  box-shadow:var(--shadow);
   padding:12px;
-  border:1px solid rgba(148,163,184,.28);
+  border:1px solid rgba(148,163,184,.4);
 }
 .card-title{
   font-size:15px;
@@ -743,17 +649,17 @@ body.theme-dark{
   display:flex;
   flex-direction:column;
   gap:4px;
-  color:var(--muted);
+  color:#e5e7eb;
 }
 .form-grid input,
 .form-grid select,
 .form-grid textarea{
   border-radius:var(--radius);
-  border:1px solid rgba(148,163,184,.5);
+  border:1px solid rgba(148,163,184,.6);
   padding:6px 9px;
-  background:var(--bg-soft);
+  background:#020617;
   font-size:13px;
-  color:var(--text);
+  color:#e5e7eb;
 }
 .form-grid textarea{
   min-height:60px;
@@ -770,9 +676,9 @@ body.theme-dark{
   justify-content:space-between;
   align-items:center;
   padding:6px 0;
-  border-bottom:1px solid rgba(148,163,184,.2);
+  border-bottom:1px solid rgba(148,163,184,.3);
   font-size:13px;
-  color:var(--text);
+  color:#e5e7eb;
 }
 .admin-edit-btn,
 .admin-delete-btn{
@@ -781,7 +687,7 @@ body.theme-dark{
   cursor:pointer;
   font-size:14px;
 }
-.admin-edit-btn{color:var(--primary);}
+.admin-edit-btn{color:#c4b5fd;}
 .admin-delete-btn{color:var(--danger);}
 
 .admin-order-filters{
@@ -791,67 +697,11 @@ body.theme-dark{
   margin-bottom:8px;
 }
 
-/* ===============================
-   🚚 COURIER MAP CARD
-================================ */
-.courier-card{
-  margin-top:14px;
-}
-.courier-map-toolbar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  align-items:center;
-  margin-bottom:10px;
-}
-.courier-map-toolbar select{
-  flex:1;
-  min-width:180px;
-  border-radius:999px;
-  border:1px solid rgba(148,163,184,.6);
-  padding:6px 10px;
-  background:var(--bg-soft);
-  font-size:13px;
-  color:var(--text);
-}
-.courier-map-frame-wrap{
-  border-radius:var(--radius-lg);
-  overflow:hidden;
-  border:1px solid rgba(148,163,184,.35);
-  box-shadow:var(--shadow-soft);
-  margin-bottom:10px;
-  background:#000;
-}
-#courierMapFrame{
-  width:100%;
-  height:260px;
-  border:0;
-}
-.courier-info{
-  font-size:13px;
-  color:var(--muted);
-  display:grid;
-  gap:3px;
-  margin-bottom:10px;
-}
-.courier-gps-hint{
-  font-size:12px;
-  color:var(--muted);
-  background:var(--primary-soft);
-  border-radius:var(--radius);
-  padding:8px 10px;
-}
-.courier-gps-hint ul{
-  margin:4px 0 0 18px;
-}
-
-/* ===============================
-   PRODUCT DETAIL (MODAL)
-================================ */
+/* === PRODUCT DETAIL (MODAL) – UZUM STYLE === */
 .detail-overlay{
   position:fixed;
   inset:0;
-  background:rgba(15,23,42,.55);
+  background:rgba(0,0,0,.75);
   display:flex;
   justify-content:center;
   align-items:flex-start;
@@ -859,112 +709,223 @@ body.theme-dark{
   z-index:100;
 }
 .detail-card{
-  background:var(--card);
   width:100%;
   max-width:520px;
   height:100vh;
   border-radius:0;
-  padding:12px 16px 16px;
-  box-shadow:0 22px 60px rgba(15,23,42,.75);
+  box-shadow:var(--shadow);
   position:relative;
   overflow-y:auto;
-  color:var(--text);
+  background:linear-gradient(180deg,#ff0f7b 0%,#ffffff 18%,#faf5ff 100%);
+  padding-bottom:24px;
 }
 .detail-close{
   position:absolute;
-  right:10px;
+  left:12px;
   top:10px;
   border:none;
-  background:none;
-  font-size:18px;
+  background:transparent;
+  font-size:20px;
   cursor:pointer;
-  color:var(--muted);
+  color:#ffffff;
+  font-weight:600;
+  z-index:3;
 }
+
+/* rasm bloki – katta kartochka */
 .detail-img-wrap{
-  margin-top:28px;
+  margin-top:44px; /* yopish tugmasi ostida */
   position:relative;
+  padding:16px;
 }
 .detail-img-wrap img{
   width:100%;
-  max-height:70vh;
-  border-radius:var(--radius-lg);
+  height:260px;
+  border-radius:22px;
   object-fit:cover;
-  box-shadow:0 22px 60px rgba(15,23,42,.7);
+  box-shadow:0 22px 40px rgba(0,0,0,.5);
+  background:#000;
+}
+@media(min-width:480px){
+  .detail-img-wrap img{height:300px;}
+}
+.detail-img-index{
+  position:absolute;
+  bottom:24px;
+  right:28px;
+  background:rgba(0,0,0,.65);
+  color:#fff;
+  border-radius:999px;
+  padding:3px 8px;
+  font-size:11px;
 }
 .detail-nav-btn{
   position:absolute;
   top:50%;
   transform:translateY(-50%);
   border:none;
-  background:rgba(0,0,0,.5);
+  background:rgba(0,0,0,.45);
   color:#fff;
   font-size:20px;
   padding:4px 9px;
   cursor:pointer;
   border-radius:999px;
 }
-#detailPrevBtn{left:6px;}
-#detailNextBtn{right:6px;}
-.detail-img-index{
-  position:absolute;
-  bottom:6px;
-  right:10px;
-  background:rgba(15,23,42,.75);
-  color:#fff;
-  border-radius:999px;
-  padding:3px 8px;
-  font-size:11px;
+#detailPrevBtn{left:24px;}
+#detailNextBtn{right:24px;}
+
+/* matn qismi */
+.detail-body{
+  margin-top:12px;
+  padding:0 20px 40px;
+  color:#111827;
 }
-.detail-body{margin-top:14px;}
 .detail-category{
   font-size:12px;
-  color:var(--primary-strong);
+  color:#6b21a8;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:4px;
 }
 .detail-name{
-  font-size:20px;
-  font-weight:600;
+  font-size:22px;
+  font-weight:700;
+  color:#111827;
 }
 .detail-desc{
   font-size:13px;
-  color:var(--muted);
-  margin-top:4px;
+  color:#4b5563;
+  margin-top:6px;
 }
 .detail-tag{
-  font-size:12px;
-  color:var(--primary-strong);
+  font-size:13px;
+  color:#2563eb;
   margin-top:4px;
 }
+
+/* narx + soni */
 .detail-price-row{
-  margin-top:10px;
+  margin-top:18px;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:12px;
 }
 .detail-price-main{
-  font-size:22px;
+  font-size:24px;
   font-weight:700;
-  color:var(--primary-strong);
+  color:#4c1d95;
 }
 .detail-price-old{
-  font-size:12px;
+  font-size:13px;
   text-decoration:line-through;
-  color:var(--muted);
+  color:#9ca3af;
 }
 
-/* ===============================
-   TOAST
-================================ */
+/* SONI – kattaroq qizil tugmalar */
+.detail-price-row .qty-control{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.detail-price-row .qty-control button{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  border:none;
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
+  color:#fff;
+  font-size:18px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 14px 30px rgba(239,68,68,.7);
+}
+.detail-price-row .qty-control span{
+  min-width:24px;
+  text-align:center;
+  font-size:16px;
+  font-weight:600;
+  color:#111827;
+}
+
+/* SAVATGA QO‘SHISH – pastdagi uzun knopka */
+#detailAddBtn{
+  margin-top:26px;
+  width:100%;
+  border-radius:999px;
+  padding:14px 20px;
+  font-size:15px;
+  font-weight:600;
+  background:linear-gradient(90deg,#7000ff,#4c1d95);
+  box-shadow:0 24px 50px rgba(112,0,255,.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+#detailAddBtn.added{
+  background:linear-gradient(90deg,#16a34a,#22c55e);
+}
+#detailBackBtn{
+  margin-top:10px;
+  font-size:13px;
+  color:#4c1d95;
+  border-radius:999px;
+  padding:6px 10px;
+  border:1px solid rgba(148,163,184,.5);
+  background:rgba(248,250,252,.9);
+}
+
+/* RASMGA BOSGANDA TO‘LIQ EKRAN HOLAT */
+.detail-card.image-fullscreen{
+  background:#000;
+  padding:0;
+}
+.detail-card.image-fullscreen .detail-body{
+  display:none;
+}
+.detail-card.image-fullscreen .detail-img-wrap{
+  margin-top:0;
+  padding:0;
+}
+.detail-card.image-fullscreen .detail-img-wrap img{
+  width:100%;
+  height:100vh;
+  border-radius:0;
+  object-fit:contain;
+  box-shadow:none;
+}
+.detail-card.image-fullscreen .detail-img-index{
+  bottom:14px;
+  right:16px;
+}
+.detail-card.image-fullscreen .detail-nav-btn{
+  display:none;
+}
+.detail-card.image-fullscreen .detail-close{
+  top:14px;
+  left:16px;
+  right:auto;
+  background:#ef4444;
+  color:#fff;
+  padding:6px 14px;
+  border-radius:999px;
+  font-size:14px;
+  box-shadow:0 14px 30px rgba(239,68,68,.7);
+}
+
+/* TOAST */
 .toast{
   position:fixed;
   bottom:18px;
   left:50%;
   transform:translateX(-50%) translateY(130%);
-  background:linear-gradient(135deg,var(--primary),var(--primary-strong));
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
   color:#fff;
   padding:9px 14px;
   border-radius:999px;
   font-size:13px;
-  box-shadow:var(--shadow-strong);
+  box-shadow:var(--shadow);
   opacity:0;
   transition:opacity .25s,transform .25s;
   z-index:200;
@@ -974,15 +935,13 @@ body.theme-dark{
   transform:translateX(-50%) translateY(0);
 }
 
-/* ===============================
-   SCROLLBAR
-================================ */
+/* SCROLLBAR */
 ::-webkit-scrollbar{
   width:5px;
   height:5px;
 }
 ::-webkit-scrollbar-thumb{
-  background:var(--primary);
+  background:var(--accent);
   border-radius:999px;
 }
 ::-webkit-scrollbar-track{
