@@ -1,333 +1,237 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8" />
-  <title>Beauty Store — Onlayn do‘kon</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark light" />
-
-  <!-- FONT: ROBOTO -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <title>Restoran — Online Buyurtma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- STYLE -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
+
+  <!-- ICONS -->
+  <link rel="icon" type="image/png" href="icon.png">
 </head>
 
-<body class="theme-dark">
+<body>
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================ -->
   <header class="app-header">
     <div class="logo-wrap">
-      <div class="logo-circle">BS</div>
+      <div class="logo-circle">🍽</div>
       <div class="logo-text">
-        <div class="logo-title">Beauty Store</div>
-        <div class="logo-sub">Ayollar uchun onlayn do‘kon</div>
+        <div class="logo-title">RESTORAN</div>
+        <div class="logo-sub">Tez yetkazib berish</div>
       </div>
     </div>
 
     <div class="header-right">
-      <button id="themeToggleBtn" class="icon-btn" type="button">☀️</button>
-
-      <!-- Tezkor buyurtma tugmasi: faqat savatda mahsulot bo‘lsa ko‘rinadi -->
-      <button id="quickOrderBtn" class="cart-top-btn hidden" type="button" onclick="sendOrder()">
-        📦 Buyurtma berish
+      <button class="icon-btn" id="themeToggleBtn">🌗</button>
+      <button class="cart-top-btn" id="cartTopBtn">
+        🛒 Savat <span class="pill" id="cartTopCount">0</span>
       </button>
-
-      <button class="cart-top-btn" type="button" onclick="toggleCartSheet(true)">
-        🧺 Savat <span id="cartCountTop" class="pill">0</span>
-      </button>
-
-      <div class="cart-top-total">
-        <span id="cartTotalTop">0 so‘m</span>
-      </div>
     </div>
   </header>
 
-  <!-- TABS -->
-  <nav id="tabs" class="tabs">
-    <button class="tab-btn active" data-page="shopPage">🛍 Magazin</button>
-    <button class="tab-btn" data-page="ordersPage">📦 Buyurtmalarim</button>
-    <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">👑 Admin</button>
-  </nav>
+  <!-- ================= TABS ================ -->
+  <div class="tabs">
+    <button class="tab-btn active" id="shopTabBtn">Menyu</button>
+    <button class="tab-btn" id="ordersTabBtn">Buyurtmalarim</button>
+    <button class="tab-btn" id="adminTabBtn">Admin</button>
+  </div>
 
-  <!-- CUSTOMER INFO + WELCOME PANEL -->
-  <section class="customer-panel">
-    <div class="customer-info">
-      <div style="font-weight:600; margin-bottom:4px;">
-        Xush kelibsiz bizning onlayn do‘konimizga! 💖
-      </div>
-      <div style="font-size:13px; color:var(--muted); margin-bottom:6px;">
-        Nafis atirlar, lab bo‘yoqlar, parvarish vositalari va ko‘plab go‘zallik mahsulotlari siz uchun.
-      </div>
-      <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">
-        🕒 Ish vaqti: <strong>7/24</strong> • Hozirgi vaqt: <span id="liveClock">--:--</span>
-      </div>
-      <div id="customerInfoText">Mijoz ma’lumotlari kiritilmagan.</div>
+  <!-- ============ CUSTOMER PANEL (INFO) ============ -->
+  <div class="customer-panel">
+    <div class="customer-info" id="customerInfoText">
+      Mijoz: Malumot kiritilmagan
     </div>
     <div class="customer-actions">
-      <button class="btn-outline" type="button" onclick="editCustomerInfo()">✏️ Ma’lumotlarni o‘zgartirish</button>
-      <button class="btn-ghost" type="button" onclick="resetCustomerInfo()">🧹 Ma’lumotlarni tozalash</button>
+      <button id="editCustomerBtn" class="btn-outline">Malumotlarni o‘zgartirish</button>
+      <button id="locationBtn" class="btn-outline">📍 Lokatsiya</button>
     </div>
-  </section>
+  </div>
 
-  <!-- PAGE WRAP -->
-  <main class="page-wrap">
+  <!-- ============ SHOP PAGE ============ -->
+  <div id="shopPage" class="page-wrap">
 
-    <!-- SHOP PAGE -->
-    <section id="shopPage">
-      <div class="shop-toolbar">
-        <input id="searchInput" type="search" class="search-input" placeholder="Mahsulot qidirish..." />
-        <button id="adminAccessBtn" class="btn-ghost" type="button">👑 Admin uchun</button>
-      </div>
+    <!-- QIDIRUV -->
+    <div class="shop-toolbar">
+      <input type="text" id="searchInput" class="search-input" placeholder="Ovqat qidirish...">
+    </div>
 
-      <!-- CATEGORY FILTER BAR -->
-      <div id="filterBar" class="chips-row"></div>
+    <!-- KATEGORIYALAR -->
+    <div id="categoryRow" class="chips-row"></div>
 
-      <!-- PRODUCTS GRID / LIST -->
-      <div id="productsGrid" class="products-grid"></div>
-    </section>
+    <!-- MAHSULOTLAR -->
+    <div id="productsGrid" class="products-grid"></div>
+  </div>
 
-    <!-- CUSTOMER ORDERS PAGE -->
-    <section id="ordersPage" class="hidden">
-      <h2 class="section-title">📦 Buyurtmalarim</h2>
-      <p class="section-sub">
-        Buyurtmalaringiz holatini real vaqt rejimida kuzatishingiz mumkin.
-      </p>
+  <!-- ============ MY ORDERS PAGE ============ -->
+  <div id="ordersPage" class="page-wrap hidden">
+    <div class="section-title">Buyurtmalarim</div>
+    <div class="section-sub">Bu yerda barcha buyurtmalaringiz tarixi ko‘rinadi.</div>
 
-      <div id="clientOrdersList" class="orders-list"></div>
-    </section>
+    <div id="myOrdersList" class="orders-list"></div>
+  </div>
 
-    <!-- ADMIN PAGE -->
-    <section id="adminPage" class="hidden admin-page">
+  <!-- ============ ADMIN PAGE ============ -->
+  <div id="adminPage" class="page-wrap hidden">
 
-      <div class="admin-cols">
+    <div class="section-title">Admin Panel</div>
 
-        <!-- ADMIN ORDERS COLUMN -->
-        <div class="admin-col">
-          <h2 class="section-title">👑 Admin — Buyurtmalar</h2>
-          <p class="section-sub">
-            Yangi buyurtma kelganda ovoz avtomatik yangraydi. Kuryerga berilgan buyurtmalarni pastdagi paneldan kuzating.
-          </p>
+    <div class="admin-cols">
 
-          <div id="adminOrdersList" class="orders-list admin-orders-list"></div>
+      <!-- ---------- ADMIN: MAHSULOT QO‘SHISH ---------- -->
+      <div class="admin-col">
+        <div class="card">
+          <div class="card-title">🍛 Yangi taom qo‘shish</div>
 
-          <!-- 🚚 KURYER PANELI -->
-          <div class="card courier-card">
-            <h3 class="card-title">🚚 Kuryer paneli</h3>
-
-            <div class="courier-map-toolbar">
-              <select id="courierOrderSelect">
-                <option value="">Kuryerda buyurtma yo‘q</option>
-              </select>
-              <button
-                class="btn-xs btn-xs-secondary"
-                type="button"
-                onclick="openSelectedCourierExternal()">
-                🌐 Google Maps’da ochish
-              </button>
-              <button
-                class="btn-xs btn-xs-primary"
-                type="button"
-                onclick="centerToCourier()">
-                📍 Mening joylashuvim
-              </button>
-            </div>
-
-            <div class="courier-map-frame-wrap">
-              <iframe
-                id="courierMapFrame"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade">
-              </iframe>
-            </div>
-
-            <div id="courierInfo" class="courier-info">
-              Kuryerga berilgan buyurtma tanlang — mijoz manzili, telefon raqamlar va mo‘ljal shu yerda ko‘rinadi.
-            </div>
-
-            <div class="courier-gps-hint">
-              📌 Agar xarita joylashuvni ko‘rsatmasa:
-              <ul>
-                <li>Telefon sozlamalaridan <strong>Joylashuv (GPS)</strong>ni yoqing.</li>
-                <li>Brauzerga joylashuvga ruxsat bering (Allow / Разрешить).</li>
-                <li>Agar baribir ishlamasa, <strong>“Google Maps’da ochish”</strong> tugmasini bosing.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- ADMIN CATALOG COLUMN -->
-        <div class="admin-col">
-
-          <!-- CATEGORY MANAGEMENT -->
-          <div class="card admin-card">
-            <h3 class="card-title">🗂 Kategoriyalar</h3>
-
-            <div class="form-grid">
-              <label>
-                Kod:
-                <input id="adminCatCode" type="text" />
-              </label>
-              <label>
-                Nomi:
-                <input id="adminCatLabel" type="text" />
-              </label>
-              <label>
-                Emoji:
-                <input id="adminCatEmoji" type="text" placeholder="💄" />
-              </label>
-            </div>
-
-            <button class="btn-primary" type="button" onclick="saveCategory()">💾 Saqlash</button>
-
-            <div id="adminCategoryList" class="admin-list"></div>
+          <div class="form-grid">
+            <label>
+              Nomi
+              <input id="pName" type="text">
+            </label>
+            <label>
+              Kategoriya
+              <select id="pCategory"></select>
+            </label>
+            <label>
+              Narxi
+              <input id="pPrice" type="number">
+            </label>
+            <label>
+              Eski narx (ixtiyoriy)
+              <input id="pOldPrice" type="number">
+            </label>
+            <label>
+              Rasm URL 1
+              <input id="pImg1" type="text">
+            </label>
+            <label>
+              Rasm URL 2
+              <input id="pImg2" type="text">
+            </label>
+            <label>
+              Rasm URL 3
+              <input id="pImg3" type="text">
+            </label>
+            <label>
+              Tavsif
+              <textarea id="pDesc"></textarea>
+            </label>
           </div>
 
-          <!-- PRODUCT MANAGEMENT -->
-          <div class="card admin-card">
-            <h3 class="card-title">🛍 Mahsulotlar</h3>
+          <button id="addProductBtn" class="btn-primary btn-full">➕ Qo‘shish</button>
 
-            <div class="form-grid">
-              <label>
-                Nomi:
-                <input id="adminName" type="text" />
-              </label>
-
-              <label>
-                Kategoriya:
-                <select id="adminCategory"></select>
-              </label>
-
-              <label>
-                Asosiy narx:
-                <input id="adminPriceBase" type="number" />
-              </label>
-
-              <label class="checkbox-row">
-                <input id="adminHasDiscount" type="checkbox" />
-                Chegirma bor
-              </label>
-
-              <label>
-                Chegirma narxi:
-                <input id="adminPriceDiscount" type="number" />
-              </label>
-
-              <label>
-                Tag:
-                <input id="adminTag" type="text" />
-              </label>
-
-              <label>
-                Tavsif:
-                <textarea id="adminDescription"></textarea>
-              </label>
-
-              <label>
-                Rasmlar:
-                <textarea id="adminImages" placeholder="image1, image2, ..."></textarea>
-              </label>
-            </div>
-
-            <button class="btn-primary admin-btn" type="button" onclick="addCustomProduct()">
-              ➕ Mahsulot qo‘shish
-            </button>
-
-            <div id="adminCustomList" class="admin-list"></div>
-          </div>
-
+          <div id="adminProductsList" class="admin-list"></div>
         </div>
       </div>
-    </section>
 
-  </main>
+      <!-- ---------- ADMIN: KATEGORIYA QO‘SHISH ---------- -->
+      <div class="admin-col">
+        <div class="card">
+          <div class="card-title">🏷 Kategoriya qo‘shish</div>
 
-  <!-- CART SHEET -->
-  <div id="cartSheetOverlay" class="overlay"></div>
-  <aside id="cartSheet" class="cart-sheet">
-    <header>
-      <h2>🧺 Savat</h2>
-      <button type="button" onclick="toggleCartSheet(false)" class="icon-btn">✕</button>
-    </header>
+          <div class="form-grid">
+            <label>
+              Kategoriya nomi
+              <input id="catName" type="text">
+            </label>
+          </div>
 
-    <div id="cartItems"></div>
+          <button id="addCategoryBtn" class="btn-primary btn-full">➕ Kategoriya qo‘shish</button>
 
-    <footer>
-      <div class="cart-sheet-total-row">
-        Jami: <strong id="cartSheetTotal">0 so‘m</strong>
+          <div id="adminCategoriesList" class="admin-list"></div>
+        </div>
       </div>
-      <button class="btn-primary btn-full" type="button" onclick="sendOrder()">📦 Buyurtma berish</button>
-    </footer>
-  </aside>
 
-  <!-- PRODUCT DETAIL MODAL -->
+    </div>
+
+    <!-- ---------- ADMIN: BUYURTMALAR ---------- -->
+    <div class="card" style="margin:20px;">
+      <div class="card-title">📦 Buyurtmalar</div>
+
+      <div id="adminOrdersList" class="orders-list"></div>
+    </div>
+
+    <!-- ---------- ADMIN: KURYER QO‘SHISH (A BOSQICH) ---------- -->
+    <div class="card" style="margin:20px;">
+      <div class="card-title">🚚 Kuryer qo‘shish</div>
+
+      <div class="form-grid">
+        <label>Ism <input id="courNewName" type="text"></label>
+        <label>Familiya <input id="courNewSurname" type="text"></label>
+        <label>Telefon <input id="courNewPhone" type="text"></label>
+        <label>Mashina nomi <input id="courNewCar" type="text"></label>
+        <label>Mashina raqami <input id="courNewCarNumber" type="text"></label>
+        <label>Login <input id="courNewLogin" type="text"></label>
+        <label>Parol <input id="courNewPassword" type="password"></label>
+        <label>Profil rasmi URL (ixtiyoriy) <input id="courNewAvatar" type="text"></label>
+      </div>
+
+      <button class="btn-primary btn-full" onclick="adminCreateCourier()">➕ Kuryer qo‘shish</button>
+
+      <div id="adminCourierList" class="admin-list" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <!-- ============ PRODUCT DETAIL OVERLAY (C BOSQICH) ============ -->
   <div id="productDetailOverlay" class="detail-overlay hidden">
     <div class="detail-card">
 
-      <button class="detail-close" type="button" onclick="closeProductDetail()">✕</button>
+      <button class="detail-close" onclick="closeProductDetail()">◀ Magaziniga qaytish</button>
 
       <div class="detail-img-wrap">
-        <button id="detailPrevBtn" class="detail-nav-btn" type="button">‹</button>
-
-        <img id="detailImage" src="" alt="Mahsulot rasmi" />
-
-        <button id="detailNextBtn" class="detail-nav-btn" type="button">›</button>
-
-        <div id="detailImageIndex" class="detail-img-index"></div>
+        <button id="detailPrevBtn" class="detail-nav-btn">‹</button>
+        <img id="detailImage" src="">
+        <button id="detailNextBtn" class="detail-nav-btn">›</button>
+        <div id="detailImageIndex" class="detail-img-index">1 / 1</div>
       </div>
+
+      <!-- 🆕 Pastdagi vertikal galereya -->
+      <div id="detailGallery" class="detail-gallery"></div>
 
       <div class="detail-body">
         <div id="detailCategory" class="detail-category"></div>
-        <h3 id="detailName" class="detail-name"></h3>
-        <p id="detailTag" class="detail-tag"></p>
+        <h2 id="detailName" class="detail-name"></h2>
         <p id="detailDesc" class="detail-desc"></p>
+        <div id="detailTag" class="detail-tag"></div>
 
         <div class="detail-price-row">
           <div>
             <div id="detailPrice" class="detail-price-main"></div>
             <div id="detailOldPrice" class="detail-price-old hidden"></div>
           </div>
-
           <div class="qty-control">
-            <button id="detailQtyMinus" type="button">-</button>
+            <button id="detailQtyMinus">-</button>
             <span id="detailQtyValue">1</span>
-            <button id="detailQtyPlus" type="button">+</button>
+            <button id="detailQtyPlus">+</button>
           </div>
         </div>
 
-        <button id="detailAddBtn" class="btn-primary btn-full" type="button">
-          🛒 Savatga qo‘shish
-        </button>
-        <button id="detailBackBtn" class="btn-ghost hidden" type="button">
-          ◀ Magaziniga qaytish
-        </button>
+        <button id="detailAddBtn" class="btn-primary">🛒 Savatga qo‘shish</button>
+        <button id="detailBackBtn" class="btn-outline hidden">◀ Magaziniga qaytish</button>
       </div>
+
     </div>
   </div>
 
+  <!-- ============ CART OVERLAY ============ -->
+  <div id="overlay" class="overlay"></div>
+
+  <div id="cartSheet" class="cart-sheet">
+    <header>
+      <h2>Savat</h2>
+      <button onclick="closeCart()" class="icon-btn">✕</button>
+    </header>
+    <div id="cartContent"></div>
+    <div id="cartTotal" class="cart-sheet-total"></div>
+    <button class="btn-primary btn-full" id="checkoutBtn">Buyurtma qilish</button>
+  </div>
+
   <!-- TOAST -->
-  <div id="toast" class="toast"></div>
+  <div id="toast" class="toast">Toast text</div>
 
-  <!-- NOTIFICATION SOUND -->
-  <audio id="notifySound" src="ding.mp3" preload="auto"></audio>
-
-  <!-- APP SCRIPT -->
-  <script type="module" src="app.js"></script>
-
-  <!-- LIVE CLOCK SCRIPT -->
-  <script>
-    (function(){
-      const clockEl = document.getElementById("liveClock");
-      function updateClock(){
-        if(!clockEl) return;
-        const now = new Date();
-        const hh = String(now.getHours()).padStart(2,"0");
-        const mm = String(now.getMinutes()).padStart(2,"0");
-        clockEl.textContent = hh + ":" + mm;
-      }
-      updateClock();
-      setInterval(updateClock, 60000);
-    })();
-  </script>
+  <!-- APP -->
+  <script src="app.js"></script>
 </body>
 </html>

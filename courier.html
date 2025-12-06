@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Kuryer paneli — Restoran</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Asosiy umumiy style -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Favicon (ixtiyoriy) -->
+  <link rel="icon" type="image/png" href="icon.png">
+</head>
+<body data-theme="dark">
+
+  <!-- 🔔 Yangi zakaz tushganda chaladigan ovoz -->
+  <audio id="courierDing" src="ding.mp3" preload="auto"></audio>
+
+  <!-- GLOBAL TOAST -->
+  <div id="courierToast" class="toast">Toast</div>
+
+  <!-- ================== LOGIN VIEW ================== -->
+  <div id="courierLoginView" class="cour-wrap">
+    <header class="cour-header">
+      <div class="cour-logo">
+        <div class="cour-logo-circle">🚚</div>
+        <div class="cour-logo-text">
+          <div class="cour-logo-title">Kuryer paneli</div>
+          <div class="cour-logo-sub">Admin bergan login / parol bilan kiring</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="cour-main">
+      <div class="cour-card cour-login-card">
+        <h1 class="cour-card-title">Kirish</h1>
+
+        <div class="cour-form-grid">
+          <label>
+            Login
+            <input type="text" id="courLoginInput" autocomplete="username">
+          </label>
+          <label>
+            Parol
+            <input type="password" id="courPasswordInput" autocomplete="current-password">
+          </label>
+        </div>
+
+        <button id="courLoginBtn" class="btn-primary btn-full" type="button">
+          🔐 Kirish
+        </button>
+
+        <p class="cour-help">
+          Loginingiz va parolingizni admin beradigan bo‘ladi.  
+          Agar kira olmasangiz — administrator bilan bog‘laning.
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ================== MAIN VIEW (LOGINDAN KEYIN) ================== -->
+  <div id="courierMainView" class="cour-wrap hidden">
+
+    <!-- HEADER + PROFIL + STATISTIKA -->
+    <header class="cour-header">
+      <div class="cour-logo">
+        <div class="cour-logo-circle" id="courAvatarCircle">🚚</div>
+        <div class="cour-logo-text">
+          <div class="cour-logo-title" id="courNameText">Kuryer</div>
+          <div class="cour-logo-sub" id="courCarText">Mashina ma’lumoti</div>
+        </div>
+      </div>
+
+      <div class="cour-header-right">
+        <div class="cour-stats-mini">
+          <div class="cour-stat-pill">
+            Bugungi zakazlar: <span id="courTodayCount">0</span>
+          </div>
+          <div class="cour-stat-pill">
+            Bugungi summa: <span id="courTodaySum">0 so‘m</span>
+          </div>
+        </div>
+        <button id="courLogoutBtn" class="icon-btn" type="button">⏏ Chiqish</button>
+      </div>
+    </header>
+
+    <!-- KATTA STATISTIKA PANELI -->
+    <section class="cour-stats-panel">
+      <div class="cour-stat-card">
+        <div class="cour-stat-label">Umumiy yetkazilgan zakazlar</div>
+        <div class="cour-stat-value" id="courTotalDeliveredCount">0</div>
+      </div>
+      <div class="cour-stat-card">
+        <div class="cour-stat-label">Umumiy yetkazilgan summa</div>
+        <div class="cour-stat-value" id="courTotalDeliveredSum">0 so‘m</div>
+      </div>
+    </section>
+
+    <!-- TABS: Yangi zakazlar / Mening zakazlarim / Yakunlanganlar -->
+    <nav class="cour-tabs">
+      <button class="cour-tab-btn active" data-tab="new">🆕 Yangi zakazlar</button>
+      <button class="cour-tab-btn" data-tab="active">🚚 Mening zakazlarim</button>
+      <button class="cour-tab-btn" data-tab="history">✅ Yakunlanganlar</button>
+    </nav>
+
+    <!-- ASOSIY KONTENT -->
+    <main class="cour-main">
+
+      <!-- 🔹 YANGI ZAKAZLAR RO‘YXATI -->
+      <section id="courTabNew" class="cour-tab-page">
+        <h2 class="cour-section-title">🆕 Yangi zakazlar</h2>
+        <p class="cour-section-sub">
+          Bu bo‘limda admin kuryerlarga bergan, hali hech kim olmagan zakazlar ko‘rinadi.
+          Birinchi bo‘lib “Zakazni olish” tugmasini bosgan kuryerga biriktiriladi.
+        </p>
+
+        <div id="courNewOrdersList" class="cour-orders-list">
+          <!-- JS orqali to‘ldiriladi -->
+        </div>
+      </section>
+
+      <!-- 🔹 MENING AKTIV ZAKAZLARIM -->
+      <section id="courTabActive" class="cour-tab-page hidden">
+        <h2 class="cour-section-title">🚚 Mening zakazlarim</h2>
+        <p class="cour-section-sub">
+          Hozir siz yetkazayotgan zakazlar shu yerda. Manzil bo‘yicha marshrut ochib, yetkazilgach “Yakunlash” tugmasini bosing.
+        </p>
+
+        <div id="courMyOrdersList" class="cour-orders-list">
+          <!-- JS orqali to‘ldiriladi -->
+        </div>
+      </section>
+
+      <!-- 🔹 YAKUNLANGANLAR TARIXI -->
+      <section id="courTabHistory" class="cour-tab-page hidden">
+        <h2 class="cour-section-title">✅ Yakunlangan zakazlar</h2>
+        <p class="cour-section-sub">
+          Siz yetkazib bergan zakazlar tarixi. Bu yerda sanasi, mijoz va summa ko‘rinadi.
+        </p>
+
+        <div id="courHistoryList" class="cour-orders-list">
+          <!-- JS orqali to‘ldiriladi -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================== ORDER CARD TEMPLATE (IZOH) ==================
+  JS orqali har bir zakaz quyidagi ko‘rinishda chiqariladi:
+
+  <article class="cour-order-card">
+    <header class="cour-order-header">
+      <div>
+        <div class="cour-order-id">ID: abc123...</div>
+        <div class="cour-order-date">12.03.2025 14:32</div>
+      </div>
+      <div class="cour-order-total">120 000 so‘m</div>
+    </header>
+
+    <div class="cour-order-customer">
+      👤 Ism • 📱 Raqam
+      📍 Manzil
+      🧭 Mo‘ljal
+    </div>
+
+    <div class="cour-order-items">
+      <strong>Taomlar:</strong>
+      <ul>
+        <li>Osh — 2 dona × 35 000</li>
+        ...
+      </ul>
+    </div>
+
+    <footer class="cour-order-actions">
+      <button>Zakazni olish</button>
+      <button>Marshrut</button>
+      <button>Yakunlash</button>
+    </footer>
+  </article>
+
+  ========================================================== -->
+
+  <!-- JS: kuryer uchun maxsus -->
+  <script src="courier.js"></script>
+</body>
+</html>

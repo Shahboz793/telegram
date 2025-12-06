@@ -23,39 +23,29 @@ a{
 }
 .hidden{display:none!important}
 
-/* ================================
-   THEME – KUNDUZ (LIGHT) QIZIL/YASHIL
-================================ */
+/* THEME TOKENS */
 :root{
-  --bg:#f4f4f5;
+  --bg:#f5f3f7;
   --bg-soft:#e5e7eb;
   --panel:#ffffff;
   --card:#ffffff;
-  --text:#111111;
-  --muted:#475569;
+  --text:#111827;
+  --muted:#6b7280;
 
-  /* QIZIL / YASHIL USLUB */
-  --accent:#dc2626;          /* asosiy qizil */
+  /* QIZIL / QORA USLUB */
+  --accent:#ef4444;          /* asosiy qizil */
   --accent-soft:#fee2e2;     /* yumshoq qizil */
-  --accent-strong:#991b1b;   /* to‘q qizil */
+  --accent-strong:#b91c1c;   /* to‘q qizil */
 
-  --ok:#16a34a;              /* yutuq – yashil */
-  --ok-soft:#dcfce7;
-  --ok-strong:#0f5f2e;
-
-  --warning:#f59e0b;
-  --danger:#ef4444;
-
-  --border:rgba(0,0,0,0.12);
+  --border:rgba(0,0,0,0.08);
   --shadow:0 18px 40px rgba(15,23,42,.18);
   --radius:12px;
   --radius-lg:22px;
-  --chip-bg:#ffffff;
+  --danger:#ef4444;
+  --ok:#22c55e;
+  --warning:#f59e0b;
+  --chip-bg:#111827;
 }
-
-/* ================================
-   THEME – TUNGI (DARK) QORA/QIZIL/YASHIL
-================================ */
 body.theme-dark{
   --bg:#020617;
   --bg-soft:#020617;
@@ -64,16 +54,10 @@ body.theme-dark{
   --text:#f9fafb;
   --muted:#9ca3af;
 
-  --accent:#ef4444;          /* neon qizil */
-  --accent-soft:#7f1d1d;
-  --accent-strong:#b91c1c;
-
-  --ok:#22c55e;              /* neon yashil */
-  --ok-soft:#14532d;
-  --ok-strong:#15803d;
-
-  --warning:#facc15;
-  --danger:#ef4444;
+  /* dark rejimda binafsha + qizil aralash */
+  --accent:#16a34a;          /* asosiy birinchi rangni yashil qildik */
+  --accent-soft:#bbf7d0;     /* yumshoq yashil */
+  --accent-strong:#15803d;   /* to‘q yashil */
 
   --border:rgba(148,163,184,.35);
   --shadow:0 22px 50px rgba(0,0,0,.65);
@@ -90,13 +74,13 @@ body.theme-dark{
   position:sticky;
   top:0;
   z-index:50;
-  background:linear-gradient(90deg,#dc2626,#16a34a);
+  background:linear-gradient(90deg,#ef4444,#16a34a); /* qizil + yashil */
   padding:10px 16px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   border-bottom:1px solid rgba(248,250,252,.25);
-  box-shadow:0 18px 40px rgba(0,0,0,.7);
+  box-shadow:0 18px 40px rgba(15,23,42,.7);
 }
 .logo-wrap{
   display:flex;
@@ -135,8 +119,8 @@ body.theme-dark{
   gap:8px;
 }
 .icon-btn{
-  background:rgba(0,0,0,.35);
-  border:1px solid rgba(248,250,252,.6);
+  background:rgba(15,23,42,.4);
+  border:1px solid rgba(248,250,252,.5);
   border-radius:999px;
   padding:7px 10px;
   cursor:pointer;
@@ -145,13 +129,12 @@ body.theme-dark{
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 10px 22px rgba(0,0,0,.55);
 }
 .icon-btn:hover{
   border-color:#fff;
 }
 .cart-top-btn{
-  background:linear-gradient(135deg,#dc2626,#b91c1c);
+  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
   border:none;
   border-radius:999px;
   color:#fff;
@@ -165,11 +148,10 @@ body.theme-dark{
 }
 .cart-top-btn.hidden{display:none;}
 .pill{
-  background:rgba(0,0,0,.35);
+  background:rgba(0,0,0,.3);
   border-radius:999px;
   padding:2px 8px;
   font-size:11px;
-  color:#e5e7eb;
 }
 .cart-top-total{
   font-size:13px;
@@ -198,13 +180,11 @@ body.theme-dark{
   font-size:13px;
   cursor:pointer;
   color:#9ca3af;
-  transition:background .2s,box-shadow .2s,color .2s,transform .15s;
 }
 .tab-btn.active{
-  background:linear-gradient(135deg,#dc2626,#16a34a);
+  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
   color:#fff;
   box-shadow:0 10px 25px rgba(0,0,0,.7);
-  transform:translateY(-1px);
 }
 .admin-active{
   border-color:var(--accent);
@@ -237,9 +217,9 @@ body.theme-dark{
   color:#e5e7eb;
 }
 .btn-outline{
-  border-color:#22c55e;
+  border-color:#16a34a;
   color:#bbf7d0;
-  background:rgba(12,20,12,.9);
+  background:rgba(24,24,27,.9);
 }
 
 /* SHOP TOOLBAR */
@@ -256,20 +236,16 @@ body.theme-dark{
   border-radius:999px;
   border:1px solid var(--border);
   padding:8px 12px;
-  background:var(--bg-soft);
+  background:var(--bg);
   font-size:13px;
   outline:none;
-  color:var(--text);
 }
-.search-input::placeholder{color:var(--muted);}
 .search-input:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 1px rgba(220,38,38,.35);
+  border-color:#16a34a;
+  box-shadow:0 0 0 1px rgba(22,163,74,.35);
 }
 
-/* ==========================
-   KATEGORIYA CHIP – 3D EFFEKT
-========================== */
+/* CATEGORY GRID (4 ta) */
 .chips-row{
   background:var(--panel);
   border-bottom:1px solid var(--border);
@@ -291,25 +267,15 @@ body.theme-dark{
   align-items:center;
   justify-content:center;
   min-height:52px;
-  color:var(--text);
-  box-shadow:0 8px 18px rgba(0,0,0,.35);
-  transform:translateY(0);
-  transition:transform .15s ease, box-shadow .15s ease, background .15s, color .15s, border-color .15s;
+  color:#e5e7eb;
+  box-shadow:0 8px 18px rgba(15,23,42,.55);
 }
 .chip span{display:block;}
-.chip:hover{
-  transform:translateY(-3px);
-  box-shadow:0 14px 26px rgba(0,0,0,.5);
-}
-.chip:active{
-  transform:translateY(1px) scale(.98);
-  box-shadow:0 6px 12px rgba(0,0,0,.4);
-}
 .chip.active{
-  background:linear-gradient(135deg,#dc2626,#16a34a);
+  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
   color:#fff;
   border-color:transparent;
-  box-shadow:0 14px 30px rgba(0,0,0,.75);
+  box-shadow:0 12px 26px rgba(0,0,0,.7);
 }
 @media(min-width:480px){
   .chip{font-size:12px;min-height:56px;}
@@ -399,8 +365,8 @@ body.theme-dark{
 .tag-mini{
   margin-top:7px;
   font-size:11px;
-  color:var(--accent-strong);
-  background:var(--accent-soft);
+  color:#bbf7d0; /* yashil matn */
+  background:rgba(22,163,74,.18); /* yumshoq yashil fon */
   padding:3px 7px;
   border-radius:999px;
   display:inline-block;
@@ -424,16 +390,16 @@ body.theme-dark{
 .btn-add{
   border:none;
   border-radius:999px;
-  background:linear-gradient(135deg,#111827,#020617);
+  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
   color:#fff;
   font-size:12px;
   padding:7px 14px;
   cursor:pointer;
-  box-shadow:0 10px 24px rgba(15,23,42,.8);
+  box-shadow:0 10px 24px rgba(0,0,0,.8);
   border:1px solid rgba(148,163,184,.6);
 }
 .btn-add:hover{
-  border-color:var(--accent);
+  border-color:#bbf7d0;
 }
 
 /* CART BOTTOM SHEET */
@@ -515,17 +481,17 @@ body.theme-dark{
 .btn-primary{
   border:none;
   border-radius:999px;
-  background:linear-gradient(135deg,#dc2626,#b91c1c);
+  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
   color:#fff;
   padding:9px 14px;
   font-size:14px;
   cursor:pointer;
-  box-shadow:0 14px 32px rgba(0,0,0,.55);
+  box-shadow:0 14px 32px rgba(0,0,0,.6);
 }
 .btn-full{width:100%;}
 .btn-primary.admin-btn{font-size:13px;margin-top:8px;}
 .admin-btn-success{
-  background:var(--ok);
+  background:linear-gradient(135deg,#16a34a,#22c55e);
   box-shadow:0 14px 32px rgba(34,197,94,.6);
 }
 .btn-xs{
@@ -587,7 +553,7 @@ body.theme-dark{
 .order-total{
   font-size:18px;
   font-weight:700;
-  color:#22c55e;
+  color:#22c55e; /* umumiy summa yashil */
 }
 .order-items{
   margin-top:6px;
@@ -634,7 +600,7 @@ body.theme-dark{
 }
 .progress-fill{
   height:100%;
-  background:linear-gradient(90deg,#dc2626,#16a34a);
+  background:linear-gradient(90deg,#ef4444,#16a34a); /* qizil + yashil */
   width:0;
 }
 .progress-steps{
@@ -645,7 +611,7 @@ body.theme-dark{
   color:var(--muted);
 }
 .progress-step.active{
-  color:#e0e7ff;
+  color:#bbf7d0;
   font-weight:600;
 }
 
@@ -675,6 +641,11 @@ body.theme-dark{
   font-size:15px;
   font-weight:600;
   margin-bottom:8px;
+}
+.card-sub{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:10px;
 }
 .form-grid{
   display:grid;
@@ -724,7 +695,7 @@ body.theme-dark{
   cursor:pointer;
   font-size:14px;
 }
-.admin-edit-btn{color:#c4b5fd;}
+.admin-edit-btn{color:#bbf7d0;}
 .admin-delete-btn{color:var(--danger);}
 
 .admin-order-filters{
@@ -734,9 +705,7 @@ body.theme-dark{
   margin-bottom:8px;
 }
 
-/* ==============================
-   PRODUCT DETAIL (MODAL) + ZOOM
-============================== */
+/* === PRODUCT DETAIL (MODAL) – UZUM STYLE === */
 .detail-overlay{
   position:fixed;
   inset:0;
@@ -755,7 +724,7 @@ body.theme-dark{
   box-shadow:var(--shadow);
   position:relative;
   overflow-y:auto;
-  background:linear-gradient(180deg,#dc2626 0%,#ffffff 18%,#faf5ff 100%);
+  background:linear-gradient(180deg,#ef4444 0%,#ffffff 18%,#fef2f2 100%); /* qizil fon */
   padding-bottom:24px;
 }
 .detail-close{
@@ -771,9 +740,9 @@ body.theme-dark{
   z-index:3;
 }
 
-/* rasm bloki */
+/* rasm bloki – katta kartochka */
 .detail-img-wrap{
-  margin-top:44px;
+  margin-top:44px; /* yopish tugmasi ostida */
   position:relative;
   padding:16px;
 }
@@ -784,25 +753,10 @@ body.theme-dark{
   object-fit:cover;
   box-shadow:0 22px 40px rgba(0,0,0,.5);
   background:#000;
-  transform:scale(1);
-  transition:transform .28s ease-out, box-shadow .28s ease-out;
 }
 @media(min-width:480px){
   .detail-img-wrap img{height:300px;}
 }
-
-/* ZOOM ANIMATSIYA – fullscreen holatga o'tganda */
-@keyframes detailZoomIn{
-  from{
-    transform:scale(.9);
-    opacity:.5;
-  }
-  to{
-    transform:scale(1);
-    opacity:1;
-  }
-}
-
 .detail-img-index{
   position:absolute;
   bottom:24px;
@@ -853,7 +807,7 @@ body.theme-dark{
 }
 .detail-tag{
   font-size:13px;
-  color:#16a34a;
+  color:#16a34a; /* yashil tag */
   margin-top:4px;
 }
 
@@ -887,12 +841,12 @@ body.theme-dark{
   height:34px;
   border-radius:999px;
   border:none;
-  background:linear-gradient(135deg,#dc2626,#991b1b);
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
   color:#fff;
   font-size:18px;
   font-weight:600;
   cursor:pointer;
-  box-shadow:0 14px 30px rgba(220,38,38,.7);
+  box-shadow:0 14px 30px rgba(239,68,68,.7);
 }
 .detail-price-row .qty-control span{
   min-width:24px;
@@ -910,29 +864,27 @@ body.theme-dark{
   padding:14px 20px;
   font-size:15px;
   font-weight:600;
-  background:linear-gradient(90deg,#16a34a,#22c55e);
-  box-shadow:0 24px 50px rgba(34,197,94,.6);
+  background:linear-gradient(90deg,#ef4444,#16a34a); /* qizil + yashil */
+  box-shadow:0 24px 50px rgba(0,0,0,.7);
   display:flex;
   align-items:center;
   justify-content:center;
   gap:8px;
-  border:none;
-  color:#fff;
 }
 #detailAddBtn.added{
-  background:linear-gradient(90deg,#4b5563,#0f172a);
+  background:linear-gradient(90deg,#16a34a,#22c55e);
 }
 #detailBackBtn{
   margin-top:10px;
   font-size:13px;
-  color:#4c1d95;
+  color:#b91c1c;
   border-radius:999px;
   padding:6px 10px;
   border:1px solid rgba(148,163,184,.5);
   background:rgba(248,250,252,.9);
 }
 
-/* FULLSCREEN HOLAT – kitobcha ko‘rinish, zoom bilan */
+/* RASMGA BOSGANDA TO‘LIQ EKRAN HOLAT */
 .detail-card.image-fullscreen{
   background:#000;
   padding:0;
@@ -946,8 +898,7 @@ body.theme-dark{
 }
 .detail-card.image-fullscreen .detail-img-wrap img{
   width:100%;
-  height:100vh
-
+  height:100vh;
   border-radius:0;
   object-fit:contain;
   box-shadow:none;
@@ -977,7 +928,7 @@ body.theme-dark{
   bottom:18px;
   left:50%;
   transform:translateX(-50%) translateY(130%);
-  background:linear-gradient(135deg,#7000ff,#4c1d95);
+  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
   color:#fff;
   padding:9px 14px;
   border-radius:999px;
@@ -1003,4 +954,309 @@ body.theme-dark{
 }
 ::-webkit-scrollbar-track{
   background:transparent;
+}
+
+/* =======================================================
+   KURYER PANELI — RESTORAN KARTOCHKALARI DIZAYNI
+   (faqat courier.html da ishlaydi, body.courier-body orqali)
+======================================================= */
+
+.courier-body{
+  font-family:"Poppins","Roboto",sans-serif;
+  background:linear-gradient(180deg,#111827 0%,#020617 35%,#0b1120 100%);
+  color:#e5e7eb;
+}
+
+/* HEADER */
+.courier-header{
+  position:sticky;
+  top:0;
+  z-index:50;
+  padding:10px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:linear-gradient(90deg,#b91c1c,#16a34a); /* qizil + yashil */
+  box-shadow:0 20px 40px rgba(0,0,0,.6);
+}
+.courier-header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.courier-logo{
+  width:40px;
+  height:40px;
+  border-radius:14px;
+  background:radial-gradient(circle at 30% 10%,#fef9c3,#b91c1c);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  box-shadow:0 10px 24px rgba(0,0,0,.7);
+}
+.courier-header-text{
+  display:flex;
+  flex-direction:column;
+}
+.courier-title{
+  font-weight:600;
+  font-size:18px;
+  color:#f9fafb;
+}
+.courier-subtitle{
+  font-size:12px;
+  color:#fee2e2;
+}
+.courier-header-right{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* CHIP BUTTONS (logout va h.k.) */
+.btn-chip{
+  border-radius:999px;
+  border:1px solid rgba(248,250,252,.85);
+  background:rgba(15,23,42,.4);
+  padding:6px 12px;
+  font-size:12px;
+  color:#f9fafb;
+  cursor:pointer;
+}
+.btn-chip-danger{
+  background:#991b1b;
+  border-color:#fecaca;
+}
+
+/* MAIN LAYOUT */
+.courier-main{
+  padding:12px 12px 24px;
+}
+.courier-login-section{
+  max-width:420px;
+  margin:16px auto 0;
+}
+.courier-app-section{
+  max-width:900px;
+  margin:10px auto 0;
+}
+
+/* KURYER CARDLAR */
+.courier-card{
+  background:radial-gradient(circle at top,#0f172a,#020617);
+  border-radius:22px;
+  box-shadow:0 22px 50px rgba(0,0,0,.85);
+  border:1px solid rgba(248,250,252,.06);
+  padding:14px 16px 16px;
+}
+.courier-login-card{
+  background:radial-gradient(circle at top,#7f1d1d,#020617);
+  border-color:rgba(254,226,226,.4);
+}
+
+/* TOP PANEL: Kuryer ma’lumoti + statistikasi */
+.courier-top-panel{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.courier-info-card{
+  background:radial-gradient(circle at top,#1f2937,#020617);
+  border-radius:22px;
+  box-shadow:0 16px 40px rgba(0,0,0,.8);
+  padding:12px 14px;
+  border:1px solid rgba(148,163,184,.4);
+}
+.courier-info-main{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.courier-avatar{
+  width:46px;
+  height:46px;
+  border-radius:999px;
+  background:radial-gradient(circle at 30% 10%,#fef3c7,#f97316);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  box-shadow:0 16px 34px rgba(0,0,0,.8);
+}
+.courier-name{
+  font-size:17px;
+  font-weight:600;
+  color:#f9fafb;
+}
+.courier-meta{
+  font-size:12px;
+  color:#cbd5f5;
+}
+.courier-badge-row{
+  margin-top:6px;
+}
+.courier-badge{
+  display:inline-block;
+  border-radius:999px;
+  border:1px solid rgba(251,191,36,.6);
+  background:rgba(24,24,27,.95);
+  padding:3px 9px;
+  font-size:11px;
+  color:#fde68a;
+}
+
+/* STAT KARTALAR — RESTORAN DASHBOARD STYLE */
+.courier-stats-row{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.courier-stat-card{
+  background:radial-gradient(circle at top,#b91c1c,#111827);
+  border-radius:20px;
+  padding:10px 12px;
+  box-shadow:0 18px 40px rgba(0,0,0,.85);
+  border:1px solid rgba(248,250,252,.14);
+}
+.courier-stat-card:nth-child(2){
+  background:radial-gradient(circle at top,#15803d,#020817);
+}
+.stat-label{
+  font-size:11px;
+  color:#fee2e2;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.stat-value{
+  margin-top:4px;
+  font-size:22px;
+  font-weight:700;
+  color:#fef9c3;
+}
+.stat-sub{
+  font-size:12px;
+  color:#e5e7eb;
+}
+
+/* TABLAR (kuryer) */
+.courier-tabs{
+  margin-top:14px;
+  padding:4px;
+  border-radius:999px;
+  background:rgba(15,23,42,.95);
+  box-shadow:0 15px 40px rgba(0,0,0,.8);
+  display:flex;
+  gap:4px;
+}
+.courier-tab-btn{
+  flex:1;
+  border:none;
+  border-radius:999px;
+  padding:7px 4px;
+  font-size:12px;
+  color:#9ca3af;
+  background:transparent;
+  cursor:pointer;
+}
+.courier-tab-btn.active{
+  background:linear-gradient(90deg,#f97316,#ef4444);
+  color:#fefce8;
+  box-shadow:0 12px 30px rgba(248,113,113,.7);
+}
+
+/* TAB PAGE LAYOUT */
+.courier-tab-page{
+  margin-top:12px;
+}
+.section-title-sm{
+  font-size:15px;
+  font-weight:600;
+  margin-bottom:2px;
+}
+.section-sub-sm{
+  font-size:12px;
+  color:#9ca3af;
+  margin-bottom:8px;
+}
+.courier-orders-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* RESTORAN KARTOCHKA USLUBI — faqat kuryer sahifasida */
+.courier-body .courier-order-card{
+  background:
+    radial-gradient(circle at top,#f97316 0,transparent 55%),
+    radial-gradient(circle at bottom,#111827 0,transparent 60%),
+    #020617;
+  border-radius:24px;
+  border:1px solid rgba(248,250,252,.18);
+  box-shadow:0 24px 60px rgba(0,0,0,.9);
+  padding:14px 14px 12px;
+}
+.courier-body .courier-order-card .order-header{
+  align-items:flex-start;
+}
+.courier-body .courier-order-card .order-id{
+  font-size:12px;
+  font-weight:600;
+  color:#fee2e2;
+}
+.courier-body .courier-order-card .order-date{
+  font-size:11px;
+  color:#e5e7eb;
+}
+.courier-body .courier-order-card .order-customer{
+  font-size:12px;
+  color:#f9fafb;
+}
+.courier-body .courier-order-card .order-total{
+  font-size:20px;
+  font-weight:700;
+  color:#fef9c3;
+}
+
+/* Mahsulotlar ro‘yxati — restoran menyu ko‘rinishida */
+.courier-body .courier-order-card .order-items{
+  margin-top:8px;
+  font-size:12px;
+  color:#e5e7eb;
+}
+.courier-body .courier-order-card .order-items ul{
+  margin-top:4px;
+  margin-left:16px;
+}
+.courier-body .courier-order-card .order-items li{
+  margin-bottom:2px;
+}
+
+/* Kuryer kart footer (tugmalar qatori) */
+.courier-card-footer{
+  margin-top:10px;
+  display:flex;
+  justify-content:flex-end;
+  gap:6px;
+}
+
+/* Kuryer uchun kichik tugmalar biroz kattaroq ko‘rinishda */
+.courier-body .btn-xs{
+  padding:6px 12px;
+  font-size:12px;
+}
+
+/* Login form matn rangi yorqin bo‘lsin */
+.courier-body .courier-login-card .form-grid label{
+  color:#fee2e2;
+}
+.courier-body .courier-login-card .form-grid input{
+  background:#020617;
+  border-color:rgba(254,226,226,.7);
+}
+
+/* Kuryer sahifasida toast biroz pastroq tursin */
+.courier-body .toast{
+  bottom:26px;
 }

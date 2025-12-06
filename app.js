@@ -75,17 +75,6 @@ let detailCountdownTimer     = null;
 let detailCountdownRemaining = 0;
 let isImageFullscreen        = false; // FULLSCREEN HOLATI
 
-// TOUCH / SWIPE / PINCH STATE (detail rasm uchun)
-let touchStartX   = 0;
-let touchStartY   = 0;
-let touchStartTime = 0;
-let isSwiping     = false;
-
-let pinchStartDist  = 0;
-let pinchBaseScale  = 1;
-let currentScale    = 1;
-let isPinching      = false;
-
 // COURIER STATE
 let courierSelectedOrderId = null;
 
@@ -126,8 +115,9 @@ const detailQtyMinus = document.getElementById("detailQtyMinus");
 const detailQtyPlus  = document.getElementById("detailQtyPlus");
 const detailQtyValue = document.getElementById("detailQtyValue");
 
-// detail rasm konteyneri (swipe / pinch uchun)
-const detailImgWrap = document.querySelector(".detail-img-wrap");
+// rasm konteynerlari
+const detailImgWrap        = document.querySelector(".detail-img-wrap");
+const detailGalleryListEl  = document.getElementById("detailGalleryList"); // pastga scroll bo‘ladigan galereya (agar HTML’da bo‘lsa)
 
 // ADMIN FORM DOM
 const adminNameEl          = document.getElementById("adminName");
@@ -149,7 +139,7 @@ const adminCategoryListEl = document.getElementById("adminCategoryList");
 const clientOrdersListEl = document.getElementById("clientOrdersList");
 const adminOrdersListEl  = document.getElementById("adminOrdersList");
 
-// COURIER DOM
+// COURIER DOM (admin ichidagi xarita paneli)
 const courierOrderSelect = document.getElementById("courierOrderSelect");
 const courierMapFrame    = document.getElementById("courierMapFrame");
 const courierInfoEl      = document.getElementById("courierInfo");
@@ -234,12 +224,14 @@ async function getOrAskLocation(){
       "Shu joylashuvdan foydalanilsinmi?"
     );
     if(ok) return saved;
+    // eski lokatsiyani bekor qilsa – tozalaymiz
+    localStorage.removeItem(STORAGE_LOCATION);
   }
 
   const allow = confirm(
     "📍 Joylashuvingiz aniqlansinmi?\n" +
     "Bu ma’lumot kuryerga aniq marshrut tuzish uchun kerak bo‘ladi.\n\n" +
-    "Telefon sozlamalaridan GPS (Location) yoqilgan bo‘lishi kerak."
+    "Telefon sozlamalaridan GPS (Location) yoqilgan bo‘lishi kerak. 'Allow' / 'Ruxsat berish' tugmasini bosing."
   );
   if(!allow) return null;
 
@@ -251,7 +243,7 @@ async function getOrAskLocation(){
     return loc;
   }catch(e){
     console.error("Joylashuv aniqlanmadi:", e);
-    showToast("⚠️ Joylashuv aniqlanmadi. Telefon sozlamalaridan GPS ni yoqing yoki manzilni matn ko‘rinishida yozing.", 3500);
+    showToast("⚠️ Joylashuv aniqlanmadi. Telefoningizda GPS va internetni yoqing, brauzerda 'Allow' ni bosing.", 4000);
     return null;
   }
 }
@@ -336,8 +328,8 @@ function promptNewCustomerInfo(){
   const address = prompt("📍 Asosiy manzil (shahar, tuman, ko‘cha, uy):");
   if(!address) return null;
 
-  const landmark      = prompt("🧭 Mo‘ljal (masalan, bozor oldi, maktab yonida) — ixtiyoriy:") || "";
-  const secondPhone   = prompt("📞 Qo‘shimcha telefon raqam (ixtiyoriy):") || "";
+  const landmark = prompt("🧭 Mo‘ljal (masalan, bozor oldi, maktab yonida) — ixtiyoriy:") || "";
+  const secondPhone = prompt("📞 Qo‘shimcha telefon raqam (ixtiyoriy):") || "";
   const preferredTime = prompt("⏰ Buyurtmani qaysi vaqtda qabul qilishni xohlaysiz? (ixtiyoriy):") || "";
 
   const info = {
@@ -1094,7 +1086,7 @@ async function sendOrder(){
 
     const docRef = await addDoc(ordersCol, payload);
 
-    showToast("✅ Buyurtma qabul qilindi. Holatini 'Buyurtmalarim' bo‘limidan ko‘rasiz.");
+    showToast("✅ Ma’lumotlaringiz olindi. Buyurtma berildi! Holatini 'Buyurtmalarim' bo‘limidan kuzatib boring. Tasdiqlanganda sizga xabar beramiz.", 4500);
     cart = [];
     updateCartUI();
     renderCartItems();
@@ -1427,7 +1419,7 @@ function setImageFullscreen(on){
   card.classList.toggle("image-fullscreen", isImageFullscreen);
 }
 
-// toggle (hozircha ishlatilmaydi, lekin qoldiramiz)
+// toggle function
 function toggleImageFullscreen(){
   setImageFullscreen(!isImageFullscreen);
 }
@@ -1440,6 +1432,7 @@ function getDetailImages(){
   return [RAW_PREFIX + "noimage.png"];
 }
 
+// Asosiy katta rasm (tepada)
 function renderDetailImage(){
   if(!detailImageEl) return;
   const imgs = getDetailImages();
@@ -1451,6 +1444,43 @@ function renderDetailImage(){
     detailImageIndexEl.textContent = `${detailImageIndex+1} / ${imgs.length}`;
   }
 }
+
+// Pastga qarab scroll bo‘ladigan galereya (agar HTML’da #detailGalleryList bo‘lsa)
+function renderDetailGallery(){
+  if(!detailGalleryListEl) return;
+  const imgs = getDetailImages();
+  if(!imgs.length){
+    detailGalleryListEl.innerHTML = "";
+    return;
+  }
+  detailGalleryListEl.innerHTML = "";
+  imgs.forEach((url, idx)=>{
+    const base = url.startsWith(RAW_PREFIX)
+      ? url.replace(/\.(png|jpg|jpeg)$/i,"")
+      : null;
+    const srcPng = base ? base + ".png" : url;
+    const srcJpg = base ? base + ".jpg" : url;
+
+    const img = document.createElement("img");
+    img.className = "detail-gallery-img";
+    img.alt = "Mahsulot rasmi " + (idx+1);
+    img.src = srcPng;
+    if(base){
+      img.onerror = function(){
+        this.onerror = null;
+        this.src = srcJpg;
+      };
+    }
+    img.addEventListener("click", e=>{
+      e.stopPropagation();
+      detailImageIndex = idx;
+      renderDetailImage();
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
+    detailGalleryListEl.appendChild(img);
+  });
+}
+
 function changeDetailImage(delta){
   if(detailIndex===null) return;
   const imgs = getDetailImages();
@@ -1458,6 +1488,7 @@ function changeDetailImage(delta){
   detailImageIndex = (detailImageIndex+delta+imgs.length)%imgs.length;
   renderDetailImage();
 }
+
 function clearDetailCountdown(){
   if(detailCountdownTimer){
     clearInterval(detailCountdownTimer);
@@ -1469,6 +1500,7 @@ function clearDetailCountdown(){
     detailBackBtn.style.color = "";
   }
 }
+
 function openProductDetail(index){
   const p = products[index];
   if(!p) return;
@@ -1479,14 +1511,17 @@ function openProductDetail(index){
   setImageFullscreen(false); // har safar yangi kartada normal holat
 
   const catLbl = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
+
   renderDetailImage();
+  renderDetailGallery(); // rasmlarni pastga chizish (agar konteyner bo‘lsa)
+
   detailCategoryEl.textContent = catLbl;
   detailNameEl.textContent     = p.name;
   detailTagEl.textContent      = p.tag ? "💡 " + p.tag : "";
   detailDescEl.textContent =
     p.description && p.description.trim().length
       ? p.description
-      : "Bu mahsulot sizning go‘zallik rutiningiz uchun mo‘ljallangan.";
+      : "Bu mahsulot sizning buyurtmangiz uchun tayyorlangan.";
   detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
   if(p.oldPrice){
     detailOldPriceEl.classList.remove("hidden");
@@ -1558,122 +1593,15 @@ if(detailQtyPlus){
     detailQtyValue.textContent = detailQty;
   });
 }
-
-/* 📷 DETAIL RASM: CLICK, SWIPE, PINCH ZOOM */
-if (detailImgWrap && detailImageEl) {
-
-  // ikki touch orasidagi masofa
-  function distance(t1, t2) {
-    const dx = t1.clientX - t2.clientX;
-    const dy = t1.clientY - t2.clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  // click: chap / o‘ng tomonga bosilganda rasm almashtirish
-  detailImgWrap.addEventListener("click", (e) => {
+// rasmga bosganda fullscreen / qaytish
+if(detailImgWrap){
+  detailImgWrap.addEventListener("click", e=>{
     e.stopPropagation();
-    const rect = detailImgWrap.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    if (!rect.width) return;
-
-    if (x < rect.width / 2) {
-      // chap tomon → oldingi rasm
-      changeDetailImage(-1);
-    } else {
-      // o‘ng tomon → keyingi rasm
-      changeDetailImage(1);
-    }
-  });
-
-  // touchstart
-  detailImgWrap.addEventListener(
-    "touchstart",
-    (e) => {
-      if (e.touches.length === 1) {
-        // SWIPE
-        isSwiping = true;
-        isPinching = false;
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-        touchStartTime = Date.now();
-      } else if (e.touches.length === 2) {
-        // PINCH ZOOM
-        isSwiping = false;
-        isPinching = true;
-        pinchStartDist = distance(e.touches[0], e.touches[1]);
-        pinchBaseScale = currentScale || 1;
-        detailImageEl.style.transition = "none";
-      }
-    },
-    { passive: true }
-  );
-
-  // touchmove – pinch zoom
-  detailImgWrap.addEventListener(
-    "touchmove",
-    (e) => {
-      if (isPinching && e.touches.length === 2) {
-        e.preventDefault();
-        const dist = distance(e.touches[0], e.touches[1]);
-        if (!pinchStartDist) return;
-
-        let scale = (dist / pinchStartDist) * pinchBaseScale;
-        // 1x–3x orasida cheklaymiz
-        scale = Math.max(1, Math.min(scale, 3));
-        currentScale = scale;
-
-        detailImageEl.style.transform = `scale(${scale})`;
-        detailImageEl.style.transformOrigin = "center center";
-      }
-    },
-    { passive: false }
-  );
-
-  // touchend – swipe va pinch yakunlash
-  detailImgWrap.addEventListener("touchend", (e) => {
-    // PINCH tugadi → avtomatik 1x ga qaytadi
-    if (isPinching && e.touches.length < 2) {
-      isPinching = false;
-      currentScale = 1;
-      detailImageEl.style.transition = "transform .25s ease-out";
-      detailImageEl.style.transform = "scale(1)";
-    }
-
-    // SWIPE tugadi
-    if (isSwiping) {
-      const dt = Date.now() - touchStartTime;
-      const touch = e.changedTouches[0];
-      const dx = touch.clientX - touchStartX;
-      const dy = touch.clientY - touchStartY;
-
-      // tez gorizontal harakat bo‘lsa – rasm almashadi
-      if (dt < 600 && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
-        if (dx < 0) {
-          // chapga surdi → keyingi rasm
-          changeDetailImage(1);
-        } else {
-          // o‘ngga surdi → oldingi rasm
-          changeDetailImage(-1);
-        }
-      }
-    }
-
-    isSwiping = false;
-  });
-
-  // touchcancel – zoomni ham reset qiladi
-  detailImgWrap.addEventListener("touchcancel", () => {
-    if (isPinching) {
-      isPinching = false;
-      currentScale = 1;
-      detailImageEl.style.transition = "transform .25s ease-out";
-      detailImageEl.style.transform = "scale(1)";
-    }
-    isSwiping = false;
+    toggleImageFullscreen();
   });
 }
 
-/* 🚚 COURIER PANEL LOGIC */
+/* 🚚 COURIER PANEL LOGIC (ADMIN ICHIDA XARITA) */
 function refreshCourierPanel(){
   if(!courierOrderSelect || !courierMapFrame || !courierInfoEl) return;
 
