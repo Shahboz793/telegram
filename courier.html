@@ -78,11 +78,11 @@
     }
     .courier-badge{
       display:inline-block;
-      background:#22c55e;
+      background:#ef4444;
       padding:4px 10px;
       border-radius:40px;
       font-size:12px;
-      color:black;
+      color:white;
       font-weight:bold;
     }
 
@@ -193,11 +193,11 @@
 
   <main class="courier-main">
 
-    <!-- LOGIN PAGE -->
+    <!-- LOGIN -->
     <section id="courierLoginSection">
       <article class="courier-card">
         <h2>🚚 Kuryer uchun kirish</h2>
-        <p>Admin tomonidan berilgan login va parolni kiriting.</p>
+        <p>Admin bergan login va parolni kiriting.</p>
 
         <div class="form-grid">
           <label>Login <input id="courierLoginInput"></label>
@@ -210,7 +210,7 @@
       </article>
     </section>
 
-    <!-- APP PAGE -->
+    <!-- APP -->
     <section id="courierAppSection" class="hidden">
 
       <article class="courier-card">
@@ -218,8 +218,8 @@
           <div class="courier-info-main">
             <div class="courier-avatar">🚚</div>
             <div>
-              <div class="courier-name" id="courierNameText"></div>
-              <div class="courier-meta" id="courierCarText"></div>
+              <div id="courierNameText"></div>
+              <div id="courierCarText"></div>
             </div>
           </div>
 
@@ -228,32 +228,29 @@
           </div>
 
           <div style="margin-top:10px; display:flex; gap:10px;">
-            <button id="goOnline" class="btn-xs btn-xs-primary">Ishda (Onlayn)</button>
-            <button id="goOffline" class="btn-xs btn-xs-danger">Ishda emas</button>
+            <button id="goOnline" class="btn-xs btn-xs-primary">Onlayn</button>
+            <button id="goOffline" class="btn-xs btn-xs-danger">Offline</button>
           </div>
         </div>
 
-        <!-- STATS -->
         <div class="courier-stats-row">
           <div class="courier-stat-card">
             <div>Bugun yetkazilgan</div>
             <div id="statTodayCount" class="stat-value">0</div>
           </div>
           <div class="courier-stat-card">
-            <div>Bugungi tushum</div>
+            <div>Tushum</div>
             <div id="statTodaySum" class="stat-value">0</div>
           </div>
         </div>
 
-        <!-- TABS -->
         <div class="courier-tabs">
           <button class="courier-tab-btn active" data-tab="available">🆕 Yangi</button>
-          <button class="courier-tab-btn" data-tab="my">📦 Mening zakazlarim</button>
-          <button class="courier-tab-btn" data-tab="done">✅ Yetkazilganlar</button>
+          <button class="courier-tab-btn" data-tab="my">📦 Mening</button>
+          <button class="courier-tab-btn" data-tab="done">✅ Yetkazilgan</button>
         </div>
       </article>
 
-      <!-- LISTS -->
       <section id="courierTabAvailable"></section>
       <section id="courierTabMy" class="hidden"></section>
       <section id="courierTabDone" class="hidden"></section>
@@ -302,6 +299,9 @@
     let unsub = null;
     let lastTime = 0;
 
+    const REST_LAT = 39.90023;
+    const REST_LNG = 68.78980;
+
     const loginSec = document.getElementById("courierLoginSection");
     const appSec   = document.getElementById("courierAppSection");
 
@@ -327,9 +327,6 @@
     const toast = document.getElementById("courierToast");
     const ding  = document.getElementById("courierNotify");
 
-    const REST_LAT = 39.90023;
-    const REST_LNG = 68.78980;
-
     function showToast(msg){
       toast.textContent = msg;
       toast.classList.add("show");
@@ -337,7 +334,6 @@
     }
     function sound(){ ding.currentTime=0; ding.play().catch(()=>{}); }
 
-    // Masofa hisoblash
     function distKm(lat1, lon1, lat2, lon2){
       const R = 6371;
       const dLat = (lat2-lat1)*Math.PI/180;
@@ -348,7 +344,6 @@
       return (R * 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(2);
     }
 
-    // LOGIN
     loginBtn.onclick = async ()=>{
       const login = loginInput.value.trim().toLowerCase();
       const pass  = passInput.value.trim();
@@ -379,7 +374,6 @@
       subscribe();
     };
 
-    // CHIQISH
     logoutBtn.onclick = ()=>{
       localStorage.removeItem(STORAGE_KEY);
       currentCourier=null;
@@ -387,17 +381,15 @@
       loginSec.classList.remove("hidden");
     };
 
-    // ONLINE / OFFLINE
     goOnline.onclick = ()=>{
       badge.textContent="Onlayn";
-      badge.style.background="lime";
+      badge.style.background="#22c55e";
     };
     goOffline.onclick = ()=>{
       badge.textContent="Offline";
       badge.style.background="#ef4444";
     };
 
-    // SNAPSHOT
     function subscribe(){
       if(unsub) unsub();
       const q = query(ordersCol, orderBy("createdAt","desc"));
@@ -420,7 +412,6 @@
       });
     }
 
-    // RENDER
     function render(){
       const A = orders.filter(o=>o.status==="courier" && !o.courierLogin);
       const M = orders.filter(o=>o.status==="courier" && o.courierLogin===currentCourier.login);
@@ -429,6 +420,8 @@
       tabA.innerHTML = A.map(renderCard_A).join("");
       tabM.innerHTML = M.map(renderCard_M).join("");
       tabD.innerHTML = D.map(renderCard_D).join("");
+
+      document.getElementById("statTodayCount").textContent = D.length;
     }
 
     function renderCard_A(o){
@@ -440,6 +433,7 @@
         <div><strong>${c.name}</strong></div>
         <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
         <div>📍 ${c.address}</div>
+        <div>Izoh: ${c.note || "-"}</div>
         <div>Masofa: ${d}</div>
 
         <ul>${(o.items||[]).map(i=>`<li>${i.name} — ${i.qty}</li>`).join("")}</ul>
@@ -458,19 +452,25 @@
         <div><strong>${c.name}</strong></div>
         <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
         <div>📍 ${c.address}</div>
+        <div>Izoh: ${c.note || "-"}</div>
         <div>Masofa: ${d}</div>
 
         <ul>${(o.items||[]).map(i=>`<li>${i.name} — ${i.qty}</li>`).join("")}</ul>
 
         <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">📍 Marshrut</button>
+
         <button class="btn-xs btn-xs-danger" onclick="releaseOrder('${o.id}')">❌ Yechish</button>
+
         <button class="btn-xs btn-xs-primary" onclick="markDelivered('${o.id}')">Yetkazdim</button>
       </div>`;
     }
 
     function renderCard_D(o){
       const c = o.customer||{};
-      return `<div class="order-card">✔ ${c.name} — Yetkazildi</div>`;
+      return `
+      <div class="order-card">
+        ✔ ${c.name} — Yetkazildi
+      </div>`;
     }
 
     window.takeOrder = async(id)=>{
@@ -507,7 +507,6 @@
       window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
     };
 
-    // AUTO LOGIN
     (function(){
       const saved = localStorage.getItem(STORAGE_KEY);
       if(saved){
@@ -519,6 +518,22 @@
         subscribe();
       }
     })();
+
+    tabBtns.forEach(btn=>{
+      btn.onclick = ()=>{
+        tabBtns.forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+
+        tabA.classList.add("hidden");
+        tabM.classList.add("hidden");
+        tabD.classList.add("hidden");
+
+        if(btn.dataset.tab==="available") tabA.classList.remove("hidden");
+        if(btn.dataset.tab==="my")        tabM.classList.remove("hidden");
+        if(btn.dataset.tab==="done")      tabD.classList.remove("hidden");
+      };
+    });
+
   </script>
 
 </body>
