@@ -170,14 +170,14 @@
       display:none;
     }
     .toast.show{display:block;}
-
   </style>
 </head>
 
 <body>
+
   <!-- HEADER -->
   <header class="courier-header">
-    <div class="courier-header-left">
+    <div class="courier-header-left" style="display:flex; gap:10px;">
       <div class="courier-logo">🍔</div>
       <div>
         <div class="courier-title">Premium FastFood — Kuryer</div>
@@ -261,370 +261,365 @@
   <div id="courierToast" class="toast"></div>
   <audio id="courierNotify" src="ding.mp3" preload="auto"></audio>
 
-  <!-- ================= JS ====================== -->
-  <script type="module">
-
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      onSnapshot,
-      query,
-      orderBy,
-      updateDoc,
-      doc,
-      serverTimestamp,
-      getDocs
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
-      authDomain: "shahboz-5d0a3.firebaseapp.com",
-      projectId: "shahboz-5d0a3",
-      storageBucket: "shahboz-5d0a3.firebasestorage.app",
-      messagingSenderId: "352024095535",
-      appId: "1:352024095535:web:3f495ac74cdd40f5c54fda"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db  = getFirestore(app);
-
-    const ordersCol   = collection(db, "orders");
-    const couriersCol = collection(db, "couriers");
-
-    const STORAGE_KEY = "beauty_courier_auth";
-
-    let currentCourier = null;
-    let orders = [];
-    let unsub = null;
-    let lastTime = 0;
-
-    const REST_LAT = 39.90023;
-    const REST_LNG = 68.78980;
-
-    const loginSec = document.getElementById("courierLoginSection");
-    const appSec   = document.getElementById("courierAppSection");
-
-    const loginInput = document.getElementById("courierLoginInput");
-    const passInput  = document.getElementById("courierPassInput");
-    const loginBtn   = document.getElementById("courierLoginBtn");
-
-    const logoutBtn  = document.getElementById("courierLogoutBtn");
-
-    const nameEl = document.getElementById("courierNameText");
-    const carEl  = document.getElementById("courierCarText");
-    const badge  = document.getElementById("courierStatusBadge");
-
-    const tabBtns = document.querySelectorAll(".courier-tab-btn");
-
-    const tabA = document.getElementById("courierTabAvailable");
-    const tabM = document.getElementById("courierTabMy");
-    const tabD = document.getElementById("courierTabDone");
-
-    const toast = document.getElementById("courierToast");
-    const ding  = document.getElementById("courierNotify");
-
-    function showToast(msg){
-      toast.textContent = msg;
-      toast.classList.add("show");
-      setTimeout(()=>toast.classList.remove("show"),2000);
-    }
-    function sound(){ ding.currentTime=0; ding.play().catch(()=>{}); }
-
-    function distKm(lat1, lon1, lat2, lon2){
-      const R = 6371;
-      const dLat = (lat2-lat1)*Math.PI/180;
-      const dLon = (lon2-lon1)*Math.PI/180;
-      const a = Math.sin(dLat/2)**2 +
-        Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)
-        * Math.sin(dLon/2)**2;
-      return (R * 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(2);
-    }
-
-    loginBtn.onclick = async ()=>{
-      const login = loginInput.value.trim().toLowerCase();
-      const pass  = passInput.value.trim();
-
-      const snap = await getDocs(couriersCol);
-      let found = null;
-
-      snap.forEach(d=>{
-        const c = d.data();
-        if(c.login?.toLowerCase() === login && c.password === pass) found = c;
-      });
-
-      if(!found){
-        showToast("Login yoki parol xato");
-        return;
-      }
-
-      currentCourier = found;
-      nameEl.textContent = found.name;
-      carEl.textContent  = "🚗 " + found.car;
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(found));
-
-      loginSec.classList.add("hidden");
-      appSec.classList.remove("hidden");
-
-      showToast("Kirish muvaffaqiyatli!");
-      subscribe();
-    };
-
-    logoutBtn.onclick = ()=>{
-      localStorage.removeItem(STORAGE_KEY);
-      currentCourier=null;
-      appSec.classList.add("hidden");
-      loginSec.classList.remove("hidden");
-    };
-
-    function subscribe(){
-      if(unsub) unsub();
-      const q = query(ordersCol, orderBy("createdAt","desc"));
-      unsub = onSnapshot(q, snap=>{
-        orders = snap.docs.map(d=>({id:d.id,...d.data()}));
-
-        // Signal for new orders
-        const latest = orders.filter(o =>
-          o.status==="courier" && !o.courierLogin &&
-          (o.createdAt?.seconds||0) > lastTime
-        );
-        if(latest.length){
-          sound();
-          showToast("Yangi zakaz!");
-        }
-        if(orders.length){
-          lastTime = Math.max(...orders.map(o => o.createdAt?.seconds||0));
-        }
-
-        render();
-      });
-    }
-
-    goOnline.onclick = ()=>{
-      badge.textContent="Onlayn";
-      badge.style.background="#22c55e";
-    };
-    goOffline.onclick = ()=>{
-      badge.textContent="Offline";
-      badge.style.background="#ef4444";
-    };
-
-    function render(){
-
-      const A = orders.filter(o=>o.status==="courier" && !o.courierLogin);
-      const M = orders.filter(o=>o.status==="courier" && o.courierLogin===currentCourier.login);
-      const D = orders.filter(o=>o.status==="delivered" && o.courierLogin===currentCourier.login);
-
-      tabA.innerHTML = A.map(renderCard_A).join("");
-      tabM.innerHTML = M.map(renderCard_M).join("");
-      tabD.innerHTML = D.map(renderCard_D).join("");
-
-      document.getElementById("statTodayCount").textContent = D.length;
-    }
-
-    /* ============================================================
-       FULL UPDATED — Yangi zakazlar (to‘liq ma’lumot)
-    ============================================================ */
-    function renderCard_A(o){
-      const c = o.customer || {};
-      const loc = o.location;
-
-      const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
-      const total = o.totalPrice || (o.items || []).reduce(
-        (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
-      );
-
-      let distance = loc ? distKm(REST_LAT,REST_LNG,loc.lat,loc.lng)+" km" : "";
-
-      return `
-        <div class="order-card">
-
-          <div><strong>🧾 Buyurtma kodi: #${code}</strong></div>
-
-          <div><strong>${c.name}</strong></div>
-          <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
-
-          <div>📍 Manzil: ${c.address}</div>
-          <div>📝 Izoh: ${c.note || "-"}</div>
-
-          <div>💰 Summa: <strong>${total.toLocaleString()} so'm</strong></div>
-          <div>📏 Masofa: ${distance}</div>
-
-          <ul>
-            ${(o.items || []).map(i => `
-              <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
-            `).join("")}
-          </ul>
-
-          <button class="btn-xs btn-xs-primary" onclick="takeOrder('${o.id}')">Qabul qilish</button>
-          <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">📍 Marshrut</button>
-
-        </div>
-      `;
-    }
-
-    /* ============================================================
-       FULL UPDATED — Mening zakazlarim (to‘liq ma’lumot)
-    ============================================================ */
-    function renderCard_M(o){
-      const c = o.customer || {};
-      const loc = o.location;
-
-      const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
-      const total = o.totalPrice || (o.items || []).reduce(
-        (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
-      );
-
-      let distance = loc ? distKm(REST_LAT,REST_LNG,loc.lat,loc.lng)+" km" : "";
-
-      return `
-        <div class="order-card">
-
-          <div><strong>🟨 Mening buyurtmam — #${code}</strong></div>
-
-          <div><strong>${c.name}</strong></div>
-          <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
-
-          <div>📍 Manzil: ${c.address}</div>
-          <div>📝 Izoh: ${c.note || "-"}</div>
-
-          <div>💰 Summa: <strong>${total.toLocaleString()} so'm</strong></div>
-          <div>📏 Masofa: ${distance}</div>
-
-          <ul>
-            ${(o.items || []).map(i => `
-              <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
-            `).join("")}
-          </ul>
-
-          <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">📍 Marshrut</button>
-          <button class="btn-xs btn-xs-danger" onclick="releaseOrder('${o.id}')">❌ Yechish</button>
-          <button class="btn-xs btn-xs-primary" onclick="markDelivered('${o.id}')">Yetkazdim</button>
-
-        </div>
-      `;
-    }
-
-    /* ============================================================
-       FULL UPDATED — Yetkazilgan zakazlar (FULL ma’lumot + qayta yechish)
-    ============================================================ */
-    function renderCard_D(o){
-      const c = o.customer || {};
-
-      const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
-      const total = o.totalPrice || (o.items || []).reduce(
-        (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
-      );
-
-      return `
-        <div class="order-card">
-
-          <div><strong>🟩 ✔ Yetkazilgan — #${code}</strong></div>
-
-          <div><strong>${c.name}</strong></div>
-          <div>📱 ${c.phone}</div>
-
-          <div>📍 ${c.address}</div>
-          <div>📝 Izoh: ${c.note || "-"}</div>
-
-          <div>💰 Summa: <strong>${total.toLocaleString()} so'm</strong></div>
-
-          <ul>
-            ${(o.items || []).map(i => `
-              <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
-            `).join("")}
-          </ul>
-
-          <button class="btn-xs btn-xs-danger" onclick="releaseDelivered('${o.id}')">
-            ❌ Qayta yechish
-          </button>
-
-        </div>
-      `;
-    }
-
-    /* ============================================================
-       FIREBASE UPDATE FUNKSIYALARI
-    ============================================================ */
-    window.takeOrder = async(id)=>{
-      await updateDoc(doc(db,"orders",id),{
-        courierLogin:currentCourier.login,
-        courierName:currentCourier.name,
-        courierCar:currentCourier.car,
-        status:"courier",
-        courierTakenAt:serverTimestamp()
-      });
-      showToast("Zakaz olindi");
-    };
-
-    window.releaseOrder = async(id)=>{
-      await updateDoc(doc(db,"orders",id),{
-        courierLogin:null,
-        courierName:null,
-        courierCar:null,
-        status:"courier"
-      });
-      showToast("Zakaz yechildi");
-    };
-
-    window.markDelivered = async(id)=>{
-      await updateDoc(doc(db,"orders",id),{
-        status:"delivered",
-        deliveredAt:serverTimestamp()
-      });
-      showToast("Yetkazildi");
-    };
-
-    /* ============================================================
-       NEW FUNCTION — Yetkazilgan zakazni qayta aktivlashtirish
-    ============================================================ */
-    window.releaseDelivered = async(id)=>{
-      await updateDoc(doc(db,"orders",id),{
-        status:"courier",
-        courierLogin:null,
-        courierName:null,
-        courierCar:null
-      });
-      showToast("Yetkazilgan zakaz qayta aktivlashtirildi");
-    };
-
-    /* ============================ MAP LINK ============================ */
-    window.openMap = (lat,lng)=>{
-      if(!lat) return showToast("Lokatsiya yo‘q");
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
-    };
-
-    /* ============================ AUTO LOGIN ============================ */
-    (function(){
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if(saved){
-        currentCourier = JSON.parse(saved);
-        nameEl.textContent = currentCourier.name;
-        carEl.textContent  = "🚗 "+currentCourier.car;
-        loginSec.classList.add("hidden");
-        appSec.classList.remove("hidden");
-        subscribe();
-      }
-    })();
-
-    /* ============================ TABS ============================ */
-    tabBtns.forEach(btn=>{
-      btn.onclick = ()=>{
-        tabBtns.forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-
-        tabA.classList.add("hidden");
-        tabM.classList.add("hidden");
-        tabD.classList.add("hidden");
-
-        if(btn.dataset.tab==="available") tabA.classList.remove("hidden");
-        if(btn.dataset.tab==="my")        tabM.classList.remove("hidden");
-        if(btn.dataset.tab==="done")      tabD.classList.remove("hidden");
-      };
-    });
-
-  </script>
+<!-- ========================= JS START ============================== -->
+<script type="module">
+
+/* FIREBASE LOAD */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  updateDoc,
+  doc,
+  serverTimestamp,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+/* CONFIG */
+const firebaseConfig = {
+  apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
+  authDomain: "shahboz-5d0a3.firebaseapp.com",
+  projectId: "shahboz-5d0a3",
+  storageBucket: "shahboz-5d0a3.firebasestorage.app",
+  messagingSenderId: "352024095535",
+  appId: "1:352024095535:web:3f495ac74cdd40f5c54fda"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* GLOBALS */
+const ordersCol   = collection(db, "orders");
+const couriersCol = collection(db, "couriers");
+
+let currentCourier = null;
+let orders = [];
+let isOnline = false;
+let unsub = null;
+
+const STORAGE_KEY = "beauty_courier_auth";
+const REST_LAT = 39.90023;
+const REST_LNG = 68.78980;
+
+/* DOM */
+const loginSec = document.getElementById("courierLoginSection");
+const appSec   = document.getElementById("courierAppSection");
+const loginBtn = document.getElementById("courierLoginBtn");
+const logoutBtn = document.getElementById("courierLogoutBtn");
+const loginInput = document.getElementById("courierLoginInput");
+const passInput  = document.getElementById("courierPassInput");
+const nameEl = document.getElementById("courierNameText");
+const carEl  = document.getElementById("courierCarText");
+const badge  = document.getElementById("courierStatusBadge");
+
+const tabBtns = document.querySelectorAll(".courier-tab-btn");
+const tabA = document.getElementById("courierTabAvailable");
+const tabM = document.getElementById("courierTabMy");
+const tabD = document.getElementById("courierTabDone");
+
+const toast = document.getElementById("courierToast");
+const ding = document.getElementById("courierNotify");
+
+/* HELPERS */
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),2000);
+}
+function sound(){ ding.currentTime=0; ding.play().catch(()=>{}); }
+
+function distKm(lat1, lon1, lat2, lon2){
+  if(!lat1 || !lon1 || !lat2 || !lon2) return "";
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 +
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)
+    * Math.sin(dLon/2)**2;
+  return (R * 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(2);
+}
+
+/* LOGIN */
+loginBtn.onclick = async ()=>{
+  const login = loginInput.value.trim().toLowerCase();
+  const pass  = passInput.value.trim();
+
+  const snap = await getDocs(couriersCol);
+  let found = null;
+
+  snap.forEach(d=>{
+    const c = d.data();
+    if(c.login?.toLowerCase() === login && c.password === pass) found = c;
+  });
+
+  if(!found){
+    showToast("Login yoki parol xato");
+    return;
+  }
+
+  currentCourier = found;
+  nameEl.textContent = found.name;
+  carEl.textContent  = "🚗 " + found.car;
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(found));
+
+  loginSec.classList.add("hidden");
+  appSec.classList.remove("hidden");
+
+  subscribe();
+};
+
+/* LOGOUT */
+logoutBtn.onclick = ()=>{
+  localStorage.removeItem(STORAGE_KEY);
+  currentCourier=null;
+  appSec.classList.add("hidden");
+  loginSec.classList.remove("hidden");
+};
+
+/* ONLINE/OFFLINE */
+goOnline.onclick = ()=>{
+  isOnline = true;
+  badge.textContent="Onlayn";
+  badge.style.background="#22c55e";
+  render();
+};
+goOffline.onclick = ()=>{
+  isOnline = false;
+  badge.textContent="Offline";
+  badge.style.background="#ef4444";
+  render();
+};
+
+/* SUBSCRIBE */
+function subscribe(){
+  if(unsub) unsub();
+  const q = query(ordersCol, orderBy("createdAt","desc"));
+
+  unsub = onSnapshot(q, snap=>{
+    orders = snap.docs.map(d=>({id:d.id,...d.data()}));
+    render();
+  });
+}
+
+/* RENDER */
+function render(){
+
+  if(!isOnline){
+    tabA.innerHTML = `<div style="padding:20px;text-align:center;opacity:.7;">Offline holatda zakazlar ko‘rinmaydi</div>`;
+    tabM.innerHTML = "";
+    tabD.innerHTML = "";
+    return;
+  }
+
+  const A = orders.filter(o=>o.status==="courier" && !o.courierLogin);
+  const M = orders.filter(o=>o.status==="courier" && o.courierLogin===currentCourier.login);
+  const D = orders.filter(o=>o.status==="delivered" && o.courierLogin===currentCourier.login);
+
+  tabA.innerHTML = A.map(renderCard_A).join("");
+  tabM.innerHTML = M.map(renderCard_M).join("");
+  tabD.innerHTML = D.map(renderCard_D).join("");
+
+  document.getElementById("statTodayCount").textContent = D.length;
+}
+
+/* CARD — AVAILABLE */
+function renderCard_A(o){
+  const c = o.customer || {};
+  const loc = o.location;
+
+  const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
+  const total = o.totalPrice || (o.items || []).reduce(
+    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
+  );
+
+  return `
+    <div class="order-card">
+
+      <div><strong>🧾 Buyurtma #${code}</strong></div>
+
+      <div><strong>${c.name}</strong></div>
+      <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
+
+      <div>📍 ${c.address}</div>
+      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
+
+      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
+      <div>📏 ${loc ? distKm(REST_LAT,REST_LNG,loc.lat,loc.lng)+" km" : ""}</div>
+
+      <ul>
+        ${(o.items||[]).map(i => `
+          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
+        `).join("")}
+      </ul>
+
+      <button class="btn-xs btn-xs-primary" onclick="takeOrder('${o.id}')">Qabul qilish</button>
+      <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">Marshrut</button>
+
+    </div>
+  `;
+}
+
+/* CARD — MY */
+function renderCard_M(o){
+  const c = o.customer || {};
+  const loc = o.location;
+
+  const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
+  const total = o.totalPrice || (o.items || []).reduce(
+    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
+  );
+
+  return `
+    <div class="order-card">
+
+      <div><strong>📦 Mening zakazim #${code}</strong></div>
+
+      <div><strong>${c.name}</strong></div>
+      <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
+
+      <div>📍 ${c.address}</div>
+      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
+
+      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
+      <div>📏 ${loc ? distKm(REST_LAT,REST_LNG,loc.lat,loc.lng)+" km" : ""}</div>
+
+      <ul>
+        ${(o.items||[]).map(i => `
+          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
+        `).join("")}
+      </ul>
+
+      <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">Marshrut</button>
+      <button class="btn-xs btn-xs-danger" onclick="releaseOrder('${o.id}')">❌ Yechish</button>
+      <button class="btn-xs btn-xs-primary" onclick="markDelivered('${o.id}')">Yetkazdim</button>
+
+    </div>
+  `;
+}
+
+/* CARD — DELIVERED */
+function renderCard_D(o){
+  const c = o.customer || {};
+
+  const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
+  const total = o.totalPrice || (o.items || []).reduce(
+    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
+  );
+
+  return `
+    <div class="order-card">
+
+      <div><strong>✔ Yetkazilgan #${code}</strong></div>
+
+      <div><strong>${c.name}</strong></div>
+      <div>📱 ${c.phone}</div>
+
+      <div>📍 ${c.address}</div>
+      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
+
+      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
+
+      <ul>
+        ${(o.items||[]).map(i => `
+          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
+        `).join("")}
+      </ul>
+
+      <button class="btn-xs btn-xs-danger" onclick="releaseDelivered('${o.id}')">❌ Qayta aktivlashtirish</button>
+
+    </div>
+  `;
+}
+
+/* ACTIONS */
+window.takeOrder = async(id)=>{
+  if(!isOnline) return showToast("Offline holatda qabul qilib bo‘lmaydi.");
+
+  await updateDoc(doc(db,"orders",id),{
+    courierLogin:currentCourier.login,
+    courierName:currentCourier.name,
+    courierCar:currentCourier.car,
+    status:"courier",
+    courierTakenAt:serverTimestamp()
+  });
+  showToast("Zakaz olindi");
+};
+
+window.releaseOrder = async(id)=>{
+  if(!isOnline) return showToast("Offline holatda amal bajarilmaydi.");
+
+  await updateDoc(doc(db,"orders",id),{
+    courierLogin:null,
+    courierName:null,
+    courierCar:null,
+    status:"courier"
+  });
+  showToast("Zakaz yechildi");
+};
+
+window.markDelivered = async(id)=>{
+  if(!isOnline) return showToast("Offline holatda yetkazib bo‘lmaydi.");
+
+  await updateDoc(doc(db,"orders",id),{
+    status:"delivered",
+    deliveredAt:serverTimestamp()
+  });
+  showToast("Yetkazildi");
+};
+
+window.releaseDelivered = async(id)=>{
+  if(!isOnline) return showToast("Offline holatda aktivlashtirib bo‘lmaydi.");
+
+  await updateDoc(doc(db,"orders",id),{
+    status:"courier",
+    courierLogin:null,
+    courierName:null,
+    courierCar:null
+  });
+  showToast("Qayta aktivlashtirildi");
+};
+
+/* MAP */
+window.openMap = (lat,lng)=>{
+  if(!lat) return showToast("Lokatsiya yo‘q");
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
+};
+
+/* AUTO LOGIN */
+(function(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(saved){
+    currentCourier = JSON.parse(saved);
+    nameEl.textContent = currentCourier.name;
+    carEl.textContent  = "🚗 "+currentCourier.car;
+    loginSec.classList.add("hidden");
+    appSec.classList.remove("hidden");
+    subscribe();
+  }
+})();
+
+/* TABS */
+tabBtns.forEach(btn=>{
+  btn.onclick = ()=>{
+    tabBtns.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+
+    tabA.classList.add("hidden");
+    tabM.classList.add("hidden");
+    tabD.classList.add("hidden");
+
+    if(btn.dataset.tab==="available") tabA.classList.remove("hidden");
+    if(btn.dataset.tab==="my")        tabM.classList.remove("hidden");
+    if(btn.dataset.tab==="done")      tabD.classList.remove("hidden");
+  };
+});
+
+</script>
+<!-- ========================= JS END ============================== -->
 
 </body>
 </html>
