@@ -32,7 +32,7 @@ a{
   --text:#111827;
   --muted:#6b7280;
 
-  /* QIZIL / QORA USLUB */
+  /* QIZIL / QORA USLUB (FastFood / Uzum style) */
   --accent:#ef4444;          /* asosiy qizil */
   --accent-soft:#fee2e2;     /* yumshoq qizil */
   --accent-strong:#b91c1c;   /* to‘q qizil */
@@ -55,9 +55,9 @@ body.theme-dark{
   --muted:#9ca3af;
 
   /* dark rejimda binafsha + qizil aralash */
-  --accent:#16a34a;          /* asosiy birinchi rangni yashil qildik */
-  --accent-soft:#bbf7d0;     /* yumshoq yashil */
-  --accent-strong:#15803d;   /* to‘q yashil */
+  --accent:#7000ff;
+  --accent-soft:#f2edff;
+  --accent-strong:#4c1d95;
 
   --border:rgba(148,163,184,.35);
   --shadow:0 22px 50px rgba(0,0,0,.65);
@@ -68,13 +68,16 @@ body.theme-dark{
 .page-wrap{
   min-height:calc(100vh - 60px);
 }
+.page{
+  padding-bottom:80px; /* pastdagi buyurtma tugmasi uchun joy */
+}
 
 /* HEADER */
 .app-header{
   position:sticky;
   top:0;
   z-index:50;
-  background:linear-gradient(90deg,#ef4444,#16a34a); /* qizil + yashil */
+  background:linear-gradient(90deg,#ff0f7b,#f97316);
   padding:10px 16px;
   display:flex;
   align-items:center;
@@ -134,7 +137,7 @@ body.theme-dark{
   border-color:#fff;
 }
 .cart-top-btn{
-  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
   border:none;
   border-radius:999px;
   color:#fff;
@@ -144,7 +147,7 @@ body.theme-dark{
   gap:6px;
   font-size:13px;
   cursor:pointer;
-  box-shadow:0 10px 25px rgba(0,0,0,.7);
+  box-shadow:0 10px 25px rgba(112,0,255,.7);
 }
 .cart-top-btn.hidden{display:none;}
 .pill{
@@ -182,9 +185,9 @@ body.theme-dark{
   color:#9ca3af;
 }
 .tab-btn.active{
-  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
   color:#fff;
-  box-shadow:0 10px 25px rgba(0,0,0,.7);
+  box-shadow:0 10px 25px rgba(112,0,255,.7);
 }
 .admin-active{
   border-color:var(--accent);
@@ -217,8 +220,8 @@ body.theme-dark{
   color:#e5e7eb;
 }
 .btn-outline{
-  border-color:#16a34a;
-  color:#bbf7d0;
+  border-color:#7000ff;
+  color:#e0e7ff;
   background:rgba(24,24,27,.9);
 }
 
@@ -241,8 +244,8 @@ body.theme-dark{
   outline:none;
 }
 .search-input:focus{
-  border-color:#16a34a;
-  box-shadow:0 0 0 1px rgba(22,163,74,.35);
+  border-color:#7000ff;
+  box-shadow:0 0 0 1px rgba(112,0,255,.35);
 }
 
 /* CATEGORY GRID (4 ta) */
@@ -272,16 +275,16 @@ body.theme-dark{
 }
 .chip span{display:block;}
 .chip.active{
-  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
   color:#fff;
   border-color:transparent;
-  box-shadow:0 12px 26px rgba(0,0,0,.7);
+  box-shadow:0 12px 26px rgba(112,0,255,.7);
 }
 @media(min-width:480px){
   .chip{font-size:12px;min-height:56px;}
 }
 
-/* PRODUCTS – KATTA KARTOCHKA, KATTA RASM */
+/* PRODUCTS – KATTA KARTOCHKA, RASM BO‘YIGA (UZUM STYLE) */
 .products-grid{
   display:flex;
   flex-direction:column;
@@ -318,12 +321,12 @@ body.theme-dark{
 }
 .product-img-wrap img{
   width:100%;
-  height:270px;
+  height:270px;          /* telefon uchun baland, pastga qarab rasm */
   object-fit:cover;
   display:block;
 }
 @media(min-width:768px){
-  .product-img-wrap img{height:310px;}
+  .product-img-wrap img{height:320px;} /* katta ekranlarda yanayam baland */
 }
 .product-img-tag{
   position:absolute;
@@ -365,8 +368,8 @@ body.theme-dark{
 .tag-mini{
   margin-top:7px;
   font-size:11px;
-  color:#bbf7d0; /* yashil matn */
-  background:rgba(22,163,74,.18); /* yumshoq yashil fon */
+  color:var(--accent-soft);
+  background:rgba(112,0,255,.12);
   padding:3px 7px;
   border-radius:999px;
   display:inline-block;
@@ -390,16 +393,16 @@ body.theme-dark{
 .btn-add{
   border:none;
   border-radius:999px;
-  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
+  background:linear-gradient(135deg,#111827,#020617);
   color:#fff;
   font-size:12px;
   padding:7px 14px;
   cursor:pointer;
-  box-shadow:0 10px 24px rgba(0,0,0,.8);
+  box-shadow:0 10px 24px rgba(15,23,42,.8);
   border:1px solid rgba(148,163,184,.6);
 }
 .btn-add:hover{
-  border-color:#bbf7d0;
+  border-color:#7000ff;
 }
 
 /* CART BOTTOM SHEET */
@@ -481,19 +484,16 @@ body.theme-dark{
 .btn-primary{
   border:none;
   border-radius:999px;
-  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
   color:#fff;
   padding:9px 14px;
   font-size:14px;
   cursor:pointer;
-  box-shadow:0 14px 32px rgba(0,0,0,.6);
+  box-shadow:0 14px 32px rgba(112,0,255,.6);
 }
 .btn-full{width:100%;}
 .btn-primary.admin-btn{font-size:13px;margin-top:8px;}
-.admin-btn-success{
-  background:linear-gradient(135deg,#16a34a,#22c55e);
-  box-shadow:0 14px 32px rgba(34,197,94,.6);
-}
+.admin-btn-success{background:var(--ok);box-shadow:0 14px 32px rgba(34,197,94,.6);}
 .btn-xs{
   padding:5px 9px;
   font-size:11px;
@@ -514,6 +514,12 @@ body.theme-dark{
   background:var(--danger);
   color:#fff;
   border-color:var(--danger);
+}
+
+/* EKRAN PASTIDAGI QUICK BUYURTMA TUGMASI (QIZIL) */
+#quickOrderBtn{
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
+  box-shadow:0 20px 45px rgba(239,68,68,.75);
 }
 
 /* ORDERS */
@@ -553,7 +559,7 @@ body.theme-dark{
 .order-total{
   font-size:18px;
   font-weight:700;
-  color:#22c55e; /* umumiy summa yashil */
+  color:#a855f7;
 }
 .order-items{
   margin-top:6px;
@@ -570,6 +576,10 @@ body.theme-dark{
   display:flex;
   justify-content:space-between;
   color:var(--muted);
+}
+.order-status-row{
+  margin-top:6px;
+  margin-bottom:4px;
 }
 
 /* STATUS + PROGRESS */
@@ -600,7 +610,7 @@ body.theme-dark{
 }
 .progress-fill{
   height:100%;
-  background:linear-gradient(90deg,#ef4444,#16a34a); /* qizil + yashil */
+  background:linear-gradient(90deg,#7000ff,#4c1d95);
   width:0;
 }
 .progress-steps{
@@ -611,7 +621,7 @@ body.theme-dark{
   color:var(--muted);
 }
 .progress-step.active{
-  color:#bbf7d0;
+  color:#e0e7ff;
   font-weight:600;
 }
 
@@ -695,7 +705,7 @@ body.theme-dark{
   cursor:pointer;
   font-size:14px;
 }
-.admin-edit-btn{color:#bbf7d0;}
+.admin-edit-btn{color:#c4b5fd;}
 .admin-delete-btn{color:var(--danger);}
 
 .admin-order-filters{
@@ -703,6 +713,25 @@ body.theme-dark{
   flex-wrap:wrap;
   gap:8px;
   margin-bottom:8px;
+}
+.admin-order-actions{
+  margin-top:10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+/* ADMIN TOP BAR */
+.admin-top-bar{
+  padding:8px 16px 4px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.admin-top-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
 }
 
 /* === PRODUCT DETAIL (MODAL) – UZUM STYLE === */
@@ -724,7 +753,7 @@ body.theme-dark{
   box-shadow:var(--shadow);
   position:relative;
   overflow-y:auto;
-  background:linear-gradient(180deg,#ef4444 0%,#ffffff 18%,#fef2f2 100%); /* qizil fon */
+  background:linear-gradient(180deg,#ff0f7b 0%,#ffffff 18%,#faf5ff 100%);
   padding-bottom:24px;
 }
 .detail-close{
@@ -740,7 +769,7 @@ body.theme-dark{
   z-index:3;
 }
 
-/* rasm bloki – katta kartochka */
+/* rasm bloki – katta kartochka, bo‘yiga */
 .detail-img-wrap{
   margin-top:44px; /* yopish tugmasi ostida */
   position:relative;
@@ -790,7 +819,7 @@ body.theme-dark{
 }
 .detail-category{
   font-size:12px;
-  color:#b91c1c;
+  color:#6b21a8;
   text-transform:uppercase;
   letter-spacing:.04em;
   margin-bottom:4px;
@@ -807,7 +836,7 @@ body.theme-dark{
 }
 .detail-tag{
   font-size:13px;
-  color:#16a34a; /* yashil tag */
+  color:#2563eb;
   margin-top:4px;
 }
 
@@ -822,7 +851,7 @@ body.theme-dark{
 .detail-price-main{
   font-size:24px;
   font-weight:700;
-  color:#b91c1c;
+  color:#4c1d95;
 }
 .detail-price-old{
   font-size:13px;
@@ -864,8 +893,8 @@ body.theme-dark{
   padding:14px 20px;
   font-size:15px;
   font-weight:600;
-  background:linear-gradient(90deg,#ef4444,#16a34a); /* qizil + yashil */
-  box-shadow:0 24px 50px rgba(0,0,0,.7);
+  background:linear-gradient(90deg,#7000ff,#4c1d95);
+  box-shadow:0 24px 50px rgba(112,0,255,.6);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -877,7 +906,7 @@ body.theme-dark{
 #detailBackBtn{
   margin-top:10px;
   font-size:13px;
-  color:#b91c1c;
+  color:#4c1d95;
   border-radius:999px;
   padding:6px 10px;
   border:1px solid rgba(148,163,184,.5);
@@ -928,7 +957,7 @@ body.theme-dark{
   bottom:18px;
   left:50%;
   transform:translateX(-50%) translateY(130%);
-  background:linear-gradient(135deg,#ef4444,#16a34a); /* qizil + yashil */
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
   color:#fff;
   padding:9px 14px;
   border-radius:999px;
@@ -958,7 +987,7 @@ body.theme-dark{
 
 /* =======================================================
    KURYER PANELI — RESTORAN KARTOCHKALARI DIZAYNI
-   (faqat courier.html da ishlaydi, body.courier-body orqali)
+   (courier.html)
 ======================================================= */
 
 .courier-body{
@@ -976,7 +1005,7 @@ body.theme-dark{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:linear-gradient(90deg,#b91c1c,#16a34a); /* qizil + yashil */
+  background:linear-gradient(90deg,#b91c1c,#f97316);
   box-shadow:0 20px 40px rgba(0,0,0,.6);
 }
 .courier-header-left{
@@ -1186,7 +1215,7 @@ body.theme-dark{
   gap:10px;
 }
 
-/* RESTORAN KARTOCHKA USLUBI — faqat kuryer sahifasida */
+/* RESTORAN KARTOCHKA USLUBI — kuryer sahifasida */
 .courier-body .courier-order-card{
   background:
     radial-gradient(circle at top,#f97316 0,transparent 55%),
