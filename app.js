@@ -1948,3 +1948,4 @@ window.openOrderLocation           = openOrderLocation;
 // Courier globals
 window.openSelectedCourierExternal = openSelectedCourierExternal;
 window.centerToCourier             = centerToCourier;
+window.getOrAskLocation            = getOrAskLocation;
