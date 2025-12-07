@@ -5,7 +5,11 @@
   <title>Premium FastFood — Online buyurtma</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
+
+  <!-- FAVICON -->
   <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/5787/5787016.png">
+
+  <!-- STYLE -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -31,8 +35,13 @@
           <span class="cart-top-total" id="cartTotalTop">0 so‘m</span>
         </button>
 
-        <button id="adminAccessBtn" type="button" class="icon-btn">👑 Admin</button>
-        <button type="button" class="icon-btn" onclick="location.href='courier.html'">🚚</button>
+        <button id="adminAccessBtn" type="button" class="icon-btn">
+          👑 Admin
+        </button>
+
+        <button type="button" class="icon-btn" onclick="location.href='courier.html'">
+          🚚
+        </button>
       </div>
     </header>
 
@@ -43,9 +52,10 @@
       <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">👑 Admin</button>
     </nav>
 
+    <!-- MAIN -->
     <main>
 
-      <!-- SHOP PAGE -->
+      <!-- === SHOP PAGE === -->
       <section id="shopPage" class="page">
 
         <div class="customer-panel">
@@ -64,34 +74,40 @@
         </div>
 
         <div id="filterBar" class="chips-row"></div>
+
         <section id="productsGrid" class="products-grid"></section>
 
       </section>
 
-      <!-- ORDERS PAGE -->
+      <!-- === BUYURTMALAR === -->
       <section id="ordersPage" class="page hidden">
         <h2 class="section-title">📦 Buyurtmalarim</h2>
         <p class="section-sub">Buyurtmalaringiz holatini real vaqt rejimida kuzating.</p>
         <div id="clientOrdersList" class="orders-list"></div>
       </section>
 
-      <!-- ADMIN PAGE -->
+      <!-- === ADMIN PAGE === -->
       <section id="adminPage" class="page hidden admin-page">
+
         <header class="admin-top-bar">
           <h2 class="section-title">👑 Admin paneli</h2>
-          <button class="btn-xs btn-xs-secondary" onclick="location.href='courier.html'">🚚 Kuryer paneli</button>
+          <button class="btn-xs btn-xs-secondary" onclick="location.href='courier.html'">
+            🚚 Kuryer paneli
+          </button>
         </header>
 
         <div class="admin-cols">
-          
-          <!-- ----- PRODUCTS ----- -->
+
+          <!-- LEFT: PRODUCTS -->
           <div class="admin-col">
             <article class="card">
               <h3 class="card-title">🍔 Mahsulotlar</h3>
               <div class="form-grid">
 
                 <label>Nomi <input id="adminName" type="text"></label>
+
                 <label>Kategoriya <select id="adminCategory"></select></label>
+
                 <label>Asosiy narx <input id="adminPriceBase" type="number"></label>
 
                 <label class="checkbox-row">
@@ -99,21 +115,25 @@
                 </label>
 
                 <label>Chegirmali narx <input id="adminPriceDiscount" type="number"></label>
+
                 <label>Tag / chip <input id="adminTag" type="text"></label>
+
                 <label>Tavsif <textarea id="adminDescription"></textarea></label>
+
                 <label>Rasmlar <textarea id="adminImages"></textarea></label>
 
               </div>
 
-              <button class="btn-primary btn-full admin-btn" onclick="addCustomProduct()">
-                ➕ Mahsulot qo‘shish (Firestore)
+              <button class="btn-primary btn-full" onclick="addCustomProduct()">
+                ➕ Mahsulot qo‘shish
               </button>
 
               <div id="adminCustomList" class="admin-list"></div>
+
             </article>
           </div>
 
-          <!-- ----- CATEGORIES + COURIER ----- -->
+          <!-- MIDDLE: CATEGORIES + COURIER -->
           <div class="admin-col">
 
             <article class="card">
@@ -126,7 +146,9 @@
 
               </div>
 
-              <button class="btn-primary btn-full" onclick="saveCategory()">💾 Saqlash</button>
+              <button class="btn-primary btn-full" onclick="saveCategory()">
+                💾 Saqlash
+              </button>
 
               <div id="adminCategoryList" class="admin-list"></div>
             </article>
@@ -150,7 +172,7 @@
               <div id="adminCourierList" class="admin-list" style="margin-top:12px;"></div>
             </article>
 
-            <article class="card" style="margin-top:20px;">
+            <article class="card">
               <h3 class="card-title">📍 Kuryer xaritasi</h3>
 
               <select id="courierOrderSelect" class="search-input"></select>
@@ -159,7 +181,9 @@
                 <iframe id="courierMapFrame" width="100%" height="100%" style="border:0;"></iframe>
               </div>
 
-              <div id="courierInfo" class="section-sub" style="margin-top:8px;">Buyurtma tanlang.</div>
+              <div id="courierInfo" class="section-sub" style="margin-top:8px;">
+                Buyurtma tanlang.
+              </div>
 
               <div style="margin-top:8px; display:flex; gap:8px;">
                 <button class="btn-xs btn-xs-secondary" onclick="centerToCourier()">📍 Marshrut</button>
@@ -170,7 +194,7 @@
 
           </div>
 
-          <!-- ----- ORDERS ---- -->
+          <!-- RIGHT: ORDERS -->
           <div class="admin-col">
             <article class="card">
               <h3 class="card-title">🧾 Buyurtmalar</h3>
@@ -179,70 +203,11 @@
           </div>
 
         </div>
+
       </section>
 
     </main>
   </div>
-
-  <!-- =============== UZUM STYLE PRODUCT DETAIL =============== -->
-  <div id="productDetailOverlay" class="detail-overlay hidden">
-    <div class="detail-card" onclick="event.stopPropagation()">
-
-      <header class="detail-header">
-        <button id="detailBackBtn" type="button" class="detail-back-btn">
-          ⬅️ Magaziniga qaytish
-        </button>
-        <div class="detail-header-text">
-          <div id="detailCategory" class="detail-category">Kategoriya</div>
-          <div id="detailName" class="detail-title">Mahsulot nomi</div>
-          <div id="detailTag" class="detail-tag"></div>
-        </div>
-      </header>
-
-      <div class="detail-media">
-        <button id="detailPrevBtn" type="button"
-                class="detail-nav-btn detail-nav-prev">‹</button>
-
-        <div class="detail-img-wrap">
-          <img id="detailImage" src="" alt="Mahsulot rasmi">
-        </div>
-
-        <button id="detailNextBtn" type="button"
-                class="detail-nav-btn detail-nav-next">›</button>
-
-        <div id="detailImageIndex" class="detail-index-pill">1 / 1</div>
-      </div>
-
-      <div id="detailGalleryList" class="detail-thumbs-row"></div>
-
-      <section class="detail-info">
-        <div class="detail-prices">
-          <span id="detailPrice" class="detail-price-main">0 so‘m</span>
-          <span id="detailOldPrice" class="detail-price-old hidden">0 so‘m</span>
-        </div>
-        <p id="detailDesc" class="detail-desc">
-          Mahsulot haqida qisqa tavsif shu yerda bo‘ladi.
-        </p>
-
-        <div class="detail-qty-row">
-          <span class="detail-qty-label">Soni:</span>
-          <div class="detail-qty-control">
-            <button id="detailQtyMinus" type="button" class="detail-qty-btn">−</button>
-            <span id="detailQtyValue" class="detail-qty-value">1</span>
-            <button id="detailQtyPlus" type="button" class="detail-qty-btn">+</button>
-          </div>
-        </div>
-      </section>
-
-      <footer class="detail-footer">
-        <button id="detailAddBtn" type="button" class="btn-primary detail-add-btn">
-          🛒 Savatga qo‘shish
-        </button>
-      </footer>
-
-    </div>
-  </div>
-  <!-- ======================================================== -->
 
   <!-- CART SHEET -->
   <div id="cartSheetOverlay" class="overlay" onclick="toggleCartSheet(false)"></div>
@@ -276,7 +241,56 @@
   <!-- SOUND -->
   <audio id="notifySound" src="ding.mp3" preload="auto"></audio>
 
-  <!-- SCRIPTS -->
+  <!-- ================================================== -->
+  <!--             PRODUCT DETAIL — FINAL                 -->
+  <!-- ================================================== -->
+  <div id="productDetailOverlay" class="detail-overlay hidden">
+    <div class="detail-card">
+
+      <!-- RASM -->
+      <div class="detail-img-wrap" id="detailImgWrap">
+        <img id="detailImage" class="detail-main-img" alt="rasm">
+
+        <button id="detailPrevBtn" class="detail-nav prev">‹</button>
+        <button id="detailNextBtn" class="detail-nav next">›</button>
+
+        <div id="detailImageIndex" class="detail-index"></div>
+      </div>
+
+      <!-- MA'LUMOTLAR -->
+      <div class="detail-body">
+
+        <div id="detailCategory" class="detail-category"></div>
+        <h2 id="detailName" class="detail-name"></h2>
+        <div id="detailTag" class="detail-tag"></div>
+
+        <p id="detailDesc" class="detail-desc"></p>
+
+        <div class="detail-prices">
+          <span id="detailPrice" class="detail-price"></span>
+          <span id="detailOldPrice" class="detail-oldprice hidden"></span>
+        </div>
+
+        <div class="detail-qty-row">
+          <button id="detailQtyMinus">-</button>
+          <span id="detailQtyValue">1</span>
+          <button id="detailQtyPlus">+</button>
+        </div>
+
+        <button id="detailAddBtn" class="btn-primary btn-full">
+          🛒 Savatga qo‘shish
+        </button>
+
+        <button id="detailBackBtn" class="btn-outline btn-full hidden">
+          ◀ Orqaga
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- APP SCRIPT -->
   <script type="module" src="app.js"></script>
 
 </body>

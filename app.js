@@ -75,7 +75,7 @@ let detailImageIndex         = 0;
 let detailQty                = 1;
 let detailCountdownTimer     = null;
 let detailCountdownRemaining = 0;
-let isImageFullscreen        = false; // hozir ishlatilmaydi, lekin state qolgan
+let isImageFullscreen        = false; // FULLSCREEN HOLATI
 
 // COURIER STATE (xarita paneli ichida)
 let courierSelectedOrderId = null;
@@ -102,7 +102,6 @@ const searchInput        = document.getElementById("searchInput");
 const customerInfoTextEl = document.getElementById("customerInfoText");
 const quickOrderBtn      = document.getElementById("quickOrderBtn");
 
-// DETAIL DOM (Uzum style)
 const productDetailOverlay = document.getElementById("productDetailOverlay");
 const detailImageEl        = document.getElementById("detailImage");
 const detailCategoryEl     = document.getElementById("detailCategory");
@@ -124,7 +123,7 @@ const detailQtyValue = document.getElementById("detailQtyValue");
 
 // rasm konteynerlari
 const detailImgWrap       = document.querySelector(".detail-img-wrap");
-const detailGalleryListEl = document.getElementById("detailGalleryList");
+const detailGalleryListEl = document.getElementById("detailGalleryList"); // pastga scroll bo‘ladigan galereya (agar HTML’da bo‘lsa)
 
 // ADMIN FORM DOM
 const adminNameEl          = document.getElementById("adminName");
@@ -714,7 +713,7 @@ function notifyClientStatus(status){
   playNotify();
 }
 function checkDeliveredThankYou(){
-  const hasDelivered = clientOrders.some(o => o.status === "delivered" && !o.awaitClientConfirm);
+  const hasDelivered = clientOrders.some(o => o.status === "delivered");
   if(hasDelivered){
     showToast("🎉 Buyurtmani qabul qilganingiz uchun rahmat!", 3000);
   }
@@ -766,43 +765,6 @@ function subscribeClientOrders(){
   });
 }
 
-// KURYER MA’LUMOTINI MIJOZGA CHIQARISH
-function renderClientCourierHTML(o){
-  const courier = o.courier || {};
-  if(!(courier.name || courier.phone || courier.car || courier.plate)){
-    return "";
-  }
-  const parts = [];
-  parts.push(`<section class="order-items"><strong>Kuryer:</strong><div class="order-courier">`);
-  parts.push(`🚚 ${courier.name || "-"}`);
-  if(courier.phone) parts.push(` • 📱 ${courier.phone}`);
-  if(courier.car || courier.plate){
-    parts.push(`<br>🚗 ${courier.car || ""} ${courier.plate || ""}`);
-  }
-  parts.push(`</div></section>`);
-  return parts.join("");
-}
-
-// MIJOZ TASDIQ BLOKI (delivered + awaitClientConfirm)
-function renderClientConfirmHTML(o){
-  if(!(o.status === "delivered" && o.awaitClientConfirm)) return "";
-  return `
-    <div class="order-client-confirm">
-      <p class="section-sub" style="margin-top:6px;font-size:11px;">
-        🚚 Kuryer buyurtmangizni yetkazdi deb belgiladi. Haqiqatdan yetkazildimi?
-      </p>
-      <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;">
-        <button class="btn-xs btn-xs-primary" onclick="clientConfirmDelivered('${o.id}', true)">
-          ✅ Ha, yetkazildi
-        </button>
-        <button class="btn-xs btn-xs-danger" onclick="clientConfirmDelivered('${o.id}', false)">
-          ❌ Yo‘q, yetmagan
-        </button>
-      </div>
-    </div>
-  `;
-}
-
 function renderClientOrders(){
   if(!clientOrdersListEl) return;
 
@@ -825,12 +787,6 @@ function renderClientOrders(){
       const itemsHtml = (o.items || []).map(i=>
         `<li>${i.name} — ${i.qty} dona × ${formatPrice(i.price)} so‘m</li>`
       ).join("");
-
-      const statusTextBottom =
-        o.status === "delivered"
-          ? (o.awaitClientConfirm ? "⏳ Tasdiq kutilmoqda" : "✅ Yakunlandi")
-          : (o.status === "rejected" ? "❌ Bekor qilingan" : "⏳ Jarayonda");
-
       clientOrdersListEl.innerHTML += `
         <article class="order-card">
           <header class="order-header">
@@ -848,12 +804,12 @@ function renderClientOrders(){
             <strong>Mahsulotlar:</strong>
             <ul>${itemsHtml}</ul>
           </section>
-          ${renderClientCourierHTML(o)}
           <footer class="order-footer">
             <span>Holat: ${statusLabel(o.status)}</span>
-            <span>${statusTextBottom}</span>
+            <span>${o.status==="delivered" ? "✅ Yakunlandi" :
+                    o.status==="rejected" ? "❌ Bekor qilingan" :
+                    "⏳ Jarayonda"}</span>
           </footer>
-          ${renderClientConfirmHTML(o)}
         </article>
       `;
     });
@@ -873,33 +829,6 @@ function renderClientOrders(){
     renderList(backup,true);
   }else{
     renderList([],false);
-  }
-}
-
-/* MIJOZ TASDIQI — YES / NO */
-async function clientConfirmDelivered(orderId, isOk){
-  try{
-    const ref = doc(db,"orders",orderId);
-    if(isOk){
-      await updateDoc(ref,{
-        awaitClientConfirm:false,
-        clientConfirmed:true,
-        clientConfirmedAt:serverTimestamp()
-      });
-      showToast("✅ Rahmat! Buyurtma yetkazilgan deb tasdiqlandi.",3000);
-    }else{
-      await updateDoc(ref,{
-        status:"courier",
-        awaitClientConfirm:false,
-        clientConfirmed:false,
-        clientDisputed:true,
-        updatedAt:serverTimestamp()
-      });
-      showToast("⚠️ Kuryerga qayta tekshirish uchun yuborildi.",3000);
-    }
-  }catch(e){
-    console.error("clientConfirmDelivered xato:", e);
-    showToast("⚠️ Tasdiq yuborishda xato.");
   }
 }
 
@@ -982,7 +911,7 @@ function renderAdminOrders(){
   `;
 
   if(!visibleOrders.length){
-    adminOrdersListEl.innerHTML += "<p class='cart-empty'>Tanlangan bo‘limda buyurtma yo‘q.</p>";
+    adminOrdersListEl.innerHTML += "<p class='cart-empty'>Tanlangan bo‘limda buyurtма yo‘q.</p>";
     refreshCourierPanel();
     return;
   }
@@ -1006,9 +935,6 @@ function renderAdminOrders(){
     if(customer.preferredTime) extraLines.push(`⏰ Vaqt: ${customer.preferredTime}`);
     if(customer.comment)       extraLines.push(`✏️ Izoh: ${customer.comment}`);
 
-    const courier = o.courier || {};
-    const hasCourier = courier && (courier.name || courier.phone || courier.car || courier.plate || courier.login);
-
     adminOrdersListEl.innerHTML += `
       <article class="order-card">
         <header class="order-header">
@@ -1029,13 +955,6 @@ function renderAdminOrders(){
             ${hasLoc ? `
               <div class="order-customer">
                 📍 GPS joylashuv mavjud
-              </div>
-            ` : ""}
-            ${hasCourier ? `
-              <div class="order-customer">
-                🚚 Kuryer: ${courier.name || "-"}${courier.phone ? " • 📱 " + courier.phone : ""}<br>
-                ${courier.car || courier.plate ? `🚗 ${(courier.car || "") + " " + (courier.plate || "")}<br>` : ""}
-                ${courier.login ? `👤 Login: ${courier.login}` : ""}
               </div>
             ` : ""}
           </div>
@@ -1079,16 +998,10 @@ async function updateOrderStatus(orderId, newStatus){
       }
     }
 
-    // Admin panelidan "delivered" qilinsa, mijoz tasdig‘i ham yoqiladi
-    const payload = {
+    await updateDoc(doc(db,"orders",orderId),{
       status:newStatus,
       updatedAt:serverTimestamp()
-    };
-    if(newStatus === "delivered"){
-      payload.awaitClientConfirm = true;
-    }
-
-    await updateDoc(doc(db,"orders",orderId), payload);
+    });
     showToast("✅ Buyurtma statusi yangilandi.");
 
     if(isAdmin && newStatus === "delivered"){
@@ -1514,42 +1427,43 @@ function editProduct(id){
   showToast("✏️ Tahrirlash rejimi.");
 }
 
-/* PRODUCT DETAIL — UZUM STYLE */
+/* PRODUCT DETAIL */
 
-// asosiy rasmlar massivini olish
+// detail kartani fullscreen / normal rejimga o‘tkazish
+function setImageFullscreen(on){
+  const card = document.querySelector(".detail-card");
+  if(!card) return;
+  isImageFullscreen = !!on;
+  card.classList.toggle("image-fullscreen", isImageFullscreen);
+}
+
+// toggle function
+function toggleImageFullscreen(){
+  setImageFullscreen(!isImageFullscreen);
+}
+
 function getDetailImages(){
-  if(detailIndex === null) return [RAW_PREFIX + "noimage.png"];
+  if(detailIndex===null) return [RAW_PREFIX + "noimage.png"];
   const p = products[detailIndex];
   if(!p) return [RAW_PREFIX + "noimage.png"];
   if(p.images && p.images.length) return p.images;
   return [RAW_PREFIX + "noimage.png"];
 }
 
-// katta rasmni yangilash
+// Asosiy katta rasm (tepada)
 function renderDetailImage(){
   if(!detailImageEl) return;
   const imgs = getDetailImages();
   if(!imgs.length) return;
-
-  if(detailImageIndex >= imgs.length) detailImageIndex = 0;
-  if(detailImageIndex < 0) detailImageIndex = imgs.length - 1;
-
-  const url = imgs[detailImageIndex];
-  setImageWithPngJpgFallback(detailImageEl, url);
-
+  if(detailImageIndex>=imgs.length) detailImageIndex=0;
+  if(detailImageIndex<0) detailImageIndex=imgs.length-1;
+  setImageWithPngJpgFallback(detailImageEl, imgs[detailImageIndex]);
   if(detailImageIndexEl){
-    detailImageIndexEl.textContent = `${detailImageIndex + 1} / ${imgs.length}`;
-  }
-
-  // galereyadagi aktiv ramka
-  if(detailGalleryListEl){
-    [...detailGalleryListEl.querySelectorAll(".detail-gallery-img")].forEach((imgEl, idx)=>{
-      imgEl.classList.toggle("active", idx === detailImageIndex);
-    });
+    detailImageIndexEl.textContent = `${detailImageIndex+1} / ${imgs.length}`;
   }
 }
 
-// pastdagi kichik rasmlar (agar bo‘lsa)
+// Pastga qarab scroll bo‘ladigan galereya (agar HTML’da #detailGalleryList bo‘lsa)
 function renderDetailGallery(){
   if(!detailGalleryListEl) return;
   const imgs = getDetailImages();
@@ -1559,7 +1473,7 @@ function renderDetailGallery(){
   }
   detailGalleryListEl.innerHTML = "";
   imgs.forEach((url, idx)=>{
-    const base   = url.startsWith(RAW_PREFIX)
+    const base = url.startsWith(RAW_PREFIX)
       ? url.replace(/\.(png|jpg|jpeg)$/i,"")
       : null;
     const srcPng = base ? base + ".png" : url;
@@ -1567,117 +1481,108 @@ function renderDetailGallery(){
 
     const img = document.createElement("img");
     img.className = "detail-gallery-img";
-    img.alt       = "Mahsulot rasmi " + (idx+1);
-    img.src       = srcPng;
+    img.alt = "Mahsulot rasmi " + (idx+1);
+    img.src = srcPng;
     if(base){
       img.onerror = function(){
         this.onerror = null;
         this.src = srcJpg;
       };
     }
-    if(idx === detailImageIndex){
-      img.classList.add("active");
-    }
     img.addEventListener("click", e=>{
       e.stopPropagation();
       detailImageIndex = idx;
       renderDetailImage();
+      window.scrollTo({top:0,behavior:"smooth"});
     });
     detailGalleryListEl.appendChild(img);
   });
 }
 
-// rasm indeksini o'zgartirish
 function changeDetailImage(delta){
-  if(detailIndex === null) return;
+  if(detailIndex===null) return;
   const imgs = getDetailImages();
-  if(imgs.length <= 1) return;
-  detailImageIndex = (detailImageIndex + delta + imgs.length) % imgs.length;
+  if(imgs.length<=1) return;
+  detailImageIndex = (detailImageIndex+delta+imgs.length)%imgs.length;
   renderDetailImage();
 }
 
-// detail oynasini ochish
+function clearDetailCountdown(){
+  if(detailCountdownTimer){
+    clearInterval(detailCountdownTimer);
+    detailCountdownTimer=null;
+  }
+  if(detailBackBtn){
+    detailBackBtn.classList.add("hidden");
+    detailBackBtn.textContent = "◀ Magaziniga qaytish";
+    detailBackBtn.style.color = "";
+  }
+}
+
 function openProductDetail(index){
   const p = products[index];
   if(!p) return;
-
   detailIndex      = index;
   detailImageIndex = 0;
   detailQty        = 1;
+  clearDetailCountdown();
+  setImageFullscreen(false); // har safar yangi kartada normal holat
 
   const catLbl = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
 
   renderDetailImage();
-  renderDetailGallery();
+  renderDetailGallery(); // rasmlarni pastga chizish (agar konteyner bo‘lsa)
 
-  if(detailCategoryEl) detailCategoryEl.textContent = catLbl;
-  if(detailNameEl)     detailNameEl.textContent     = p.name;
-  if(detailTagEl)      detailTagEl.textContent      = p.tag ? "💡 " + p.tag : "";
-  if(detailDescEl){
-    detailDescEl.textContent =
-      p.description && p.description.trim().length
-        ? p.description
-        : "Bu mahsulot buyurtma qilish uchun tayyor.";
+  detailCategoryEl.textContent = catLbl;
+  detailNameEl.textContent     = p.name;
+  detailTagEl.textContent      = p.tag ? "💡 " + p.tag : "";
+  detailDescEl.textContent =
+    p.description && p.description.trim().length
+      ? p.description
+      : "Bu mahsulot sizning buyurtmangiz uchun tayyorlangan.";
+  detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
+  if(p.oldPrice){
+    detailOldPriceEl.classList.remove("hidden");
+    detailOldPriceEl.textContent = formatPrice(p.oldPrice)+" so‘m";
+  }else{
+    detailOldPriceEl.classList.add("hidden");
   }
+  detailQtyValue.textContent = detailQty;
+  detailAddBtn.classList.remove("added");
+  detailAddBtn.textContent   = "🛒 Savatga qo‘shish";
 
-  if(detailPriceEl)    detailPriceEl.textContent    = formatPrice(p.price) + " so‘m";
-  if(detailOldPriceEl){
-    if(p.oldPrice){
-      detailOldPriceEl.classList.remove("hidden");
-      detailOldPriceEl.textContent = formatPrice(p.oldPrice) + " so‘m";
-    }else{
-      detailOldPriceEl.classList.add("hidden");
-    }
-  }
-  if(detailQtyValue) detailQtyValue.textContent = detailQty;
-
-  if(detailAddBtn){
-    detailAddBtn.classList.remove("added");
-    detailAddBtn.textContent = "🛒 Savatga qo‘shish";
-  }
-
-  if(productDetailOverlay){
-    productDetailOverlay.classList.remove("hidden");
-    document.body.style.overflow = "hidden";
-  }
+  productDetailOverlay.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
 }
-
-// yopish
 function closeProductDetail(){
-  if(productDetailOverlay){
-    productDetailOverlay.classList.add("hidden");
-  }
+  clearDetailCountdown();
+  setImageFullscreen(false);
+  productDetailOverlay.classList.add("hidden");
   document.body.style.overflow = "";
   detailIndex = null;
 }
 
-/* DETAIL EVENTLAR */
-
-// Savatga qo‘shish
 if(detailAddBtn){
   detailAddBtn.addEventListener("click", ()=>{
-    if(detailIndex === null) return;
+    if(detailIndex===null) return;
+    if(detailAddBtn.classList.contains("added")){
+      closeProductDetail();
+      return;
+    }
     addToCart(detailIndex, detailQty);
     detailAddBtn.classList.add("added");
-    detailAddBtn.textContent = "✅ Savatga qo‘shildi";
+    detailAddBtn.textContent = "⬅️ Magaziniga qaytish";
+    if(detailBackBtn) detailBackBtn.classList.remove("hidden");
   });
 }
-
-// Magaziniga qaytish — hech narsa qo‘shmasdan yopish
 if(detailBackBtn){
-  detailBackBtn.addEventListener("click", ()=>{
-    closeProductDetail();
-  });
+  detailBackBtn.addEventListener("click", closeProductDetail);
 }
-
-// overlay foniga bosganda yopish
 if(productDetailOverlay){
   productDetailOverlay.addEventListener("click", e=>{
-    if(e.target === productDetailOverlay) closeProductDetail();
+    if(e.target===productDetailOverlay) closeProductDetail();
   });
 }
-
-// oldingi / keyingi rasm
 if(detailPrevBtn){
   detailPrevBtn.addEventListener("click", e=>{
     e.stopPropagation();
@@ -1690,12 +1595,10 @@ if(detailNextBtn){
     changeDetailImage(1);
   });
 }
-
-// soni − / +
 if(detailQtyMinus){
   detailQtyMinus.addEventListener("click", e=>{
     e.stopPropagation();
-    if(detailQty > 1){
+    if(detailQty>1){
       detailQty--;
       detailQtyValue.textContent = detailQty;
     }
@@ -1708,12 +1611,11 @@ if(detailQtyPlus){
     detailQtyValue.textContent = detailQty;
   });
 }
-
-// rasmning o'ziga bosganda — keyingi rasm
+// rasmga bosganda fullscreen / qaytish
 if(detailImgWrap){
   detailImgWrap.addEventListener("click", e=>{
     e.stopPropagation();
-    changeDetailImage(1);
+    toggleImageFullscreen();
   });
 }
 
@@ -2102,6 +2004,3 @@ window.blockCourier                = blockCourier;
 window.unblockCourier              = unblockCourier;
 window.softDeleteCourier           = softDeleteCourier;
 window.restoreCourier              = restoreCourier;
-
-// Mijoz tasdiq funksiyasi
-window.clientConfirmDelivered      = clientConfirmDelivered;
