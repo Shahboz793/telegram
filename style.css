@@ -8,10 +8,10 @@ html,body{
   height:100%;
 }
 body{
-  font-family:"Roboto","Poppins",sans-serif;
+  font-family:"Roboto","Poppins","system-ui",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:
     radial-gradient(circle at top,#111827 0,transparent 55%),
-    radial-gradient(circle at bottom,#7f1d1d 0,transparent 55%),
+    radial-gradient(circle at bottom,#450a0a 0,transparent 55%),
     var(--bg);
   color:var(--text);
   -webkit-tap-highlight-color:transparent;
@@ -20,6 +20,9 @@ body{
 a{
   color:inherit;
   text-decoration:none;
+}
+button,input,textarea,select{
+  font-family:inherit;
 }
 .hidden{display:none!important}
 
@@ -32,58 +35,59 @@ a{
   --text:#111827;
   --muted:#6b7280;
 
-  /* QIZIL / QORA USLUB (FastFood / Uzum style) */
-  --accent:#ef4444;          /* asosiy qizil */
-  --accent-soft:#fee2e2;     /* yumshoq qizil */
-  --accent-strong:#b91c1c;   /* to‘q qizil */
+  /* FASTFOOD (qizil) */
+  --accent:#ef4444;
+  --accent-soft:#fee2e2;
+  --accent-2:#fb923c;
+  --border-soft:rgba(148,163,184,.6);
+  --danger:#dc2626;
 
-  --border:rgba(0,0,0,0.08);
-  --shadow:0 18px 40px rgba(15,23,42,.18);
-  --radius:12px;
-  --radius-lg:22px;
-  --danger:#ef4444;
-  --ok:#22c55e;
-  --warning:#f59e0b;
-  --chip-bg:#111827;
+  --radius-lg:18px;
+  --radius-md:12px;
+  --radius-sm:8px;
+
+  --shadow-soft:0 18px 45px rgba(15,23,42,.09);
+  --shadow-strong:0 20px 60px rgba(15,23,42,.22);
 }
+
 body.theme-dark{
   --bg:#020617;
   --bg-soft:#020617;
   --panel:#020617;
   --card:#020617;
-  --text:#f9fafb;
+  --text:#e5e7eb;
   --muted:#9ca3af;
-
-  /* dark rejimda binafsha + qizil aralash */
-  --accent:#7000ff;
-  --accent-soft:#f2edff;
-  --accent-strong:#4c1d95;
-
-  --border:rgba(148,163,184,.35);
-  --shadow:0 22px 50px rgba(0,0,0,.65);
-  --chip-bg:#020617;
+  --accent:#f97373;
+  --accent-soft:rgba(248,113,113,.12);
+  --accent-2:#fb923c;
+  --border-soft:rgba(55,65,81,.9);
+  --shadow-soft:0 18px 45px rgba(0,0,0,.55);
+  --shadow-strong:0 30px 80px rgba(0,0,0,.9);
 }
 
-/* LAYOUT */
+/* PAGE LAYOUT */
 .page-wrap{
-  min-height:calc(100vh - 60px);
-}
-.page{
-  padding-bottom:80px; /* pastdagi buyurtma tugmasi uchun joy */
+  min-height:100vh;
+  max-width:1200px;
+  margin:0 auto;
+  padding:12px 10px 80px;
 }
 
 /* HEADER */
 .app-header{
-  position:sticky;
-  top:0;
-  z-index:50;
-  background:linear-gradient(90deg,#ff0f7b,#f97316);
-  padding:10px 16px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  border-bottom:1px solid rgba(248,250,252,.25);
-  box-shadow:0 18px 40px rgba(15,23,42,.7);
+  gap:12px;
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(15,23,42,.96);
+  color:#f9fafb;
+  box-shadow:0 20px 50px rgba(15,23,42,.7);
+  position:sticky;
+  top:8px;
+  z-index:40;
+  backdrop-filter:blur(16px);
 }
 .logo-wrap{
   display:flex;
@@ -91,593 +95,774 @@ body.theme-dark{
   gap:10px;
 }
 .logo-circle{
-  width:48px;
-  height:48px;
+  width:36px;
+  height:36px;
   border-radius:50%;
-  background:radial-gradient(circle at 30% 10%,#f9fafb,#b91c1c);
   display:flex;
   align-items:center;
   justify-content:center;
-  color:#fff;
-  font-size:18px;
-  font-weight:700;
-  box-shadow:0 0 0 2px rgba(248,250,252,.25),0 14px 30px rgba(0,0,0,.55);
+  background:radial-gradient(circle at 20% 20%,#facc15,#b91c1c);
+  box-shadow:0 0 0 2px rgba(248,250,252,.2),0 10px 25px rgba(0,0,0,.45);
+  font-size:22px;
 }
 .logo-text{
   display:flex;
   flex-direction:column;
 }
 .logo-title{
-  font-size:18px;
-  font-weight:600;
-  color:#f9fafb;
+  font-weight:700;
+  letter-spacing:.03em;
+  font-size:15px;
 }
 .logo-sub{
-  font-size:12px;
-  color:#fee2e2;
+  font-size:11px;
+  opacity:.75;
 }
+
 .header-right{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:6px;
 }
+
+/* GENERIC BUTTONS */
 .icon-btn{
-  background:rgba(15,23,42,.4);
-  border:1px solid rgba(248,250,252,.5);
+  border:none;
+  background:rgba(15,23,42,.85);
+  color:inherit;
   border-radius:999px;
-  padding:7px 10px;
-  cursor:pointer;
-  font-size:16px;
-  color:#f9fafb;
+  width:34px;
+  height:34px;
   display:flex;
   align-items:center;
   justify-content:center;
+  cursor:pointer;
+  font-size:16px;
+  transition:background .18s ease,transform .12s ease,box-shadow .18s ease;
+  box-shadow:0 4px 15px rgba(0,0,0,.45);
 }
 .icon-btn:hover{
-  border-color:#fff;
+  background:rgba(30,64,175,.95);
+  transform:translateY(-1px);
 }
+.icon-btn:active{
+  transform:translateY(0) scale(.97);
+  box-shadow:0 2px 8px rgba(0,0,0,.55);
+}
+
 .cart-top-btn{
-  background:linear-gradient(135deg,#7000ff,#4c1d95);
   border:none;
-  border-radius:999px;
-  color:#fff;
-  padding:7px 12px;
+  cursor:pointer;
   display:flex;
   align-items:center;
-  gap:6px;
-  font-size:13px;
-  cursor:pointer;
-  box-shadow:0 10px 25px rgba(112,0,255,.7);
-}
-.cart-top-btn.hidden{display:none;}
-.pill{
-  background:rgba(0,0,0,.3);
+  gap:8px;
+  padding:6px 12px;
   border-radius:999px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#f9fafb;
+  font-size:13px;
+  font-weight:600;
+  box-shadow:0 12px 30px rgba(220,38,38,.55);
+  transition:transform .12s ease,box-shadow .18s ease;
+}
+.cart-top-btn .pill{
   padding:2px 8px;
+  border-radius:999px;
+  background:rgba(15,23,42,.92);
   font-size:11px;
 }
 .cart-top-total{
-  font-size:13px;
-  font-weight:600;
-  color:#fee2e2;
+  font-size:11px;
+  opacity:.9;
+}
+.cart-top-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 18px 40px rgba(220,38,38,.75);
+}
+.cart-top-btn:active{
+  transform:translateY(0) scale(.97);
 }
 
 /* TABS */
 .tabs{
-  position:sticky;
-  top:64px;
-  z-index:45;
-  background:rgba(15,23,42,.98);
-  padding:6px;
   display:flex;
   gap:4px;
-  border-bottom:1px solid rgba(148,163,184,.3);
-  backdrop-filter:blur(16px);
+  margin:12px auto 10px;
+  padding:4px;
+  border-radius:999px;
+  background:rgba(15,23,42,.92);
+  box-shadow:0 16px 40px rgba(15,23,42,.65);
+  max-width:420px;
 }
 .tab-btn{
   flex:1;
   border:none;
   background:transparent;
-  border-radius:999px;
-  padding:9px 6px;
-  font-size:13px;
-  cursor:pointer;
   color:#9ca3af;
+  font-size:13px;
+  padding:7px 8px;
+  border-radius:999px;
+  cursor:pointer;
+  transition:background .18s ease,color .18s ease,transform .12s ease;
 }
 .tab-btn.active{
-  background:linear-gradient(135deg,#7000ff,#4c1d95);
-  color:#fff;
-  box-shadow:0 10px 25px rgba(112,0,255,.7);
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#f9fafb;
+  transform:translateY(-1px);
 }
-.admin-active{
-  border-color:var(--accent);
-  color:var(--accent);
+.tab-btn:not(.active):hover{
+  background:rgba(15,23,42,.75);
+  color:#e5e7eb;
+}
+
+/* COMMON PAGE SECTIONS */
+main{
+  margin-top:8px;
+}
+.page{
+  margin-top:4px;
+}
+.section-title{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:4px;
+}
+.section-sub{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:10px;
 }
 
 /* CUSTOMER PANEL */
 .customer-panel{
-  background:rgba(15,23,42,.96);
-  border-bottom:1px solid rgba(148,163,184,.3);
-  padding:10px 16px 12px;
+  background:var(--panel);
+  border-radius:var(--radius-lg);
+  padding:10px 12px;
+  box-shadow:var(--shadow-soft);
+  margin-bottom:10px;
+  border:1px solid var(--border-soft);
 }
 .customer-info{
   font-size:13px;
-  margin-bottom:8px;
-  color:#e5e7eb;
+  color:var(--muted);
+  margin-bottom:6px;
 }
 .customer-actions{
   display:flex;
   gap:8px;
 }
+
 .btn-outline,
-.btn-ghost{
+.btn-ghost,
+.btn-primary,
+.btn-xs{
   border-radius:999px;
-  padding:6px 12px;
-  border:1px solid rgba(148,163,184,.5);
-  font-size:12px;
-  background:rgba(15,23,42,.7);
+  font-size:13px;
   cursor:pointer;
-  color:#e5e7eb;
+  border:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  transition:background .18s ease,color .18s ease,transform .12s ease,box-shadow .18s ease;
 }
+
 .btn-outline{
-  border-color:#7000ff;
-  color:#e0e7ff;
-  background:rgba(24,24,27,.9);
+  padding:5px 12px;
+  background:transparent;
+  border:1px solid var(--border-soft);
+  color:var(--text);
+}
+.btn-outline:hover{
+  background:var(--bg-soft);
+}
+
+.btn-ghost{
+  padding:5px 10px;
+  background:transparent;
+  color:var(--muted);
+}
+.btn-ghost:hover{
+  background:rgba(148,163,184,.15);
 }
 
 /* SHOP TOOLBAR */
 .shop-toolbar{
-  background:var(--panel);
-  border-bottom:1px solid var(--border);
-  padding:10px 16px;
-  display:flex;
-  align-items:center;
-  gap:8px;
+  margin:10px 0 8px;
 }
 .search-input{
-  flex:1;
+  width:100%;
+  padding:10px 12px;
   border-radius:999px;
-  border:1px solid var(--border);
-  padding:8px 12px;
-  background:var(--bg);
+  border:1px solid var(--border-soft);
+  background:rgba(15,23,42,.03);
+  color:var(--text);
   font-size:13px;
   outline:none;
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.search-input::placeholder{
+  color:var(--muted);
 }
 .search-input:focus{
-  border-color:#7000ff;
-  box-shadow:0 0 0 1px rgba(112,0,255,.35);
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px rgba(248,113,113,.4);
+  background:rgba(15,23,42,.02);
 }
 
-/* CATEGORY GRID (4 ta) */
+/* CHIPS (CATEGORIES) */
 .chips-row{
-  background:var(--panel);
-  border-bottom:1px solid var(--border);
-  padding:10px 10px 12px;
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:8px;
-}
-.chip{
-  border-radius:var(--radius);
-  border:1px solid rgba(148,163,184,.6);
-  background:var(--chip-bg);
-  padding:9px 4px;
-  font-size:11px;
-  text-align:center;
-  cursor:pointer;
   display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  min-height:52px;
-  color:#e5e7eb;
-  box-shadow:0 8px 18px rgba(15,23,42,.55);
+  gap:6px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  margin-bottom:8px;
 }
-.chip span{display:block;}
-.chip.active{
-  background:linear-gradient(135deg,#7000ff,#4c1d95);
-  color:#fff;
-  border-color:transparent;
-  box-shadow:0 12px 26px rgba(112,0,255,.7);
+.chips-row::-webkit-scrollbar{
+  height:4px;
 }
-@media(min-width:480px){
-  .chip{font-size:12px;min-height:56px;}
+.chips-row::-webkit-scrollbar-thumb{
+  background:rgba(148,163,184,.6);
+  border-radius:999px;
 }
 
-/* PRODUCTS – KATTA KARTOCHKA, RASM BO‘YIGA (UZUM STYLE) */
-.products-grid{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  padding:14px;
+.chip{
+  border:none;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 11px;
+  border-radius:999px;
+  background:rgba(15,23,42,.06);
+  color:var(--muted);
+  font-size:12px;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:background .18s ease,color .18s ease,transform .12s ease,box-shadow .18s ease;
 }
-@media(min-width:768px){
+.chip span:first-child{
+  font-size:14px;
+}
+.chip.active{
+  background:var(--accent-soft);
+  color:#991b1b;
+  box-shadow:0 10px 25px rgba(220,38,38,.45);
+  transform:translateY(-1px);
+}
+body.theme-dark .chip.active{
+  color:#fee2e2;
+}
+
+/* PRODUCTS GRID */
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:6px;
+}
+@media (min-width:720px){
   .products-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
-    gap:18px;
-    padding:20px;
+    grid-template-columns:repeat(3,minmax(0,1fr));
   }
 }
+
+/* PRODUCT CARD */
 .product-card{
-  background:radial-gradient(circle at top,#111827,var(--card));
-  border-radius:var(--radius-lg);
-  box-shadow:var(--shadow);
-  overflow:hidden;
+  background:var(--card);
+  border-radius:16px;
+  padding:6px 6px 8px;
+  box-shadow:var(--shadow-soft);
+  border:1px solid rgba(148,163,184,.35);
   cursor:pointer;
-  display:flex;
-  flex-direction:column;
-  transition:transform .18s,box-shadow .18s,filter .18s;
-  border:1px solid rgba(148,163,184,.3);
+  transition:transform .14s ease,box-shadow .18s ease,border-color .18s ease;
+  overflow:hidden;
 }
 .product-card:hover{
-  transform:translateY(-4px) scale(1.01);
-  box-shadow:0 26px 60px rgba(0,0,0,.75);
-  filter:saturate(1.1);
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-strong);
+  border-color:rgba(248,113,113,.85);
 }
 .product-img-wrap{
   position:relative;
-  width:100%;
+  border-radius:14px;
+  overflow:hidden;
+  aspect-ratio:4/3;
+  background:linear-gradient(135deg,#fecaca,#fee2e2);
 }
 .product-img-wrap img{
   width:100%;
-  height:270px;          /* telefon uchun baland, pastga qarab rasm */
+  height:100%;
   object-fit:cover;
   display:block;
+  transition:transform .4s ease,filter .4s ease;
 }
-@media(min-width:768px){
-  .product-img-wrap img{height:320px;} /* katta ekranlarda yanayam baland */
+.product-card:hover .product-img-wrap img{
+  transform:scale(1.06);
+  filter:saturate(1.1);
 }
 .product-img-tag{
   position:absolute;
-  top:8px; left:8px;
+  left:8px;
+  top:8px;
   display:flex;
   gap:4px;
-  font-size:10px;
 }
 .product-img-tag span{
-  padding:2px 6px;
-  border-radius:999px;
-  background:rgba(0,0,0,.65);
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+  background:rgba(15,23,42,.75);
   color:#f9fafb;
+  border-radius:999px;
+  padding:3px 6px;
 }
 .product-sale{
   position:absolute;
-  right:8px; top:8px;
-  padding:4px 9px;
-  border-radius:999px;
+  right:8px;
+  top:8px;
+  background:linear-gradient(135deg,#f97316,#b91c1c);
+  color:#fef3c7;
   font-size:11px;
-  background:var(--danger);
-  color:#fff;
-  font-weight:600;
-  box-shadow:0 12px 30px rgba(239,68,68,.7);
+  padding:3px 7px;
+  border-radius:999px;
+  box-shadow:0 10px 22px rgba(185,28,28,.6);
 }
+
 .product-body{
-  padding:11px 13px 13px;
+  margin-top:7px;
 }
 .product-name{
-  font-size:16px;
+  font-size:13px;
   font-weight:600;
-  color:#f9fafb;
 }
 .product-meta{
-  font-size:12px;
-  color:#9ca3af;
+  font-size:11px;
+  color:var(--muted);
   margin-top:2px;
 }
 .tag-mini{
-  margin-top:7px;
+  margin-top:4px;
   font-size:11px;
-  color:var(--accent-soft);
-  background:rgba(112,0,255,.12);
+  background:rgba(248,113,113,.12);
+  color:#b91c1c;
   padding:3px 7px;
   border-radius:999px;
-  display:inline-block;
+  display:inline-flex;
+}
+body.theme-dark .tag-mini{
+  background:rgba(248,113,113,.18);
+  color:#fee2e2;
 }
 .price-row{
-  margin-top:10px;
+  margin-top:6px;
   display:flex;
+  align-items:flex-end;
   justify-content:space-between;
-  align-items:center;
+  gap:6px;
 }
 .price-main{
-  font-size:18px;
   font-weight:700;
-  color:#fee2e2;
+  font-size:13px;
 }
 .price-old{
   font-size:11px;
+  color:var(--muted);
   text-decoration:line-through;
-  color:#9ca3af;
 }
+
 .btn-add{
   border:none;
   border-radius:999px;
-  background:linear-gradient(135deg,#111827,#020617);
-  color:#fff;
+  padding:6px 10px;
   font-size:12px;
-  padding:7px 14px;
   cursor:pointer;
-  box-shadow:0 10px 24px rgba(15,23,42,.8);
-  border:1px solid rgba(148,163,184,.6);
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#f9fafb;
+  box-shadow:0 10px 22px rgba(220,38,38,.5);
+  white-space:nowrap;
+  transition:transform .12s ease,box-shadow .18s ease,filter .18s ease;
 }
 .btn-add:hover{
-  border-color:#7000ff;
+  transform:translateY(-1px);
+  box-shadow:0 16px 32px rgba(220,38,38,.7);
+}
+.btn-add:active{
+  transform:translateY(0) scale(.96);
 }
 
-/* CART BOTTOM SHEET */
+/* CART SHEET */
 .overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.5);
-  backdrop-filter:blur(3px);
-  display:none;
-  z-index:90;
+  background:rgba(15,23,42,.65);
+  backdrop-filter:blur(6px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease;
+  z-index:50;
 }
-.overlay.show{display:block;}
+.overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
 .cart-sheet{
   position:fixed;
-  left:0; right:0;
+  left:50%;
   bottom:-100%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:520px;
   background:var(--panel);
-  max-height:80%;
-  border-top-left-radius:var(--radius-lg);
-  border-top-right-radius:var(--radius-lg);
-  padding:16px;
-  box-shadow:var(--shadow);
-  transition:bottom .3s ease;
-  z-index:100;
+  border-radius:18px 18px 0 0;
+  box-shadow:0 -10px 40px rgba(0,0,0,.55);
+  padding:10px 14px 16px;
+  z-index:60;
+  transition:bottom .2s ease;
+  border:1px solid var(--border-soft);
 }
-.cart-sheet.open{bottom:0;}
+.cart-sheet.open{
+  bottom:0;
+}
 .cart-sheet header{
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  margin-bottom:10px;
-}
-.cart-sheet h2{
-  font-size:18px;
-  font-weight:600;
-}
-.cart-sheet-total-row{font-size:15px;margin-bottom:8px;}
-.cart-empty{font-size:14px;color:var(--muted);}
-.cart-item-row{
-  display:flex;
   justify-content:space-between;
-  gap:10px;
-  padding:7px 0;
-  border-bottom:1px solid var(--border);
+  margin-bottom:8px;
 }
-.cart-item-main{flex:1;}
-.cart-item-name{font-size:14px;font-weight:500;}
-.cart-item-meta{font-size:12px;color:var(--muted);}
-.cart-item-actions{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  gap:4px;
-}
-.qty-control{
-  display:flex;
-  align-items:center;
-  gap:4px;
-}
-.qty-control button{
-  width:22px;
-  height:22px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:var(--bg);
+.cart-sheet-total-row{
   font-size:13px;
-  cursor:pointer;
-}
-.cart-item-total{font-size:13px;font-weight:600;}
-.cart-remove{
-  border:none;
-  background:none;
-  color:var(--danger);
-  font-size:13px;
-  cursor:pointer;
-}
-
-/* BUTTONS */
-.btn-primary{
-  border:none;
-  border-radius:999px;
-  background:linear-gradient(135deg,#7000ff,#4c1d95);
-  color:#fff;
-  padding:9px 14px;
-  font-size:14px;
-  cursor:pointer;
-  box-shadow:0 14px 32px rgba(112,0,255,.6);
-}
-.btn-full{width:100%;}
-.btn-primary.admin-btn{font-size:13px;margin-top:8px;}
-.admin-btn-success{background:var(--ok);box-shadow:0 14px 32px rgba(34,197,94,.6);}
-.btn-xs{
-  padding:5px 9px;
-  font-size:11px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  cursor:pointer;
-}
-.btn-xs-primary{
-  background:var(--accent);
-  color:#fff;
-  border-color:var(--accent);
-}
-.btn-xs-secondary{
-  background:#111827;
-  color:#e5e7eb;
-}
-.btn-xs-danger{
-  background:var(--danger);
-  color:#fff;
-  border-color:var(--danger);
-}
-
-/* EKRAN PASTIDAGI QUICK BUYURTMA TUGMASI (QIZIL) */
-#quickOrderBtn{
-  background:linear-gradient(135deg,#ef4444,#b91c1c);
-  box-shadow:0 20px 45px rgba(239,68,68,.75);
-}
-
-/* ORDERS */
-.section-title{
-  font-size:18px;
   font-weight:600;
-  margin:14px 16px 0;
+  margin-bottom:6px;
 }
-.section-sub{
+#cartItems{
+  max-height:260px;
+  overflow-y:auto;
+  padding-right:3px;
+}
+#cartItems::-webkit-scrollbar{
+  width:4px;
+}
+#cartItems::-webkit-scrollbar-thumb{
+  background:rgba(148,163,184,.6);
+  border-radius:999px;
+}
+
+.cart-empty{
   font-size:13px;
   color:var(--muted);
-  margin:4px 16px 8px;
+  padding:10px 4px;
 }
+
+/* CART ITEM ROW */
+.cart-item-row{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:7px 4px;
+  border-bottom:1px dashed rgba(148,163,184,.6);
+}
+.cart-item-row:last-child{
+  border-bottom:none;
+}
+.cart-item-main{
+  display:flex;
+  justify-content:space-between;
+  gap:6px;
+}
+.cart-item-name{
+  font-size:13px;
+  font-weight:500;
+}
+.cart-item-meta{
+  font-size:11px;
+  color:var(--muted);
+}
+.cart-item-actions{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+}
+.qty-control{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,.7);
+  overflow:hidden;
+  font-size:12px;
+}
+.qty-control button{
+  border:none;
+  background:rgba(15,23,42,.05);
+  width:24px;
+  height:24px;
+  cursor:pointer;
+}
+.qty-control span{
+  min-width:22px;
+  text-align:center;
+}
+.cart-item-total{
+  font-size:12px;
+  font-weight:600;
+}
+.cart-remove{
+  border:none;
+  background:transparent;
+  color:var(--danger);
+  font-size:14px;
+  cursor:pointer;
+}
+
+/* BIG BUTTONS */
+.btn-primary{
+  padding:9px 14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#f9fafb;
+  border:none;
+  box-shadow:0 14px 32px rgba(220,38,38,.7);
+}
+.btn-primary:hover{
+  filter:brightness(1.05);
+}
+.btn-primary:active{
+  transform:translateY(1px) scale(.98);
+}
+.btn-full{
+  width:100%;
+}
+
+/* SMALL BUTTONS (ADMIN FILTERS) */
+.btn-xs{
+  padding:4px 9px;
+  font-size:11px;
+}
+.btn-xs-primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#f9fafb;
+}
+.btn-xs-secondary{
+  background:rgba(15,23,42,.06);
+  color:var(--text);
+}
+.btn-xs-danger{
+  background:rgba(220,38,38,.12);
+  color:#b91c1c;
+}
+
+/* QUICK ORDER BTN (fixed) */
+#quickOrderBtn{
+  box-shadow:0 16px 40px rgba(220,38,38,.8);
+}
+
+/* TOAST */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:70px;
+  transform:translateX(-50%) translateY(20px);
+  padding:8px 14px;
+  font-size:12px;
+  background:rgba(15,23,42,.96);
+  color:#f9fafb;
+  border-radius:999px;
+  box-shadow:0 15px 35px rgba(0,0,0,.7);
+  opacity:0;
+  pointer-events:none;
+  z-index:120;
+  transition:opacity .2s ease,transform .2s ease;
+}
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* ORDERS (CLIENT) */
 .orders-list{
-  padding:10px 16px 20px;
+  margin-top:8px;
 }
 .order-card{
-  background:radial-gradient(circle at top,#020617,var(--card));
+  background:var(--card);
   border-radius:var(--radius-lg);
-  box-shadow:var(--shadow);
-  padding:14px;
-  margin-bottom:12px;
-  border:1px solid rgba(148,163,184,.4);
+  padding:10px 12px;
+  margin-bottom:10px;
+  border:1px solid var(--border-soft);
+  box-shadow:var(--shadow-soft);
+  font-size:13px;
 }
 .order-header{
   display:flex;
   justify-content:space-between;
-  gap:10px;
+  gap:8px;
   margin-bottom:6px;
 }
-.order-id,
-.order-date,
-.order-customer{
-  font-size:12px;
+.order-id{
+  font-size:11px;
+  font-family:monospace;
+  color:var(--muted);
+}
+.order-date{
+  font-size:11px;
   color:var(--muted);
 }
 .order-total{
-  font-size:18px;
   font-weight:700;
-  color:#a855f7;
-}
-.order-items{
-  margin-top:6px;
   font-size:13px;
-  color:#e5e7eb;
-}
-.order-items ul{
-  margin-top:3px;
-  margin-left:16px;
-}
-.order-footer{
-  margin-top:6px;
-  font-size:12px;
-  display:flex;
-  justify-content:space-between;
-  color:var(--muted);
 }
 .order-status-row{
-  margin-top:6px;
-  margin-bottom:4px;
+  margin:4px 0;
 }
 
-/* STATUS + PROGRESS */
+/* STATUS PILLS */
 .status-pill{
-  display:inline-block;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
   padding:3px 9px;
   border-radius:999px;
   font-size:11px;
-  font-weight:600;
+  font-weight:500;
 }
-.status-pending{background:var(--bg-soft);color:var(--muted);}
-.status-confirmed{background:var(--accent-soft);color:var(--accent-strong);}
-.status-courier{background:var(--warning);color:#111827;}
-.status-delivered{background:var(--ok);color:#fff;}
-.status-rejected{background:var(--danger);color:#fff;}
+.status-pending{
+  background:rgba(251,191,36,.12);
+  color:#92400e;
+}
+.status-confirmed{
+  background:rgba(59,130,246,.12);
+  color:#1d4ed8;
+}
+.status-courier{
+  background:rgba(34,197,94,.15);
+  color:#166534;
+}
+.status-delivered{
+  background:rgba(22,163,74,.18);
+  color:#14532d;
+}
+.status-rejected{
+  background:rgba(239,68,68,.17);
+  color:#991b1b;
+}
 
-.progress-wrap{margin:6px 0;}
+/* PROGRESS */
+.progress-wrap{
+  margin-top:4px;
+}
 .progress-label{
   font-size:11px;
   color:var(--muted);
-  margin-bottom:3px;
+  margin-bottom:4px;
 }
 .progress-line{
+  width:100%;
   height:4px;
   border-radius:999px;
-  background:var(--bg-soft);
+  background:rgba(148,163,184,.4);
   overflow:hidden;
 }
 .progress-fill{
   height:100%;
-  background:linear-gradient(90deg,#7000ff,#4c1d95);
-  width:0;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
 }
 .progress-steps{
   display:flex;
   justify-content:space-between;
-  margin-top:3px;
+  margin-top:4px;
+}
+.progress-step{
   font-size:10px;
   color:var(--muted);
 }
 .progress-step.active{
-  color:#e0e7ff;
-  font-weight:600;
+  color:var(--accent);
 }
 
-/* ADMIN */
-.admin-page{padding-top:8px;}
+/* ORDER ITEMS */
+.order-items{
+  margin-top:7px;
+  font-size:12px;
+}
+.order-items ul{
+  margin-top:4px;
+  padding-left:18px;
+}
+.order-footer{
+  margin-top:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:11px;
+  color:var(--muted);
+}
+
+/* ADMIN PAGE */
+.admin-page{
+  margin-top:8px;
+}
+.admin-top-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
 .admin-cols{
-  padding:0 16px 16px;
   display:flex;
   flex-direction:column;
-  gap:16px;
+  gap:10px;
 }
-@media(min-width:900px){
+@media (min-width:860px){
   .admin-cols{
-    flex-direction:row;
+    display:grid;
+    grid-template-columns:1.2fr 1.1fr 1.1fr;
     align-items:flex-start;
   }
 }
-.admin-col{flex:1;}
+.admin-col{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
 .card{
-  background:radial-gradient(circle at top,#020617,var(--card));
+  background:var(--card);
   border-radius:var(--radius-lg);
-  box-shadow:var(--shadow);
-  padding:12px;
-  border:1px solid rgba(148,163,184,.4);
+  padding:10px 12px;
+  border:1px solid var(--border-soft);
+  box-shadow:var(--shadow-soft);
 }
 .card-title{
-  font-size:15px;
+  font-size:14px;
   font-weight:600;
   margin-bottom:8px;
 }
-.card-sub{
-  font-size:13px;
-  color:var(--muted);
-  margin-bottom:10px;
-}
+
+/* ADMIN FORM GRID */
 .form-grid{
   display:grid;
-  grid-template-columns:1fr;
-  gap:7px;
-  font-size:13px;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:8px;
 }
 .form-grid label{
+  font-size:11px;
+  color:var(--muted);
   display:flex;
   flex-direction:column;
   gap:4px;
-  color:#e5e7eb;
 }
 .form-grid input,
-.form-grid select,
-.form-grid textarea{
-  border-radius:var(--radius);
-  border:1px solid rgba(148,163,184,.6);
-  padding:6px 9px;
-  background:#020617;
-  font-size:13px;
-  color:#e5e7eb;
+.form-grid textarea,
+.form-grid select{
+  border-radius:10px;
+  border:1px solid rgba(148,163,184,.7);
+  padding:7px 8px;
+  font-size:12px;
+  background:rgba(15,23,42,.02);
+  color:var(--text);
+  outline:none;
+  min-height:32px;
 }
 .form-grid textarea{
   min-height:60px;
@@ -688,604 +873,226 @@ body.theme-dark{
   align-items:center;
   gap:6px;
 }
-.admin-list{margin-top:8px;}
+.checkbox-row input{
+  width:15px;
+  height:15px;
+}
+
+/* ADMIN LISTS */
+.admin-list{
+  margin-top:6px;
+  max-height:260px;
+  overflow-y:auto;
+  padding-right:4px;
+  font-size:12px;
+}
+.admin-list::-webkit-scrollbar{
+  width:4px;
+}
+.admin-list::-webkit-scrollbar-thumb{
+  background:rgba(148,163,184,.6);
+  border-radius:999px;
+}
+
 .admin-product-row{
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  padding:6px 0;
-  border-bottom:1px solid rgba(148,163,184,.3);
-  font-size:13px;
-  color:#e5e7eb;
+  align-items:flex-start;
+  gap:8px;
+  padding:5px 2px;
+  border-bottom:1px dashed rgba(148,163,184,.5);
+}
+.admin-product-row:last-child{
+  border-bottom:none;
 }
 .admin-edit-btn,
 .admin-delete-btn{
   border:none;
-  background:none;
+  width:24px;
+  height:24px;
+  border-radius:999px;
   cursor:pointer;
-  font-size:14px;
+  font-size:13px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:2px;
 }
-.admin-edit-btn{color:#c4b5fd;}
-.admin-delete-btn{color:var(--danger);}
+.admin-edit-btn{
+  background:rgba(59,130,246,.14);
+  color:#1d4ed8;
+}
+.admin-delete-btn{
+  background:rgba(248,113,113,.15);
+  color:#b91c1c;
+}
 
+/* ADMIN ORDERS */
 .admin-order-filters{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:8px;
-}
-.admin-order-actions{
-  margin-top:10px;
-  display:flex;
-  flex-wrap:wrap;
   gap:6px;
+  margin-bottom:6px;
 }
 
-/* ADMIN TOP BAR */
-.admin-top-bar{
-  padding:8px 16px 4px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+/* ADMIN MAIN BUTTON FLASH */
+.admin-btn{
+  position:relative;
 }
-.admin-top-actions{
-  display:flex;
-  gap:8px;
-  align-items:center;
+.admin-btn-success{
+  box-shadow:0 16px 40px rgba(34,197,94,.7)!important;
+  background:linear-gradient(135deg,#22c55e,#16a34a)!important;
 }
 
-/* === PRODUCT DETAIL (MODAL) – UZUM STYLE === */
-.detail-overlay{
+/* ADMIN ACCESS STATE */
+#adminAccessBtn.admin-active{
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+}
+
+/* TELEGRAM-STYLE FULLSCREEN VIEWER */
+.viewer-overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.75);
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding:0;
-  z-index:100;
-}
-.detail-card{
-  width:100%;
-  max-width:520px;
-  height:100vh;
-  border-radius:0;
-  box-shadow:var(--shadow);
-  position:relative;
-  overflow-y:auto;
-  background:linear-gradient(180deg,#ff0f7b 0%,#ffffff 18%,#faf5ff 100%);
-  padding-bottom:24px;
-}
-.detail-close{
-  position:absolute;
-  left:12px;
-  top:10px;
-  border:none;
-  background:transparent;
-  font-size:20px;
-  cursor:pointer;
-  color:#ffffff;
-  font-weight:600;
-  z-index:3;
-}
-
-/* rasm bloki – katta kartochka, bo‘yiga */
-.detail-img-wrap{
-  margin-top:44px; /* yopish tugmasi ostida */
-  position:relative;
-  padding:16px;
-}
-.detail-img-wrap img{
-  width:100%;
-  height:260px;
-  border-radius:22px;
-  object-fit:cover;
-  box-shadow:0 22px 40px rgba(0,0,0,.5);
   background:#000;
-}
-@media(min-width:480px){
-  .detail-img-wrap img{height:300px;}
-}
-.detail-img-index{
-  position:absolute;
-  bottom:24px;
-  right:28px;
-  background:rgba(0,0,0,.65);
-  color:#fff;
-  border-radius:999px;
-  padding:3px 8px;
-  font-size:11px;
-}
-.detail-nav-btn{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  border:none;
-  background:rgba(0,0,0,.45);
-  color:#fff;
-  font-size:20px;
-  padding:4px 9px;
-  cursor:pointer;
-  border-radius:999px;
-}
-#detailPrevBtn{left:24px;}
-#detailNextBtn{right:24px;}
-
-/* matn qismi */
-.detail-body{
-  margin-top:12px;
-  padding:0 20px 40px;
-  color:#111827;
-}
-.detail-category{
-  font-size:12px;
-  color:#6b21a8;
-  text-transform:uppercase;
-  letter-spacing:.04em;
-  margin-bottom:4px;
-}
-.detail-name{
-  font-size:22px;
-  font-weight:700;
-  color:#111827;
-}
-.detail-desc{
-  font-size:13px;
-  color:#4b5563;
-  margin-top:6px;
-}
-.detail-tag{
-  font-size:13px;
-  color:#2563eb;
-  margin-top:4px;
-}
-
-/* narx + soni */
-.detail-price-row{
-  margin-top:18px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-}
-.detail-price-main{
-  font-size:24px;
-  font-weight:700;
-  color:#4c1d95;
-}
-.detail-price-old{
-  font-size:13px;
-  text-decoration:line-through;
-  color:#9ca3af;
-}
-
-/* SONI – kattaroq qizil tugmalar */
-.detail-price-row .qty-control{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.detail-price-row .qty-control button{
-  width:34px;
-  height:34px;
-  border-radius:999px;
-  border:none;
-  background:linear-gradient(135deg,#ef4444,#b91c1c);
-  color:#fff;
-  font-size:18px;
-  font-weight:600;
-  cursor:pointer;
-  box-shadow:0 14px 30px rgba(239,68,68,.7);
-}
-.detail-price-row .qty-control span{
-  min-width:24px;
-  text-align:center;
-  font-size:16px;
-  font-weight:600;
-  color:#111827;
-}
-
-/* SAVATGA QO‘SHISH – pastdagi uzun knopka */
-#detailAddBtn{
-  margin-top:26px;
-  width:100%;
-  border-radius:999px;
-  padding:14px 20px;
-  font-size:15px;
-  font-weight:600;
-  background:linear-gradient(90deg,#7000ff,#4c1d95);
-  box-shadow:0 24px 50px rgba(112,0,255,.6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-}
-#detailAddBtn.added{
-  background:linear-gradient(90deg,#16a34a,#22c55e);
-}
-#detailBackBtn{
-  margin-top:10px;
-  font-size:13px;
-  color:#4c1d95;
-  border-radius:999px;
-  padding:6px 10px;
-  border:1px solid rgba(148,163,184,.5);
-  background:rgba(248,250,252,.9);
-}
-
-/* RASMGA BOSGANDA TO‘LIQ EKRAN HOLAT */
-.detail-card.image-fullscreen{
-  background:#000;
-  padding:0;
-}
-.detail-card.image-fullscreen .detail-body{
-  display:none;
-}
-.detail-card.image-fullscreen .detail-img-wrap{
-  margin-top:0;
-  padding:0;
-}
-.detail-card.image-fullscreen .detail-img-wrap img{
-  width:100%;
-  height:100vh;
-  border-radius:0;
-  object-fit:contain;
-  box-shadow:none;
-}
-.detail-card.image-fullscreen .detail-img-index{
-  bottom:14px;
-  right:16px;
-}
-.detail-card.image-fullscreen .detail-nav-btn{
-  display:none;
-}
-.detail-card.image-fullscreen .detail-close{
-  top:14px;
-  left:16px;
-  right:auto;
-  background:#ef4444;
-  color:#fff;
-  padding:6px 14px;
-  border-radius:999px;
-  font-size:14px;
-  box-shadow:0 14px 30px rgba(239,68,68,.7);
-}
-
-/* TOAST */
-.toast{
-  position:fixed;
-  bottom:18px;
-  left:50%;
-  transform:translateX(-50%) translateY(130%);
-  background:linear-gradient(135deg,#7000ff,#4c1d95);
-  color:#fff;
-  padding:9px 14px;
-  border-radius:999px;
-  font-size:13px;
-  box-shadow:var(--shadow);
-  opacity:0;
-  transition:opacity .25s,transform .25s;
-  z-index:200;
-}
-.toast.show{
-  opacity:1;
-  transform:translateX(-50%) translateY(0);
-}
-
-/* SCROLLBAR */
-::-webkit-scrollbar{
-  width:5px;
-  height:5px;
-}
-::-webkit-scrollbar-thumb{
-  background:var(--accent);
-  border-radius:999px;
-}
-::-webkit-scrollbar-track{
-  background:transparent;
-}
-
-/* =======================================================
-   KURYER PANELI — RESTORAN KARTOCHKALARI DIZAYNI
-   (courier.html)
-======================================================= */
-
-.courier-body{
-  font-family:"Poppins","Roboto",sans-serif;
-  background:linear-gradient(180deg,#111827 0%,#020617 35%,#0b1120 100%);
-  color:#e5e7eb;
-}
-
-/* HEADER */
-.courier-header{
-  position:sticky;
-  top:0;
-  z-index:50;
-  padding:10px 16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:linear-gradient(90deg,#b91c1c,#f97316);
-  box-shadow:0 20px 40px rgba(0,0,0,.6);
-}
-.courier-header-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.courier-logo{
-  width:40px;
-  height:40px;
-  border-radius:14px;
-  background:radial-gradient(circle at 30% 10%,#fef9c3,#b91c1c);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:22px;
-  box-shadow:0 10px 24px rgba(0,0,0,.7);
-}
-.courier-header-text{
   display:flex;
   flex-direction:column;
-}
-.courier-title{
-  font-weight:600;
-  font-size:18px;
-  color:#f9fafb;
-}
-.courier-subtitle{
-  font-size:12px;
-  color:#fee2e2;
-}
-.courier-header-right{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-/* CHIP BUTTONS (logout va h.k.) */
-.btn-chip{
-  border-radius:999px;
-  border:1px solid rgba(248,250,252,.85);
-  background:rgba(15,23,42,.4);
-  padding:6px 12px;
-  font-size:12px;
-  color:#f9fafb;
-  cursor:pointer;
-}
-.btn-chip-danger{
-  background:#991b1b;
-  border-color:#fecaca;
-}
-
-/* MAIN LAYOUT */
-.courier-main{
-  padding:12px 12px 24px;
-}
-.courier-login-section{
-  max-width:420px;
-  margin:16px auto 0;
-}
-.courier-app-section{
-  max-width:900px;
-  margin:10px auto 0;
-}
-
-/* KURYER CARDLAR */
-.courier-card{
-  background:radial-gradient(circle at top,#0f172a,#020617);
-  border-radius:22px;
-  box-shadow:0 22px 50px rgba(0,0,0,.85);
-  border:1px solid rgba(248,250,252,.06);
-  padding:14px 16px 16px;
-}
-.courier-login-card{
-  background:radial-gradient(circle at top,#7f1d1d,#020617);
-  border-color:rgba(254,226,226,.4);
-}
-
-/* TOP PANEL: Kuryer ma’lumoti + statistikasi */
-.courier-top-panel{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.courier-info-card{
-  background:radial-gradient(circle at top,#1f2937,#020617);
-  border-radius:22px;
-  box-shadow:0 16px 40px rgba(0,0,0,.8);
-  padding:12px 14px;
-  border:1px solid rgba(148,163,184,.4);
-}
-.courier-info-main{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.courier-avatar{
-  width:46px;
-  height:46px;
-  border-radius:999px;
-  background:radial-gradient(circle at 30% 10%,#fef3c7,#f97316);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:22px;
-  box-shadow:0 16px 34px rgba(0,0,0,.8);
-}
-.courier-name{
-  font-size:17px;
-  font-weight:600;
-  color:#f9fafb;
-}
-.courier-meta{
-  font-size:12px;
-  color:#cbd5f5;
-}
-.courier-badge-row{
-  margin-top:6px;
-}
-.courier-badge{
-  display:inline-block;
-  border-radius:999px;
-  border:1px solid rgba(251,191,36,.6);
-  background:rgba(24,24,27,.95);
-  padding:3px 9px;
-  font-size:11px;
-  color:#fde68a;
-}
-
-/* STAT KARTALAR — RESTORAN DASHBOARD STYLE */
-.courier-stats-row{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-}
-.courier-stat-card{
-  background:radial-gradient(circle at top,#b91c1c,#111827);
-  border-radius:20px;
-  padding:10px 12px;
-  box-shadow:0 18px 40px rgba(0,0,0,.85);
-  border:1px solid rgba(248,250,252,.14);
-}
-.courier-stat-card:nth-child(2){
-  background:radial-gradient(circle at top,#15803d,#020817);
-}
-.stat-label{
-  font-size:11px;
-  color:#fee2e2;
-  text-transform:uppercase;
-  letter-spacing:.06em;
-}
-.stat-value{
-  margin-top:4px;
-  font-size:22px;
-  font-weight:700;
-  color:#fef9c3;
-}
-.stat-sub{
-  font-size:12px;
-  color:#e5e7eb;
-}
-
-/* TABLAR (kuryer) */
-.courier-tabs{
-  margin-top:14px;
-  padding:4px;
-  border-radius:999px;
-  background:rgba(15,23,42,.95);
-  box-shadow:0 15px 40px rgba(0,0,0,.8);
-  display:flex;
-  gap:4px;
-}
-.courier-tab-btn{
-  flex:1;
-  border:none;
-  border-radius:999px;
-  padding:7px 4px;
-  font-size:12px;
-  color:#9ca3af;
-  background:transparent;
-  cursor:pointer;
-}
-.courier-tab-btn.active{
-  background:linear-gradient(90deg,#f97316,#ef4444);
-  color:#fefce8;
-  box-shadow:0 12px 30px rgba(248,113,113,.7);
-}
-
-/* TAB PAGE LAYOUT */
-.courier-tab-page{
-  margin-top:12px;
-}
-.section-title-sm{
-  font-size:15px;
-  font-weight:600;
-  margin-bottom:2px;
-}
-.section-sub-sm{
-  font-size:12px;
-  color:#9ca3af;
-  margin-bottom:8px;
-}
-.courier-orders-list{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-/* RESTORAN KARTOCHKA USLUBI — kuryer sahifasida */
-.courier-body .courier-order-card{
-  background:
-    radial-gradient(circle at top,#f97316 0,transparent 55%),
-    radial-gradient(circle at bottom,#111827 0,transparent 60%),
-    #020617;
-  border-radius:24px;
-  border:1px solid rgba(248,250,252,.18);
-  box-shadow:0 24px 60px rgba(0,0,0,.9);
-  padding:14px 14px 12px;
-}
-.courier-body .courier-order-card .order-header{
-  align-items:flex-start;
-}
-.courier-body .courier-order-card .order-id{
-  font-size:12px;
-  font-weight:600;
-  color:#fee2e2;
-}
-.courier-body .courier-order-card .order-date{
-  font-size:11px;
-  color:#e5e7eb;
-}
-.courier-body .courier-order-card .order-customer{
-  font-size:12px;
-  color:#f9fafb;
-}
-.courier-body .courier-order-card .order-total{
-  font-size:20px;
-  font-weight:700;
-  color:#fef9c3;
-}
-
-/* Mahsulotlar ro‘yxati — restoran menyu ko‘rinishida */
-.courier-body .courier-order-card .order-items{
-  margin-top:8px;
-  font-size:12px;
-  color:#e5e7eb;
-}
-.courier-body .courier-order-card .order-items ul{
-  margin-top:4px;
-  margin-left:16px;
-}
-.courier-body .courier-order-card .order-items li{
-  margin-bottom:2px;
-}
-
-/* Kuryer kart footer (tugmalar qatori) */
-.courier-card-footer{
-  margin-top:10px;
-  display:flex;
   justify-content:flex-end;
+  opacity:0;
+  pointer-events:none;
+  z-index:100;
+  transition:opacity .2s ease;
+}
+.viewer-overlay.show,
+.viewer-overlay:not(.hidden){
+  opacity:1;
+  pointer-events:auto;
+}
+
+.viewer-close{
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:32px;
+  height:32px;
+  border-radius:999px;
+  background:rgba(0,0,0,.65);
+  color:#f9fafb;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  cursor:pointer;
+  z-index:110;
+}
+.viewer-index{
+  position:absolute;
+  top:16px;
+  left:16px;
+  padding:3px 9px;
+  border-radius:999px;
+  background:rgba(0,0,0,.7);
+  color:#e5e7eb;
+  font-size:11px;
+}
+
+/* SLIDE AREA */
+.viewer-track{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+}
+.viewer-slide{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px 12px 80px;
+}
+.viewer-img{
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  border-radius:16px;
+  box-shadow:0 18px 45px rgba(0,0,0,.9);
+}
+
+/* BOTTOM SHEET (TITLE + PRICE + BUTTON) */
+.viewer-bottom{
+  background:linear-gradient(to top,rgba(0,0,0,.95),rgba(0,0,0,.4));
+  padding:10px 14px 14px;
+  color:#f9fafb;
+}
+.viewer-bottom-main{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.viewer-title{
+  font-size:14px;
+  font-weight:600;
+}
+.viewer-prices{
+  margin-top:3px;
+  display:flex;
   gap:6px;
+  align-items:center;
+}
+.viewer-price{
+  font-size:14px;
+  font-weight:700;
+}
+.viewer-oldprice{
+  font-size:11px;
+  color:#9ca3af;
+  text-decoration:line-through;
+}
+.viewer-oldprice.hidden{
+  display:none;
 }
 
-/* Kuryer uchun kichik tugmalar biroz kattaroq ko‘rinishda */
-.courier-body .btn-xs{
-  padding:6px 12px;
-  font-size:12px;
+.viewer-add-btn{
+  border:none;
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:600;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#f9fafb;
+  box-shadow:0 14px 36px rgba(220,38,38,.9);
+  cursor:pointer;
+  white-space:nowrap;
 }
 
-/* Login form matn rangi yorqin bo‘lsin */
-.courier-body .courier-login-card .form-grid label{
-  color:#fee2e2;
-}
-.courier-body .courier-login-card .form-grid input{
-  background:#020617;
-  border-color:rgba(254,226,226,.7);
+/* RESPONSIVE */
+@media (max-width:480px){
+  .app-header{
+    padding:8px 10px;
+  }
+  .page-wrap{
+    padding-inline:8px;
+  }
+  .products-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+  .admin-top-bar{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:6px;
+  }
 }
 
-/* Kuryer sahifasida toast biroz pastroq tursin */
-.courier-body .toast{
-  bottom:26px;
+/* SMALL DESKTOP OPTIMIZATION */
+@media (min-width:1024px){
+  .page-wrap{
+    padding-top:16px;
+    padding-bottom:110px;
+  }
 }
