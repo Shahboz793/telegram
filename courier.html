@@ -8,7 +8,6 @@
 </head>
 
 <body class="courier-body">
-
   <!-- HEADER -->
   <header class="courier-header">
     <div class="courier-header-left">
@@ -18,64 +17,84 @@
         <div class="courier-subtitle">Buyurtmalarni tez va aniq yetkazish</div>
       </div>
     </div>
-
     <div class="courier-header-right">
-      <button class="btn-chip" onclick="location.href='index.html'">⬅ Menyuga qaytish</button>
 
-      <button id="courierStatusBtn" class="btn-chip btn-chip-secondary">
-        Offline
+      <!-- ONLINE / OFFLINE SWITCH -->
+      <button id="courierStatusBtn" class="btn-chip btn-chip-green">
+        🟢 Onlayn
       </button>
 
-      <button class="btn-chip btn-chip-danger" id="courierLogoutBtn">
+      <button
+        type="button"
+        class="btn-chip"
+        onclick="location.href='index.html'">
+        ⬅ Menyuga qaytish
+      </button>
+
+      <button
+        type="button"
+        class="btn-chip btn-chip-danger"
+        id="courierLogoutBtn">
         Chiqish
       </button>
     </div>
   </header>
 
   <main class="courier-main">
-
-    <!-- LOGIN SCREEN -->
+    <!-- LOGIN -->
     <section id="courierLoginSection" class="courier-login-section">
       <article class="courier-card courier-login-card">
+
         <h2 class="section-title-sm">🚚 Kuryer uchun kirish</h2>
-        <p class="section-sub-sm">Admin bergan login va parolni kiriting.</p>
+        <p class="section-sub-sm">
+          Admin bergan login va parolni kiriting.
+        </p>
 
         <div class="form-grid">
-          <label>Login <input id="courierLoginInput" type="text" placeholder="Masalan: ahmad"></label>
-          <label>Parol <input id="courierPassInput" type="password" placeholder="Masalan: 1234"></label>
+          <label>
+            Login
+            <input id="courierLoginInput" type="text" placeholder="Masalan: sherzod" />
+          </label>
+          <label>
+            Parol
+            <input id="courierPassInput" type="password" placeholder="Masalan: 2768" />
+          </label>
         </div>
 
-        <button class="btn-primary btn-full" id="courierLoginBtn">Kirish</button>
+        <button type="button" class="btn-primary btn-full" id="courierLoginBtn">
+          Kirish
+        </button>
+
       </article>
     </section>
 
     <!-- MAIN APP -->
     <section id="courierAppSection" class="courier-app-section hidden">
-      <article class="courier-card">
 
-        <!-- KURYER INFO -->
+      <article class="courier-card">
         <div class="courier-top-panel">
+          <!-- KURYER MA'LUMOTI -->
           <div class="courier-info-card">
             <div class="courier-info-main">
               <div class="courier-avatar">🚚</div>
               <div>
-                <div id="courierNameText" class="courier-name"></div>
-                <div id="courierCarText" class="courier-meta"></div>
+                <div class="courier-name" id="courierNameText"></div>
+                <div class="courier-meta" id="courierCarText"></div>
+                <div class="courier-meta" id="courierPhoneText"></div>
               </div>
             </div>
             <div class="courier-badge-row">
-              <span id="courierBadge" class="courier-badge">Offline</span>
+              <span class="courier-badge" id="statusText">🟢 Onlayn</span>
             </div>
           </div>
 
-          <!-- STATS -->
+          <!-- STATISTIKA -->
           <div class="courier-stats-row">
             <div class="courier-stat-card">
               <div class="stat-label">Bugun yetkazilgan</div>
               <div class="stat-value" id="statTodayCount">0</div>
               <div class="stat-sub">ta buyurtma</div>
             </div>
-
             <div class="courier-stat-card">
               <div class="stat-label">Bugun umumiy summa</div>
               <div class="stat-value" id="statTodaySum">0</div>
@@ -89,23 +108,23 @@
             <button class="courier-tab-btn" data-tab="my">📦 Mening zakazlarim</button>
             <button class="courier-tab-btn" data-tab="done">✅ Yetkazilganlar</button>
           </div>
-        </div>
 
+        </div>
       </article>
 
-      <!-- AVAILABLE -->
+      <!-- YANGI ZAKAZLAR -->
       <section id="courierTabAvailable" class="courier-tab-page">
         <h3 class="section-title-sm">🆕 Yangi zakazlar</h3>
         <div id="courierAvailableList" class="courier-orders-list"></div>
       </section>
 
-      <!-- MY ORDERS -->
+      <!-- MENING ZAKAZLARIM -->
       <section id="courierTabMy" class="courier-tab-page hidden">
         <h3 class="section-title-sm">📦 Mening zakazlarim</h3>
         <div id="courierMyList" class="courier-orders-list"></div>
       </section>
 
-      <!-- DONE -->
+      <!-- YETKAZILGAN -->
       <section id="courierTabDone" class="courier-tab-page hidden">
         <h3 class="section-title-sm">✅ Yetkazilganlar</h3>
         <div id="courierDoneList" class="courier-orders-list"></div>
@@ -114,17 +133,18 @@
     </section>
   </main>
 
-  <!-- TOAST + SOUND -->
+  <!-- TOAST / SOUND -->
   <div id="courierToast" class="toast"></div>
   <audio id="courierNotify" src="ding.mp3" preload="auto"></audio>
 
-  <!-- SCRIPT -->
+  <!-- JS -->
   <script type="module">
 
+    /* FIREBASE */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import {
-      getFirestore, collection, getDocs, query, where,
-      onSnapshot, updateDoc, doc, orderBy, serverTimestamp
+      getFirestore, collection, getDocs, onSnapshot,
+      query, orderBy, updateDoc, doc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -138,312 +158,223 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const ordersCol = collection(db, "orders");
+    const couriersCol = collection(db, "couriers");
 
-    /* ================================
-       GLOBAL STATE
-    ================================== */
-    let currentCourier = null;
-    let courierDocId = null;
-
-    let orders = [];
-    let unsub = null;
-    let lastSnapshotTs = 0;
-
-    /* ================================
-       DOM ELEMENTS
-    ================================== */
+    /* DOM */
     const loginSection = document.getElementById("courierLoginSection");
-    const appSection = document.getElementById("courierAppSection");
+    const appSection   = document.getElementById("courierAppSection");
 
     const loginInput = document.getElementById("courierLoginInput");
-    const passInput = document.getElementById("courierPassInput");
-    const loginBtn = document.getElementById("courierLoginBtn");
-    const logoutBtn = document.getElementById("courierLogoutBtn");
+    const passInput  = document.getElementById("courierPassInput");
+    const loginBtn   = document.getElementById("courierLoginBtn");
+    const logoutBtn  = document.getElementById("courierLogoutBtn");
 
-    const courierStatusBtn = document.getElementById("courierStatusBtn");
-    const courierBadge = document.getElementById("courierBadge");
+    const courierNameText  = document.getElementById("courierNameText");
+    const courierCarText   = document.getElementById("courierCarText");
+    const courierPhoneText = document.getElementById("courierPhoneText");
 
-    const courierNameText = document.getElementById("courierNameText");
-    const courierCarText = document.getElementById("courierCarText");
-
-    const statTodayCount = document.getElementById("statTodayCount");
-    const statTodaySum = document.getElementById("statTodaySum");
+    const statusBtn = document.getElementById("courierStatusBtn");
+    const statusText = document.getElementById("statusText");
 
     const listAvailable = document.getElementById("courierAvailableList");
-    const listMy = document.getElementById("courierMyList");
-    const listDone = document.getElementById("courierDoneList");
+    const listMy        = document.getElementById("courierMyList");
+    const listDone      = document.getElementById("courierDoneList");
 
     const toastEl = document.getElementById("courierToast");
-    const notifySound = document.getElementById("courierNotify");
+    const notifySoundEl = document.getElementById("courierNotify");
 
-    /* ================================
-       HELPERS
-    ================================== */
-    function showToast(msg) {
-      toastEl.textContent = msg;
+    /* STATE */
+    let currentCourier = null;
+    let courierList = [];
+    let orders = [];
+    let unsub = null;
+    let online = true;
+
+    /* TOOLS */
+    function showToast(t){
+      toastEl.textContent = t;
       toastEl.classList.add("show");
-      setTimeout(() => toastEl.classList.remove("show"), 2000);
+      setTimeout(()=> toastEl.classList.remove("show"), 2000);
     }
 
-    function playNotify() {
-      notifySound.currentTime = 0;
-      notifySound.play().catch(()=>{});
+    function playNotify(){
+      notifySoundEl.currentTime = 0;
+      notifySoundEl.play().catch(()=>{});
     }
 
-    function formatPrice(v) {
-      return (v || 0).toLocaleString("uz-UZ");
+    /* LOAD COURIERS FROM FIRESTORE */
+    async function loadCouriers(){
+      const snap = await getDocs(couriersCol);
+      courierList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
-    function isToday(ts) {
-      if (!ts) return false;
-      const d = new Date(ts * 1000);
-      const n = new Date();
-      return d.getFullYear() === n.getFullYear() &&
-             d.getMonth() === n.getMonth() &&
-             d.getDate() === n.getDate();
-    }
-
-    function setLoggedInUI(on) {
-      if (on) {
-        loginSection.classList.add("hidden");
-        appSection.classList.remove("hidden");
-      } else {
-        loginSection.classList.remove("hidden");
-        appSection.classList.add("hidden");
-      }
-    }
-
-    /* ================================
-       LOGIN
-    ================================== */
-    async function handleLogin() {
+    /* LOGIN */
+    loginBtn.onclick = async () => {
+      await loadCouriers();
       const login = loginInput.value.trim().toLowerCase();
       const pass  = passInput.value.trim();
 
-      if (!login || !pass) {
-        showToast("Login va parolni kiriting");
-        return;
-      }
-
-      const q = query(
-        collection(db, "couriers"),
-        where("login", "==", login),
-        where("password", "==", pass)
+      const c = courierList.find(x =>
+        x.login.toLowerCase() === login &&
+        x.password === pass
       );
 
-      const snap = await getDocs(q);
-
-      if (snap.empty) {
-        showToast("Noto‘g‘ri login yoki parol");
+      if(!c){
+        showToast("❌ Login yoki parol noto‘g‘ri");
         return;
       }
 
-      snap.forEach(docu => {
-        courierDocId = docu.id;
-        currentCourier = docu.data();
-      });
+      currentCourier = c;
 
-      courierNameText.textContent = currentCourier.name;
-      courierCarText.textContent = "🚗 " + currentCourier.car;
+      courierNameText.textContent = c.name;
+      courierCarText.textContent  = "🚗 " + c.car;
+      courierPhoneText.textContent = "📞 " + c.phone;
 
-      // Online qilish
-      await updateDoc(doc(db, "couriers", courierDocId), {
-        status: "online",
-        updatedAt: serverTimestamp()
-      });
+      loginSection.classList.add("hidden");
+      appSection.classList.remove("hidden");
 
-      courierBadge.textContent = "Online";
-      courierBadge.classList.add("badge-online");
-
-      setLoggedInUI(true);
       subscribeOrders();
-
-      showToast("Kirish muvaffaqiyatli!");
-    }
-
-    loginBtn.addEventListener("click", handleLogin);
-
-    /* ENTER bilan login */
-    passInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") handleLogin();
-    });
-
-    /* ================================
-       OFFLINE / ONLINE
-    ================================== */
-    courierStatusBtn.onclick = async () => {
-      if (!currentCourier) return;
-
-      const newStatus = currentCourier.status === "online" ? "offline" : "online";
-
-      await updateDoc(doc(db, "couriers", courierDocId), {
-        status: newStatus,
-        updatedAt: serverTimestamp()
-      });
-
-      currentCourier.status = newStatus;
-
-      courierBadge.textContent = newStatus === "online" ? "Online" : "Offline";
-      courierStatusBtn.textContent = newStatus === "online" ? "Ishda (online)" : "Offline";
-
-      showToast("Holat: " + newStatus);
+      showToast("✅ Kuryer sifatida kirdingiz");
     };
 
-    /* ================================
-       LOGOUT
-    ================================== */
-    logoutBtn.onclick = async () => {
-      if (currentCourier) {
-        await updateDoc(doc(db, "couriers", courierDocId), {
-          status: "offline",
-          updatedAt: serverTimestamp()
-        });
+    /* ONLINE / OFFLINE */
+    statusBtn.onclick = () => {
+      online = !online;
+      if(online){
+        statusBtn.textContent = "🟢 Onlayn";
+        statusBtn.classList.remove("btn-chip-red");
+        statusBtn.classList.add("btn-chip-green");
+        statusText.textContent = "🟢 Onlayn";
+      } else {
+        statusBtn.textContent = "🔴 Offline";
+        statusBtn.classList.remove("btn-chip-green");
+        statusBtn.classList.add("btn-chip-red");
+        statusText.textContent = "🔴 Offline";
+      }
+    };
+
+    /* FIRESTORE LISTENER */
+    function subscribeOrders(){
+      if(unsub) unsub();
+
+      const q = query(ordersCol, orderBy("createdAt","desc"));
+      unsub = onSnapshot(q, snap => {
+        orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderLists();
+      });
+    }
+
+    /* RENDER LISTS */
+    function renderLists(){
+
+      const avail = orders.filter(o =>
+        o.status === "courier" &&
+        !o.courierLogin
+      );
+
+      const myOrders = orders.filter(o =>
+        o.status === "courier" &&
+        o.courierLogin === currentCourier.login
+      );
+
+      const done = orders.filter(o =>
+        o.status === "delivered" &&
+        o.courierLogin === currentCourier.login
+      );
+
+      listAvailable.innerHTML =
+        avail.map(o => renderOrder(o, "available")).join("");
+
+      listMy.innerHTML =
+        myOrders.map(o => renderOrder(o, "my")).join("");
+
+      listDone.innerHTML =
+        done.map(o => renderOrder(o, "done")).join("");
+    }
+
+    /* RENDER ORDER CARD */
+    function renderOrder(o, type){
+
+      const items = (o.items || [])
+        .map(i => `<li>${i.name} — ${i.qty} × ${i.price} so‘m</li>`)
+        .join("");
+
+      let btns = "";
+
+      if(type === "available" && online){
+        btns = `
+          <button class="btn-xs btn-xs-primary"
+            onclick="takeOrder('${o.id}')">Qabul qilish</button>`;
       }
 
-      currentCourier = null;
-      courierDocId = null;
-      setLoggedInUI(false);
+      if(type === "my"){
+        btns = `
+          <button class="btn-xs btn-xs-primary"
+            onclick="markDelivered('${o.id}')">Yetkazdim</button>`;
+      }
 
-      if (unsub) unsub();
+      return `
+        <article class="order-card">
+          <header class="order-header">
+            <div>
+              <div>ID: ${o.id.slice(0,8)}...</div>
+              <div>${o.customer?.name} • ${o.customer?.phone}</div>
+              <div>${o.customer?.address}</div>
+            </div>
+            <div class="order-total">${o.totalPrice} so‘m</div>
+          </header>
 
-      showToast("Chiqildi");
-    };
+          <ul>${items}</ul>
 
-    /* ================================
-       SUBSCRIBE ORDERS
-    ================================== */
-    function subscribeOrders() {
-      const qOrders = query(collection(db, "orders"), orderBy("createdAt", "desc"));
-
-      unsub = onSnapshot(qOrders, snap => {
-        orders = [];
-        let maxTS = lastSnapshotTs;
-
-        snap.forEach(d => {
-          const o = { id: d.id, ...d.data() };
-          orders.push(o);
-
-          const ts = o.createdAt?.seconds || 0;
-          if (ts > maxTS) maxTS = ts;
-        });
-
-        // Signal
-        if (maxTS > lastSnapshotTs) playNotify();
-        lastSnapshotTs = maxTS;
-
-        renderAllLists();
-      });
+          <footer class="courier-card-footer">${btns}</footer>
+        </article>`;
     }
 
-    /* ================================
-       RENDER LISTS
-    ================================== */
-    function renderAllLists() {
-
-      const available = orders.filter(o => o.status === "courier" && !o.courierLogin);
-      const myOrders  = orders.filter(o => o.status === "courier" && o.courierLogin === currentCourier.login);
-      const doneOrders = orders.filter(o => o.status === "delivered" && o.courierLogin === currentCourier.login);
-
-      listAvailable.innerHTML = buildListHTML(available, "available");
-      listMy.innerHTML        = buildListHTML(myOrders, "my");
-      listDone.innerHTML      = buildListHTML(doneOrders, "done");
-
-      // Stats
-      let tc = 0;
-      let ts = 0;
-      doneOrders.forEach(o => {
-        if (isToday(o.deliveredAt?.seconds || o.createdAt?.seconds)) {
-          tc++;
-          ts += (o.totalPrice || 0);
-        }
-      });
-
-      statTodayCount.textContent = tc;
-      statTodaySum.textContent   = formatPrice(ts);
-    }
-
-    function buildListHTML(list, type) {
-      if (!list.length) return `<p class='cart-empty'>Buyurtma yo‘q.</p>`;
-
-      return list.map(o => {
-
-        const c = o.customer || {};
-        const items = (o.items || [])
-          .map(i => `<li>${i.name} — ${i.qty} × ${formatPrice(i.price)}</li>`)
-          .join("");
-
-        const ts = o.createdAt?.seconds
-          ? new Date(o.createdAt.seconds * 1000).toLocaleString("uz-UZ")
-          : "";
-
-        let btns = "";
-
-        if (type === "available")
-          btns = `<button class="btn-xs btn-xs-primary" onclick="takeOrder('${o.id}')">Qabul qilish</button>`;
-
-        if (type === "my")
-          btns =
-            `<button class="btn-xs btn-xs-secondary" onclick="openMap(${o.location?.lat},${o.location?.lng})">📍 Marshrut</button>
-             <button class="btn-xs btn-xs-primary" onclick="markDelivered('${o.id}')">Yetkazdim</button>`;
-
-        if (type === "done")
-          btns =
-            `<button class="btn-xs btn-xs-secondary" onclick="openMap(${o.location?.lat},${o.location?.lng})">📍 Marshrut</button>`;
-
-        return `
-          <article class="order-card courier-order-card">
-            <header class="order-header">
-              <div>
-                <div class="order-id">ID: ${o.id.slice(0, 8)}...</div>
-                <div class="order-date">${ts}</div>
-                <div class="order-customer">👤 ${c.name} • ${c.phone}</div>
-                <div class="order-customer">📍 ${c.address}</div>
-              </div>
-              <div class="order-total">${formatPrice(o.totalPrice)} so‘m</div>
-            </header>
-
-            <section class="order-items">
-              <strong>Taomlar:</strong>
-              <ul>${items}</ul>
-            </section>
-
-            <footer class="courier-card-footer">${btns}</footer>
-          </article>
-        `;
-      }).join("");
-    }
-
-    /* ================================
-       TAKE ORDER
-    ================================== */
-    window.takeOrder = async id => {
-      await updateDoc(doc(db, "orders", id), {
+    /* GLOBAL FUNCTIONS */
+    window.takeOrder = async (id) => {
+      await updateDoc(doc(db,"orders",id),{
+        status:"courier",
         courierLogin: currentCourier.login,
         courierName: currentCourier.name,
         courierCar: currentCourier.car,
-        status: "courier"
+        courierPhone: currentCourier.phone,
+        courierTakenAt: serverTimestamp()
       });
-      showToast("Buyurtma olindi");
+      showToast("📦 Buyurtma olindi");
     };
 
-    /* ================================
-       DELIVER ORDER
-    ================================== */
-    window.markDelivered = async id => {
-      await updateDoc(doc(db, "orders", id), {
-        status: "delivered",
+    window.markDelivered = async (id) =>{
+      await updateDoc(doc(db,"orders",id),{
+        status:"delivered",
         deliveredAt: serverTimestamp()
       });
-      showToast("Yetkazildi");
+      showToast("🎉 Yetkazildi");
     };
 
-    /* ================================
-       MAP OPEN
-    ================================== */
-    window.openMap = (lat, lng) => {
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
-    };
+    /* TAB SYSTEM */
+    const tabs = document.querySelectorAll(".courier-tab-btn");
+    const tabAvailable = document.getElementById("courierTabAvailable");
+    const tabMy = document.getElementById("courierTabMy");
+    const tabDone = document.getElementById("courierTabDone");
+
+    tabs.forEach(btn => {
+      btn.addEventListener("click", () => {
+        tabs.forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+
+        tabAvailable.classList.add("hidden");
+        tabMy.classList.add("hidden");
+        tabDone.classList.add("hidden");
+
+        const t = btn.dataset.tab;
+        if(t==="available") tabAvailable.classList.remove("hidden");
+        if(t==="my")        tabMy.classList.remove("hidden");
+        if(t==="done")      tabDone.classList.remove("hidden");
+      });
+    });
 
   </script>
+
 </body>
 </html>
