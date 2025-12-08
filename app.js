@@ -417,6 +417,9 @@ function rebuildProducts(){
   renderProducts();
 }
 function renderProducts(){
+  // [SAFE ADD] Guard DOM existence
+  if(!productsGrid) return;
+
   productsGrid.innerHTML = "";
   const filtered = products.filter(p =>
     (activeCategory === "all" ? true : p.category === activeCategory) &&
@@ -585,16 +588,22 @@ function updateCartUI(){
     quickOrderBtn.classList.toggle("hidden", totalCount === 0);
   }
 
-  if(cartSheet.classList.contains("open")) renderCartItems();
+  if(cartSheet && cartSheet.classList.contains("open")) renderCartItems();
 }
 function toggleCartSheet(force){
+  if(!cartSheet || !cartSheetOverlay) return;
   const isOpen = cartSheet.classList.contains("open");
   const next   = typeof force==="boolean" ? force : !isOpen;
   cartSheet.classList.toggle("open", next);
   cartSheetOverlay.classList.toggle("show", next);
   if(next) renderCartItems();
 }
+// [SAFE ADD] Overlayga bosilganda yopish
+if(cartSheetOverlay){
+  cartSheetOverlay.addEventListener("click", ()=> toggleCartSheet(false));
+}
 function renderCartItems(){
+  if(!cartItemsEl || !cartSheetTotalEl) return;
   if(cart.length===0){
     cartItemsEl.innerHTML = "<p class='cart-empty'>Savat hozircha bo‘sh 🙂</p>";
     cartSheetTotalEl.textContent = "0 so‘m";
@@ -1130,16 +1139,17 @@ if(tabsEl){
     document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
 
-    document.getElementById("shopPage").classList.add("hidden");
-    document.getElementById("ordersPage").classList.add("hidden");
-    document.getElementById("adminPage").classList.add("hidden");
+    document.getElementById("shopPage")?.classList.add("hidden");
+    document.getElementById("ordersPage")?.classList.add("hidden");
+    document.getElementById("adminPage")?.classList.add("hidden");
 
-    document.getElementById(pageId).classList.remove("hidden");
+    document.getElementById(pageId)?.classList.remove("hidden");
   });
 }
 
 /* ADMIN LOGIN */
 function updateAdminUI(){
+  if(!adminTabBtn || !adminAccessBtn) return;
   if(isAdmin){
     adminTabBtn.classList.remove("hidden");
     adminAccessBtn.classList.add("admin-active");
@@ -1153,10 +1163,10 @@ function updateAdminUI(){
 async function askAdminCode(){
   if(isAdmin){
     document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    adminTabBtn.classList.add("active");
-    document.getElementById("shopPage").classList.add("hidden");
-    document.getElementById("ordersPage").classList.add("hidden");
-    document.getElementById("adminPage").classList.remove("hidden");
+    adminTabBtn?.classList.add("active");
+    document.getElementById("shopPage")?.classList.add("hidden");
+    document.getElementById("ordersPage")?.classList.add("hidden");
+    document.getElementById("adminPage")?.classList.remove("hidden");
     return;
   }
   const code = prompt("Admin uchun kirish kodi:");
@@ -1300,15 +1310,15 @@ function flashAdminButton(text){
   }, 1500);
 }
 async function addCustomProduct(){
-  const name        = adminNameEl.value.trim();
-  const category    = adminCategoryEl.value;
-  const basePrice   = parseInt(adminPriceBaseEl.value || "0",10);
-  const hasDiscount = adminHasDiscountEl.checked;
-  const discountRaw = adminPriceDiscountEl.value
+  const name        = adminNameEl?.value.trim();
+  const category    = adminCategoryEl?.value;
+  const basePrice   = parseInt(adminPriceBaseEl?.value || "0",10);
+  const hasDiscount = adminHasDiscountEl?.checked;
+  const discountRaw = adminPriceDiscountEl?.value
     ? parseInt(adminPriceDiscountEl.value || "0",10)
     : null;
-  const tag         = adminTagEl.value.trim();
-  const description = adminDescriptionEl.value.trim();
+  const tag         = adminTagEl?.value.trim();
+  const description = adminDescriptionEl?.value.trim();
 
   if(!name || !basePrice || basePrice<=0){
     showToast("❌ Nomi va narxini to‘g‘ri kiriting.");
@@ -1326,7 +1336,7 @@ async function addCustomProduct(){
     oldPrice = basePrice;
   }
 
-  let images = normalizeImagesInput(adminImagesEl.value.trim());
+  let images = normalizeImagesInput(adminImagesEl?.value.trim());
   if(!images.length) images = [RAW_PREFIX + "noimage.png"];
 
   const emoji = categoryEmoji[category] || "💅";
@@ -1355,13 +1365,13 @@ async function addCustomProduct(){
       flashAdminButton("✅ Qo‘shildi");
     }
     editingProductId             = null;
-    adminNameEl.value           = "";
-    adminPriceBaseEl.value      = "";
-    adminPriceDiscountEl.value  = "";
-    adminHasDiscountEl.checked  = false;
-    adminTagEl.value            = "";
-    adminDescriptionEl.value    = "";
-    adminImagesEl.value         = "";
+    if(adminNameEl)           adminNameEl.value           = "";
+    if(adminPriceBaseEl)      adminPriceBaseEl.value      = "";
+    if(adminPriceDiscountEl)  adminPriceDiscountEl.value  = "";
+    if(adminHasDiscountEl)    adminHasDiscountEl.checked  = false;
+    if(adminTagEl)            adminTagEl.value            = "";
+    if(adminDescriptionEl)    adminDescriptionEl.value    = "";
+    if(adminImagesEl)         adminImagesEl.value         = "";
   }catch(e){
     console.error("Mahsulot saqlash xato:", e);
     showToast("⚠️ Mahsulot saqlashda xato.");
@@ -1408,20 +1418,20 @@ function editProduct(id){
   const p = remoteProducts.find(r=>r.id===id);
   if(!p) return;
   editingProductId = id;
-  adminNameEl.value     = p.name || "";
-  adminCategoryEl.value = p.category || "";
+  if(adminNameEl)         adminNameEl.value     = p.name || "";
+  if(adminCategoryEl)     adminCategoryEl.value = p.category || "";
   if(p.oldPrice && p.oldPrice>p.price){
-    adminPriceBaseEl.value      = p.oldPrice;
-    adminPriceDiscountEl.value  = p.price;
-    adminHasDiscountEl.checked  = true;
+    if(adminPriceBaseEl)      adminPriceBaseEl.value      = p.oldPrice;
+    if(adminPriceDiscountEl)  adminPriceDiscountEl.value  = p.price;
+    if(adminHasDiscountEl)    adminHasDiscountEl.checked  = true;
   }else{
-    adminPriceBaseEl.value      = p.price;
-    adminPriceDiscountEl.value  = "";
-    adminHasDiscountEl.checked  = false;
+    if(adminPriceBaseEl)      adminPriceBaseEl.value      = p.price;
+    if(adminPriceDiscountEl)  adminPriceDiscountEl.value  = "";
+    if(adminHasDiscountEl)    adminHasDiscountEl.checked  = false;
   }
-  adminTagEl.value         = p.tag || "";
-  adminDescriptionEl.value = p.description || "";
-  adminImagesEl.value      = (p.images && p.images.length) ? p.images.join(", ") : "";
+  if(adminTagEl)         adminTagEl.value         = p.tag || "";
+  if(adminDescriptionEl) adminDescriptionEl.value = p.description || "";
+  if(adminImagesEl)      adminImagesEl.value      = (p.images && p.images.length) ? p.images.join(", ") : "";
   const btn = document.querySelector(".admin-btn");
   if(btn) btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
   showToast("✏️ Tahrirlash rejimi.");
@@ -1533,31 +1543,35 @@ function openProductDetail(index){
   renderDetailImage();
   renderDetailGallery(); // rasmlarni pastga chizish (agar konteyner bo‘lsa)
 
-  detailCategoryEl.textContent = catLbl;
-  detailNameEl.textContent     = p.name;
-  detailTagEl.textContent      = p.tag ? "💡 " + p.tag : "";
-  detailDescEl.textContent =
+  if(detailCategoryEl) detailCategoryEl.textContent = catLbl;
+  if(detailNameEl)     detailNameEl.textContent     = p.name;
+  if(detailTagEl)      detailTagEl.textContent      = p.tag ? "💡 " + p.tag : "";
+  if(detailDescEl)     detailDescEl.textContent     =
     p.description && p.description.trim().length
       ? p.description
       : "Bu mahsulot sizning buyurtmangiz uchun tayyorlangan.";
-  detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
-  if(p.oldPrice){
-    detailOldPriceEl.classList.remove("hidden");
-    detailOldPriceEl.textContent = formatPrice(p.oldPrice)+" so‘m";
-  }else{
-    detailOldPriceEl.classList.add("hidden");
+  if(detailPriceEl)    detailPriceEl.textContent    = formatPrice(p.price) + " so‘m";
+  if(detailOldPriceEl){
+    if(p.oldPrice){
+      detailOldPriceEl.classList.remove("hidden");
+      detailOldPriceEl.textContent = formatPrice(p.oldPrice)+" so‘m";
+    }else{
+      detailOldPriceEl.classList.add("hidden");
+    }
   }
-  detailQtyValue.textContent = detailQty;
-  detailAddBtn.classList.remove("added");
-  detailAddBtn.textContent   = "🛒 Savatga qo‘shish";
+  if(detailQtyValue) detailQtyValue.textContent = detailQty;
+  if(detailAddBtn){
+    detailAddBtn.classList.remove("added");
+    detailAddBtn.textContent   = "🛒 Savatga qo‘shish";
+  }
 
-  productDetailOverlay.classList.remove("hidden");
+  productDetailOverlay?.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 }
 function closeProductDetail(){
   clearDetailCountdown();
   setImageFullscreen(false);
-  productDetailOverlay.classList.add("hidden");
+  productDetailOverlay?.classList.add("hidden");
   document.body.style.overflow = "";
   detailIndex = null;
 }
@@ -1600,7 +1614,7 @@ if(detailQtyMinus){
     e.stopPropagation();
     if(detailQty>1){
       detailQty--;
-      detailQtyValue.textContent = detailQty;
+      if(detailQtyValue) detailQtyValue.textContent = detailQty;
     }
   });
 }
@@ -1608,7 +1622,7 @@ if(detailQtyPlus){
   detailQtyPlus.addEventListener("click", e=>{
     e.stopPropagation();
     detailQty++;
-    detailQtyValue.textContent = detailQty;
+    if(detailQtyValue) detailQtyValue.textContent = detailQty;
   });
 }
 // rasmga bosganda fullscreen / qaytish
@@ -1618,6 +1632,18 @@ if(detailImgWrap){
     toggleImageFullscreen();
   });
 }
+
+// [SAFE ADD] ESC klaviatura: modal/karzni yopish
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape"){
+    if(productDetailOverlay && !productDetailOverlay.classList.contains("hidden")){
+      closeProductDetail();
+    }
+    if(cartSheet && cartSheet.classList.contains("open")){
+      toggleCartSheet(false);
+    }
+  }
+});
 
 /* 🚴‍♂️ ADMIN UCHUN KURYER BOSHQARUVI (couriers kolleksiya) */
 
@@ -1946,7 +1972,7 @@ function centerToCourier(){
 }
 
 /* INIT */
-(function init(){
+function __init(){
   const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
   applyTheme(savedTheme);
 
@@ -1966,7 +1992,14 @@ function centerToCourier(){
   subscribeCouriersRealtime();
 
   updateCartUI();
-})();
+}
+
+// [SAFE ADD] DOM tayyor bo‘lishini kutish
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", __init);
+} else {
+  __init();
+}
 
 /* GLOBAL EXPORTS */
 window.addToCart                   = addToCart;
