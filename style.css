@@ -1,8 +1,3 @@
-/* === Beauty Store — style.css (Large Type Edition) ===
-   Katta tipografiya, Uzum-style kartochkalar, admin & kuryer sahifalari.
-   Ushbu fayl siz yuklagan bazaviy CSS’dan moslashtirildi va kengaytirildi.
-========================================================================== */
-
 /* RESET */
 *{
   margin:0;
@@ -50,16 +45,6 @@ a{
   --ok:#22c55e;
   --warning:#f59e0b;
   --chip-bg:#111827;
-
-  /* TIPOGRAFIYA SHKALASI */
-  --fs-xxs:11px;
-  --fs-xs:12px;
-  --fs-sm:13px;
-  --fs-md:15px;
-  --fs-lg:18px;
-  --fs-xl:20px;
-  --fs-2xl:24px;
-  --fs-3xl:28px;
 }
 body.theme-dark{
   --bg:#020617;
@@ -93,7 +78,7 @@ body.theme-dark{
   top:0;
   z-index:50;
   background:linear-gradient(90deg,#ff0f7b,#f97316);
-  padding:12px 16px;
+  padding:10px 16px;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -103,18 +88,18 @@ body.theme-dark{
 .logo-wrap{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
 }
 .logo-circle{
-  width:52px;
-  height:52px;
+  width:48px;
+  height:48px;
   border-radius:50%;
   background:radial-gradient(circle at 30% 10%,#f9fafb,#b91c1c);
   display:flex;
   align-items:center;
   justify-content:center;
   color:#fff;
-  font-size:20px;
+  font-size:18px;
   font-weight:700;
   box-shadow:0 0 0 2px rgba(248,250,252,.25),0 14px 30px rgba(0,0,0,.55);
 }
@@ -123,25 +108,24 @@ body.theme-dark{
   flex-direction:column;
 }
 .logo-title{
-  font-size:var(--fs-xl);
-  font-weight:700;
+  font-size:18px;
+  font-weight:600;
   color:#f9fafb;
-  letter-spacing:.2px;
 }
 .logo-sub{
-  font-size:var(--fs-xs);
+  font-size:12px;
   color:#fee2e2;
 }
 .header-right{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
 }
 .icon-btn{
   background:rgba(15,23,42,.4);
   border:1px solid rgba(248,250,252,.5);
   border-radius:999px;
-  padding:8px 12px;
+  padding:7px 10px;
   cursor:pointer;
   font-size:16px;
   color:#f9fafb;
@@ -157,11 +141,11 @@ body.theme-dark{
   border:none;
   border-radius:999px;
   color:#fff;
-  padding:8px 14px;
+  padding:7px 12px;
   display:flex;
   align-items:center;
-  gap:8px;
-  font-size:var(--fs-sm);
+  gap:6px;
+  font-size:13px;
   cursor:pointer;
   box-shadow:0 10px 25px rgba(112,0,255,.7);
 }
@@ -169,24 +153,24 @@ body.theme-dark{
 .pill{
   background:rgba(0,0,0,.3);
   border-radius:999px;
-  padding:3px 9px;
-  font-size:var(--fs-xxs);
+  padding:2px 8px;
+  font-size:11px;
 }
 .cart-top-total{
-  font-size:var(--fs-sm);
+  font-size:13px;
   font-weight:600;
   color:#fee2e2;
 }
 
 /* TABS */
-.tabs{
+.tabs, #tabs{
   position:sticky;
-  top:68px;
+  top:64px;
   z-index:45;
   background:rgba(15,23,42,.98);
-  padding:8px;
+  padding:6px;
   display:flex;
-  gap:6px;
+  gap:4px;
   border-bottom:1px solid rgba(148,163,184,.3);
   backdrop-filter:blur(16px);
 }
@@ -195,11 +179,10 @@ body.theme-dark{
   border:none;
   background:transparent;
   border-radius:999px;
-  padding:10px 8px;
-  font-size:var(--fs-sm);
+  padding:9px 6px;
+  font-size:13px;
   cursor:pointer;
-  color:#cbd5e1;
-  letter-spacing:.2px;
+  color:#9ca3af;
 }
 .tab-btn.active{
   background:linear-gradient(135deg,#7000ff,#4c1d95);
@@ -215,11 +198,11 @@ body.theme-dark{
 .customer-panel{
   background:rgba(15,23,42,.96);
   border-bottom:1px solid rgba(148,163,184,.3);
-  padding:12px 16px 14px;
+  padding:10px 16px 12px;
 }
-.customer-info{
-  font-size:var(--fs-sm);
-  margin-bottom:10px;
+.customer-info, #customerInfoText{
+  font-size:13px;
+  margin-bottom:8px;
   color:#e5e7eb;
 }
 .customer-actions{
@@ -229,9 +212,9 @@ body.theme-dark{
 .btn-outline,
 .btn-ghost{
   border-radius:999px;
-  padding:8px 14px;
+  padding:6px 12px;
   border:1px solid rgba(148,163,184,.5);
-  font-size:var(--fs-sm);
+  font-size:12px;
   background:rgba(15,23,42,.7);
   cursor:pointer;
   color:#e5e7eb;
@@ -246,73 +229,73 @@ body.theme-dark{
 .shop-toolbar{
   background:var(--panel);
   border-bottom:1px solid var(--border);
-  padding:12px 16px;
+  padding:10px 16px;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
 }
-.search-input{
+.search-input, #searchInput{
   flex:1;
   border-radius:999px;
   border:1px solid var(--border);
-  padding:10px 14px;
+  padding:8px 12px;
   background:var(--bg);
-  font-size:var(--fs-sm);
+  font-size:13px;
   outline:none;
 }
-.search-input:focus{
+.search-input:focus, #searchInput:focus{
   border-color:#7000ff;
   box-shadow:0 0 0 1px rgba(112,0,255,.35);
 }
 
-/* CATEGORY FILTER (id: filterBar) */
-#filterBar{
+/* CATEGORY GRID */
+.chips-row, #filterBar{
   background:var(--panel);
   border-bottom:1px solid var(--border);
-  padding:12px 12px 14px;
+  padding:10px 10px 12px;
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
 }
-@media(min-width:420px){
-  #filterBar{grid-template-columns:repeat(4,minmax(0,1fr));}
-}
-#filterBar .chip{
+.chip{
   border-radius:var(--radius);
   border:1px solid rgba(148,163,184,.6);
   background:var(--chip-bg);
-  padding:12px 6px;
-  font-size:var(--fs-sm);
+  padding:9px 4px;
+  font-size:11px;
   text-align:center;
   cursor:pointer;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  min-height:64px;
+  min-height:52px;
   color:#e5e7eb;
   box-shadow:0 8px 18px rgba(15,23,42,.55);
 }
-#filterBar .chip span{display:block;}
-#filterBar .chip.active{
+.chip span{display:block;}
+.chip.active{
   background:linear-gradient(135deg,#7000ff,#4c1d95);
   color:#fff;
   border-color:transparent;
   box-shadow:0 12px 26px rgba(112,0,255,.7);
 }
+@media(min-width:480px){
+  .chip{font-size:12px;min-height:56px;}
+}
 
-/* PRODUCTS */
-#productsGrid{
+/* PRODUCTS – KATTA KARTOCHKA */
+.products-grid, #productsGrid{
   display:flex;
   flex-direction:column;
-  gap:16px;
-  padding:16px;
+  gap:14px;
+  padding:14px;
 }
 @media(min-width:768px){
-  #productsGrid{
+  .products-grid, #productsGrid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-    gap:20px;
+    grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:18px;
     padding:20px;
   }
 }
@@ -338,73 +321,73 @@ body.theme-dark{
 }
 .product-img-wrap img{
   width:100%;
-  height:300px;
+  height:270px;
   object-fit:cover;
   display:block;
+  background:#0b0b0b;
 }
 @media(min-width:768px){
-  .product-img-wrap img{height:340px;}
+  .product-img-wrap img{height:320px;}
 }
 .product-img-tag{
   position:absolute;
-  top:10px; left:10px;
+  top:8px; left:8px;
   display:flex;
-  gap:6px;
-  font-size:var(--fs-xs);
+  gap:4px;
+  font-size:10px;
 }
 .product-img-tag span{
-  padding:3px 8px;
+  padding:2px 6px;
   border-radius:999px;
   background:rgba(0,0,0,.65);
   color:#f9fafb;
 }
 .product-sale{
   position:absolute;
-  right:10px; top:10px;
-  padding:5px 10px;
+  right:8px; top:8px;
+  padding:4px 9px;
   border-radius:999px;
-  font-size:var(--fs-sm);
+  font-size:11px;
   background:var(--danger);
   color:#fff;
-  font-weight:700;
+  font-weight:600;
   box-shadow:0 12px 30px rgba(239,68,68,.7);
 }
 .product-body{
-  padding:14px 16px 16px;
+  padding:11px 13px 13px;
 }
 .product-name{
-  font-size:var(--fs-xl);
-  font-weight:700;
+  font-size:16px;
+  font-weight:600;
   color:#f9fafb;
-  letter-spacing:.2px;
 }
 .product-meta{
-  font-size:var(--fs-sm);
+  font-size:12px;
   color:#9ca3af;
-  margin-top:4px;
+  margin-top:2px;
 }
 .tag-mini{
-  margin-top:9px;
-  font-size:var(--fs-sm);
+  margin-top:7px;
+  font-size:11px;
   color:var(--accent-soft);
   background:rgba(112,0,255,.12);
-  padding:4px 8px;
+  padding:3px 7px;
   border-radius:999px;
   display:inline-block;
 }
 .price-row{
-  margin-top:12px;
+  margin-top:10px;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
 .price-main{
-  font-size:var(--fs-2xl);
-  font-weight:800;
+  font-size:18px;
+  font-weight:700;
   color:#fee2e2;
 }
 .price-old{
-  font-size:var(--fs-xs);
+  font-size:11px;
   text-decoration:line-through;
   color:#9ca3af;
 }
@@ -413,25 +396,27 @@ body.theme-dark{
   border-radius:999px;
   background:linear-gradient(135deg,#111827,#020617);
   color:#fff;
-  font-size:var(--fs-sm);
-  padding:9px 16px;
+  font-size:12px;
+  padding:7px 14px;
   cursor:pointer;
   box-shadow:0 10px 24px rgba(15,23,42,.8);
   border:1px solid rgba(148,163,184,.6);
 }
-.btn-add:hover{ border-color:#7000ff; }
+.btn-add:hover{
+  border-color:#7000ff;
+}
 
-/* CART BOTTOM SHEET (id-based) */
-#cartSheetOverlay{
+/* CART BOTTOM SHEET */
+.overlay, #cartSheetOverlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(4px);
+  background:rgba(0,0,0,.5);
+  backdrop-filter:blur(3px);
   display:none;
   z-index:90;
 }
-#cartSheetOverlay.show{display:block;}
-#cartSheet{
+.overlay.show, #cartSheetOverlay.show{display:block;}
+.cart-sheet, #cartSheet{
   position:fixed;
   left:0; right:0;
   bottom:-100%;
@@ -439,48 +424,61 @@ body.theme-dark{
   max-height:80%;
   border-top-left-radius:var(--radius-lg);
   border-top-right-radius:var(--radius-lg);
-  padding:18px;
+  padding:16px;
   box-shadow:var(--shadow);
   transition:bottom .3s ease;
   z-index:100;
 }
-#cartSheet.open{bottom:0;}
-#cartSheet header{
+.cart-sheet.open, #cartSheet.open{bottom:0;}
+.cart-sheet header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
-#cartSheet h2{
-  font-size:var(--fs-xl);
-  font-weight:700;
+.cart-sheet h2{
+  font-size:18px;
+  font-weight:600;
 }
-.cart-sheet-total-row{font-size:var(--fs-md);margin-bottom:10px;}
-.cart-empty{font-size:var(--fs-md);color:var(--muted);}
+.cart-sheet-total-row{font-size:15px;margin-bottom:8px;}
+.cart-empty{font-size:14px;color:var(--muted);}
 .cart-item-row{
   display:flex;
   justify-content:space-between;
-  gap:12px;
-  padding:8px 0;
+  gap:10px;
+  padding:7px 0;
   border-bottom:1px solid var(--border);
 }
 .cart-item-main{flex:1;}
-.cart-item-name{font-size:var(--fs-lg);font-weight:600;}
-.cart-item-meta{font-size:var(--fs-sm);color:var(--muted);}
-.cart-item-actions{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
-.qty-control{ display:flex; align-items:center; gap:6px; }
+.cart-item-name{font-size:14px;font-weight:500;}
+.cart-item-meta{font-size:12px;color:var(--muted);}
+.cart-item-actions{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:4px;
+}
+.qty-control{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
 .qty-control button{
-  width:26px; height:26px;
+  width:22px;
+  height:22px;
   border-radius:999px;
   border:1px solid var(--border);
   background:var(--bg);
-  font-size:var(--fs-sm);
+  font-size:13px;
   cursor:pointer;
 }
-.cart-item-total{font-size:var(--fs-sm);font-weight:700;}
+.cart-item-total{font-size:13px;font-weight:600;}
 .cart-remove{
-  border:none; background:none; color:var(--danger);
-  font-size:var(--fs-sm); cursor:pointer;
+  border:none;
+  background:none;
+  color:var(--danger);
+  font-size:13px;
+  cursor:pointer;
 }
 
 /* BUTTONS */
@@ -489,70 +487,120 @@ body.theme-dark{
   border-radius:999px;
   background:linear-gradient(135deg,#7000ff,#4c1d95);
   color:#fff;
-  padding:12px 16px;
-  font-size:var(--fs-md);
+  padding:9px 14px;
+  font-size:14px;
   cursor:pointer;
   box-shadow:0 14px 32px rgba(112,0,255,.6);
 }
 .btn-full{width:100%;}
-.btn-primary.admin-btn{font-size:var(--fs-sm);margin-top:10px;}
+.btn-primary.admin-btn{font-size:13px;margin-top:8px;}
 .admin-btn-success{background:var(--ok);box-shadow:0 14px 32px rgba(34,197,94,.6);}
 .btn-xs{
-  padding:7px 12px;
-  font-size:var(--fs-sm);
+  padding:5px 9px;
+  font-size:11px;
   border-radius:999px;
   border:1px solid var(--border);
   cursor:pointer;
 }
-.btn-xs-primary{ background:var(--accent); color:#fff; border-color:var(--accent); }
-.btn-xs-secondary{ background:#111827; color:#e5e7eb; }
-.btn-xs-danger{ background:var(--danger); color:#fff; border-color:var(--danger); }
+.btn-xs-primary{
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+}
+.btn-xs-secondary{
+  background:#111827;
+  color:#e5e7eb;
+}
+.btn-xs-danger{
+  background:var(--danger);
+  color:#fff;
+  border-color:var(--danger);
+}
 
-/* QUICK ORDER (past) */
+/* EKRAN PASTIDAGI QUICK BUYURTMA TUGMASI (QIZIL) */
 #quickOrderBtn{
   position:fixed;
-  left:16px; right:16px;
+  left:16px;
+  right:16px;
   bottom:16px;
+  border:none;
+  border-radius:999px;
+  padding:12px 16px;
+  font-weight:700;
+  font-size:15px;
   background:linear-gradient(135deg,#ef4444,#b91c1c);
-  box-shadow:0 22px 45px rgba(239,68,68,.75);
-  z-index:120;
+  color:#fff;
+  box-shadow:0 20px 45px rgba(239,68,68,.75);
+  z-index:95;
 }
 
 /* ORDERS */
 .section-title{
-  font-size:var(--fs-xl);
-  font-weight:700;
-  margin:16px 16px 0;
+  font-size:18px;
+  font-weight:600;
+  margin:14px 16px 0;
 }
 .section-sub{
-  font-size:var(--fs-sm);
+  font-size:13px;
   color:var(--muted);
-  margin:6px 16px 10px;
+  margin:4px 16px 8px;
 }
-.orders-list{ padding:12px 16px 24px; }
+.orders-list, #clientOrdersList, #adminOrdersList{
+  padding:10px 16px 20px;
+}
 .order-card{
   background:radial-gradient(circle at top,#020617,var(--card));
   border-radius:var(--radius-lg);
   box-shadow:var(--shadow);
-  padding:16px;
-  margin-bottom:14px;
+  padding:14px;
+  margin-bottom:12px;
   border:1px solid rgba(148,163,184,.4);
 }
-.order-header{ display:flex; justify-content:space-between; gap:12px; margin-bottom:8px; }
-.order-id, .order-date, .order-customer{ font-size:var(--fs-sm); color:var(--muted); }
-.order-total{ font-size:var(--fs-2xl); font-weight:800; color:#a855f7; }
-.order-items{ margin-top:8px; font-size:var(--fs-md); color:#e5e7eb; }
-.order-items ul{ margin-top:4px; margin-left:18px; }
-.order-footer{ margin-top:8px; font-size:var(--fs-sm); display:flex; justify-content:space-between; color:var(--muted); }
-.order-status-row{ margin-top:8px; margin-bottom:6px; }
+.order-header{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:6px;
+}
+.order-id,
+.order-date,
+.order-customer{
+  font-size:12px;
+  color:var(--muted);
+}
+.order-total{
+  font-size:18px;
+  font-weight:700;
+  color:#a855f7;
+}
+.order-items{
+  margin-top:6px;
+  font-size:13px;
+  color:#e5e7eb;
+}
+.order-items ul{
+  margin-top:3px;
+  margin-left:16px;
+}
+.order-footer{
+  margin-top:6px;
+  font-size:12px;
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+}
+.order-status-row{
+  margin-top:6px;
+  margin-bottom:4px;
+}
 
 /* STATUS + PROGRESS */
 .status-pill{
   display:inline-block;
-  padding:5px 11px;
+  padding:3px 9px;
   border-radius:999px;
-  font-size:var(--fs-sm);
-  font-weight:700;
+  font-size:11px;
+  font-weight:600;
 }
 .status-pending{background:var(--bg-soft);color:var(--muted);}
 .status-confirmed{background:var(--accent-soft);color:var(--accent-strong);}
@@ -560,256 +608,739 @@ body.theme-dark{
 .status-delivered{background:var(--ok);color:#fff;}
 .status-rejected{background:var(--danger);color:#fff;}
 
-.progress-wrap{margin:8px 0;}
-.progress-label{ font-size:var(--fs-sm); color:var(--muted); margin-bottom:4px; }
-.progress-line{ height:5px; border-radius:999px; background:var(--bg-soft); overflow:hidden; }
-.progress-fill{ height:100%; background:linear-gradient(90deg,#7000ff,#4c1d95); width:0; }
-.progress-steps{ display:flex; justify-content:space-between; margin-top:4px; font-size:var(--fs-xs); color:var(--muted); }
-.progress-step.active{ color:#e0e7ff; font-weight:700; }
+.progress-wrap{margin:6px 0;}
+.progress-label{
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:3px;
+}
+.progress-line{
+  height:4px;
+  border-radius:999px;
+  background:var(--bg-soft);
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,#7000ff,#4c1d95);
+  width:0;
+}
+.progress-steps{
+  display:flex;
+  justify-content:space-between;
+  margin-top:3px;
+  font-size:10px;
+  color:var(--muted);
+}
+.progress-step.active{
+  color:#e0e7ff;
+  font-weight:600;
+}
 
 /* ADMIN */
-.admin-page{ padding-top:10px; }
+.admin-page{padding-top:8px;}
 .admin-cols{
-  padding:0 16px 18px;
+  padding:0 16px 16px;
   display:flex;
   flex-direction:column;
-  gap:18px;
+  gap:16px;
 }
 @media(min-width:900px){
-  .admin-cols{ flex-direction:row; align-items:flex-start; }
+  .admin-cols{
+    flex-direction:row;
+    align-items:flex-start;
+  }
 }
-.admin-col{ flex:1; }
+.admin-col{flex:1;}
 .card{
   background:radial-gradient(circle at top,#020617,var(--card));
   border-radius:var(--radius-lg);
   box-shadow:var(--shadow);
-  padding:14px;
+  padding:12px;
   border:1px solid rgba(148,163,184,.4);
 }
-.card-title{ font-size:var(--fs-lg); font-weight:700; margin-bottom:10px; }
-.card-sub{ font-size:var(--fs-sm); color:var(--muted); margin-bottom:11px; }
-.form-grid{ display:grid; grid-template-columns:1fr; gap:8px; font-size:var(--fs-sm); }
-.form-grid label{ display:flex; flex-direction:column; gap:6px; color:#e5e7eb; }
-.form-grid input, .form-grid select, .form-grid textarea{
-  border-radius:var(--radius);
-  border:1px solid rgba(148,163,184,.6);
-  padding:8px 11px;
-  background:#020617;
-  font-size:var(--fs-sm);
+.card-title{
+  font-size:15px;
+  font-weight:600;
+  margin-bottom:8px;
+}
+.card-sub{
+  font-size:13px;
+  color:#var(--muted);
+  margin-bottom:10px;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:7px;
+  font-size:13px;
+}
+.form-grid label{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
   color:#e5e7eb;
 }
-.form-grid textarea{ min-height:80px; resize:vertical; }
-.checkbox-row{ flex-direction:row; align-items:center; gap:8px; }
-.admin-list{ margin-top:10px; }
-.admin-product-row{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:8px 0; border-bottom:1px solid rgba(148,163,184,.3);
-  font-size:var(--fs-sm); color:#e5e7eb;
+.form-grid input,
+.form-grid select,
+.form-grid textarea{
+  border-radius:var(--radius);
+  border:1px solid rgba(148,163,184,.6);
+  padding:6px 9px;
+  background:#020617;
+  font-size:13px;
+  color:#e5e7eb;
 }
-.admin-edit-btn,.admin-delete-btn{ border:none; background:none; cursor:pointer; font-size:16px; }
-.admin-edit-btn{ color:#c4b5fd; } .admin-delete-btn{ color:var(--danger); }
-.admin-order-filters{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
-.admin-order-actions{ margin-top:12px; display:flex; flex-wrap:wrap; gap:8px; }
+.form-grid textarea{
+  min-height:60px;
+  resize:vertical;
+}
+.checkbox-row{
+  flex-direction:row;
+  align-items:center;
+  gap:6px;
+}
+.admin-list{margin-top:8px;}
+.admin-product-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 0;
+  border-bottom:1px solid rgba(148,163,184,.3);
+  font-size:13px;
+  color:#e5e7eb;
+}
+.admin-edit-btn,
+.admin-delete-btn{
+  border:none;
+  background:none;
+  cursor:pointer;
+  font-size:14px;
+}
+.admin-edit-btn{color:#c4b5fd;}
+.admin-delete-btn{color:var(--danger);}
+
+.admin-order-filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:8px;
+}
+.admin-order-actions{
+  margin-top:10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
 
 /* ADMIN TOP BAR */
-.admin-top-bar{ padding:10px 16px 6px; display:flex; align-items:center; justify-content:space-between; }
-.admin-top-actions{ display:flex; gap:10px; align-items:center; }
+.admin-top-bar{
+  padding:8px 16px 4px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.admin-top-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
 
-/* PRODUCT DETAIL (MODAL) */
-#productDetailOverlay{
-  position:fixed; inset:0; background:rgba(0,0,0,.75);
-  display:flex; justify-content:center; align-items:flex-start;
-  padding:0; z-index:100;
+/* === PRODUCT DETAIL (MODAL) – UZUM STYLE === */
+.detail-overlay, #productDetailOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:0;
+  z-index:100;
 }
 .detail-card{
-  width:100%; max-width:560px; height:100vh; border-radius:0;
-  box-shadow:var(--shadow); position:relative; overflow-y:auto;
+  width:100%;
+  max-width:520px;
+  height:100vh;
+  border-radius:0;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow-y:auto;
   background:linear-gradient(180deg,#ff0f7b 0%,#ffffff 18%,#faf5ff 100%);
-  padding-bottom:28px;
+  padding-bottom:24px;
 }
 .detail-close{
-  position:absolute; left:14px; top:12px; border:none; background:transparent;
-  font-size:22px; cursor:pointer; color:#ffffff; font-weight:700; z-index:3;
+  position:absolute;
+  left:12px;
+  top:10px;
+  border:none;
+  background:transparent;
+  font-size:20px;
+  cursor:pointer;
+  color:#ffffff;
+  font-weight:600;
+  z-index:3;
 }
-.detail-img-wrap{ margin-top:50px; position:relative; padding:16px; }
+
+/* rasm bloki – katta kartochka, bo‘yiga */
+.detail-img-wrap{
+  margin-top:44px; /* yopish tugmasi ostida */
+  position:relative;
+  padding:16px;
+}
 .detail-img-wrap img{
-  width:100%; height:320px; border-radius:24px; object-fit:cover;
-  box-shadow:0 22px 40px rgba(0,0,0,.5); background:#000;
+  width:100%;
+  height:260px;
+  border-radius:22px;
+  object-fit:cover;
+  box-shadow:0 22px 40px rgba(0,0,0,.5);
+  background:#000;
 }
-@media(min-width:480px){ .detail-img-wrap img{height:360px;} }
-.detail-img-index{
-  position:absolute; bottom:26px; right:30px; background:rgba(0,0,0,.65);
-  color:#fff; border-radius:999px; padding:4px 9px; font-size:var(--fs-xs);
+@media(min-width:480px){
+  .detail-img-wrap img{height:300px;}
+}
+.detail-img-index, #detailImageIndex{
+  position:absolute;
+  bottom:24px;
+  right:28px;
+  background:rgba(0,0,0,.65);
+  color:#fff;
+  border-radius:999px;
+  padding:3px 8px;
+  font-size:11px;
 }
 .detail-nav-btn{
-  position:absolute; top:50%; transform:translateY(-50%);
-  border:none; background:rgba(0,0,0,.45); color:#fff; font-size:22px;
-  padding:6px 10px; cursor:pointer; border-radius:999px;
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  border:none;
+  background:rgba(0,0,0,.45);
+  color:#fff;
+  font-size:20px;
+  padding:4px 9px;
+  cursor:pointer;
+  border-radius:999px;
 }
-#detailPrevBtn{left:26px;} #detailNextBtn{right:26px;}
+#detailPrevBtn{left:24px;}
+#detailNextBtn{right:24px;}
 
-.detail-body{ margin-top:14px; padding:0 22px 44px; color:#111827; }
+/* GALLERY (pastdagi scroll ro‘yxat) */
+#detailGalleryList{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:0 20px 14px;
+}
+.detail-gallery-img{
+  width:84px;
+  height:84px;
+  border-radius:12px;
+  object-fit:cover;
+  border:1px solid rgba(148,163,184,.4);
+  box-shadow:0 8px 22px rgba(0,0,0,.4);
+  cursor:pointer;
+}
+
+/* matn qismi */
+.detail-body{
+  margin-top:12px;
+  padding:0 20px 40px;
+  color:#111827;
+}
 .detail-category{
-  font-size:var(--fs-xs); color:#6b21a8; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px;
+  font-size:12px;
+  color:#6b21a8;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:4px;
 }
-.detail-name{ font-size:var(--fs-3xl); font-weight:800; color:#111827; }
-.detail-desc{ font-size:var(--fs-md); color:#4b5563; margin-top:8px; }
-.detail-tag{ font-size:var(--fs-md); color:#2563eb; margin-top:6px; }
+.detail-name{
+  font-size:22px;
+  font-weight:700;
+  color:#111827;
+}
+.detail-desc{
+  font-size:13px;
+  color:#4b5563;
+  margin-top:6px;
+}
+.detail-tag{
+  font-size:13px;
+  color:#2563eb;
+  margin-top:4px;
+}
 
-.detail-price-row{ margin-top:20px; display:flex; justify-content:space-between; align-items:center; gap:14px; }
-.detail-price-main{ font-size:var(--fs-3xl); font-weight:800; color:#4c1d95; }
-.detail-price-old{ font-size:var(--fs-sm); text-decoration:line-through; color:#9ca3af; }
+/* narx + soni */
+.detail-price-row{
+  margin-top:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.detail-price-main{
+  font-size:24px;
+  font-weight:700;
+  color:#4c1d95;
+}
+.detail-price-old{
+  font-size:13px;
+  text-decoration:line-through;
+  color:#9ca3af;
+}
 
-.detail-price-row .qty-control{ display:flex; align-items:center; gap:10px; }
+/* SONI – kattaroq qizil tugmalar */
+.detail-price-row .qty-control{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
 .detail-price-row .qty-control button{
-  width:38px; height:38px; border-radius:999px; border:none;
-  background:linear-gradient(135deg,#ef4444,#b91c1c); color:#fff; font-size:20px; font-weight:700;
-  cursor:pointer; box-shadow:0 14px 30px rgba(239,68,68,.7);
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  border:none;
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
+  color:#fff;
+  font-size:18px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 14px 30px rgba(239,68,68,.7);
 }
 .detail-price-row .qty-control span{
-  min-width:28px; text-align:center; font-size:var(--fs-lg); font-weight:700; color:#111827;
+  min-width:24px;
+  text-align:center;
+  font-size:16px;
+  font-weight:600;
+  color:#111827;
 }
 
+/* SAVATGA QO‘SHISH – pastdagi uzun knopka */
 #detailAddBtn{
-  margin-top:28px; width:100%; border-radius:999px; padding:16px 22px;
-  font-size:var(--fs-lg); font-weight:800;
+  margin-top:26px;
+  width:100%;
+  border-radius:999px;
+  padding:14px 20px;
+  font-size:15px;
+  font-weight:600;
   background:linear-gradient(90deg,#7000ff,#4c1d95);
   box-shadow:0 24px 50px rgba(112,0,255,.6);
-  display:flex; align-items:center; justify-content:center; gap:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
 }
-#detailAddBtn.added{ background:linear-gradient(90deg,#16a34a,#22c55e); }
+#detailAddBtn.added{
+  background:linear-gradient(90deg,#16a34a,#22c55e);
+}
 #detailBackBtn{
-  margin-top:12px; font-size:var(--fs-sm); color:#4c1d95; border-radius:999px; padding:8px 12px;
-  border:1px solid rgba(148,163,184,.5); background:rgba(248,250,252,.9);
+  margin-top:10px;
+  font-size:13px;
+  color:#4c1d95;
+  border-radius:999px;
+  padding:6px 10px;
+  border:1px solid rgba(148,163,184,.5);
+  background:rgba(248,250,252,.9);
 }
 
-/* FULLSCREEN IMAGE MODE */
-.detail-card.image-fullscreen{ background:#000; padding:0; }
-.detail-card.image-fullscreen .detail-body{ display:none; }
-.detail-card.image-fullscreen .detail-img-wrap{ margin-top:0; padding:0; }
-.detail-card.image-fullscreen .detail-img-wrap img{ width:100%; height:100vh; border-radius:0; object-fit:contain; box-shadow:none; }
-.detail-card.image-fullscreen .detail-img-index{ bottom:16px; right:18px; }
-.detail-card.image-fullscreen .detail-nav-btn{ display:none; }
+/* RASMGA BOSGANDA TO‘LIQ EKRAN HOLAT */
+.detail-card.image-fullscreen{
+  background:#000;
+  padding:0;
+}
+.detail-card.image-fullscreen .detail-body{
+  display:none;
+}
+.detail-card.image-fullscreen .detail-img-wrap{
+  margin-top:0;
+  padding:0;
+}
+.detail-card.image-fullscreen .detail-img-wrap img{
+  width:100%;
+  height:100vh;
+  border-radius:0;
+  object-fit:contain;
+  box-shadow:none;
+}
+.detail-card.image-fullscreen .detail-img-index{
+  bottom:14px;
+  right:16px;
+}
+.detail-card.image-fullscreen .detail-nav-btn{
+  display:none;
+}
 .detail-card.image-fullscreen .detail-close{
-  top:16px; left:18px; right:auto; background:#ef4444; color:#fff; padding:8px 16px;
-  border-radius:999px; font-size:var(--fs-md); box-shadow:0 14px 30px rgba(239,68,68,.7);
+  top:14px;
+  left:16px;
+  right:auto;
+  background:#ef4444;
+  color:#fff;
+  padding:6px 14px;
+  border-radius:999px;
+  font-size:14px;
+  box-shadow:0 14px 30px rgba(239,68,68,.7);
 }
 
 /* TOAST */
-#toast{
-  position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(130%);
-  background:linear-gradient(135deg,#7000ff,#4c1d95); color:#fff;
-  padding:10px 16px; border-radius:999px; font-size:var(--fs-sm);
-  box-shadow:var(--shadow); opacity:0; transition:opacity .25s,transform .25s;
+.toast, #toast{
+  position:fixed;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%) translateY(130%);
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
+  color:#fff;
+  padding:9px 14px;
+  border-radius:999px;
+  font-size:13px;
+  box-shadow:var(--shadow);
+  opacity:0;
+  transition:opacity .25s,transform .25s;
   z-index:200;
 }
-#toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.show, #toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
 
 /* SCROLLBAR */
-::-webkit-scrollbar{ width:6px; height:6px; }
-::-webkit-scrollbar-thumb{ background:var(--accent); border-radius:999px; }
-::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar{
+  width:5px;
+  height:5px;
+}
+::-webkit-scrollbar-thumb{
+  background:var(--accent);
+  border-radius:999px;
+}
+::-webkit-scrollbar-track{
+  background:transparent;
+}
 
-/* ===================== KURYER PANELI ===================== */
+/* =======================================================
+   KURYER PANELI — RESTORAN KARTOCHKALARI DIZAYNI
+   (courier.html)
+======================================================= */
+
 .courier-body{
   font-family:"Poppins","Roboto",sans-serif;
   background:linear-gradient(180deg,#111827 0%,#020617 35%,#0b1120 100%);
   color:#e5e7eb;
 }
+
+/* HEADER */
 .courier-header{
-  position:sticky; top:0; z-index:50; padding:12px 16px;
-  display:flex; justify-content:space-between; align-items:center;
-  background:linear-gradient(90deg,#b91c1c,#f97316); box-shadow:0 20px 40px rgba(0,0,0,.6);
+  position:sticky;
+  top:0;
+  z-index:50;
+  padding:10px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:linear-gradient(90deg,#b91c1c,#f97316);
+  box-shadow:0 20px 40px rgba(0,0,0,.6);
 }
-.courier-header-left{ display:flex; align-items:center; gap:12px; }
+.courier-header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
 .courier-logo{
-  width:44px; height:44px; border-radius:14px;
+  width:40px;
+  height:40px;
+  border-radius:14px;
   background:radial-gradient(circle at 30% 10%,#fef9c3,#b91c1c);
-  display:flex; align-items:center; justify-content:center; font-size:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
   box-shadow:0 10px 24px rgba(0,0,0,.7);
 }
-.courier-header-text{ display:flex; flex-direction:column; }
-.courier-title{ font-weight:700; font-size:var(--fs-xl); color:#f9fafb; }
-.courier-subtitle{ font-size:var(--fs-xs); color:#fee2e2; }
-.courier-header-right{ display:flex; align-items:center; gap:10px; }
-.btn-chip{
-  border-radius:999px; border:1px solid rgba(248,250,252,.85);
-  background:rgba(15,23,42,.4); padding:8px 14px; font-size:var(--fs-sm); color:#f9fafb; cursor:pointer;
+.courier-header-text{
+  display:flex;
+  flex-direction:column;
 }
-.btn-chip-danger{ background:#991b1b; border-color:#fecaca; }
+.courier-title{
+  font-weight:600;
+  font-size:18px;
+  color:#f9fafb;
+}
+.courier-subtitle{
+  font-size:12px;
+  color:#fee2e2;
+}
+.courier-header-right{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
 
-.courier-main{ padding:14px 12px 26px; }
-.courier-login-section{ max-width:460px; margin:18px auto 0; }
-.courier-app-section{ max-width:940px; margin:12px auto 0; }
+/* CHIP BUTTONS (logout va h.k.) */
+.btn-chip{
+  border-radius:999px;
+  border:1px solid rgba(248,250,252,.85);
+  background:rgba(15,23,42,.4);
+  padding:6px 12px;
+  font-size:12px;
+  color:#f9fafb;
+  cursor:pointer;
+}
+.btn-chip-danger{
+  background:#991b1b;
+  border-color:#fecaca;
+}
 
+/* MAIN LAYOUT */
+.courier-main{
+  padding:12px 12px 24px;
+}
+.courier-login-section{
+  max-width:420px;
+  margin:16px auto 0;
+}
+.courier-app-section{
+  max-width:900px;
+  margin:10px auto 0;
+}
+
+/* KURYER CARDLAR */
 .courier-card{
   background:radial-gradient(circle at top,#0f172a,#020617);
-  border-radius:24px; box-shadow:0 22px 50px rgba(0,0,0,.85);
-  border:1px solid rgba(248,250,252,.06); padding:16px 16px 18px;
+  border-radius:22px;
+  box-shadow:0 22px 50px rgba(0,0,0,.85);
+  border:1px solid rgba(248,250,252,.06);
+  padding:14px 16px 16px;
 }
-.courier-login-card{ background:radial-gradient(circle at top,#7f1d1d,#020617); border-color:rgba(254,226,226,.4); }
+.courier-login-card{
+  background:radial-gradient(circle at top,#7f1d1d,#020617);
+  border-color:rgba(254,226,226,.4);
+}
 
-.courier-top-panel{ display:flex; flex-direction:column; gap:14px; }
-.courier-info-card{ background:radial-gradient(circle at top,#1f2937,#020617); border-radius:24px; box-shadow:0 16px 40px rgba(0,0,0,.8); padding:14px; border:1px solid rgba(148,163,184,.4); }
-.courier-info-main{ display:flex; align-items:center; gap:14px; }
+/* TOP PANEL: Kuryer ma’lumoti + statistikasi */
+.courier-top-panel{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.courier-info-card{
+  background:radial-gradient(circle at top,#1f2937,#020617);
+  border-radius:22px;
+  box-shadow:0 16px 40px rgba(0,0,0,.8);
+  padding:12px 14px;
+  border:1px solid rgba(148,163,184,.4);
+}
+.courier-info-main{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
 .courier-avatar{
-  width:52px; height:52px; border-radius:999px; background:radial-gradient(circle at 30% 10%,#fef3c7,#f97316);
-  display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 16px 34px rgba(0,0,0,.8);
+  width:46px;
+  height:46px;
+  border-radius:999px;
+  background:radial-gradient(circle at 30% 10%,#fef3c7,#f97316);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  box-shadow:0 16px 34px rgba(0,0,0,.8);
 }
-.courier-name{ font-size:var(--fs-xl); font-weight:700; color:#f9fafb; }
-.courier-meta{ font-size:var(--fs-sm); color:#cbd5f5; }
-.courier-badge-row{ margin-top:8px; }
+.courier-name{
+  font-size:17px;
+  font-weight:600;
+  color:#f9fafb;
+}
+.courier-meta{
+  font-size:12px;
+  color:#cbd5f5;
+}
+.courier-badge-row{
+  margin-top:6px;
+}
 .courier-badge{
-  display:inline-block; border-radius:999px; border:1px solid rgba(251,191,36,.6);
-  background:rgba(24,24,27,.95); padding:5px 11px; font-size:var(--fs-sm); color:#fde68a;
+  display:inline-block;
+  border-radius:999px;
+  border:1px solid rgba(251,191,36,.6);
+  background:rgba(24,24,27,.95);
+  padding:3px 9px;
+  font-size:11px;
+  color:#fde68a;
 }
 
-.courier-stats-row{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+/* STAT KARTALAR — RESTORAN DASHBOARD STYLE */
+.courier-stats-row{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
 .courier-stat-card{
   background:radial-gradient(circle at top,#b91c1c,#111827);
-  border-radius:22px; padding:12px 14px; box-shadow:0 18px 40px rgba(0,0,0,.85); border:1px solid rgba(248,250,252,.14);
+  border-radius:20px;
+  padding:10px 12px;
+  box-shadow:0 18px 40px rgba(0,0,0,.85);
+  border:1px solid rgba(248,250,252,.14);
 }
-.courier-stat-card:nth-child(2){ background:radial-gradient(circle at top,#15803d,#020817); }
-.stat-label{ font-size:var(--fs-xs); color:#fee2e2; text-transform:uppercase; letter-spacing:.06em; }
-.stat-value{ margin-top:6px; font-size:var(--fs-2xl); font-weight:800; color:#fef9c3; }
-.stat-sub{ font-size:var(--fs-sm); color:#e5e7eb; }
+.courier-stat-card:nth-child(2){
+  background:radial-gradient(circle at top,#15803d,#020817);
+}
+.stat-label{
+  font-size:11px;
+  color:#fee2e2;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.stat-value{
+  margin-top:4px;
+  font-size:22px;
+  font-weight:700;
+  color:#fef9c3;
+}
+.stat-sub{
+  font-size:12px;
+  color:#e5e7eb;
+}
 
-.courier-tabs{ margin-top:16px; padding:6px; border-radius:999px; background:rgba(15,23,42,.95); box-shadow:0 15px 40px rgba(0,0,0,.8); display:flex; gap:6px; }
-.courier-tab-btn{ flex:1; border:none; border-radius:999px; padding:9px 6px; font-size:var(--fs-sm); color:#9ca3af; background:transparent; cursor:pointer; }
-.courier-tab-btn.active{ background:linear-gradient(90deg,#f97316,#ef4444); color:#fefce8; box-shadow:0 12px 30px rgba(248,113,113,.7); }
+/* TABLAR (kuryer) */
+.courier-tabs{
+  margin-top:14px;
+  padding:4px;
+  border-radius:999px;
+  background:rgba(15,23,42,.95);
+  box-shadow:0 15px 40px rgba(0,0,0,.8);
+  display:flex;
+  gap:4px;
+}
+.courier-tab-btn{
+  flex:1;
+  border:none;
+  border-radius:999px;
+  padding:7px 4px;
+  font-size:12px;
+  color:#9ca3af;
+  background:transparent;
+  cursor:pointer;
+}
+.courier-tab-btn.active{
+  background:linear-gradient(90deg,#f97316,#ef4444);
+  color:#fefce8;
+  box-shadow:0 12px 30px rgba(248,113,113,.7);
+}
 
-.courier-tab-page{ margin-top:14px; }
-.section-title-sm{ font-size:var(--fs-lg); font-weight:700; margin-bottom:4px; }
-.section-sub-sm{ font-size:var(--fs-sm); color:#9ca3af; margin-bottom:10px; }
-.courier-orders-list{ display:flex; flex-direction:column; gap:12px; }
+/* TAB PAGE LAYOUT */
+.courier-tab-page{
+  margin-top:12px;
+}
+.section-title-sm{
+  font-size:15px;
+  font-weight:600;
+  margin-bottom:2px;
+}
+.section-sub-sm{
+  font-size:12px;
+  color:#9ca3af;
+  margin-bottom:8px;
+}
+.courier-orders-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
 
+/* RESTORAN KARTOCHKA USLUBI — kuryer sahifasida */
 .courier-body .courier-order-card{
   background:
     radial-gradient(circle at top,#f97316 0,transparent 55%),
     radial-gradient(circle at bottom,#111827 0,transparent 60%),
     #020617;
-  border-radius:26px; border:1px solid rgba(248,250,252,.18);
+  border-radius:24px;
+  border:1px solid rgba(248,250,252,.18);
   box-shadow:0 24px 60px rgba(0,0,0,.9);
-  padding:16px 16px 14px;
+  padding:14px 14px 12px;
 }
-.courier-body .courier-order-card .order-header{ align-items:flex-start; }
-.courier-body .courier-order-card .order-id{ font-size:var(--fs-sm); font-weight:700; color:#fee2e2; }
-.courier-body .courier-order-card .order-date{ font-size:var(--fs-xs); color:#e5e7eb; }
-.courier-body .courier-order-card .order-customer{ font-size:var(--fs-sm); color:#f9fafb; }
-.courier-body .courier-order-card .order-total{ font-size:var(--fs-2xl); font-weight:800; color:#fef9c3; }
+.courier-body .courier-order-card .order-header{
+  align-items:flex-start;
+}
+.courier-body .courier-order-card .order-id{
+  font-size:12px;
+  font-weight:600;
+  color:#fee2e2;
+}
+.courier-body .courier-order-card .order-date{
+  font-size:11px;
+  color:#e5e7eb;
+}
+.courier-body .courier-order-card .order-customer{
+  font-size:12px;
+  color:#f9fafb;
+}
+.courier-body .courier-order-card .order-total{
+  font-size:20px;
+  font-weight:700;
+  color:#fef9c3;
+}
 
-.courier-body .courier-order-card .order-items{ margin-top:10px; font-size:var(--fs-sm); color:#e5e7eb; }
-.courier-body .courier-order-card .order-items ul{ margin-top:6px; margin-left:18px; }
-.courier-body .courier-order-card .order-items li{ margin-bottom:3px; }
+/* Mahsulotlar ro‘yxati — restoran menyu ko‘rinishida */
+.courier-body .courier-order-card .order-items{
+  margin-top:8px;
+  font-size:12px;
+  color:#e5e7eb;
+}
+.courier-body .courier-order-card .order-items ul{
+  margin-top:4px;
+  margin-left:16px;
+}
+.courier-body .courier-order-card .order-items li{
+  margin-bottom:2px;
+}
 
-.courier-card-footer{ margin-top:12px; display:flex; justify-content:flex-end; gap:8px; }
-.courier-body .btn-xs{ padding:8px 14px; font-size:var(--fs-sm); }
+/* Kuryer kart footer (tugmalar qatori) */
+.courier-card-footer{
+  margin-top:10px;
+  display:flex;
+  justify-content:flex-end;
+  gap:6px;
+}
 
-.courier-body .courier-login-card .form-grid label{ color:#fee2e2; }
-.courier-body .courier-login-card .form-grid input{ background:#020617; border-color:rgba(254,226,226,.7); }
+/* Kuryer uchun kichik tugmalar biroz kattaroq ko‘rinishda */
+.courier-body .btn-xs{
+  padding:6px 12px;
+  font-size:12px;
+}
 
-.courier-body #toast{ bottom:28px; }
+/* Login form matn rangi yorqin bo‘lsin */
+.courier-body .courier-login-card .form-grid label{
+  color:#fee2e2;
+}
+.courier-body .courier-login-card .form-grid input{
+  background:#020617;
+  border-color:rgba(254,226,226,.7);
+}
 
-/* ===== Minor helpers */
-.center{display:flex;align-items:center;justify-content:center}
-.mt-8{margin-top:8px}.mt-10{margin-top:10px}.mt-12{margin-top:12px}
+/* Kuryer sahifasida toast biroz pastroq tursin */
+.courier-body .toast{
+  bottom:26px;
+}
+
+/* COURIER MAP/INFO IDS */
+#courierOrderSelect{
+  width:100%;
+  margin-top:8px;
+  margin-bottom:10px;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(148,163,184,.4);
+  background:#0b1220;
+  color:#f1f5f9;
+  font-size:13px;
+}
+#courierMapFrame{
+  width:100%;
+  height:280px;
+  border:0;
+  border-radius:16px;
+  box-shadow:0 16px 36px rgba(0,0,0,.6);
+  margin-top:8px;
+}
+#courierInfo{
+  margin-top:10px;
+  font-size:13px;
+  color:#e5e7eb;
+}
