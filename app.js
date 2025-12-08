@@ -163,6 +163,17 @@ const adminCourierListEl     = document.getElementById("adminCourierList")     |
 // SOUND
 const notifySoundEl = document.getElementById("notifySound");
 
+// MIJOZ TASDIQ MODALI (zakaz yetkazilganda tasdiqlash)
+const confirmOverlay        = document.getElementById("confirmOverlay");
+const confirmOrderSummaryEl = document.getElementById("confirmOrderSummary");
+const confirmCourierInfoEl  = document.getElementById("confirmCourierInfo");
+const problemBlockEl        = document.getElementById("problemBlock");
+const problemReasonInputEl  = document.getElementById("problemReasonInput");
+const btnConfirmYes         = document.getElementById("btnConfirmYes");
+const btnConfirmNo          = document.getElementById("btnConfirmNo");
+
+let pendingConfirmOrderId   = null;
+
 /* HELPERS */
 function formatPrice(v){
   return (v || 0).toLocaleString("uz-UZ");
@@ -643,22 +654,24 @@ function removeFromCart(idx){
 }
 
 /* ORDER STATUS HELPERS */
-const ORDER_STEPS = ["pending","confirmed","courier","delivered"];
+const ORDER_STEPS = ["pending","confirmed","courier","delivered_wait","delivered"];
 function statusLabel(status){
   switch(status){
-    case "pending":   return "Tasdiqlash kutilmoqda";
-    case "confirmed": return "Admin tasdiqladi";
-    case "courier":   return "Kuryerga berildi";
-    case "delivered": return "Yetkazildi";
-    case "rejected":  return "Bekor qilindi";
-    default:          return status;
+    case "pending":        return "Tasdiqlash kutilmoqda";
+    case "confirmed":      return "Admin tasdiqladi";
+    case "courier":        return "Kuryer oldi";
+    case "delivered_wait": return "Kuryer yetkazdi (tasdiq kutilmoqda)";
+    case "delivered":      return "Yetkazildi";
+    case "rejected":       return "Bekor qilindi";
+    case "problem":        return "Muammoli zakaz";
+    default:               return status;
   }
 }
 function statusClass(status){
   return `status-pill status-${status}`;
 }
 function progressPercent(status){
-  if(status==="rejected") return 0;
+  if(status==="rejected" || status==="problem") return 0;
   const idx = ORDER_STEPS.indexOf(status);
   if(idx<0) return 0;
   return ((idx+1)/ORDER_STEPS.length)*100;
@@ -678,6 +691,7 @@ function renderProgressHTML(status){
             ${s==="pending"?"Yuborildi":
               s==="confirmed"?"Tasdiq":
               s==="courier"?"Kuryer":
+              s==="delivered_wait"?"Tasdiq kutilmoqda":
               "Yetdi"}
           </span>
         `).join("")}
@@ -698,25 +712,40 @@ function playNotify(){
 }
 
 /* MIJOZGA STATUS XABARLARI */
-function clientStatusMessage(status){
+function clientStatusMessage(order){
+  const status = order.status;
+  const cInfo  = order.courierInfo || {};
+
+  if(status === "courier" && cInfo){
+    return (
+      "🚚 Sizning buyurtmangizni kuryer oldi.\n\n" +
+      "👤 Kuryer: " + (cInfo.name || "Kuryer") + "\n" +
+      "📱 Tel: " + (cInfo.phone || "-") + "\n" +
+      (cInfo.car ? "🚗 " + cInfo.car + " " + (cInfo.plate || "") + "\n" : "") +
+      (cInfo.login ? "🆔 Login: " + cInfo.login + "\n" : "")
+    );
+  }
+
   switch(status){
-    case "confirmed": return "✅ Buyurtmangiz tasdiqlandi.";
-    case "courier":   return "🚚 Buyurtmangiz kuryerga topshirildi.";
-    case "delivered": return "🎉 Buyurtma yetkazildi. Bizni tanlaganingiz uchun rahmat!";
-    case "rejected":  return "❌ Buyurtmangiz bekor qilindi. Mahsulot tugagan bo‘lishi mumkin.";
-    default:          return "ℹ️ Buyurtma holati yangilandi.";
+    case "confirmed":      return "✅ Buyurtmangiz tasdiqlandi.";
+    case "courier":        return "🚚 Buyurtmangiz kuryerga topshirildi.";
+    case "delivered_wait": return "✅ Kuryer buyurtmani yetkazdi. Iltimos, saytga kirib tasdiqlang.";
+    case "delivered":      return "🎉 Buyurtma yakunlandi.";
+    case "rejected":       return "❌ Buyurtmangiz bekor qilindi. Mahsulot tugagan bo‘lishi mumkin.";
+    case "problem":        return "⚠️ Buyurtmangiz muammoli sifatida belgilandi. Admin tekshiradi.";
+    default:               return "ℹ️ Buyurtma holati yangilandi.";
   }
 }
-function notifyClientStatus(status){
-  const msg = clientStatusMessage(status);
-  showToast(msg, 3000);
+
+function notifyClientStatus(order){
+  const msg = clientStatusMessage(order);
+  if(!msg) return;
+  showToast(msg, 3500);
   playNotify();
 }
+
 function checkDeliveredThankYou(){
-  const hasDelivered = clientOrders.some(o => o.status === "delivered");
-  if(hasDelivered){
-    showToast("🎉 Buyurtmani qabul qilganingiz uchun rahmat!", 3000);
-  }
+  // endi avtomatik "rahmat" toasti chiqarmaymiz
 }
 
 /* REAL-TIME ORDERS (CLIENT) */
@@ -726,8 +755,7 @@ function subscribeClientOrders(){
     where("clientId","==", clientId)
   );
   onSnapshot(qClient, snap=>{
-    let hasStatusChange   = false;
-    let lastChangedStatus = null;
+    let changedOrder = null;
 
     const list = [];
     snap.forEach(d=>{
@@ -737,8 +765,7 @@ function subscribeClientOrders(){
 
       const prevStatus = clientOrderStatusMap[id];
       if(prevStatus && prevStatus !== status){
-        hasStatusChange   = true;
-        lastChangedStatus = status;
+        changedOrder = { id, ...data };
       }
       clientOrderStatusMap[id] = status;
 
@@ -754,14 +781,126 @@ function subscribeClientOrders(){
     }catch(e){}
 
     renderClientOrders();
-    checkDeliveredThankYou();
 
-    if(hasStatusChange && lastChangedStatus){
-      notifyClientStatus(lastChangedStatus);
+    // Tasdiq kutayotgan zakaz bormi?
+    checkOrdersNeedingConfirmation();
+
+    if(changedOrder){
+      notifyClientStatus(changedOrder);
     }
   },err=>{
     console.error("Client orders xato:", err);
     showToast("⚠️ Buyurtmalarni o‘qishda xato.");
+  });
+}
+
+/* MIJOZ TASDIQ MODALI LOGIKASI */
+function buildOrderSummaryHTML(order){
+  const items = order.items || [];
+  const total = order.totalPrice || 0;
+  const listHtml = items.map(i =>
+    `<li>${i.name} — ${i.qty} dona × ${formatPrice(i.price)} so‘m</li>`
+  ).join("");
+
+  return `
+    <div><strong>Buyurtma ID:</strong> ${order.id}</div>
+    <ul>${listHtml}</ul>
+    <div class="sum-row">Jami: <strong>${formatPrice(total)} so‘m</strong></div>
+  `;
+}
+
+function buildCourierInfoHTML(cInfo){
+  if(!cInfo) return "";
+  const parts = [];
+  if(cInfo.name)  parts.push("👤 " + cInfo.name);
+  if(cInfo.phone) parts.push("📱 " + cInfo.phone);
+  if(cInfo.car || cInfo.plate) parts.push("🚗 " + (cInfo.car || "") + " " + (cInfo.plate || ""));
+  return parts.length ? parts.join("<br>") : "";
+}
+
+function hideConfirmModal(){
+  if(!confirmOverlay) return;
+  confirmOverlay.classList.add("hidden");
+  pendingConfirmOrderId = null;
+  if(problemBlockEl) problemBlockEl.classList.add("hidden");
+  if(problemReasonInputEl) problemReasonInputEl.value = "";
+}
+
+function showConfirmModalForOrder(order){
+  if(!confirmOverlay || !confirmOrderSummaryEl) return;
+
+  pendingConfirmOrderId = order.id;
+
+  confirmOrderSummaryEl.innerHTML = buildOrderSummaryHTML(order);
+
+  if(confirmCourierInfoEl){
+    const html = buildCourierInfoHTML(order.courierInfo);
+    if(html){
+      confirmCourierInfoEl.innerHTML = html;
+      confirmCourierInfoEl.style.display = "block";
+    }else{
+      confirmCourierInfoEl.style.display = "none";
+    }
+  }
+
+  if(problemBlockEl) problemBlockEl.classList.add("hidden");
+  confirmOverlay.classList.remove("hidden");
+}
+
+function checkOrdersNeedingConfirmation(){
+  if(!clientOrders.length || !confirmOverlay) return;
+  if(!confirmOverlay.classList.contains("hidden")) return; // modal ochiq bo‘lsa
+
+  const pending = clientOrders.find(o => o.status === "delivered_wait");
+  if(pending){
+    showConfirmModalForOrder(pending);
+  }
+}
+
+// Mijoz: "Ha, oldim"
+if(btnConfirmYes){
+  btnConfirmYes.addEventListener("click", async ()=>{
+    if(!pendingConfirmOrderId) return;
+    try{
+      await updateDoc(doc(db,"orders",pendingConfirmOrderId),{
+        status: "delivered",
+        clientConfirmed: true,
+        clientConfirmedAt: serverTimestamp()
+      });
+      showToast("🎉 Rahmat! Doimo sog‘ bo‘ling!", 3000);
+      hideConfirmModal();
+    }catch(e){
+      console.error("Tasdiq xato:", e);
+      showToast("⚠️ Tasdiq saqlashda xato.");
+    }
+  });
+}
+
+// Mijoz: "Yo‘q, kelmadi"
+if(btnConfirmNo){
+  btnConfirmNo.addEventListener("click", async ()=>{
+    if(!pendingConfirmOrderId) return;
+    if(problemBlockEl) problemBlockEl.classList.remove("hidden");
+
+    const reason = (problemReasonInputEl?.value || "").trim();
+    if(!reason){
+      showToast("❗ Muammo sababini yozing.", 2500);
+      return;
+    }
+
+    try{
+      await updateDoc(doc(db,"orders",pendingConfirmOrderId),{
+        status: "problem",
+        clientConfirmed: false,
+        problemReason: reason,
+        problemAt: serverTimestamp()
+      });
+      showToast("⚠️ Muammo admin uchun yuborildi.", 3000);
+      hideConfirmModal();
+    }catch(e){
+      console.error("Problem xato:", e);
+      showToast("⚠️ Muammoli zakazni saqlashda xato.");
+    }
   });
 }
 
@@ -787,12 +926,20 @@ function renderClientOrders(){
       const itemsHtml = (o.items || []).map(i=>
         `<li>${i.name} — ${i.qty} dona × ${formatPrice(i.price)} so‘m</li>`
       ).join("");
+      const courier = o.courierInfo || {};
+      const courierLine = (courier.name || courier.phone) 
+        ? `<div class="order-courier-mini">
+             🚚 ${courier.name || "Kuryer"}${courier.phone ? " • " + courier.phone : ""}
+           </div>`
+        : "";
+
       clientOrdersListEl.innerHTML += `
         <article class="order-card">
           <header class="order-header">
             <div>
               <div class="order-id">ID: ${o.id.slice(0,8)}...</div>
               ${dateStr ? `<div class="order-date">${dateStr}</div>` : ""}
+              ${courierLine}
             </div>
             <div class="order-total">${formatPrice(o.totalPrice)} so‘m</div>
           </header>
@@ -803,12 +950,17 @@ function renderClientOrders(){
           <section class="order-items">
             <strong>Mahsulotlar:</strong>
             <ul>${itemsHtml}</ul>
+            ${o.problemReason ? `<div class="problem-reason">❗ Sizning izohingiz: ${o.problemReason}</div>` : ""}
           </section>
           <footer class="order-footer">
             <span>Holat: ${statusLabel(o.status)}</span>
-            <span>${o.status==="delivered" ? "✅ Yakunlandi" :
-                    o.status==="rejected" ? "❌ Bekor qilingan" :
-                    "⏳ Jarayonda"}</span>
+            <span>${
+              o.status==="delivered"      ? "✅ Yakunlandi" :
+              o.status==="delivered_wait" ? "✅ Tasdiq kutilmoqda" :
+              o.status==="rejected"       ? "❌ Bekor qilingan" :
+              o.status==="problem"        ? "⚠️ Muammoli zakaz" :
+                                            "⏳ Jarayonda"
+            }</span>
           </footer>
         </article>
       `;
@@ -872,11 +1024,15 @@ function renderAdminOrders(){
       visibleOrders = adminOrders.filter(o => o.status === "delivered");
       break;
     case "rejected":
-      visibleOrders = adminOrders.filter(o => o.status === "rejected");
+      // Bekor qilingan + muammoli zakazlar
+      visibleOrders = adminOrders.filter(o => o.status === "rejected" || o.status === "problem");
       break;
     default:
+      // Faol: yakunlanmagan va muammoli emas
       visibleOrders = adminOrders.filter(o =>
-        o.status !== "delivered" && o.status !== "rejected"
+        o.status !== "delivered" &&
+        o.status !== "rejected" &&
+        o.status !== "problem"
       );
   }
 
@@ -900,7 +1056,7 @@ function renderAdminOrders(){
       <button
         class="btn-xs ${adminOrderFilter === "rejected" ? "btn-xs-primary" : "btn-xs-secondary"}"
         onclick="setAdminOrderFilter('rejected')">
-        Bekor qilinganlar
+        Bekor / muammoli
       </button>
       <button
         class="btn-xs btn-xs-danger"
@@ -927,6 +1083,7 @@ function renderAdminOrders(){
       `<li>${i.name} — ${i.qty} dona × ${formatPrice(i.price)} so‘m</li>`
     ).join("");
     const customer = o.customer || {};
+    const courier  = o.courierInfo || {};
     const hasLoc   = o.location && typeof o.location.lat === "number" && typeof o.location.lng === "number";
 
     const extraLines = [];
@@ -934,6 +1091,13 @@ function renderAdminOrders(){
     if(customer.landmark)      extraLines.push(`🧭 Mo‘ljal: ${customer.landmark}`);
     if(customer.preferredTime) extraLines.push(`⏰ Vaqt: ${customer.preferredTime}`);
     if(customer.comment)       extraLines.push(`✏️ Izoh: ${customer.comment}`);
+
+    const courierLine = (courier.name || courier.phone || courier.car || courier.plate)
+      ? `<div class="order-courier">
+           🚚 ${courier.name || "Kuryer"}${courier.phone ? " • " + courier.phone : ""}<br>
+           ${courier.car || ""} ${courier.plate || ""}
+         </div>`
+      : "";
 
     adminOrdersListEl.innerHTML += `
       <article class="order-card">
@@ -947,6 +1111,7 @@ function renderAdminOrders(){
             <div class="order-customer">
               📍 ${customer.address || "-"}
             </div>
+            ${courierLine}
             ${extraLines.length ? `
               <div class="order-customer">
                 ${extraLines.join("<br>")}
@@ -967,6 +1132,7 @@ function renderAdminOrders(){
         <section class="order-items">
           <strong>Mahsulotlar:</strong>
           <ul>${itemsHtml}</ul>
+          ${o.problemReason ? `<div class="problem-reason-admin">❗ Mijoz izohi: ${o.problemReason}</div>` : ""}
         </section>
         <div class="admin-order-actions">
           <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','confirmed')">Tasdiqlash</button>
@@ -998,13 +1164,19 @@ async function updateOrderStatus(orderId, newStatus){
       }
     }
 
+    // Admin "Yetkazildi" tugmasi bosganda ham avval "delivered_wait" ga o‘tkazamiz.
+    let statusToSave = newStatus;
+    if(newStatus === "delivered"){
+      statusToSave = "delivered_wait";
+    }
+
     await updateDoc(doc(db,"orders",orderId),{
-      status:newStatus,
+      status: statusToSave,
       updatedAt:serverTimestamp()
     });
     showToast("✅ Buyurtma statusi yangilandi.");
 
-    if(isAdmin && newStatus === "delivered"){
+    if(isAdmin && statusToSave === "delivered"){
       adminOrderFilter = "delivered";
       renderAdminOrders();
     }else{
