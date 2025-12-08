@@ -261,154 +261,149 @@
   <div id="courierToast" class="toast"></div>
   <audio id="courierNotify" src="ding.mp3" preload="auto"></audio>
 
-  <!-- BEGIN JS PART 1/2 -->
-  <script type="module">
-
-  /* FIREBASE LOAD */
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    onSnapshot,
-    query,
-    orderBy,
-    updateDoc,
-    doc,
-    serverTimestamp,
-    getDocs,
-    addDoc
-  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-  /* CONFIG */
-  const firebaseConfig = {
-    apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
-    authDomain: "shahboz-5d0a3.firebaseapp.com",
-    projectId: "shahboz-5d0a3",
-    storageBucket: "shahboz-5d0a3.firebasestorage.app",
-    messagingSenderId: "352024095535",
-    appId: "1:352024095535:web:3f495ac74cdd40f5c54fda"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
-
-  /* GLOBALS */
-  const ordersCol   = collection(db, "orders");
-  const couriersCol = collection(db, "couriers");
-
-  let currentCourier = null;
-  let orders = [];
-  let isOnline = false;
-  let unsub = null;
-
-  const STORAGE_KEY = "beauty_courier_auth";
-  const REST_LAT = 39.90023;
-  const REST_LNG = 68.78980;
-
-  /* DOM */
-  const loginSec = document.getElementById("courierLoginSection");
-  const appSec   = document.getElementById("courierAppSection");
-  const loginBtn = document.getElementById("courierLoginBtn");
-  const logoutBtn = document.getElementById("courierLogoutBtn");
-  const loginInput = document.getElementById("courierLoginInput");
-  const passInput  = document.getElementById("courierPassInput");
-  const nameEl = document.getElementById("courierNameText");
-  const carEl  = document.getElementById("courierCarText");
-  const badge  = document.getElementById("courierStatusBadge");
-
-  const tabBtns = document.querySelectorAll(".courier-tab-btn");
-  const tabA = document.getElementById("courierTabAvailable");
-  const tabM = document.getElementById("courierTabMy");
-  const tabD = document.getElementById("courierTabDone");
-
-  const toast = document.getElementById("courierToast");
-  const ding = document.getElementById("courierNotify");
-
-  /* HELPERS */
-  function showToast(msg){
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(()=>toast.classList.remove("show"),2000);
-  }
-  function sound(){ ding.currentTime=0; ding.play().catch(()=>{}); }
-
-  function distKm(lat1, lon1, lat2, lon2){
-    if(!lat1 || !lon1 || !lat2 || !lon2) return "";
-    const R = 6371;
-    const dLat = (lat2-lat1)*Math.PI/180;
-    const dLon = (lon2-lon1)*Math.PI/180;
-    const a = Math.sin(dLat/2)**2 +
-      Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)
-      * Math.sin(dLon/2)**2;
-    return (R * 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(2);
-  }
-
-  /* LOGIN */
-  loginBtn.onclick = async ()=>{
-    const login = loginInput.value.trim().toLowerCase();
-    const pass  = passInput.value.trim();
-
-    const snap = await getDocs(couriersCol);
-    let found = null;
-
-    snap.forEach(d=>{
-      const c = d.data();
-      if(c.login?.toLowerCase() === login && c.password === pass) found = c;
-    });
-
-    if(!found){
-      showToast("Login yoki parol xato");
-      return;
-    }
-
-    currentCourier = found;
-    nameEl.textContent = found.name;
-    carEl.textContent  = "🚗 " + found.car;
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(found));
-
-    loginSec.classList.add("hidden");
-    appSec.classList.remove("hidden");
-
-    subscribe();
-  };
-
-  /* LOGOUT */
-  logoutBtn.onclick = ()=>{
-    localStorage.removeItem(STORAGE_KEY);
-    currentCourier=null;
-    appSec.classList.add("hidden");
-    loginSec.classList.remove("hidden");
-  };
-
-  /* ONLINE/OFFLINE */
-  goOnline.onclick = ()=>{
-    isOnline = true;
-    badge.textContent="Onlayn";
-    badge.style.background="#22c55e";
-    render();
-  };
-  goOffline.onclick = ()=>{
-    isOnline = false;
-    badge.textContent="Offline";
-    badge.style.background="#ef4444";
-    render();
-  };
-
-  /* SUBSCRIBE */
-  function subscribe(){
-    if(unsub) unsub();
-    const q = query(ordersCol, orderBy("createdAt","desc"));
-
-    unsub = onSnapshot(q, snap=>{
-      orders = snap.docs.map(d=>({id:d.id,...d.data()}));
-      render();
-    });
-  }
-
-  /* END OF PART 1/2 */
-  <!-- JS PART 2/2 CONTINUE -->
+<!-- ========================= JS START ============================== -->
 <script type="module">
+
+/* FIREBASE LOAD */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  updateDoc,
+  doc,
+  serverTimestamp,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+/* CONFIG */
+const firebaseConfig = {
+  apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
+  authDomain: "shahboz-5d0a3.firebaseapp.com",
+  projectId: "shahboz-5d0a3",
+  storageBucket: "shahboz-5d0a3.firebasestorage.app",
+  messagingSenderId: "352024095535",
+  appId: "1:352024095535:web:3f495ac74cdd40f5c54fda"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* GLOBALS */
+const ordersCol   = collection(db, "orders");
+const couriersCol = collection(db, "couriers");
+
+let currentCourier = null;
+let orders = [];
+let isOnline = false;
+let unsub = null;
+
+const STORAGE_KEY = "beauty_courier_auth";
+const REST_LAT = 39.90023;
+const REST_LNG = 68.78980;
+
+/* DOM */
+const loginSec = document.getElementById("courierLoginSection");
+const appSec   = document.getElementById("courierAppSection");
+const loginBtn = document.getElementById("courierLoginBtn");
+const logoutBtn = document.getElementById("courierLogoutBtn");
+const loginInput = document.getElementById("courierLoginInput");
+const passInput  = document.getElementById("courierPassInput");
+const nameEl = document.getElementById("courierNameText");
+const carEl  = document.getElementById("courierCarText");
+const badge  = document.getElementById("courierStatusBadge");
+
+const tabBtns = document.querySelectorAll(".courier-tab-btn");
+const tabA = document.getElementById("courierTabAvailable");
+const tabM = document.getElementById("courierTabMy");
+const tabD = document.getElementById("courierTabDone");
+
+const toast = document.getElementById("courierToast");
+const ding = document.getElementById("courierNotify");
+
+/* HELPERS */
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),2000);
+}
+function sound(){ ding.currentTime=0; ding.play().catch(()=>{}); }
+
+function distKm(lat1, lon1, lat2, lon2){
+  if(!lat1 || !lon1 || !lat2 || !lon2) return "";
+  const R = 6371;
+  const dLat = (lat2-lat1)*Math.PI/180;
+  const dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 +
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)
+    * Math.sin(dLon/2)**2;
+  return (R * 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(2);
+}
+
+/* LOGIN */
+loginBtn.onclick = async ()=>{
+  const login = loginInput.value.trim().toLowerCase();
+  const pass  = passInput.value.trim();
+
+  const snap = await getDocs(couriersCol);
+  let found = null;
+
+  snap.forEach(d=>{
+    const c = d.data();
+    if(c.login?.toLowerCase() === login && c.password === pass) found = c;
+  });
+
+  if(!found){
+    showToast("Login yoki parol xato");
+    return;
+  }
+
+  currentCourier = found;
+  nameEl.textContent = found.name;
+  carEl.textContent  = "🚗 " + found.car;
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(found));
+
+  loginSec.classList.add("hidden");
+  appSec.classList.remove("hidden");
+
+  subscribe();
+};
+
+/* LOGOUT */
+logoutBtn.onclick = ()=>{
+  localStorage.removeItem(STORAGE_KEY);
+  currentCourier=null;
+  appSec.classList.add("hidden");
+  loginSec.classList.remove("hidden");
+};
+
+/* ONLINE/OFFLINE */
+goOnline.onclick = ()=>{
+  isOnline = true;
+  badge.textContent="Onlayn";
+  badge.style.background="#22c55e";
+  render();
+};
+goOffline.onclick = ()=>{
+  isOnline = false;
+  badge.textContent="Offline";
+  badge.style.background="#ef4444";
+  render();
+};
+
+/* SUBSCRIBE */
+function subscribe(){
+  if(unsub) unsub();
+  const q = query(ordersCol, orderBy("createdAt","desc"));
+
+  unsub = onSnapshot(q, snap=>{
+    orders = snap.docs.map(d=>({id:d.id,...d.data()}));
+    render();
+  });
+}
 
 /* RENDER */
 function render(){
@@ -431,149 +426,159 @@ function render(){
   document.getElementById("statTodayCount").textContent = D.length;
 }
 
-/* AVAILABLE CARD */
+/* CARD — AVAILABLE */
 function renderCard_A(o){
   const c = o.customer || {};
   const loc = o.location;
 
   const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
-  const total = o.totalPrice || (o.items || []).reduce((s,i)=>s + i.price*i.qty, 0);
+  const total = o.totalPrice || (o.items || []).reduce(
+    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
+  );
 
   return `
     <div class="order-card">
+
       <div><strong>🧾 Buyurtma #${code}</strong></div>
 
       <div><strong>${c.name}</strong></div>
       <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
+
       <div>📍 ${c.address}</div>
+      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
 
       <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
+      <div>📏 ${loc ? distKm(REST_LAT,REST_LNG,loc.lat,loc.lng)+" km" : ""}</div>
 
       <ul>
-        ${(o.items||[]).map(i => `<li>${i.name} — ${i.qty} × ${i.price}</li>`).join("")}
+        ${(o.items||[]).map(i => `
+          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
+        `).join("")}
       </ul>
 
       <button class="btn-xs btn-xs-primary" onclick="takeOrder('${o.id}')">Qabul qilish</button>
       <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">Marshrut</button>
+
     </div>
   `;
 }
 
-/* MY CARD */
+/* CARD — MY */
 function renderCard_M(o){
   const c = o.customer || {};
   const loc = o.location;
-  const total = o.totalPrice || (o.items || []).reduce((s,i)=>s + i.price*i.qty, 0);
+
   const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
+  const total = o.totalPrice || (o.items || []).reduce(
+    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
+  );
 
   return `
     <div class="order-card">
+
       <div><strong>📦 Mening zakazim #${code}</strong></div>
+
       <div><strong>${c.name}</strong></div>
       <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
+
       <div>📍 ${c.address}</div>
+      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
+
+      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
+      <div>📏 ${loc ? distKm(REST_LAT,REST_LNG,loc.lat,loc.lng)+" km" : ""}</div>
 
       <ul>
-        ${(o.items||[]).map(i => `<li>${i.name} — ${i.qty} × ${i.price}</li>`).join("")}
+        ${(o.items||[]).map(i => `
+          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
+        `).join("")}
       </ul>
 
       <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">Marshrut</button>
       <button class="btn-xs btn-xs-danger" onclick="releaseOrder('${o.id}')">❌ Yechish</button>
-
       <button class="btn-xs btn-xs-primary" onclick="markDelivered('${o.id}')">Yetkazdim</button>
+
     </div>
   `;
 }
 
-/* DELIVERED CARD */
+/* CARD — DELIVERED */
 function renderCard_D(o){
   const c = o.customer || {};
-  const total = o.totalPrice;
+
   const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
+  const total = o.totalPrice || (o.items || []).reduce(
+    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
+  );
 
   return `
     <div class="order-card">
+
       <div><strong>✔ Yetkazilgan #${code}</strong></div>
+
       <div><strong>${c.name}</strong></div>
       <div>📱 ${c.phone}</div>
+
       <div>📍 ${c.address}</div>
+      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
+
+      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
 
       <ul>
-        ${(o.items||[]).map(i => `<li>${i.name} — ${i.qty} × ${i.price}</li>`).join("")}
+        ${(o.items||[]).map(i => `
+          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
+        `).join("")}
       </ul>
 
       <button class="btn-xs btn-xs-danger" onclick="releaseDelivered('${o.id}')">❌ Qayta aktivlashtirish</button>
+
     </div>
   `;
 }
 
 /* ACTIONS */
-
-/* 1) ZAKAZNI QABUL QILISH */
-window.takeOrder = async (id)=>{
+window.takeOrder = async(id)=>{
   if(!isOnline) return showToast("Offline holatda qabul qilib bo‘lmaydi.");
 
-  const orderRef = doc(db,"orders",id);
-
-  await updateDoc(orderRef,{
+  await updateDoc(doc(db,"orders",id),{
     courierLogin:currentCourier.login,
     courierName:currentCourier.name,
-    courierPhone:currentCourier.phone || "-", 
     courierCar:currentCourier.car,
     status:"courier",
     courierTakenAt:serverTimestamp()
   });
-
   showToast("Zakaz olindi");
-
-  /* MIJOZGA HABAR QO‘SHILDI */
-  await addDoc(collection(db,"notifications"),{
-    orderId:id,
-    type:"courier_taken",
-    msg:`Sizning zakazingizni kuryer oldi.\nIsmi: ${currentCourier.name}\nTel: ${currentCourier.phone}\nMashina: ${currentCourier.car}`,
-    createdAt:serverTimestamp()
-  });
 };
 
-/* 2) ZAKAZNI QAYTARISH */
 window.releaseOrder = async(id)=>{
+  if(!isOnline) return showToast("Offline holatda amal bajarilmaydi.");
+
   await updateDoc(doc(db,"orders",id),{
     courierLogin:null,
     courierName:null,
     courierCar:null,
-    courierPhone:null,
     status:"courier"
   });
   showToast("Zakaz yechildi");
 };
 
-/* 3) YETKAZDIM — MIJOZ TASDIQLASHI SHART */
 window.markDelivered = async(id)=>{
-  showToast("Mijoz tasdiqlashi kutilmoqda...");
+  if(!isOnline) return showToast("Offline holatda yetkazib bo‘lmaydi.");
 
   await updateDoc(doc(db,"orders",id),{
-    status:"waiting_confirm",
+    status:"delivered",
     deliveredAt:serverTimestamp()
   });
-
-  /* MIJOZGA TASDIQLASH OYNASI (POPUP) */
-
-  await addDoc(collection(db,"notifications"),{
-    orderId:id,
-    type:"confirm_request",
-    msg:"Zakazni oldingizmi? Ha yoki Yo‘q tugmani bosing.",
-    createdAt:serverTimestamp()
-  });
+  showToast("Yetkazildi");
 };
 
-/* ADMIN QAYTA ULASH UCHUN */
 window.releaseDelivered = async(id)=>{
+  if(!isOnline) return showToast("Offline holatda aktivlashtirib bo‘lmaydi.");
+
   await updateDoc(doc(db,"orders",id),{
     status:"courier",
     courierLogin:null,
     courierName:null,
-    courierCar:null,
-    courierPhone:null
+    courierCar:null
   });
   showToast("Qayta aktivlashtirildi");
 };
@@ -614,4 +619,7 @@ tabBtns.forEach(btn=>{
 });
 
 </script>
- 
+<!-- ========================= JS END ============================== -->
+
+</body>
+</html>
