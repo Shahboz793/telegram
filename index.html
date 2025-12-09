@@ -27,7 +27,7 @@
       </div>
 
       <div class="header-right">
-        <button id="themeToggleBtn" type="button" class="icon-btn" aria-label="Tema almashtirish">🌙</button>
+        <button id="themeToggleBtn" type="button" class="icon-btn">🌙</button>
 
         <button class="cart-top-btn" onclick="toggleCartSheet(true)">
           <span>🛒 Savat</span>
@@ -35,28 +35,29 @@
           <span class="cart-top-total" id="cartTotalTop">0 so‘m</span>
         </button>
 
-        <button id="adminAccessBtn" type="button" class="icon-btn" aria-label="Admin kirish">
+        <button id="adminAccessBtn" type="button" class="icon-btn">
           👑 Admin
         </button>
 
-        <button type="button" class="icon-btn" onclick="location.href='courier.html'" aria-label="Kuryer paneli">
+        <button type="button" class="icon-btn" onclick="location.href='courier.html'">
           🚚
         </button>
       </div>
     </header>
 
     <!-- TABS -->
-    <nav class="tabs" id="tabs" role="tablist" aria-label="Bo‘limlar">
-      <button class="tab-btn active" data-page="shopPage" role="tab" aria-selected="true">🍽 Menyu</button>
-      <button class="tab-btn" data-page="ordersPage" role="tab" aria-selected="false">📦 Buyurtmalarim</button>
-      <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage" role="tab" aria-selected="false">👑 Admin</button>
+    <nav class="tabs" id="tabs">
+      <button class="tab-btn active" data-page="shopPage">🍽 Menyu</button>
+      <button class="tab-btn" data-page="ordersPage">📦 Buyurtmalarim</button>
+      <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">👑 Admin</button>
     </nav>
 
     <!-- MAIN -->
     <main>
 
       <!-- === SHOP PAGE === -->
-      <section id="shopPage" class="page" role="tabpanel" aria-labelledby="Menyu">
+      <section id="shopPage" class="page">
+
         <div class="customer-panel">
           <p id="customerInfoText" class="customer-info">
             Mijoz ma’lumotlari saqlanmagan. Buyurtma paytida ism va telefon so‘raladi.
@@ -74,18 +75,20 @@
 
         <div id="filterBar" class="chips-row"></div>
 
-        <section id="productsGrid" class="products-grid" aria-live="polite"></section>
+        <section id="productsGrid" class="products-grid"></section>
+
       </section>
 
       <!-- === BUYURTMALAR === -->
-      <section id="ordersPage" class="page hidden" role="tabpanel" aria-labelledby="Buyurtmalarim">
+      <section id="ordersPage" class="page hidden">
         <h2 class="section-title">📦 Buyurtmalarim</h2>
         <p class="section-sub">Buyurtmalaringiz holatini real vaqt rejimida kuzating.</p>
         <div id="clientOrdersList" class="orders-list"></div>
       </section>
 
       <!-- === ADMIN PAGE === -->
-      <section id="adminPage" class="page hidden admin-page" role="tabpanel" aria-labelledby="Admin">
+      <section id="adminPage" class="page hidden admin-page">
+
         <header class="admin-top-bar">
           <h2 class="section-title">👑 Admin paneli</h2>
           <button class="btn-xs btn-xs-secondary" onclick="location.href='courier.html'">
@@ -100,24 +103,33 @@
             <article class="card">
               <h3 class="card-title">🍔 Mahsulotlar</h3>
               <div class="form-grid">
-                <label>Nomi <input id="adminName" type="text" autocomplete="off"></label>
+
+                <label>Nomi <input id="adminName" type="text"></label>
+
                 <label>Kategoriya <select id="adminCategory"></select></label>
-                <label>Asosiy narx <input id="adminPriceBase" type="number" inputmode="numeric"></label>
+
+                <label>Asosiy narx <input id="adminPriceBase" type="number"></label>
+
                 <label class="checkbox-row">
                   <input id="adminHasDiscount" type="checkbox"> Chegirma mavjud
                 </label>
-                <label>Chegirmali narx <input id="adminPriceDiscount" type="number" inputmode="numeric"></label>
-                <label>Tag / chip <input id="adminTag" type="text" autocomplete="off"></label>
-                <label>Tavsif <textarea id="adminDescription" rows="3"></textarea></label>
-                <label>Rasmlar <textarea id="adminImages" rows="2" placeholder="img1.png, img2.jpg yoki https://..."></textarea></label>
+
+                <label>Chegirmali narx <input id="adminPriceDiscount" type="number"></label>
+
+                <label>Tag / chip <input id="adminTag" type="text"></label>
+
+                <label>Tavsif <textarea id="adminDescription"></textarea></label>
+
+                <label>Rasmlar <textarea id="adminImages"></textarea></label>
+
               </div>
 
-              <!-- MUHIM: .admin-btn klassi app.js dagi flash uchun kerak -->
-              <button class="btn-primary btn-full admin-btn" onclick="addCustomProduct()">
-                ➕ Mahsulot qo‘shish (Firestore)
+              <button class="btn-primary btn-full" onclick="addCustomProduct()">
+                ➕ Mahsulot qo‘shish
               </button>
 
               <div id="adminCustomList" class="admin-list"></div>
+
             </article>
           </div>
 
@@ -127,9 +139,11 @@
             <article class="card">
               <h3 class="card-title">🏷 Kategoriyalar</h3>
               <div class="form-grid">
-                <label>Kategoriya kodi <input id="adminCatCode" autocomplete="off" placeholder="masalan: burger"></label>
-                <label>Kategoriya nomi <input id="adminCatLabel" autocomplete="off" placeholder="masalan: Burgers"></label>
-                <label>Emoji <input id="adminCatEmoji" autocomplete="off" placeholder="🍔"></label>
+
+                <label>Kategoriya kodi <input id="adminCatCode"></label>
+                <label>Kategoriya nomi <input id="adminCatLabel"></label>
+                <label>Emoji <input id="adminCatEmoji"></label>
+
               </div>
 
               <button class="btn-primary btn-full" onclick="saveCategory()">
@@ -143,12 +157,12 @@
               <h3 class="card-title">🚚 Kuryer qo‘shish</h3>
 
               <div class="form-grid">
-                <label>Ism <input id="adminCourierName" autocomplete="off"></label>
-                <label>Telefon <input id="adminCourierPhone" autocomplete="off" placeholder="+998..."></label>
-                <label>Avtomobil <input id="adminCourierCar" autocomplete="off" placeholder="Cobalt, Nexia..."></label>
-                <label>Raqam <input id="adminCourierPlate" autocomplete="off" placeholder="01 A123BC"></label>
-                <label>Login <input id="adminCourierLogin" autocomplete="off"></label>
-                <label>Parol <input id="adminCourierPassword" type="password" autocomplete="new-password"></label>
+                <label>Ism <input id="adminCourierName"></label>
+                <label>Telefon <input id="adminCourierPhone"></label>
+                <label>Avtomobil <input id="adminCourierCar"></label>
+                <label>Raqam <input id="adminCourierPlate"></label>
+                <label>Login <input id="adminCourierLogin"></label>
+                <label>Parol <input id="adminCourierPassword" type="password"></label>
               </div>
 
               <button id="adminCourierSaveBtn" class="btn-primary btn-full" onclick="saveCourier()">
@@ -175,6 +189,7 @@
                 <button class="btn-xs btn-xs-secondary" onclick="centerToCourier()">📍 Marshrut</button>
                 <button class="btn-xs btn-xs-secondary" onclick="openSelectedCourierExternal()">🌐 Google Maps</button>
               </div>
+
             </article>
 
           </div>
@@ -188,17 +203,19 @@
           </div>
 
         </div>
+
       </section>
+
     </main>
   </div>
 
   <!-- CART SHEET -->
   <div id="cartSheetOverlay" class="overlay" onclick="toggleCartSheet(false)"></div>
 
-  <aside id="cartSheet" class="cart-sheet" aria-live="polite">
+  <aside id="cartSheet" class="cart-sheet">
     <header>
       <h2>🛒 Savat</h2>
-      <button class="icon-btn" onclick="toggleCartSheet(false)" aria-label="Yopish">✕</button>
+      <button class="icon-btn" onclick="toggleCartSheet(false)">✕</button>
     </header>
 
     <div class="cart-sheet-total-row">
@@ -219,7 +236,7 @@
   </button>
 
   <!-- TOAST -->
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast"></div>
 
   <!-- SOUND -->
   <audio id="notifySound" src="ding.mp3" preload="auto"></audio>
@@ -234,8 +251,8 @@
       <div class="detail-img-wrap" id="detailImgWrap">
         <img id="detailImage" class="detail-main-img" alt="rasm">
 
-        <button id="detailPrevBtn" class="detail-nav prev" aria-label="Oldingi rasm">‹</button>
-        <button id="detailNextBtn" class="detail-nav next" aria-label="Keyingi rasm">›</button>
+        <button id="detailPrevBtn" class="detail-nav prev">‹</button>
+        <button id="detailNextBtn" class="detail-nav next">›</button>
 
         <div id="detailImageIndex" class="detail-index"></div>
       </div>
@@ -255,13 +272,10 @@
         </div>
 
         <div class="detail-qty-row">
-          <button id="detailQtyMinus" aria-label="Kamaytirish">-</button>
+          <button id="detailQtyMinus">-</button>
           <span id="detailQtyValue">1</span>
-          <button id="detailQtyPlus" aria-label="Ko‘paytirish">+</button>
+          <button id="detailQtyPlus">+</button>
         </div>
-
-        <!-- Ixtiyoriy: app.js bo‘lsa galereyani to‘ldiradi -->
-        <div id="detailGalleryList" class="detail-gallery-list"></div>
 
         <button id="detailAddBtn" class="btn-primary btn-full">
           🛒 Savatga qo‘shish
@@ -278,5 +292,6 @@
 
   <!-- APP SCRIPT -->
   <script type="module" src="app.js"></script>
+
 </body>
 </html>
