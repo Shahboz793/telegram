@@ -2,245 +2,74 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <title>🚚 Kuryer paneli — Premium FastFood</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <style>
-    body{
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:#0d0d0d;
-      color:white;
-    }
-    .hidden{display:none;}
-
-    .courier-header{
-      background:#111;
-      padding:12px 16px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border-bottom:2px solid #22c55e;
-    }
-    .courier-logo{font-size:32px;}
-    .courier-title{font-size:20px; font-weight:bold;}
-    .courier-subtitle{font-size:13px; opacity:.7;}
-
-    .btn-chip{
-      padding:6px 12px;
-      background:#22c55e;
-      border:none;
-      border-radius:6px;
-      font-weight:bold;
-      color:#000;
-      cursor:pointer;
-    }
-    .btn-chip-danger{
-      background:#ef4444;
-      color:white;
-    }
-
-    .courier-main{padding:16px;}
-
-    .courier-card{
-      background:#111;
-      border:1px solid #222;
-      padding:16px;
-      border-radius:12px;
-      margin-bottom:16px;
-    }
-
-    .form-grid{display:grid; gap:12px;}
-
-    input{
-      width:100%;
-      padding:10px;
-      border-radius:6px;
-      border:none;
-      background:#222;
-      color:white;
-    }
-
-    .courier-info-card{
-      background:#1a1a1a;
-      padding:12px;
-      border-radius:8px;
-      border:1px solid #333;
-    }
-    .courier-avatar{
-      font-size:30px;
-      margin-right:10px;
-    }
-    .courier-info-main{
-      display:flex;
-      align-items:center;
-      margin-bottom:6px;
-    }
-    .courier-badge{
-      display:inline-block;
-      background:#ef4444;
-      padding:4px 10px;
-      border-radius:40px;
-      font-size:12px;
-      color:white;
-      font-weight:bold;
-    }
-
-    .courier-stats-row{
-      display:flex;
-      gap:12px;
-      margin-top:10px;
-    }
-    .courier-stat-card{
-      flex:1;
-      background:#1c1c1c;
-      padding:12px;
-      border-radius:10px;
-      border:1px solid #333;
-      text-align:center;
-    }
-    .stat-value{font-size:22px; font-weight:bold; color:#22c55e;}
-
-    .courier-tabs{
-      display:flex;
-      gap:6px;
-      margin-top:12px;
-    }
-    .courier-tab-btn{
-      flex:1;
-      padding:10px;
-      background:#222;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-      color:white;
-      font-weight:bold;
-    }
-    .courier-tab-btn.active{
-      background:#22c55e;
-      color:black;
-    }
-
-    .order-card{
-      background:#141414;
-      padding:14px;
-      border-radius:12px;
-      margin-top:12px;
-      border:1px solid #333;
-    }
-
-    .order-card ul{
-      margin:10px 0;
-      padding-left:18px;
-    }
-
-    .btn-xs{
-      padding:8px 12px;
-      border:none;
-      border-radius:6px;
-      font-size:13px;
-      cursor:pointer;
-      margin-right:6px;
-      margin-top:6px;
-    }
-    .btn-xs-primary{
-      background:#22c55e;
-      color:black;
-      font-weight:bold;
-    }
-    .btn-xs-secondary{
-      background:#333;
-      color:white;
-    }
-    .btn-xs-danger{
-      background:#ef4444;
-      color:white;
-    }
-
-    .toast{
-      position:fixed;
-      bottom:20px;
-      left:50%;
-      transform:translateX(-50%);
-      background:#22c55e;
-      color:black;
-      padding:12px 18px;
-      border-radius:8px;
-      font-weight:bold;
-      display:none;
-    }
-    .toast.show{display:block;}
-  </style>
+  <title>🚚 Kuryer paneli — Premium Beauty</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
-
+<body class="courier-body">
   <!-- HEADER -->
   <header class="courier-header">
-    <div class="courier-header-left" style="display:flex; gap:10px;">
+    <div class="courier-header-left">
       <div class="courier-logo">🍔</div>
-      <div>
+      <div class="courier-header-text">
         <div class="courier-title">Premium FastFood — Kuryer</div>
-        <div class="courier-subtitle">Qabul qil, olib bor, yetkaz.</div>
+        <div class="courier-subtitle">Qabul qil • Olib bor • Yetkaz</div>
       </div>
     </div>
-
     <div class="courier-header-right">
       <button class="btn-chip" onclick="location.href='index.html'">⬅ Menyu</button>
-      <button class="btn-chip btn-chip-danger" id="courierLogoutBtn">Chiqish</button>
+      <button id="courierLogoutBtn" class="btn-chip btn-chip-danger">Chiqish</button>
     </div>
   </header>
 
   <main class="courier-main">
-
-    <!-- LOGIN -->
-    <section id="courierLoginSection">
-      <article class="courier-card">
+    <!-- LOGIN SECTION -->
+    <section id="courierLoginSection" class="courier-login-section">
+      <article class="courier-card courier-login-card">
         <h2>🚚 Kuryer uchun kirish</h2>
         <p>Admin bergan login va parolni kiriting.</p>
-
         <div class="form-grid">
-          <label>Login <input id="courierLoginInput"></label>
-          <label>Parol <input id="courierPassInput" type="password"></label>
+          <label>Login <input id="courierLoginInput" autocomplete="username"></label>
+          <label>Parol <input id="courierPassInput" type="password" autocomplete="current-password"></label>
         </div>
-
-        <button class="btn-chip" id="courierLoginBtn" style="margin-top:12px;">
-          Kirish
-        </button>
+        <button id="courierLoginBtn" class="btn-chip" style="margin-top:12px;">Kirish</button>
       </article>
     </section>
 
-    <!-- APP -->
-    <section id="courierAppSection" class="hidden">
-
+    <!-- APP SECTION -->
+    <section id="courierAppSection" class="courier-app-section hidden">
+      <!-- INFO + STATS -->
       <article class="courier-card">
         <div class="courier-info-card">
           <div class="courier-info-main">
             <div class="courier-avatar">🚚</div>
             <div>
-              <div id="courierNameText"></div>
-              <div id="courierCarText"></div>
+              <div id="courierNameText" class="courier-name"></div>
+              <div id="courierCarText" class="courier-meta"></div>
             </div>
           </div>
-
-          <div style="margin-top:6px;">
+          <div class="courier-badge-row">
             <span id="courierStatusBadge" class="courier-badge">Offline</span>
           </div>
-
           <div style="margin-top:10px; display:flex; gap:10px;">
-            <button id="goOnline" class="btn-xs btn-xs-primary">Onlayn</button>
+            <button id="goOnline"  class="btn-xs btn-xs-primary">Onlayn</button>
             <button id="goOffline" class="btn-xs btn-xs-danger">Offline</button>
           </div>
         </div>
 
-        <div class="courier-stats-row">
+        <div class="courier-stats-row" style="margin-top:12px;">
           <div class="courier-stat-card">
-            <div>Bugun yetkazilgan</div>
+            <div class="stat-label">Bugun yetkazilgan</div>
             <div id="statTodayCount" class="stat-value">0</div>
+            <div class="stat-sub">dona</div>
           </div>
           <div class="courier-stat-card">
-            <div>Tushum</div>
+            <div class="stat-label">Tushum</div>
             <div id="statTodaySum" class="stat-value">0</div>
+            <div class="stat-sub">so‘m</div>
           </div>
         </div>
 
@@ -251,375 +80,202 @@
         </div>
       </article>
 
-      <section id="courierTabAvailable"></section>
-      <section id="courierTabMy" class="hidden"></section>
-      <section id="courierTabDone" class="hidden"></section>
-
+      <!-- TAB PAGES -->
+      <section id="courierTabAvailable" class="courier-tab-page"></section>
+      <section id="courierTabMy"        class="courier-tab-page hidden"></section>
+      <section id="courierTabDone"      class="courier-tab-page hidden"></section>
     </section>
   </main>
 
   <div id="courierToast" class="toast"></div>
-  <audio id="courierNotify" src="ding.mp3" preload="auto"></audio>
-
-<!-- ========================= JS START ============================== -->
-<script type="module">
-
-/* FIREBASE LOAD */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  onSnapshot,
-  query,
-  orderBy,
-  updateDoc,
-  doc,
-  serverTimestamp,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-/* CONFIG */
-const firebaseConfig = {
-  apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
-  authDomain: "shahboz-5d0a3.firebaseapp.com",
-  projectId: "shahboz-5d0a3",
-  storageBucket: "shahboz-5d0a3.firebasestorage.app",
-  messagingSenderId: "352024095535",
-  appId: "1:352024095535:web:3f495ac74cdd40f5c54fda"
-};
-
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-
-/* GLOBALS */
-const ordersCol   = collection(db, "orders");
-const couriersCol = collection(db, "couriers");
-
-let currentCourier = null;
-let orders = [];
-let isOnline = false;
-let unsub = null;
-
-const STORAGE_KEY = "beauty_courier_auth";
-const REST_LAT = 39.90023;
-const REST_LNG = 68.78980;
-
-/* DOM */
-const loginSec = document.getElementById("courierLoginSection");
-const appSec   = document.getElementById("courierAppSection");
-const loginBtn = document.getElementById("courierLoginBtn");
-const logoutBtn = document.getElementById("courierLogoutBtn");
-const loginInput = document.getElementById("courierLoginInput");
-const passInput  = document.getElementById("courierPassInput");
-const nameEl = document.getElementById("courierNameText");
-const carEl  = document.getElementById("courierCarText");
-const badge  = document.getElementById("courierStatusBadge");
-
-const tabBtns = document.querySelectorAll(".courier-tab-btn");
-const tabA = document.getElementById("courierTabAvailable");
-const tabM = document.getElementById("courierTabMy");
-const tabD = document.getElementById("courierTabDone");
-
-const toast = document.getElementById("courierToast");
-const ding = document.getElementById("courierNotify");
-
-/* HELPERS */
-function showToast(msg){
-  toast.textContent = msg;
-  toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"),2000);
-}
-function sound(){ ding.currentTime=0; ding.play().catch(()=>{}); }
-
-function distKm(lat1, lon1, lat2, lon2){
-  if(!lat1 || !lon1 || !lat2 || !lon2) return "";
-  const R = 6371;
-  const dLat = (lat2-lat1)*Math.PI/180;
-  const dLon = (lon2-lon1)*Math.PI/180;
-  const a = Math.sin(dLat/2)**2 +
-    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)
-    * Math.sin(dLon/2)**2;
-  return (R * 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(2);
-}
-
-/* LOGIN */
-loginBtn.onclick = async ()=>{
-  const login = loginInput.value.trim().toLowerCase();
-  const pass  = passInput.value.trim();
-
-  const snap = await getDocs(couriersCol);
-  let found = null;
-
-  snap.forEach(d=>{
-    const c = d.data();
-    if(c.login?.toLowerCase() === login && c.password === pass) found = c;
-  });
-
-  if(!found){
-    showToast("Login yoki parol xato");
-    return;
-  }
-
-  currentCourier = found;
-  nameEl.textContent = found.name;
-  carEl.textContent  = "🚗 " + found.car;
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(found));
-
-  loginSec.classList.add("hidden");
-  appSec.classList.remove("hidden");
-
-  subscribe();
-};
-
-/* LOGOUT */
-logoutBtn.onclick = ()=>{
-  localStorage.removeItem(STORAGE_KEY);
-  currentCourier=null;
-  appSec.classList.add("hidden");
-  loginSec.classList.remove("hidden");
-};
-
-/* ONLINE/OFFLINE */
-goOnline.onclick = ()=>{
-  isOnline = true;
-  badge.textContent="Onlayn";
-  badge.style.background="#22c55e";
-  render();
-};
-goOffline.onclick = ()=>{
-  isOnline = false;
-  badge.textContent="Offline";
-  badge.style.background="#ef4444";
-  render();
-};
-
-/* SUBSCRIBE */
-function subscribe(){
-  if(unsub) unsub();
-  const q = query(ordersCol, orderBy("createdAt","desc"));
-
-  unsub = onSnapshot(q, snap=>{
-    orders = snap.docs.map(d=>({id:d.id,...d.data()}));
-    render();
-  });
-}
-
-/* RENDER */
-function render(){
-
-  if(!isOnline){
-    tabA.innerHTML = `<div style="padding:20px;text-align:center;opacity:.7;">Offline holatda zakazlar ko‘rinmaydi</div>`;
-    tabM.innerHTML = "";
-    tabD.innerHTML = "";
-    return;
-  }
-
-  const A = orders.filter(o=>o.status==="courier" && !o.courierLogin);
-  const M = orders.filter(o=>o.status==="courier" && o.courierLogin===currentCourier.login);
-  const D = orders.filter(o=>o.status==="delivered" && o.courierLogin===currentCourier.login);
-
-  tabA.innerHTML = A.map(renderCard_A).join("");
-  tabM.innerHTML = M.map(renderCard_M).join("");
-  tabD.innerHTML = D.map(renderCard_D).join("");
-
-  document.getElementById("statTodayCount").textContent = D.length;
-}
-
-/* CARD — AVAILABLE */
-function renderCard_A(o){
-  const c = o.customer || {};
-  const loc = o.location;
-
-  const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
-  const total = o.totalPrice || (o.items || []).reduce(
-    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
-  );
 
-  return `
-    <div class="order-card">
-
-      <div><strong>🧾 Buyurtma #${code}</strong></div>
-
-      <div><strong>${c.name}</strong></div>
-      <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
-
-      <div>📍 ${c.address}</div>
-      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
-
-      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
-      <div>📏 ${loc ? distKm(REST_LAT,REST_LNG,loc.lat,loc.lng)+" km" : ""}</div>
-
-      <ul>
-        ${(o.items||[]).map(i => `
-          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
-        `).join("")}
-      </ul>
-
-      <button class="btn-xs btn-xs-primary" onclick="takeOrder('${o.id}')">Qabul qilish</button>
-      <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">Marshrut</button>
-
-    </div>
-  `;
-}
-
-/* CARD — MY */
-function renderCard_M(o){
-  const c = o.customer || {};
-  const loc = o.location;
-
-  const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
-  const total = o.totalPrice || (o.items || []).reduce(
-    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
-  );
-
-  return `
-    <div class="order-card">
-
-      <div><strong>📦 Mening zakazim #${code}</strong></div>
-
-      <div><strong>${c.name}</strong></div>
-      <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
-
-      <div>📍 ${c.address}</div>
-      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
-
-      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
-      <div>📏 ${loc ? distKm(REST_LAT,REST_LNG,loc.lat,loc.lng)+" km" : ""}</div>
-
-      <ul>
-        ${(o.items||[]).map(i => `
-          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
-        `).join("")}
-      </ul>
-
-      <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">Marshrut</button>
-      <button class="btn-xs btn-xs-danger" onclick="releaseOrder('${o.id}')">❌ Yechish</button>
-      <button class="btn-xs btn-xs-primary" onclick="markDelivered('${o.id}')">Yetkazdim</button>
-
-    </div>
-  `;
-}
-
-/* CARD — DELIVERED */
-function renderCard_D(o){
-  const c = o.customer || {};
-
-  const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
-  const total = o.totalPrice || (o.items || []).reduce(
-    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
-  );
-
-  return `
-    <div class="order-card">
-
-      <div><strong>✔ Yetkazilgan #${code}</strong></div>
-
-      <div><strong>${c.name}</strong></div>
-      <div>📱 ${c.phone}</div>
-
-      <div>📍 ${c.address}</div>
-      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
-
-      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
-
-      <ul>
-        ${(o.items||[]).map(i => `
-          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
-        `).join("")}
-      </ul>
-
-      <button class="btn-xs btn-xs-danger" onclick="releaseDelivered('${o.id}')">❌ Qayta aktivlashtirish</button>
-
-    </div>
-  `;
-}
-
-/* ACTIONS */
-window.takeOrder = async(id)=>{
-  if(!isOnline) return showToast("Offline holatda qabul qilib bo‘lmaydi.");
-
-  await updateDoc(doc(db,"orders",id),{
-    courierLogin:currentCourier.login,
-    courierName:currentCourier.name,
-    courierCar:currentCourier.car,
-    status:"courier",
-    courierTakenAt:serverTimestamp()
-  });
-  showToast("Zakaz olindi");
-};
-
-window.releaseOrder = async(id)=>{
-  if(!isOnline) return showToast("Offline holatda amal bajarilmaydi.");
-
-  await updateDoc(doc(db,"orders",id),{
-    courierLogin:null,
-    courierName:null,
-    courierCar:null,
-    status:"courier"
-  });
-  showToast("Zakaz yechildi");
-};
-
-window.markDelivered = async(id)=>{
-  if(!isOnline) return showToast("Offline holatda yetkazib bo‘lmaydi.");
-
-  await updateDoc(doc(db,"orders",id),{
-    status:"delivered",
-    deliveredAt:serverTimestamp()
-  });
-  showToast("Yetkazildi");
-};
-
-window.releaseDelivered = async(id)=>{
-  if(!isOnline) return showToast("Offline holatda aktivlashtirib bo‘lmaydi.");
-
-  await updateDoc(doc(db,"orders",id),{
-    status:"courier",
-    courierLogin:null,
-    courierName:null,
-    courierCar:null
-  });
-  showToast("Qayta aktivlashtirildi");
-};
-
-/* MAP */
-window.openMap = (lat,lng)=>{
-  if(!lat) return showToast("Lokatsiya yo‘q");
-  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
-};
-
-/* AUTO LOGIN */
-(function(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if(saved){
-    currentCourier = JSON.parse(saved);
-    nameEl.textContent = currentCourier.name;
-    carEl.textContent  = "🚗 "+currentCourier.car;
-    loginSec.classList.add("hidden");
-    appSec.classList.remove("hidden");
-    subscribe();
-  }
-})();
-
-/* TABS */
-tabBtns.forEach(btn=>{
-  btn.onclick = ()=>{
-    tabBtns.forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-
-    tabA.classList.add("hidden");
-    tabM.classList.add("hidden");
-    tabD.classList.add("hidden");
-
-    if(btn.dataset.tab==="available") tabA.classList.remove("hidden");
-    if(btn.dataset.tab==="my")        tabM.classList.remove("hidden");
-    if(btn.dataset.tab==="done")      tabD.classList.remove("hidden");
-  };
-});
-
-</script>
-<!-- ========================= JS END ============================== -->
-
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getFirestore, collection, onSnapshot, query, orderBy, updateDoc, doc, serverTimestamp, getDocs
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
+      authDomain: "shahboz-5d0a3.firebaseapp.com",
+      projectId: "shahboz-5d0a3",
+      storageBucket: "shahboz-5d0a3.firebasestorage.app",
+      messagingSenderId: "352024095535",
+      appId: "1:352024095535:web:3f495ac74cdd40f5c54fda"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    const ordersCol   = collection(db, "orders");
+    const couriersCol = collection(db, "couriers");
+
+    // DOM
+    const loginSec = document.getElementById("courierLoginSection");
+    const appSec   = document.getElementById("courierAppSection");
+    const loginBtn = document.getElementById("courierLoginBtn");
+    const logoutBtn = document.getElementById("courierLogoutBtn");
+    const loginInput = document.getElementById("courierLoginInput");
+    const passInput  = document.getElementById("courierPassInput");
+    const nameEl = document.getElementById("courierNameText");
+    const carEl  = document.getElementById("courierCarText");
+    const badge  = document.getElementById("courierStatusBadge");
+    const tabBtns = document.querySelectorAll(".courier-tab-btn");
+    const tabA = document.getElementById("courierTabAvailable");
+    const tabM = document.getElementById("courierTabMy");
+    const tabD = document.getElementById("courierTabDone");
+    const toast = document.getElementById("courierToast");
+
+    let currentCourier = null;
+    let isOnline = false;
+    const STORAGE_KEY = "beauty_courier_auth";
+
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(()=>toast.classList.remove("show"),1800);
+    }
+
+    function sound(){
+      try{
+        const ctx = new (window.AudioContext||window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = "sine"; o.frequency.value = 880;
+        o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(0.001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime+0.01);
+        o.start();
+        setTimeout(()=>{
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.15);
+          o.stop(ctx.currentTime+0.16);
+        }, 120);
+      }catch(e){}
+    }
+
+    // Auth
+    loginBtn.onclick = async () => {
+      const login = (loginInput.value||"").trim().toLowerCase();
+      const pass  = (passInput.value||"").trim();
+
+      const snapshot = await getDocs(couriersCol);
+      let found = null;
+      snapshot.forEach(d=>{
+        const c = d.data();
+        if(c.login?.toLowerCase()===login && c.password===pass) found = c;
+      });
+      if(!found){ showToast("Login yoki parol xato"); return; }
+
+      currentCourier = found;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(found));
+      nameEl.textContent = found.name || "";
+      carEl.textContent  = "🚗 " + (found.car || "");
+      isOnline = true;
+      badge.textContent = "Online"; badge.style.background = "#16a34a";
+      loginSec.classList.add("hidden");
+      appSec.classList.remove("hidden");
+      showToast("Xush kelibsiz!");
+      sound();
+    };
+
+    logoutBtn.onclick = () => {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    };
+
+    // Tabs
+    tabBtns.forEach(btn=>btn.onclick = () => {
+      tabBtns.forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      const tab = btn.dataset.tab;
+      tabA.classList.toggle("hidden", tab!=="available");
+      tabM.classList.toggle("hidden", tab!=="my");
+      tabD.classList.toggle("hidden", tab!=="done");
+    });
+
+    // Live orders
+    onSnapshot(query(ordersCol, orderBy("createdAt","desc")), snap=>{
+      const available = [];
+      const mine = [];
+      const done = [];
+      snap.forEach(d=>{
+        const o = { id:d.id, ...d.data() };
+        if(o.status==="delivered") done.push(o);
+        else if(o.courierId && currentCourier && o.courierId===currentCourier.id) mine.push(o);
+        else if(!o.courierId && o.status!=="rejected") available.push(o);
+      });
+
+      render(available, tabA, true);
+      render(mine, tabM, false);
+      render(done, tabD, false);
+    });
+
+    function render(list, container, canTake){
+      container.innerHTML = "";
+      if(!list.length){ container.innerHTML = "<p class='cart-empty'>Hozircha ma’lumot yo‘q.</p>"; return; }
+      list.forEach(o=>{
+        const addr = o.customer?.address || "";
+        const name = o.customer?.name || "";
+        const phone = o.customer?.phone || "";
+        const lat = o.location?.lat; const lng = o.location?.lng;
+        const total = (o.items||[]).reduce((s,it)=>s+Number(it.price||0)*Number(it.qty||1),0);
+        const li = document.createElement("article");
+        li.className = "order-card courier-order-card";
+        li.innerHTML = `
+          <div class="order-header">
+            <div>
+              <div class="order-id">#${o.id}</div>
+              <div class="order-customer">👤 ${name} • 📱 ${phone}</div>
+              <div class="order-date">📍 ${addr}</div>
+            </div>
+            <div class="order-total">${(total||0).toLocaleString("uz-UZ")} so‘m</div>
+          </div>
+          <div class="order-items">
+            <ul>${(o.items||[]).map(it=>`<li>${it.name} × ${it.qty}</li>`).join("")}</ul>
+          </div>
+          <div class="courier-card-footer">
+            ${lat&&lng ? `<a class="btn-xs btn-xs-secondary" href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}" target="_blank">🧭 Marshrut</a>` : ""}
+            ${canTake ? `<button class="btn-xs btn-xs-primary" data-take="${o.id}">Qabul qilish</button>` : ""}
+            ${currentCourier && o.courierId===currentCourier.id && o.status!=="delivered" ? `<button class="btn-xs btn-xs-primary" data-done="${o.id}">✓ Yetkazildi</button>` : ""}
+            ${currentCourier && o.courierId===currentCourier.id ? `<button class="btn-xs btn-xs-danger" data-reject="${o.id}">✖ Bekor</button>` : ""}
+          </div>
+        `;
+        container.appendChild(li);
+      });
+
+      container.onclick = async (e) => {
+        const take = e.target.closest("[data-take]");
+        const done = e.target.closest("[data-done]");
+        const rej  = e.target.closest("[data-reject]");
+        if(take){
+          const id = take.dataset.take;
+          await updateDoc(doc(db,"orders",id), { courierId: currentCourier?.id || (currentCourier?.login||""), status:"courier", courierAcceptedAt: serverTimestamp() });
+          showToast("Buyurtma qabul qilindi.");
+          sound();
+        }else if(done){
+          const id = done.dataset.done;
+          await updateDoc(doc(db,"orders",id), { status:"delivered", deliveredAt: serverTimestamp() });
+          showToast("Yetkazilgan deb belgilandi.");
+          sound();
+        }else if(rej){
+          const id = rej.dataset.reject;
+          await updateDoc(doc(db,"orders",id), { status:"rejected", rejectedAt: serverTimestamp() });
+          showToast("Bekor qilindi.");
+        }
+      };
+    }
+
+    // Telegram theming
+    (function initTG(){
+      const tg = window.Telegram?.WebApp;
+      if(!tg) return;
+      tg.ready();
+      if(tg.colorScheme==="light"){ document.body.classList.remove("theme-dark"); }
+      tg.onEvent("themeChanged", ()=>{
+        if(tg.colorScheme==="light"){ document.body.classList.remove("theme-dark"); }
+        else{ document.body.classList.add("theme-dark"); }
+      });
+    })();
+  </script>
 </body>
 </html>
