@@ -2,624 +2,296 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <title>🚚 Kuryer paneli — Premium FastFood</title>
+  <title>Premium FastFood — Online buyurtma</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
 
-  <style>
-    body{
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:#0d0d0d;
-      color:white;
-    }
-    .hidden{display:none;}
+  <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/5787/5787016.png">
 
-    .courier-header{
-      background:#111;
-      padding:12px 16px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border-bottom:2px solid #22c55e;
-    }
-    .courier-logo{font-size:32px;}
-    .courier-title{font-size:20px; font-weight:bold;}
-    .courier-subtitle{font-size:13px; opacity:.7;}
-
-    .btn-chip{
-      padding:6px 12px;
-      background:#22c55e;
-      border:none;
-      border-radius:6px;
-      font-weight:bold;
-      color:#000;
-      cursor:pointer;
-    }
-    .btn-chip-danger{
-      background:#ef4444;
-      color:white;
-    }
-
-    .courier-main{padding:16px;}
-
-    .courier-card{
-      background:#111;
-      border:1px solid #222;
-      padding:16px;
-      border-radius:12px;
-      margin-bottom:16px;
-    }
-
-    .form-grid{display:grid; gap:12px;}
-
-    input{
-      width:100%;
-      padding:10px;
-      border-radius:6px;
-      border:none;
-      background:#222;
-      color:white;
-    }
-
-    .courier-info-card{
-      background:#1a1a1a;
-      padding:12px;
-      border-radius:8px;
-      border:1px solid #333;
-    }
-    .courier-avatar{
-      font-size:30px;
-      margin-right:10px;
-    }
-    .courier-info-main{
-      display:flex;
-      align-items:center;
-      margin-bottom:6px;
-    }
-    .courier-badge{
-      display:inline-block;
-      background:#ef4444;
-      padding:4px 10px;
-      border-radius:40px;
-      font-size:12px;
-      color:white;
-      font-weight:bold;
-    }
-
-    .courier-stats-row{
-      display:flex;
-      gap:12px;
-      margin-top:10px;
-    }
-    .courier-stat-card{
-      flex:1;
-      background:#1c1c1c;
-      padding:12px;
-      border-radius:10px;
-      border:1px solid #333;
-      text-align:center;
-    }
-    .stat-value{font-size:22px; font-weight:bold; color:#22c55e;}
-
-    .courier-tabs{
-      display:flex;
-      gap:6px;
-      margin-top:12px;
-    }
-    .courier-tab-btn{
-      flex:1;
-      padding:10px;
-      background:#222;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-      color:white;
-      font-weight:bold;
-    }
-    .courier-tab-btn.active{
-      background:#22c55e;
-      color:black;
-    }
-
-    .order-card{
-      background:#141414;
-      padding:14px;
-      border-radius:12px;
-      margin-top:12px;
-      border:1px solid #333;
-    }
-
-    .order-card ul{
-      margin:10px 0;
-      padding-left:18px;
-    }
-
-    .btn-xs{
-      padding:8px 12px;
-      border:none;
-      border-radius:6px;
-      font-size:13px;
-      cursor:pointer;
-      margin-right:6px;
-      margin-top:6px;
-    }
-    .btn-xs-primary{
-      background:#22c55e;
-      color:black;
-      font-weight:bold;
-    }
-    .btn-xs-secondary{
-      background:#333;
-      color:white;
-    }
-    .btn-xs-danger{
-      background:#ef4444;
-      color:white;
-    }
-
-    .toast{
-      position:fixed;
-      bottom:20px;
-      left:50%;
-      transform:translateX(-50%);
-      background:#22c55e;
-      color:black;
-      padding:12px 18px;
-      border-radius:8px;
-      font-weight:bold;
-      display:none;
-    }
-    .toast.show{display:block;}
-  </style>
+  <!-- STYLE -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <div class="page-wrap">
 
-  <!-- HEADER -->
-  <header class="courier-header">
-    <div class="courier-header-left" style="display:flex; gap:10px;">
-      <div class="courier-logo">🍔</div>
-      <div>
-        <div class="courier-title">Premium FastFood — Kuryer</div>
-        <div class="courier-subtitle">Qabul qil, olib bor, yetkaz.</div>
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="logo-wrap">
+        <div class="logo-circle">🍔</div>
+        <div class="logo-text">
+          <div class="logo-title">Premium FastFood</div>
+          <div class="logo-sub">Tez va qulay yetkazib berish</div>
+        </div>
       </div>
-    </div>
 
-    <div class="courier-header-right">
-      <button class="btn-chip" onclick="location.href='index.html'">⬅ Menyu</button>
-      <button class="btn-chip btn-chip-danger" id="courierLogoutBtn">Chiqish</button>
-    </div>
-  </header>
+      <div class="header-right">
+        <button id="themeToggleBtn" type="button" class="icon-btn">🌙</button>
 
-  <main class="courier-main">
-
-    <!-- LOGIN -->
-    <section id="courierLoginSection">
-      <article class="courier-card">
-        <h2>🚚 Kuryer uchun kirish</h2>
-        <p>Admin bergan login va parolni kiriting.</p>
-
-        <div class="form-grid">
-          <label>Login <input id="courierLoginInput"></label>
-          <label>Parol <input id="courierPassInput" type="password"></label>
-        </div>
-
-        <button class="btn-chip" id="courierLoginBtn" style="margin-top:12px;">
-          Kirish
+        <button class="cart-top-btn" onclick="toggleCartSheet(true)">
+          <span>🛒 Savat</span>
+          <span class="pill"><span id="cartCountTop">0</span> ta</span>
+          <span class="cart-top-total" id="cartTotalTop">0 so‘m</span>
         </button>
-      </article>
-    </section>
 
-    <!-- APP -->
-    <section id="courierAppSection" class="hidden">
+        <button id="adminAccessBtn" type="button" class="icon-btn">
+          👑 Admin
+        </button>
 
-      <article class="courier-card">
-        <div class="courier-info-card">
-          <div class="courier-info-main">
-            <div class="courier-avatar">🚚</div>
-            <div>
-              <div id="courierNameText"></div>
-              <div id="courierCarText"></div>
-            </div>
-          </div>
+        <button type="button" class="icon-btn" onclick="location.href='courier.html'">
+          🚚
+        </button>
+      </div>
+    </header>
 
-          <div style="margin-top:6px;">
-            <span id="courierStatusBadge" class="courier-badge">Offline</span>
-          </div>
+    <!-- TABS -->
+    <nav class="tabs" id="tabs">
+      <button class="tab-btn active" data-page="shopPage">🍽 Menyu</button>
+      <button class="tab-btn" data-page="ordersPage">📦 Buyurtmalarim</button>
+      <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">👑 Admin</button>
+    </nav>
 
-          <div style="margin-top:10px; display:flex; gap:10px;">
-            <button id="goOnline" class="btn-xs btn-xs-primary">Onlayn</button>
-            <button id="goOffline" class="btn-xs btn-xs-danger">Offline</button>
-          </div>
-        </div>
+    <!-- MAIN -->
+    <main>
 
-        <div class="courier-stats-row">
-          <div class="courier-stat-card">
-            <div>Bugun yetkazilgan</div>
-            <div id="statTodayCount" class="stat-value">0</div>
-          </div>
-          <div class="courier-stat-card">
-            <div>Tushum</div>
-            <div id="statTodaySum" class="stat-value">0</div>
+      <!-- === SHOP PAGE === -->
+      <section id="shopPage" class="page">
+
+        <div class="customer-panel">
+          <p id="customerInfoText" class="customer-info">
+            Mijoz ma’lumotlari saqlanmagan. Buyurtma paytida ism va telefon so‘raladi.
+          </p>
+          <div class="customer-actions">
+            <button class="btn-outline" onclick="editCustomerInfo()">👤 O‘zgartirish</button>
+            <button class="btn-ghost" onclick="resetCustomerInfo()">🧹 Tozalash</button>
           </div>
         </div>
 
-        <div class="courier-tabs">
-          <button class="courier-tab-btn active" data-tab="available">🆕 Yangi</button>
-          <button class="courier-tab-btn" data-tab="my">📦 Mening</button>
-          <button class="courier-tab-btn" data-tab="done">✅ Yetkazilgan</button>
+        <div class="shop-toolbar">
+          <input id="searchInput" class="search-input" type="search"
+                 placeholder="Qidirish: taom nomi, kategoriya, tavsif..." />
         </div>
-      </article>
 
-      <section id="courierTabAvailable"></section>
-      <section id="courierTabMy" class="hidden"></section>
-      <section id="courierTabDone" class="hidden"></section>
+        <div id="filterBar" class="chips-row"></div>
 
-    </section>
-  </main>
+        <section id="productsGrid" class="products-grid"></section>
 
-  <div id="courierToast" class="toast"></div>
-  <audio id="courierNotify" src="ding.mp3" preload="auto"></audio>
+      </section>
 
-<!-- ========================= JS START ============================== -->
-<script type="module">
+      <!-- === BUYURTMALAR === -->
+      <section id="ordersPage" class="page hidden">
+        <h2 class="section-title">📦 Buyurtmalarim</h2>
+        <p class="section-sub">Buyurtmalaringiz holatini real vaqt rejimida kuzating.</p>
+        <div id="clientOrdersList" class="orders-list"></div>
+      </section>
 
-/* FIREBASE LOAD */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  onSnapshot,
-  query,
-  orderBy,
-  updateDoc,
-  doc,
-  serverTimestamp,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+      <!-- === ADMIN PAGE === -->
+      <section id="adminPage" class="page hidden admin-page">
 
-/* CONFIG */
-const firebaseConfig = {
-  apiKey: "AIzaSyDVidcgjpUxkg88bxXfIFzmsFydv0rMMao",
-  authDomain: "shahboz-5d0a3.firebaseapp.com",
-  projectId: "shahboz-5d0a3",
-  storageBucket: "shahboz-5d0a3.firebasestorage.app",
-  messagingSenderId: "352024095535",
-  appId: "1:352024095535:web:3f495ac74cdd40f5c54fda"
-};
+        <header class="admin-top-bar">
+          <h2 class="section-title">👑 Admin paneli</h2>
+          <button class="btn-xs btn-xs-secondary" onclick="location.href='courier.html'">
+            🚚 Kuryer paneli
+          </button>
+        </header>
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+        <div class="admin-cols">
 
-/* GLOBALS */
-const ordersCol   = collection(db, "orders");
-const couriersCol = collection(db, "couriers");
+          <!-- LEFT: PRODUCTS -->
+          <div class="admin-col">
+            <article class="card">
+              <h3 class="card-title">🍔 Mahsulotlar</h3>
+              <div class="form-grid">
 
-let currentCourier = null;
-let orders = [];
-let isOnline = false;
-let unsub = null;
+                <label>Nomi <input id="adminName" type="text"></label>
 
-const STORAGE_KEY = "beauty_courier_auth";
-const REST_LAT = 39.90023;
-const REST_LNG = 68.78980;
+                <label>Kategoriya <select id="adminCategory"></select></label>
 
-/* DOM */
-const loginSec = document.getElementById("courierLoginSection");
-const appSec   = document.getElementById("courierAppSection");
-const loginBtn = document.getElementById("courierLoginBtn");
-const logoutBtn = document.getElementById("courierLogoutBtn");
-const loginInput = document.getElementById("courierLoginInput");
-const passInput  = document.getElementById("courierPassInput");
-const nameEl = document.getElementById("courierNameText");
-const carEl  = document.getElementById("courierCarText");
-const badge  = document.getElementById("courierStatusBadge");
+                <label>Asosiy narx <input id="adminPriceBase" type="number"></label>
 
-const tabBtns = document.querySelectorAll(".courier-tab-btn");
-const tabA = document.getElementById("courierTabAvailable");
-const tabM = document.getElementById("courierTabMy");
-const tabD = document.getElementById("courierTabDone");
+                <label class="checkbox-row">
+                  <input id="adminHasDiscount" type="checkbox"> Chegirma mavjud
+                </label>
 
-const toast = document.getElementById("courierToast");
-const ding = document.getElementById("courierNotify");
+                <label>Chegirmali narx <input id="adminPriceDiscount" type="number"></label>
 
-/* HELPERS */
-function showToast(msg){
-  toast.textContent = msg;
-  toast.classList.add("show");
-  setTimeout(()=>toast.classList.remove("show"),2000);
-}
-function sound(){ ding.currentTime=0; ding.play().catch(()=>{}); }
+                <label>Tag / chip <input id="adminTag" type="text"></label>
 
-function distKm(lat1, lon1, lat2, lon2){
-  if(!lat1 || !lon1 || !lat2 || !lon2) return "";
-  const R = 6371;
-  const dLat = (lat2-lat1)*Math.PI/180;
-  const dLon = (lon2-lon1)*Math.PI/180;
-  const a = Math.sin(dLat/2)**2 +
-    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)
-    * Math.sin(dLon/2)**2;
-  return (R * 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(2);
-}
+                <label>Tavsif <textarea id="adminDescription"></textarea></label>
 
-/* LOGIN */
-loginBtn.onclick = async ()=>{
-  const login = loginInput.value.trim().toLowerCase();
-  const pass  = passInput.value.trim();
+                <label>Rasmlar <textarea id="adminImages"></textarea></label>
 
-  const snap = await getDocs(couriersCol);
-  let found = null;
+              </div>
 
-  snap.forEach(d=>{
-    const c = d.data();
-    if(c.login?.toLowerCase() === login && c.password === pass) found = c;
-  });
+              <button class="btn-primary btn-full" onclick="addCustomProduct()">
+                ➕ Mahsulot qo‘shish
+              </button>
 
-  if(!found){
-    showToast("Login yoki parol xato");
-    return;
-  }
+              <div id="adminCustomList" class="admin-list"></div>
 
-  currentCourier = found;
-  nameEl.textContent = found.name;
-  carEl.textContent  = "🚗 " + found.car;
+            </article>
+          </div>
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(found));
+          <!-- MIDDLE: CATEGORIES + COURIER -->
+          <div class="admin-col">
 
-  loginSec.classList.add("hidden");
-  appSec.classList.remove("hidden");
+            <article class="card">
+              <h3 class="card-title">🏷 Kategoriyalar</h3>
+              <div class="form-grid">
 
-  subscribe();
-};
+                <label>Kategoriya kodi <input id="adminCatCode"></label>
+                <label>Kategoriya nomi <input id="adminCatLabel"></label>
+                <label>Emoji <input id="adminCatEmoji"></label>
 
-/* LOGOUT */
-logoutBtn.onclick = ()=>{
-  localStorage.removeItem(STORAGE_KEY);
-  currentCourier=null;
-  appSec.classList.add("hidden");
-  loginSec.classList.remove("hidden");
-};
+              </div>
 
-/* ONLINE/OFFLINE */
-goOnline.onclick = ()=>{
-  isOnline = true;
-  badge.textContent="Onlayn";
-  badge.style.background="#22c55e";
-  render();
-};
-goOffline.onclick = ()=>{
-  isOnline = false;
-  badge.textContent="Offline";
-  badge.style.background="#ef4444";
-  render();
-};
+              <button class="btn-primary btn-full" onclick="saveCategory()">
+                💾 Saqlash
+              </button>
 
-/* SUBSCRIBE */
-function subscribe(){
-  if(unsub) unsub();
-  const q = query(ordersCol, orderBy("createdAt","desc"));
+              <div id="adminCategoryList" class="admin-list"></div>
+            </article>
 
-  unsub = onSnapshot(q, snap=>{
-    orders = snap.docs.map(d=>({id:d.id,...d.data()}));
-    render();
-  });
-}
+            <article class="card" style="margin-top:20px;">
+              <h3 class="card-title">🚚 Kuryer qo‘shish</h3>
 
-/* RENDER */
-function render(){
+              <div class="form-grid">
+                <label>Ism <input id="adminCourierName"></label>
+                <label>Telefon <input id="adminCourierPhone"></label>
+                <label>Avtomobil <input id="adminCourierCar"></label>
+                <label>Raqam <input id="adminCourierPlate"></label>
+                <label>Login <input id="adminCourierLogin"></label>
+                <label>Parol <input id="adminCourierPassword" type="password"></label>
+              </div>
 
-  if(!isOnline){
-    tabA.innerHTML = `<div style="padding:20px;text-align:center;opacity:.7;">Offline holatda zakazlar ko‘rinmaydi</div>`;
-    tabM.innerHTML = "";
-    tabD.innerHTML = "";
-    return;
-  }
+              <button id="adminCourierSaveBtn" class="btn-primary btn-full" onclick="saveCourier()">
+                💾 Kuryerni saqlash
+              </button>
 
-  const A = orders.filter(o=>o.status==="courier" && !o.courierLogin);
-  const M = orders.filter(o=>o.status==="courier" && o.courierLogin===currentCourier.login);
-  const D = orders.filter(o=>o.status==="delivered" && o.courierLogin===currentCourier.login);
+              <div id="adminCourierList" class="admin-list" style="margin-top:12px;"></div>
+            </article>
 
-  tabA.innerHTML = A.map(renderCard_A).join("");
-  tabM.innerHTML = M.map(renderCard_M).join("");
-  tabD.innerHTML = D.map(renderCard_D).join("");
+            <article class="card">
+              <h3 class="card-title">📍 Kuryer xaritasi</h3>
 
-  document.getElementById("statTodayCount").textContent = D.length;
-}
+              <select id="courierOrderSelect" class="search-input"></select>
 
-/* CARD — AVAILABLE */
-function renderCard_A(o){
-  const c = o.customer || {};
-  const loc = o.location;
+              <div style="margin-top:8px; aspect-ratio:16/9; border-radius:12px; overflow:hidden;">
+                <iframe id="courierMapFrame" width="100%" height="100%" style="border:0;"></iframe>
+              </div>
 
-  const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
-  const total = o.totalPrice || (o.items || []).reduce(
-    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
-  );
+              <div id="courierInfo" class="section-sub" style="margin-top:8px;">
+                Buyurtma tanlang.
+              </div>
 
-  return `
-    <div class="order-card">
+              <div style="margin-top:8px; display:flex; gap:8px;">
+                <button class="btn-xs btn-xs-secondary" onclick="centerToCourier()">📍 Marshrut</button>
+                <button class="btn-xs btn-xs-secondary" onclick="openSelectedCourierExternal()">🌐 Google Maps</button>
+              </div>
 
-      <div><strong>🧾 Buyurtma #${code}</strong></div>
+            </article>
 
-      <div><strong>${c.name}</strong></div>
-      <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
+          </div>
 
-      <div>📍 ${c.address}</div>
-      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
+          <!-- RIGHT: ORDERS -->
+          <div class="admin-col">
+            <article class="card">
+              <h3 class="card-title">🧾 Buyurtmalar</h3>
+              <div id="adminOrdersList" class="admin-list"></div>
+            </article>
+          </div>
 
-      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
-      <div>📏 ${loc ? distKm(REST_LAT,REST_LNG,loc.lat,loc.lng)+" km" : ""}</div>
+        </div>
 
-      <ul>
-        ${(o.items||[]).map(i => `
-          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
-        `).join("")}
-      </ul>
+      </section>
 
-      <button class="btn-xs btn-xs-primary" onclick="takeOrder('${o.id}')">Qabul qilish</button>
-      <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">Marshrut</button>
+    </main>
+  </div>
+
+  <!-- CART SHEET -->
+  <div id="cartSheetOverlay" class="overlay" onclick="toggleCartSheet(false)"></div>
+
+  <aside id="cartSheet" class="cart-sheet">
+    <header>
+      <h2>🛒 Savat</h2>
+      <button class="icon-btn" onclick="toggleCartSheet(false)">✕</button>
+    </header>
+
+    <div class="cart-sheet-total-row">
+      Jami: <span id="cartSheetTotal">0 so‘m</span>
+    </div>
+
+    <div id="cartItems"></div>
+
+    <button class="btn-primary btn-full" onclick="sendOrder()">🔥 Buyurtma berish</button>
+  </aside>
+
+  <!-- QUICK ORDER BUTTON -->
+  <button id="quickOrderBtn" class="btn-primary btn-full hidden"
+          style="position:fixed; left:50%; bottom:10px; transform:translateX(-50%); max-width:480px;"
+          onclick="sendOrder()">
+    <span>🔥 Buyurtma berish</span>
+    <span style="font-size:11px; opacity:.8;">(Avval mahsulot tanlang)</span>
+  </button>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <!-- SOUND -->
+  <audio id="notifySound" src="ding.mp3" preload="auto"></audio>
+
+  <!-- ================================================== -->
+  <!--             PRODUCT DETAIL — FINAL                 -->
+  <!-- ================================================== -->
+  <div id="productDetailOverlay" class="detail-overlay hidden">
+    <div class="detail-card">
+
+      <!-- RASM -->
+      <div class="detail-img-wrap" id="detailImgWrap">
+        <img id="detailImage" class="detail-main-img" alt="rasm">
+
+        <button id="detailPrevBtn" class="detail-nav prev">‹</button>
+        <button id="detailNextBtn" class="detail-nav next">›</button>
+
+        <div id="detailImageIndex" class="detail-index"></div>
+      </div>
+
+      <!-- MA'LUMOTLAR -->
+      <div class="detail-body">
+
+        <div id="detailCategory" class="detail-category"></div>
+        <h2 id="detailName" class="detail-name"></h2>
+        <div id="detailTag" class="detail-tag"></div>
+
+        <p id="detailDesc" class="detail-desc"></p>
+
+        <div class="detail-prices">
+          <span id="detailPrice" class="detail-price"></span>
+          <span id="detailOldPrice" class="detail-oldprice hidden"></span>
+        </div>
+
+        <div class="detail-qty-row">
+          <button id="detailQtyMinus">-</button>
+          <span id="detailQtyValue">1</span>
+          <button id="detailQtyPlus">+</button>
+        </div>
+
+        <button id="detailAddBtn" class="btn-primary btn-full">
+          🛒 Savatga qo‘shish
+        </button>
+
+        <button id="detailBackBtn" class="btn-outline btn-full hidden">
+          ◀ Orqaga
+        </button>
+
+      </div>
 
     </div>
-  `;
-}
+  </div>
 
-/* CARD — MY */
-function renderCard_M(o){
-  const c = o.customer || {};
-  const loc = o.location;
-
-  const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
-  const total = o.totalPrice || (o.items || []).reduce(
-    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
-  );
-
-  return `
-    <div class="order-card">
-
-      <div><strong>📦 Mening zakazim #${code}</strong></div>
-
-      <div><strong>${c.name}</strong></div>
-      <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
-
-      <div>📍 ${c.address}</div>
-      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
-
-      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
-      <div>📏 ${loc ? distKm(REST_LAT,REST_LNG,loc.lat,loc.lng)+" km" : ""}</div>
-
-      <ul>
-        ${(o.items||[]).map(i => `
-          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
-        `).join("")}
-      </ul>
-
-      <button class="btn-xs btn-xs-secondary" onclick="openMap(${loc?.lat},${loc?.lng})">Marshrut</button>
-      <button class="btn-xs btn-xs-danger" onclick="releaseOrder('${o.id}')">❌ Yechish</button>
-      <button class="btn-xs btn-xs-primary" onclick="markDelivered('${o.id}')">Yetkazdim</button>
-
-    </div>
-  `;
-}
-
-/* CARD — DELIVERED */
-function renderCard_D(o){
-  const c = o.customer || {};
-
-  const code = o.orderCode || String(o.id).slice(-4).toUpperCase();
-  const total = o.totalPrice || (o.items || []).reduce(
-    (s,i)=>s + ((i.price||0) * (i.qty||1)), 0
-  );
-
-  return `
-    <div class="order-card">
-
-      <div><strong>✔ Yetkazilgan #${code}</strong></div>
-
-      <div><strong>${c.name}</strong></div>
-      <div>📱 ${c.phone}</div>
-
-      <div>📍 ${c.address}</div>
-      <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
-
-      <div>💰 <strong>${total.toLocaleString()} so'm</strong></div>
-
-      <ul>
-        ${(o.items||[]).map(i => `
-          <li>${i.name} — ${i.qty} × ${(i.price||0).toLocaleString()} so'm</li>
-        `).join("")}
-      </ul>
-
-      <button class="btn-xs btn-xs-danger" onclick="releaseDelivered('${o.id}')">❌ Qayta aktivlashtirish</button>
-
-    </div>
-  `;
-}
-
-/* ACTIONS */
-window.takeOrder = async(id)=>{
-  if(!isOnline) return showToast("Offline holatda qabul qilib bo‘lmaydi.");
-
-  await updateDoc(doc(db,"orders",id),{
-    courierLogin:currentCourier.login,
-    courierName:currentCourier.name,
-    courierCar:currentCourier.car,
-    status:"courier",
-    courierTakenAt:serverTimestamp()
-  });
-  showToast("Zakaz olindi");
-};
-
-window.releaseOrder = async(id)=>{
-  if(!isOnline) return showToast("Offline holatda amal bajarilmaydi.");
-
-  await updateDoc(doc(db,"orders",id),{
-    courierLogin:null,
-    courierName:null,
-    courierCar:null,
-    status:"courier"
-  });
-  showToast("Zakaz yechildi");
-};
-
-window.markDelivered = async(id)=>{
-  if(!isOnline) return showToast("Offline holatda yetkazib bo‘lmaydi.");
-
-  await updateDoc(doc(db,"orders",id),{
-    status:"delivered",
-    deliveredAt:serverTimestamp()
-  });
-  showToast("Yetkazildi");
-};
-
-window.releaseDelivered = async(id)=>{
-  if(!isOnline) return showToast("Offline holatda aktivlashtirib bo‘lmaydi.");
-
-  await updateDoc(doc(db,"orders",id),{
-    status:"courier",
-    courierLogin:null,
-    courierName:null,
-    courierCar:null
-  });
-  showToast("Qayta aktivlashtirildi");
-};
-
-/* MAP */
-window.openMap = (lat,lng)=>{
-  if(!lat) return showToast("Lokatsiya yo‘q");
-  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
-};
-
-/* AUTO LOGIN */
-(function(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if(saved){
-    currentCourier = JSON.parse(saved);
-    nameEl.textContent = currentCourier.name;
-    carEl.textContent  = "🚗 "+currentCourier.car;
-    loginSec.classList.add("hidden");
-    appSec.classList.remove("hidden");
-    subscribe();
-  }
-})();
-
-/* TABS */
-tabBtns.forEach(btn=>{
-  btn.onclick = ()=>{
-    tabBtns.forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-
-    tabA.classList.add("hidden");
-    tabM.classList.add("hidden");
-    tabD.classList.add("hidden");
-
-    if(btn.dataset.tab==="available") tabA.classList.remove("hidden");
-    if(btn.dataset.tab==="my")        tabM.classList.remove("hidden");
-    if(btn.dataset.tab==="done")      tabD.classList.remove("hidden");
-  };
-});
-
-</script>
-<!-- ========================= JS END ============================== -->
+  <!-- APP SCRIPT -->
+  <script type="module" src="app.js"></script>
 
 </body>
 </html>
