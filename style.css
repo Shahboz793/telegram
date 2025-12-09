@@ -1340,3 +1340,23 @@ body.theme-dark{
 }
 .hero-title{ font-size:18px; font-weight:800; letter-spacing:.2px; }
 .hero-sub{ font-size:12px; color:#e5e7eb; margin-top:6px; }
+
+
+
+/* Detail pastki galereya (scroll) */
+#detailGalleryList{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:8px 12px 4px 12px;
+  scroll-snap-type:x mandatory;
+}
+.detail-gallery-img{
+  width:92px; height:92px;
+  flex:0 0 auto;
+  border-radius:10px;
+  object-fit:cover;
+  background: var(--bg-soft,#f3f4f6);
+  border:1px solid var(--border,rgba(148,163,184,.35));
+  scroll-snap-align:center;
+}
