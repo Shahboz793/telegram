@@ -163,7 +163,7 @@ body.theme-dark{
 }
 
 /* TABS */
-.tabs, #tabs{
+.tabs{
   position:sticky;
   top:64px;
   z-index:45;
@@ -200,7 +200,7 @@ body.theme-dark{
   border-bottom:1px solid rgba(148,163,184,.3);
   padding:10px 16px 12px;
 }
-.customer-info, #customerInfoText{
+.customer-info{
   font-size:13px;
   margin-bottom:8px;
   color:#e5e7eb;
@@ -234,7 +234,7 @@ body.theme-dark{
   align-items:center;
   gap:8px;
 }
-.search-input, #searchInput{
+.search-input{
   flex:1;
   border-radius:999px;
   border:1px solid var(--border);
@@ -243,13 +243,13 @@ body.theme-dark{
   font-size:13px;
   outline:none;
 }
-.search-input:focus, #searchInput:focus{
+.search-input:focus{
   border-color:#7000ff;
   box-shadow:0 0 0 1px rgba(112,0,255,.35);
 }
 
-/* CATEGORY GRID */
-.chips-row, #filterBar{
+/* CATEGORY GRID (4 ta) */
+.chips-row{
   background:var(--panel);
   border-bottom:1px solid var(--border);
   padding:10px 10px 12px;
@@ -284,15 +284,15 @@ body.theme-dark{
   .chip{font-size:12px;min-height:56px;}
 }
 
-/* PRODUCTS – KATTA KARTOCHKA */
-.products-grid, #productsGrid{
+/* PRODUCTS – KATTA KARTOCHKA, RASM BO‘YIGA (UZUM STYLE) */
+.products-grid{
   display:flex;
   flex-direction:column;
   gap:14px;
   padding:14px;
 }
 @media(min-width:768px){
-  .products-grid, #productsGrid{
+  .products-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
     gap:18px;
@@ -321,13 +321,12 @@ body.theme-dark{
 }
 .product-img-wrap img{
   width:100%;
-  height:270px;
+  height:270px;          /* telefon uchun baland, pastga qarab rasm */
   object-fit:cover;
   display:block;
-  background:#0b0b0b;
 }
 @media(min-width:768px){
-  .product-img-wrap img{height:320px;}
+  .product-img-wrap img{height:320px;} /* katta ekranlarda yanayam baland */
 }
 .product-img-tag{
   position:absolute;
@@ -407,7 +406,7 @@ body.theme-dark{
 }
 
 /* CART BOTTOM SHEET */
-.overlay, #cartSheetOverlay{
+.overlay{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.5);
@@ -415,8 +414,8 @@ body.theme-dark{
   display:none;
   z-index:90;
 }
-.overlay.show, #cartSheetOverlay.show{display:block;}
-.cart-sheet, #cartSheet{
+.overlay.show{display:block;}
+.cart-sheet{
   position:fixed;
   left:0; right:0;
   bottom:-100%;
@@ -429,7 +428,7 @@ body.theme-dark{
   transition:bottom .3s ease;
   z-index:100;
 }
-.cart-sheet.open, #cartSheet.open{bottom:0;}
+.cart-sheet.open{bottom:0;}
 .cart-sheet header{
   display:flex;
   justify-content:space-between;
@@ -519,19 +518,8 @@ body.theme-dark{
 
 /* EKRAN PASTIDAGI QUICK BUYURTMA TUGMASI (QIZIL) */
 #quickOrderBtn{
-  position:fixed;
-  left:16px;
-  right:16px;
-  bottom:16px;
-  border:none;
-  border-radius:999px;
-  padding:12px 16px;
-  font-weight:700;
-  font-size:15px;
   background:linear-gradient(135deg,#ef4444,#b91c1c);
-  color:#fff;
   box-shadow:0 20px 45px rgba(239,68,68,.75);
-  z-index:95;
 }
 
 /* ORDERS */
@@ -545,7 +533,7 @@ body.theme-dark{
   color:var(--muted);
   margin:4px 16px 8px;
 }
-.orders-list, #clientOrdersList, #adminOrdersList{
+.orders-list{
   padding:10px 16px 20px;
 }
 .order-card{
@@ -666,7 +654,7 @@ body.theme-dark{
 }
 .card-sub{
   font-size:13px;
-  color:#var(--muted);
+  color:var(--muted);
   margin-bottom:10px;
 }
 .form-grid{
@@ -747,7 +735,7 @@ body.theme-dark{
 }
 
 /* === PRODUCT DETAIL (MODAL) – UZUM STYLE === */
-.detail-overlay, #productDetailOverlay{
+.detail-overlay{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.75);
@@ -798,7 +786,7 @@ body.theme-dark{
 @media(min-width:480px){
   .detail-img-wrap img{height:300px;}
 }
-.detail-img-index, #detailImageIndex{
+.detail-img-index{
   position:absolute;
   bottom:24px;
   right:28px;
@@ -822,23 +810,6 @@ body.theme-dark{
 }
 #detailPrevBtn{left:24px;}
 #detailNextBtn{right:24px;}
-
-/* GALLERY (pastdagi scroll ro‘yxat) */
-#detailGalleryList{
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  padding:0 20px 14px;
-}
-.detail-gallery-img{
-  width:84px;
-  height:84px;
-  border-radius:12px;
-  object-fit:cover;
-  border:1px solid rgba(148,163,184,.4);
-  box-shadow:0 8px 22px rgba(0,0,0,.4);
-  cursor:pointer;
-}
 
 /* matn qismi */
 .detail-body{
@@ -981,7 +952,7 @@ body.theme-dark{
 }
 
 /* TOAST */
-.toast, #toast{
+.toast{
   position:fixed;
   bottom:18px;
   left:50%;
@@ -996,7 +967,7 @@ body.theme-dark{
   transition:opacity .25s,transform .25s;
   z-index:200;
 }
-.toast.show, #toast.show{
+.toast.show{
   opacity:1;
   transform:translateX(-50%) translateY(0);
 }
@@ -1317,30 +1288,4 @@ body.theme-dark{
 /* Kuryer sahifasida toast biroz pastroq tursin */
 .courier-body .toast{
   bottom:26px;
-}
-
-/* COURIER MAP/INFO IDS */
-#courierOrderSelect{
-  width:100%;
-  margin-top:8px;
-  margin-bottom:10px;
-  padding:8px 10px;
-  border-radius:12px;
-  border:1px solid rgba(148,163,184,.4);
-  background:#0b1220;
-  color:#f1f5f9;
-  font-size:13px;
-}
-#courierMapFrame{
-  width:100%;
-  height:280px;
-  border:0;
-  border-radius:16px;
-  box-shadow:0 16px 36px rgba(0,0,0,.6);
-  margin-top:8px;
-}
-#courierInfo{
-  margin-top:10px;
-  font-size:13px;
-  color:#e5e7eb;
 }
