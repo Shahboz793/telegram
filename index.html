@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>Premium FastFood — Online buyurtma</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
   <meta name="color-scheme" content="dark light" />
 
   <!-- FAVICON -->
@@ -22,6 +25,34 @@
 
   <!-- TELEGRAM WEBAPP SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Telegram WebApp init (tg.ready, disableVerticalSwipes, fullscreen) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+      if (!tg) {
+        console.warn('Telegram WebApp SDK topilmadi (ehtimol oddiy brauzer rejimi).');
+        return;
+      }
+      try {
+        tg.ready();
+        if (typeof tg.disableVerticalSwipes === 'function') {
+          tg.disableVerticalSwipes();
+        }
+        if (typeof tg.expand === 'function') {
+          tg.expand();
+        }
+        if (
+          typeof tg.requestFullscreen === 'function' &&
+          (tg.platform === 'android' || tg.platform === 'ios')
+        ) {
+          tg.requestFullscreen();
+        }
+      } catch (e) {
+        console.warn('Telegram WebApp init xatolik:', e);
+      }
+    });
+  </script>
+
 </head>
 
 <body>
