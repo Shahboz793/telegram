@@ -9,8 +9,19 @@
   <!-- FAVICON -->
   <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/5787/5787016.png">
 
+  <!-- GOOGLE FONTS: INTER -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
   <!-- STYLE -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- TELEGRAM WEBAPP SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 
 <body>
@@ -73,8 +84,10 @@
                  placeholder="Qidirish: taom nomi, kategoriya, tavsif..." />
         </div>
 
+        <!-- Kategoriya chiplar (EVOS-style sticky tabs) -->
         <div id="filterBar" class="chips-row"></div>
 
+        <!-- Mahsulot kartalari (EVOS-style) -->
         <section id="productsGrid" class="products-grid"></section>
 
       </section>
@@ -289,6 +302,49 @@
 
     </div>
   </div>
+
+  <!-- TELEGRAM INIT (fullscreen, swipe-block, theme) -->
+  <script>
+    (function () {
+      if (!window.Telegram || !window.Telegram.WebApp) {
+        console.log('[TG] WebApp SDK topilmadi. Oddiy brauzer rejimi.');
+        return;
+      }
+
+      const tg = window.Telegram.WebApp;
+      window.tg = tg;
+
+      try {
+        tg.ready();
+        tg.expand();                 // fullscreen
+        if (tg.disableVerticalSwipes) {
+          tg.disableVerticalSwipes(); // swipe bilan yopilishni bloklash
+        }
+      } catch (e) {
+        console.warn('[TG] init xatolik:', e);
+      }
+
+      // Telegram mavzusi bo‘yicha CSS o‘zgaruvchilar
+      try {
+        document.documentElement.style.setProperty(
+          '--tg-bg-color',
+          tg.backgroundColor || '#f5f5f7'
+        );
+        document.documentElement.style.setProperty(
+          '--tg-text-color',
+          tg.textColor || '#111827'
+        );
+        if (tg.themeParams && tg.themeParams.button_color) {
+          document.documentElement.style.setProperty(
+            '--tg-accent-color',
+            tg.themeParams.button_color
+          );
+        }
+      } catch (e) {
+        console.warn('[TG] theme vars xatolik:', e);
+      }
+    })();
+  </script>
 
   <!-- APP SCRIPT -->
   <script type="module" src="app.js"></script>
