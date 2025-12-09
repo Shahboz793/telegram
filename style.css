@@ -1340,3 +1340,39 @@ body.theme-dark{
 }
 .hero-title{ font-size:18px; font-weight:800; letter-spacing:.2px; }
 .hero-sub{ font-size:12px; color:#e5e7eb; margin-top:6px; }
+
+
+/* =========================================
+   EVOS-STYLE SKELETON LOADING
+   (Mahsulot kartalari yuklanayotganda)
+========================================= */
+.skeleton-card{
+  position:relative;
+  overflow:hidden;
+}
+.skeleton{
+  position:relative;
+  background:linear-gradient(90deg,#1f2933,#111827,#1f2933);
+  background-size:200% 100%;
+  animation:skeleton-shimmer 1.3s infinite;
+  border-radius:8px;
+}
+.skeleton-img{
+  width:100%;
+  height:260px;
+}
+.skeleton-line{
+  height:12px;
+  margin-top:8px;
+}
+.skeleton-line-lg{
+  width:70%;
+}
+.skeleton-line-sm{
+  width:40%;
+}
+
+@keyframes skeleton-shimmer{
+  0%{background-position:-200% 0;}
+  100%{background-position:200% 0;}
+}

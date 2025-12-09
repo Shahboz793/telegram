@@ -55,6 +55,7 @@ let products       = [];
 let remoteProducts = [];
 let categories     = [];
 let cart           = [];
+let isProductsLoaded = false;
 let activeCategory = "all";
 let currentSearch  = "";
 let isAdmin        = false;
@@ -412,11 +413,42 @@ if(themeToggleBtn){
 }
 
 /* PRODUCTS REAL-TIME */
+
+/* EVOS-style skeleton loading for products */
+function showProductSkeletons(count){
+  if(!productsGrid) return;
+  const n = count || 4;
+  let html = "";
+  for(let i=0;i<n;i++){
+    html += `
+      <article class="product-card skeleton-card">
+        <div class="product-img-wrap">
+          <div class="skeleton skeleton-img"></div>
+        </div>
+        <div class="product-body">
+          <div class="skeleton skeleton-line skeleton-line-lg"></div>
+          <div class="skeleton skeleton-line skeleton-line-sm"></div>
+          <div class="skeleton skeleton-line skeleton-line-sm"></div>
+        </div>
+      </article>
+    `;
+  }
+  productsGrid.innerHTML = html;
+}
+
 function rebuildProducts(){
   products = [...remoteProducts];
   renderProducts();
 }
 function renderProducts(){
+  if(!productsGrid) return;
+
+  // Hali Firestore dan ma’lumot kelmagan bo‘lsa — skeleton
+  if(!isProductsLoaded){
+    showProductSkeletons(4);
+    return;
+  }
+
   productsGrid.innerHTML = "";
   const filtered = products.filter(p =>
     (activeCategory === "all" ? true : p.category === activeCategory) &&
