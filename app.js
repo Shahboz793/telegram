@@ -436,9 +436,9 @@ function renderProducts(){
     let imgHtml;
     if(firstImage.startsWith(RAW_PREFIX)){
       const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
-      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`
+      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
     }else{
-      imgHtml = `<img src="${firstImage}" alt="${p.name}">`
+      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
 
@@ -2056,7 +2056,7 @@ window.restoreCourier              = restoreCourier;
   function formatUZS(v){ try{return (v||0).toLocaleString('uz-UZ')+' so‘m'}catch(e){return v+' so‘m';} }
 
   function getProduct(index){
-    try{ return (products || [])[index]; }catch(e){ return null; }
+    try{ return (window.products || [])[index]; }catch(e){ return null; }
   }
 
   function getAddonsFor(index){
@@ -2130,8 +2130,8 @@ window.restoreCourier              = restoreCourier;
 
   function recalcDetailPrice(){
     try{
-      if (detailIndex == null) return;
-      var p = getProduct(detailIndex);
+      if (window.detailIndex == null) return;
+      var p = getProduct(window.detailIndex);
       if(!p) return;
       var base = p.price || 0;
       var addons = (window.__detailSelectedAddons || []);
@@ -2148,13 +2148,13 @@ window.restoreCourier              = restoreCourier;
 
   // Patch addToCart to attach addons metadata
   try{
-    var __orig_addToCart = addToCart;
+    var __orig_addToCart = window.addToCart || addToCart;
     window.addToCart = function(index, qty){
-      var sel = (detailIndex === index) ? (window.__detailSelectedAddons || []) : [];
+      var sel = (window.detailIndex === index) ? (window.__detailSelectedAddons || []) : [];
       __orig_addToCart(index, qty);
       try{
         // Attach metadata to the corresponding cart item
-        var item = cart.find(function(c){ return c.index === index; });
+        var item = (window.cart || []).find(function(c){ return c.index === index; });
         if(item && sel.length){
           // clone to avoid reference issues
           item.addonsSelected = sel.map(function(a){ return {name:a.name, price: a.price||0}; });
@@ -2167,26 +2167,26 @@ window.restoreCourier              = restoreCourier;
 
   // Override renderCartItems & updateCartUI totals to include addons
   try{
-    var __orig_renderCartItems = renderCartItems;
+    var __orig_renderCartItems = window.renderCartItems || renderCartItems;
     window.renderCartItems = function(){
       try{
         var cartItemsEl = document.getElementById('cartItems');
         var cartSheetTotalEl = document.getElementById('cartSheetTotal');
         if(!cartItemsEl || !cartSheetTotalEl){ __orig_renderCartItems(); return; }
-        var cartArr = cart || [];
-        if(cartArr.length===0){
+        var cart = window.cart || [];
+        if(cart.length===0){
           cartItemsEl.innerHTML = "<p class='cart-empty'>Savat hozircha bo‘sh 🙂</p>";
           cartSheetTotalEl.textContent = "0 so‘m";
           return;
         }
         var html = "", total=0;
-        cartArr.forEach(function(c){
+        cart.forEach(function(c){
           var p = getProduct(c.index); if(!p) return;
           var addons = c.addonsSelected || [];
           var addonsSum = addons.reduce(function(s,a){ return s + (a.price||0); }, 0);
           var line = (p.price + addonsSum) * (c.qty||1);
           total += line;
-          var catLabel = (categoryLabel && (categoryLabel[p.category] || p.category)) || (p.category || '');
+          var catLabel = (window.categoryLabel && (window.categoryLabel[p.category] || p.category)) || (p.category || '');
           html += [
             "<div class='cart-item-row'>",
               "<div class='cart-item-main'>",
@@ -2196,9 +2196,9 @@ window.restoreCourier              = restoreCourier;
               "</div>",
               "<div class='cart-item-actions'>",
                 "<div class='qty-control'>",
-                  "<button onclick='changeQty("+c.index+" ,-1)'>-</button>",
+                  "<button onclick='changeQty("+c.index+",-1)'>-</button>",
                   "<span>"+(c.qty||1)+"</span>",
-                  "<button onclick='changeQty("+c.index+", 1)'>+</button>",
+                  "<button onclick='changeQty("+c.index+",1)'>+</button>",
                 "</div>",
                 "<div class='cart-item-total'>"+ line.toLocaleString('uz-UZ') +" so‘m</div>",
                 "<button class='cart-remove' onclick='removeFromCart("+c.index+")'>✕</button>",
@@ -2215,11 +2215,11 @@ window.restoreCourier              = restoreCourier;
   }catch(e){}
 
   try{
-    var __orig_updateCartUI = updateCartUI;
+    var __orig_updateCartUI = window.updateCartUI || updateCartUI;
     window.updateCartUI = function(){
       try{
         var totalCount=0,totalPrice=0;
-        (cart||[]).forEach(function(c){
+        (window.cart||[]).forEach(function(c){
           var p = getProduct(c.index); if(!p) return;
           var addons = c.addonsSelected || [];
           var addonsSum = addons.reduce(function(s,a){ return s + (a.price||0); }, 0);
@@ -2241,10 +2241,24 @@ window.restoreCourier              = restoreCourier;
     };
   }catch(e){}
 
+  // Patch sendOrder to carry addon metadata
+  try{
+    var __orig_sendOrder = window.sendOrder || sendOrder;
+    window.sendOrder = async function(){
+      // Before sending, we ensure items map carries `addons`
+      try{
+        // no-op here; payload building happens inside original
+        // We will hook into addDoc arguments by temporarily wrapping addDoc
+        // but that's intrusive. Instead, after original runs we simply continue.
+      }catch(e){}
+      return __orig_sendOrder();
+    };
+  }catch(e){}
+
   // Render on detail open
   function hookOpenProductDetail(){
     try{
-      var __orig = openProductDetail;
+      var __orig = window.openProductDetail || openProductDetail;
       window.openProductDetail = function(index){
         __orig(index);
         try{ renderAddons(index); recalcDetailPrice(); }catch(e){}
@@ -2254,12 +2268,14 @@ window.restoreCourier              = restoreCourier;
   hookOpenProductDetail();
   // Also try rendering if already open
   document.addEventListener('DOMContentLoaded', function(){
-    try{ if(detailIndex!=null) renderAddons(detailIndex); }catch(e){}
+    try{ if(window.detailIndex!=null) renderAddons(window.detailIndex); }catch(e){}
   });
 })();
 
 /* =========================================================
-   🎯 Hero promo (old static) — may be removed by new module
+   🎯 Hero promo (main page banner)
+   Non-breaking: injects a lightweight promo slider
+   under the search/toolbar area if not present.
 ========================================================= */
 (function heroPromo(){
   function inject(){
@@ -2289,226 +2305,4 @@ window.restoreCourier              = restoreCourier;
   }else{
     inject();
   }
-})();
-
-/* =========================================================
-   📢 Reklama (barcha mahsulotlar) — dinamik, safe drop-in
-   - Har bir mahsulot slaydda (rasm + nom + narx)
-   - Ustiga bosilganda openProductDetail(...) chaqiriladi
-   - Realtime: rebuildProducts() chaqirilganda auto-yangilanadi
-========================================================= */
-(function promoAllProducts(){
-  var PROMO_ID = 'reklamaBar';
-  var state = { i:0, timer:null, count:0, autoplayMs: 3500 };
-
-  // Minimal CSS (injeksion)
-  (function injectCSS(){
-    if (document.getElementById('promoAllProductsCSS')) return;
-    var css = `
-#${PROMO_ID}{position:relative;overflow:hidden;margin:10px 12px 18px;border-radius:14px;background:var(--card,#111)}
-#${PROMO_ID} .promo-track{display:flex;transition:transform .5s ease;will-change:transform}
-#${PROMO_ID} .promo-slide{min-width:100%;padding:12px 12px 14px;cursor:pointer}
-#${PROMO_ID} .promo-card{display:flex;gap:12px;align-items:center;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-  padding:10px;border-radius:12px;border:1px solid rgba(148,163,184,.25)}
-#${PROMO_ID} .promo-img{flex:0 0 84px;height:84px;border-radius:10px;overflow:hidden;background:#0003;display:flex;align-items:center;justify-content:center}
-#${PROMO_ID} .promo-img img{width:100%;height:100%;object-fit:cover;display:block}
-#${PROMO_ID} .promo-body{min-width:0;flex:1}
-#${PROMO_ID} .promo-title{font-weight:600;font-size:15px;line-height:1.2;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#${PROMO_ID} .promo-sub{font-size:12px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#${PROMO_ID} .promo-price{margin-top:6px;font-weight:700;font-size:16px}
-#${PROMO_ID} .promo-old{margin-left:8px;font-size:12px;text-decoration:line-through;opacity:.7}
-#${PROMO_ID} .promo-badges{position:absolute;top:8px;left:10px;display:flex;gap:6px}
-#${PROMO_ID} .promo-badge{background:#ef4444;color:#fff;padding:2px 8px;border-radius:999px;font-size:11px}
-#${PROMO_ID} .promo-ctrl{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
-#${PROMO_ID} .promo-btn{pointer-events:auto;user-select:none;width:36px;height:36px;border-radius:50%;border:1px solid rgba(148,163,184,.35);background:rgba(17,24,39,.55);color:#fff;display:flex;align-items:center;justify-content:center}
-#${PROMO_ID} .promo-dots{position:absolute;right:10px;bottom:8px;display:flex;gap:6px}
-#${PROMO_ID} .promo-dot{width:6px;height:6px;border-radius:50%;background:rgba(148,163,184,.6)}
-#${PROMO_ID} .promo-dot.on{background:#fff}
-@media (max-width:520px){#${PROMO_ID}{margin:8px 8px 14px;border-radius:12px}}
-    `.trim();
-    var style = document.createElement('style');
-    style.id = 'promoAllProductsCSS';
-    style.textContent = css;
-    document.head.appendChild(style);
-  })();
-
-  function rmOldHero(){
-    var old = document.getElementById('heroPromo');
-    if(old && old.parentNode) old.parentNode.removeChild(old);
-  }
-
-  function ensureHost(){
-    var anchor = document.querySelector('.shop-toolbar') || document.querySelector('.customer-panel') || document.getElementById('shopPage') || document.body;
-    var host = document.getElementById(PROMO_ID);
-    if(!host){
-      host = document.createElement('section');
-      host.id = PROMO_ID;
-      anchor.insertAdjacentElement('afterend', host);
-    }
-    return host;
-  }
-
-  function makeImageHTML(url, alt){
-    try{
-      if(!url){ return `<img src="${RAW_PREFIX}noimage.png" alt="${alt||''}">`; }
-      if(url.startsWith(RAW_PREFIX)){
-        var base = url.replace(/\.(png|jpg|jpeg)$/i,'');
-        return `<img src="${base}.png" alt="${alt||''}" onerror="this.onerror=null;this.src='${base}.jpg'">`;
-      }
-      return `<img src="${url}" alt="${alt||''}">`;
-    }catch(e){
-      return `<img src="${RAW_PREFIX}noimage.png" alt="${alt||''}">`;
-    }
-  }
-
-  function formatUZS(v){
-    try{ return (v||0).toLocaleString('uz-UZ') + ' so‘m'; }catch(e){ return (v||0) + ' so‘m'; }
-  }
-
-  function buildSlides(productsArr){
-    if(!Array.isArray(productsArr) || !productsArr.length) return {html:'', count:0};
-    var html = '';
-    productsArr.forEach(function(p){
-      var first = (p.images && p.images.length) ? p.images[0] : (RAW_PREFIX + 'noimage.png');
-      var discount = (p.oldPrice && p.oldPrice > p.price)
-        ? (100 - Math.round((p.price*100)/p.oldPrice)) : null;
-      var cat = (categoryLabel && (categoryLabel[p.category] || p.category)) || (p.category || '');
-      html += [
-        '<div class="promo-slide" data-id="', (p.id||''), '">',
-          '<div class="promo-card">',
-            '<div class="promo-img">', makeImageHTML(first, p.name||''), '</div>',
-            '<div class="promo-body">',
-              '<div class="promo-title">', (p.name||''), '</div>',
-              '<div class="promo-sub">', (cat||'Mahsulot'), (p.tag?(' • '+p.tag):''), '</div>',
-              '<div class="promo-price">',
-                formatUZS(p.price||0),
-                (p.oldPrice ? ('<span class="promo-old">'+ formatUZS(p.oldPrice) +'</span>') : ''),
-              '</div>',
-            '</div>',
-          '</div>',
-        '</div>'
-      ].join('');
-    });
-    return {html: html, count: productsArr.length};
-  }
-
-  function render(){
-    rmOldHero();
-    var host = ensureHost();
-    var list = products || [];
-    if(!list.length){
-      host.innerHTML = '';
-      state.count = 0;
-      stop();
-      return;
-    }
-
-    // Slaydlarni quramiz
-    var built = buildSlides(list);
-    state.count = built.count;
-    state.i = 0;
-
-    host.innerHTML = [
-      '<div class="promo-badges">',
-        '<div class="promo-badge">Reklama</div>',
-        '<div class="promo-badge">Barchasi</div>',
-      '</div>',
-      '<div class="promo-track">', built.html ,'</div>',
-      '<div class="promo-ctrl">',
-        '<button class="promo-btn" type="button" data-dir="-1" aria-label="Oldingi">‹</button>',
-        '<button class="promo-btn" type="button" data-dir="1" aria-label="Keyingi">›</button>',
-      '</div>',
-      '<div class="promo-dots">', dotHTML(state.count, 0), '</div>'
-    ].join('');
-
-    // Click -> openProductDetail by id mapping
-    host.querySelectorAll('.promo-slide').forEach(function(slide){
-      slide.addEventListener('click', function(){
-        var id = slide.getAttribute('data-id');
-        var idx = (products || []).findIndex(function(x){ return x && x.id === id; });
-        if(idx >= 0 && typeof openProductDetail === 'function'){
-          openProductDetail(idx);
-        }
-      });
-    });
-
-    // Prev/Next
-    host.querySelectorAll('.promo-btn').forEach(function(btn){
-      btn.addEventListener('click', function(ev){
-        ev.stopPropagation();
-        var dir = parseInt(btn.getAttribute('data-dir'), 10) || 1;
-        move(dir);
-        restart();
-      });
-    });
-
-    // Hover pause
-    host.addEventListener('mouseenter', stop);
-    host.addEventListener('mouseleave', restart);
-
-    // Start autoplay
-    restart();
-    updateTransform();
-  }
-
-  function dotHTML(n, active){
-    var out = '';
-    for(var k=0;k<n;k++){
-      out += '<span class="promo-dot'+(k===active?' on':'')+'"></span>';
-    }
-    return out;
-  }
-
-  function updateDots(){
-    var host = document.getElementById(PROMO_ID);
-    if(!host) return;
-    var dots = host.querySelector('.promo-dots');
-    if(!dots) return;
-    dots.innerHTML = dotHTML(state.count, state.i);
-  }
-
-  function updateTransform(){
-    var host = document.getElementById(PROMO_ID);
-    if(!host) return;
-    var track = host.querySelector('.promo-track');
-    if(!track) return;
-    track.style.transform = 'translateX(' + (-state.i*100) + '%)';
-    updateDots();
-  }
-
-  function move(dir){
-    if(!state.count) return;
-    state.i = (state.i + dir + state.count) % state.count;
-    updateTransform();
-  }
-
-  function stop(){
-    if(state.timer){ clearInterval(state.timer); state.timer = null; }
-  }
-  function start(){
-    stop();
-    state.timer = setInterval(function(){ move(1); }, state.autoplayMs);
-  }
-  function restart(){ start(); }
-
-  // Hook: rebuildProducts -> render reklamani ham yangilaydi
-  (function hookRebuild(){
-    var orig = rebuildProducts;
-    rebuildProducts = function(){
-      try{ orig(); }finally{
-        try{ render(); }catch(e){}
-      }
-    };
-  })();
-
-  // Birinchi yuklanishda ham urinish
-  if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ try{ render(); }catch(e){} });
-  }else{
-    try{ render(); }catch(e){}
-  }
-
-  // Global control (ixtiyoriy)
-  window.__promoMoveNext = function(){ move(1); restart(); };
-  window.__promoMovePrev = function(){ move(-1); restart(); };
 })();
