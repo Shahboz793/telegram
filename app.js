@@ -110,6 +110,7 @@ const detailTagEl          = document.getElementById("detailTag");
 const detailDescEl         = document.getElementById("detailDesc");
 const detailPriceEl        = document.getElementById("detailPrice");
 const detailOldPriceEl     = document.getElementById("detailOldPrice");
+const detailDiscountEl     = document.getElementById("detailDiscount");
 const detailAddBtn         = document.getElementById("detailAddBtn");
 const detailBackBtn        = document.getElementById("detailBackBtn");
 
@@ -1559,6 +1560,19 @@ function updateDetailPriceUI(){
       detailOldPriceEl.classList.add("hidden");
     }
   }
+
+  // Show discount percentage if an old price exists.  The discount is
+  // calculated per unit and is independent of quantity.  When no
+  // discount exists, hide the element.
+  if(typeof detailDiscountEl !== 'undefined'){
+    if(p.oldPrice){
+      const discount = Math.round(100 - (p.price * 100) / p.oldPrice);
+      detailDiscountEl.textContent = `-${discount}%`;
+      detailDiscountEl.classList.remove("hidden");
+    } else {
+      detailDiscountEl.classList.add("hidden");
+    }
+  }
 }
 
 // Pastga qarab scroll bo‘ladigan galereya (agar HTML’da #detailGalleryList bo‘lsa)
@@ -1682,7 +1696,13 @@ if(detailBackBtn){
 if(detailRemoveBtn){
   detailRemoveBtn.addEventListener("click", ()=>{
     if(detailIndex===null) return;
+    // Remove the item from the cart
     removeFromCart(detailIndex);
+    // Reset quantity to 1 and update displayed value
+    detailQty = 1;
+    if(detailQtyValue) detailQtyValue.textContent = detailQty;
+    // Refresh the price so it reflects the base price (qty=1)
+    updateDetailPriceUI();
     // Hide the remove button again since the item is no longer in the cart
     detailRemoveBtn.classList.add("hidden");
   });

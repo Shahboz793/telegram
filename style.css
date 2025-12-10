@@ -746,15 +746,16 @@ body.theme-dark{
   z-index:100;
 }
 .detail-card{
+  /* Full‑screen modal layout: use flex to stack image and body without scroll */
   width:100%;
   max-width:520px;
   height:100vh;
+  display:flex;
+  flex-direction:column;
   border-radius:0;
   box-shadow:var(--shadow);
-  position:relative;
-  overflow-y:auto;
-  background:linear-gradient(180deg,#ff0f7b 0%,#ffffff 18%,#faf5ff 100%);
-  padding-bottom:24px;
+  overflow:hidden;
+  background:var(--panel);
 }
 .detail-close{
   position:absolute;
@@ -771,17 +772,17 @@ body.theme-dark{
 
 /* rasm bloki – katta kartochka, bo‘yiga */
 .detail-img-wrap{
-  margin-top:44px; /* yopish tugmasi ostida */
+  /* Remove extra margins so the image occupies the full width */
+  margin:0;
+  padding:0;
   position:relative;
-  padding:16px;
 }
 .detail-img-wrap img{
   width:100%;
-  /* Rasm ekranning katta qismini egallaydi – kamida 70% balandlikda */
-  height:70vh;
-  border-radius:22px;
+  height:55vh; /* occupy roughly 55% of viewport height to leave space for details */
+  border-radius:0;
   object-fit:cover;
-  box-shadow:0 22px 40px rgba(0,0,0,.5);
+  box-shadow:none;
   background:#000;
 }
 /* Nav tugmalari va indeks endi ishlatilmaydi, ko‘rinmasin */
@@ -817,54 +818,72 @@ body.theme-dark{
 
 /* matn qismi */
 .detail-body{
-  margin-top:12px;
-  padding:0 20px 40px;
-  color:#111827;
+  flex:1;
+  /* Provide scroll if content is long, but avoid full‑screen scroll */
+  overflow-y:auto;
+  margin:0;
+  padding:16px 20px;
+  color:var(--text);
 }
 
 /* Narxlar blokini zamonaviy ko‘rinishda joylashish */
+/* Price row: align items and show discount nicely */
 .detail-prices{
   margin-top:12px;
   display:flex;
-  align-items:flex-end;
+  align-items:center;
   gap:12px;
+  flex-wrap:wrap;
 }
 #detailPrice{
-  font-size:24px;
+  font-size:22px;
   font-weight:700;
-  color:#111827;
+  color:var(--text);
 }
 #detailOldPrice{
-  font-size:16px;
-  color:#ef4444;
+  font-size:14px;
+  color:#b91c1c;
   text-decoration:line-through;
+}
+/* Discount pill to show percentage */
+#detailDiscount{
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
+  color:#fff;
+  border-radius:8px;
+  padding:4px 8px;
+  font-size:12px;
+  font-weight:600;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
 }
 
 /* Mahsulot sonini tanlash ustunini kattalashtirish va diqqatga sazovor qilish */
+/* Quantity selector: bigger buttons with slight gradient and clear typography */
 .detail-qty-row{
   display:flex;
   align-items:center;
   justify-content:flex-start;
-  margin-top:24px;
+  margin-top:16px;
   gap:0;
 }
 .detail-qty-row button{
-  width:48px;
-  height:48px;
+  width:44px;
+  height:44px;
   border:none;
-  border-radius:14px;
+  border-radius:10px;
   background:linear-gradient(135deg,#ef4444,#b91c1c);
   color:#fff;
-  font-size:26px;
+  font-size:24px;
   font-weight:700;
   cursor:pointer;
-  box-shadow:0 14px 28px rgba(239,68,68,.5);
+  box-shadow:0 12px 24px rgba(239,68,68,.4);
 }
 .detail-qty-row span{
-  margin:0 18px;
-  font-size:22px;
+  margin:0 14px;
+  font-size:20px;
   font-weight:600;
-  color:#111827;
+  color:var(--text);
 }
 
 /* Buyurtma tugmalari: Savatga qo‘shish, olib tashlash va orqaga */
