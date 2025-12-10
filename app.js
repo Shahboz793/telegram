@@ -1626,11 +1626,39 @@ function toggleImageFullscreen(){
 }
 
 function getDetailImages(){
+  // Attempt to retrieve images for the currently selected product.
+  // If cached versions exist in localStorage (saved via
+  // cacheProductImages()), they are used instead of remote URLs.
   if(detailIndex===null) return [RAW_PREFIX + "noimage.png"];
   const p = products[detailIndex];
   if(!p) return [RAW_PREFIX + "noimage.png"];
-  if(p.images && p.images.length) return p.images;
-  return [RAW_PREFIX + "noimage.png"];
+  const images = [];
+  // Try to build a list of images using cached versions when available.
+  if(Array.isArray(p.images) && p.images.length){
+    p.images.forEach((url, idx) => {
+      const key = `image_cache_${p.id}_${idx}`;
+      const cached = localStorage.getItem(key);
+      images.push(cached || url);
+    });
+  }
+  // If no images were defined but cached versions exist, gather them.
+  if(images.length === 0){
+    let idx = 0;
+    let found = false;
+    while(true){
+      const key = `image_cache_${p.id}_${idx}`;
+      const cached = localStorage.getItem(key);
+      if(cached){
+        images.push(cached);
+        found = true;
+      } else {
+        break;
+      }
+      idx++;
+    }
+    if(!found) images.push(RAW_PREFIX + "noimage.png");
+  }
+  return images;
 }
 
 // Asosiy katta rasm (tepada)
