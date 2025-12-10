@@ -1043,6 +1043,15 @@ function renderClientOrders(){
             <strong>Mahsulotlar:</strong>
             <ul>${itemsHtml}</ul>
           </section>
+          ${o.courierName ? `
+          <section class="order-courier">
+            <strong>🚚 Kuryer:</strong> ${o.courierName}${o.courierCar ? ` — ${o.courierCar}` : ""}<br>
+            ${o.courierPhone ? `📞 <a href="tel:${o.courierPhone}">${o.courierPhone}</a><br>` : ""}
+          </section>
+          ` : ""}
+          ${o.courierStatus ? `
+          <div class="order-courier-status">${o.courierStatus}</div>
+          ` : ""}
           <footer class="order-footer">
             <span>Holat: ${statusLabel(o.status)}</span>
             <span>${o.status==="delivered" ? "✅ Yakunlandi" :

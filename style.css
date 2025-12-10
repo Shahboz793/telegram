@@ -589,6 +589,22 @@ body.theme-dark{
   justify-content:space-between;
   color:var(--muted);
 }
+
+/* Kuryer ma’lumotlarini buyurtma kartasida ko‘rsatish */
+.order-courier{
+  margin-top:6px;
+  font-size:13px;
+  color:var(--text);
+}
+.order-courier a{
+  color:var(--accent);
+  text-decoration:underline;
+}
+.order-courier-status{
+  margin-top:4px;
+  font-size:12px;
+  color:var(--accent-strong);
+}
 .order-status-row{
   margin-top:6px;
   margin-bottom:4px;

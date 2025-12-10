@@ -543,11 +543,13 @@ window.takeOrder = async(id)=>{
   if(!isOnline) return showToast("Offline holatda qabul qilib bo‘lmaydi.");
 
   await updateDoc(doc(db,"orders",id),{
-    courierLogin:currentCourier.login,
-    courierName:currentCourier.name,
-    courierCar:currentCourier.car,
-    status:"courier",
-    courierTakenAt:serverTimestamp()
+    courierLogin: currentCourier.login,
+    courierName: currentCourier.name,
+    courierPhone: currentCourier.phone || currentCourier.phoneNumber || currentCourier.phoneNum || null,
+    courierCar: currentCourier.car,
+    status: "courier",
+    courierStatus: "Kuryer buyurtmani qabul qildi",
+    courierTakenAt: serverTimestamp()
   });
   showToast("Zakaz olindi");
 };
@@ -556,10 +558,12 @@ window.releaseOrder = async(id)=>{
   if(!isOnline) return showToast("Offline holatda amal bajarilmaydi.");
 
   await updateDoc(doc(db,"orders",id),{
-    courierLogin:null,
-    courierName:null,
-    courierCar:null,
-    status:"courier"
+    courierLogin: null,
+    courierName: null,
+    courierPhone: null,
+    courierCar: null,
+    status: "courier",
+    courierStatus: "Kuryer buyurtmani bekor qildi"
   });
   showToast("Zakaz yechildi");
 };
@@ -568,8 +572,9 @@ window.markDelivered = async(id)=>{
   if(!isOnline) return showToast("Offline holatda yetkazib bo‘lmaydi.");
 
   await updateDoc(doc(db,"orders",id),{
-    status:"delivered",
-    deliveredAt:serverTimestamp()
+    status: "delivered",
+    deliveredAt: serverTimestamp(),
+    courierStatus: "Kuryer buyurtmani yetkazdi"
   });
   showToast("Yetkazildi");
 };
@@ -578,10 +583,12 @@ window.releaseDelivered = async(id)=>{
   if(!isOnline) return showToast("Offline holatda aktivlashtirib bo‘lmaydi.");
 
   await updateDoc(doc(db,"orders",id),{
-    status:"courier",
-    courierLogin:null,
-    courierName:null,
-    courierCar:null
+    status: "courier",
+    courierLogin: null,
+    courierName: null,
+    courierPhone: null,
+    courierCar: null,
+    courierStatus: "Zakaz qayta aktivlashdi"
   });
   showToast("Qayta aktivlashtirildi");
 };
