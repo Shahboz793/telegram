@@ -777,11 +777,39 @@ body.theme-dark{
   padding:0;
   position:relative;
 }
+
+/* Like (favorite) button overlay on product cards */
+.product-fav-btn{
+  position:absolute;
+  top:8px;
+  right:8px;
+  width:32px;
+  height:32px;
+  border:none;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  cursor:pointer;
+  background:rgba(0,0,0,.4);
+  color:#fff;
+  transition:background .2s ease, transform .2s ease;
+}
+.product-fav-btn.active{
+  background:var(--accent);
+  color:#fff;
+}
+.product-fav-btn:hover{
+  transform:scale(1.05);
+}
 .detail-img-wrap img{
+  /* Mahsulot detalidagi rasm o‘z nisbatini saqlasin va to‘liq ko‘rinsin.  */
   width:100%;
-  height:55vh; /* occupy roughly 55% of viewport height to leave space for details */
+  height:auto;
+  max-height:60vh;
   border-radius:0;
-  object-fit:cover;
+  object-fit:contain;
   box-shadow:none;
   background:#000;
 }

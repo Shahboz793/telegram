@@ -45,6 +45,8 @@ const THEME_KEY               = "beauty_theme";
 const CLIENT_ID_KEY           = "beauty_client_id";
 const RAW_PREFIX              = "https://raw.githubusercontent.com/hanbek221-design/kosmetika-premium/main/images/";
 const LOCAL_ORDERS_BACKUP_KEY = "beauty_orders_history";
+// Key to store list of favorite product indices in localStorage
+const FAVORITES_KEY = "beauty_favorites";
 
 // CATEGORY DICTS
 const categoryEmoji = { default: "💅" };
@@ -60,6 +62,9 @@ let currentSearch  = "";
 let isAdmin        = false;
 let editingProductId  = null;
 let editingCategoryId = null;
+// Liked product indices persisted in localStorage.  Each entry is a numeric
+// index into the products array.
+let favorites     = [];
 
 // ADMIN & CLIENT ORDER STATE
 // "all" | "delivered" | "courier" | "rejected"
@@ -169,6 +174,103 @@ function preloadProductImages(){
   }catch(err){
     console.warn('Image preloading error:', err);
   }
+}
+
+/* ==============================
+ * Sevimli mahsulotlar (favorites)
+ *
+ * Foydalanuvchi mahsulotlarni "like" tugmasi orqali belgilashi va keyin
+ * "Sevimlilar" sahifasida ko‘rishi mumkin.  Sevimli mahsulotlar ro‘yxati
+ * brauzerning localStorage’ida saqlanadi, shuning uchun foydalanuvchi
+ * keyingi tashriflarda ham ularni ko‘ra oladi.
+ */
+function loadFavorites(){
+  try{
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    const arr = JSON.parse(raw || "[]");
+    favorites = Array.isArray(arr) ? arr : [];
+  }catch(err){
+    console.warn("Favorites load error:", err);
+    favorites = [];
+  }
+}
+function saveFavorites(){
+  try{
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+  }catch(err){
+    console.warn("Favorites save error:", err);
+  }
+}
+function isFavorite(index){
+  return favorites.includes(index);
+}
+function toggleFavorite(index){
+  // Toggle the presence of this index in the favorites array
+  const i = favorites.indexOf(index);
+  if(i >= 0){
+    favorites.splice(i, 1);
+  }else{
+    favorites.push(index);
+  }
+  saveFavorites();
+  // Re-render UI to reflect updated state
+  renderProducts();
+  renderFavoritesPage();
+}
+function renderFavoritesPage(){
+  const favGrid = document.getElementById("favoritesGrid");
+  if(!favGrid) return;
+  // Show an empty message if there are no favorites or no products loaded
+  if(!favorites.length || !products.length){
+    favGrid.innerHTML = "<p class='cart-empty'>Sevimli mahsulotlar yo‘q.</p>";
+    return;
+  }
+  favGrid.innerHTML = "";
+  favorites.forEach(idx=>{
+    const p = products[idx];
+    if(!p) return;
+    const discount = p.oldPrice && p.oldPrice > p.price
+      ? (100 - Math.round(p.price*100/p.oldPrice))
+      : null;
+    const tag = p.tag || "Ommabop mahsulot";
+    const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
+    let imgHtml;
+    if(firstImage.startsWith(RAW_PREFIX)){
+      const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
+      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
+    }else{
+      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
+    }
+    const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
+    const favActive = favorites.includes(idx);
+    const favIcon = favActive ? "❤️" : "🤍";
+    favGrid.innerHTML += `
+      <article class="product-card" onclick="openProductDetail(${idx})">
+        <div class="product-img-wrap">
+          ${imgHtml}
+          <button class="product-fav-btn ${favActive ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${idx});">${favIcon}</button>
+          <div class="product-img-tag">
+            <span>Beauty</span><span>Pro</span>
+          </div>
+          ${discount ? `<div class="product-sale">-${discount}%</div>` : ``}
+        </div>
+        <div class="product-body">
+          <div class="product-name">${p.name}</div>
+          <div class="product-meta">${catLabel} • ${tag}</div>
+          <div class="tag-mini">💡 ${tag}</div>
+          <div class="price-row">
+            <div>
+              <div class="price-main">${formatPrice(p.price)} so‘m</div>
+              ${p.oldPrice ? `<div class="price-old">${formatPrice(p.oldPrice)} so‘m</div>` : ``}
+            </div>
+            <button class="btn-add" onclick="event.stopPropagation(); addToCart(${idx});">
+              ➕ Savatga
+            </button>
+          </div>
+        </div>
+      </article>
+    `;
+  });
 }
 
 /*
@@ -508,11 +610,17 @@ function renderProducts(){
       imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
+    // Prepare favorite button state.  Use heart icon filled when this product
+    // index exists in the favorites array.
+    const favActive = favorites.includes(index);
+    const favIcon   = favActive ? "❤️" : "🤍";
 
     productsGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${index})">
         <div class="product-img-wrap">
           ${imgHtml}
+          <!-- Like button overlay -->
+          <button class="product-fav-btn ${favActive ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${index});">${favIcon}</button>
           <div class="product-img-tag">
             <span>Beauty</span><span>Pro</span>
           </div>
@@ -560,6 +668,9 @@ function subscribeProductsRealtime(){
     // Always rebuild products using the latest snapshot from Firestore.
     rebuildProducts();
     renderAdminCustomList();
+    // After products are rebuilt, update the favorites grid to ensure
+    // liked items show properly even if the product array order changed.
+    renderFavoritesPage();
   }, err=>{
     console.error("Mahsulot realtime xato:", err);
     showToast("⚠️ Mahsulotlarni o‘qishda xato.");
@@ -604,6 +715,8 @@ function subscribeCategoriesRealtime(){
     renderCategoryFilter();
     updateAdminCategorySelect();
     renderCategoryAdminList();
+    // Update favorites page because category labels might have changed
+    renderFavoritesPage();
   },err=>{
     console.error("Kategoriya realtime xato:", err);
     showToast("⚠️ Kategoriyalarni o‘qishda xato.");
@@ -1210,6 +1323,8 @@ if(tabsEl){
     document.getElementById("shopPage").classList.add("hidden");
     document.getElementById("ordersPage").classList.add("hidden");
     document.getElementById("adminPage").classList.add("hidden");
+    const favPageEl = document.getElementById("favoritesPage");
+    if(favPageEl) favPageEl.classList.add("hidden");
 
     document.getElementById(pageId).classList.remove("hidden");
   });
@@ -1670,6 +1785,10 @@ function openProductDetail(index){
 
   productDetailOverlay.classList.remove("hidden");
   document.body.style.overflow = "hidden";
+
+  // Reset scroll position for the detail body so the top of the card is visible
+  const detailBody = document.querySelector(".detail-body");
+  if(detailBody) detailBody.scrollTop = 0;
 }
 function closeProductDetail(){
   clearDetailCountdown();
@@ -2093,6 +2212,11 @@ function centerToCourier(){
     Telegram.WebApp.onEvent('themeChanged', applyTelegramTheme);
   }
 
+  // Load favorites from localStorage before anything is rendered so that
+  // heart icons reflect the saved state.  This call will populate the
+  // `favorites` array.
+  loadFavorites();
+
   clientId = getOrCreateClientId();
   renderCustomerInfo();
 
@@ -2111,6 +2235,10 @@ function centerToCourier(){
   // snapshot populates products.  Products are no longer restored from
   // localStorage; the latest data is always obtained from Firestore.
   renderProducts();
+  // Render the favorites page after the initial product grid is drawn.  This
+  // ensures that the favorites page shows saved items even before
+  // Firestore snapshots arrive.
+  renderFavoritesPage();
 
   // Listen for real-time updates from Firestore.  When data
   // arrives, it populates the product grid.
@@ -2147,6 +2275,9 @@ window.updateOrderStatus           = updateOrderStatus;
 window.setAdminOrderFilter         = setAdminOrderFilter;
 window.clearAllOrders              = clearAllOrders;
 window.openOrderLocation           = openOrderLocation;
+
+// Export favorites toggling so buttons in the HTML markup can invoke it.
+window.toggleFavorite              = toggleFavorite;
 
 // Courier globals (admindagi xarita)
 window.openSelectedCourierExternal = openSelectedCourierExternal;
