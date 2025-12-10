@@ -152,8 +152,61 @@ function preloadProductImages(){
         });
       }
     });
+    // Trigger caching of images in localStorage so that
+    // subsequent visits can load them directly from storage.
+    cacheProductImages();
   }catch(err){
     console.warn('Image preloading error:', err);
+  }
+}
+
+/*
+ * Fetch an image from a URL and store it in localStorage under the
+ * provided key.  The image is converted to a data URL via a
+ * FileReader.  If localStorage limits are exceeded, errors are
+ * caught and logged.
+ */
+function cacheImage(url, key){
+  return fetch(url)
+    .then(res => res.blob())
+    .then(blob => new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    }))
+    .then(dataUrl => {
+      try{
+        localStorage.setItem(key, dataUrl);
+      }catch(e){
+        console.warn('Unable to cache image', key, e);
+      }
+      return dataUrl;
+    })
+    .catch(err => {
+      console.warn('Error caching image', url, err);
+    });
+}
+
+/*
+ * Iterate over all products and cache their image URLs.  Each
+ * image is stored under a unique key composed of the product ID and
+ * the image index.  Images already present in localStorage are not
+ * fetched again.
+ */
+function cacheProductImages(){
+  try{
+    (remoteProducts || []).forEach(p=>{
+      if(Array.isArray(p.images)){
+        p.images.forEach((url, idx) => {
+          const key = `image_cache_${p.id}_${idx}`;
+          if(url && typeof url === 'string' && !localStorage.getItem(key)){
+            cacheImage(url, key);
+          }
+        });
+      }
+    });
+  }catch(err){
+    console.warn('Error caching product images:', err);
   }
 }
 
@@ -478,13 +531,25 @@ function renderProducts(){
       ? (100 - Math.round(p.price*100/p.oldPrice))
       : null;
     const tag        = p.tag || "Ommabop mahsulot";
-    const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
+    // Determine the first image to display.  If a cached version exists
+    // in localStorage (saved during image preloading), use it to
+    // avoid additional network requests.  Otherwise fall back to the
+    // provided URL or the RAW_PREFIX placeholder.
+    const cacheKey    = `image_cache_${p.id}_0`;
+    const cachedFirst = localStorage.getItem(cacheKey);
+    let firstImage;
     let imgHtml;
-    if(firstImage.startsWith(RAW_PREFIX)){
-      const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
-      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
-    }else{
+    if(cachedFirst){
+      firstImage = cachedFirst;
       imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
+    }else{
+      firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
+      if(firstImage.startsWith(RAW_PREFIX)){
+        const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
+        imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
+      }else{
+        imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
+      }
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
 
