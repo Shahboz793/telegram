@@ -344,7 +344,7 @@ function promptNewCustomerInfo(){
   const address = prompt("📍 Asosiy manzil (shahar, tuman, ko‘cha, uy):");
   if(!address) return null;
 
-  const landmark = prompt("🧭 Mo‘ljal (masalan, bozor oldi, maktab yonida) — ixtiyoriy:") || "";
+  const landmark = prompt("🧭 Mo‘ljal (masalan, bozor oldi, makтаб yonida) — ixtiyoriy:") || "";
   const secondPhone = prompt("📞 Qo‘shimcha telefon raqam (ixtiyoriy):") || "";
   const preferredTime = prompt("⏰ Buyurtmani qaysi vaqtda qabul qilishni xohlaysiz? (ixtiyoriy):") || "";
 
@@ -1463,6 +1463,28 @@ function renderDetailImage(){
   }
 }
 
+/* YANGI: DETAL NARXINI QTY BO‘YICHA HISOBLASH */
+function updateDetailPriceUI(){
+  if(detailIndex === null) return;
+  const p = products[detailIndex];
+  if(!p) return;
+  const qty = detailQty || 1;
+
+  if(detailPriceEl){
+    const total = (p.price || 0) * qty;
+    detailPriceEl.textContent = formatPrice(total) + " so‘m";
+  }
+  if(detailOldPriceEl){
+    if(p.oldPrice){
+      const totalOld = (p.oldPrice || 0) * qty;
+      detailOldPriceEl.textContent = formatPrice(totalOld) + " so‘m";
+      detailOldPriceEl.classList.remove("hidden");
+    }else{
+      detailOldPriceEl.classList.add("hidden");
+    }
+  }
+}
+
 // Pastga qarab scroll bo‘ladigan galereya (agar HTML’da #detailGalleryList bo‘lsa)
 function renderDetailGallery(){
   if(!detailGalleryListEl) return;
@@ -1533,23 +1555,25 @@ function openProductDetail(index){
   renderDetailImage();
   renderDetailGallery(); // rasmlarni pastga chizish (agar konteyner bo‘lsa)
 
-  detailCategoryEl.textContent = catLbl;
-  detailNameEl.textContent     = p.name;
-  detailTagEl.textContent      = p.tag ? "💡 " + p.tag : "";
-  detailDescEl.textContent =
-    p.description && p.description.trim().length
-      ? p.description
-      : "Bu mahsulot sizning buyurtmangiz uchun tayyorlangan.";
-  detailPriceEl.textContent = formatPrice(p.price) + " so‘m";
-  if(p.oldPrice){
-    detailOldPriceEl.classList.remove("hidden");
-    detailOldPriceEl.textContent = formatPrice(p.oldPrice)+" so‘m";
-  }else{
-    detailOldPriceEl.classList.add("hidden");
+  if(detailCategoryEl) detailCategoryEl.textContent = catLbl;
+  if(detailNameEl)     detailNameEl.textContent     = p.name;
+  if(detailTagEl)      detailTagEl.textContent      = p.tag ? "💡 " + p.tag : "";
+  if(detailDescEl){
+    detailDescEl.textContent =
+      p.description && p.description.trim().length
+        ? p.description
+        : "Bu mahsulot sizning buyurtmangiz uchun tayyorlangan.";
   }
-  detailQtyValue.textContent = detailQty;
-  detailAddBtn.classList.remove("added");
-  detailAddBtn.textContent   = "🛒 Savatga qo‘shish";
+
+  if(detailQtyValue) detailQtyValue.textContent = detailQty;
+
+  // narxlarni qty bo‘yicha yangilash
+  updateDetailPriceUI();
+
+  if(detailAddBtn){
+    detailAddBtn.classList.remove("added");
+    detailAddBtn.textContent   = "🛒 Savatga qo‘shish";
+  }
 
   productDetailOverlay.classList.remove("hidden");
   document.body.style.overflow = "hidden";
@@ -1600,7 +1624,8 @@ if(detailQtyMinus){
     e.stopPropagation();
     if(detailQty>1){
       detailQty--;
-      detailQtyValue.textContent = detailQty;
+      if(detailQtyValue) detailQtyValue.textContent = detailQty;
+      updateDetailPriceUI();
     }
   });
 }
@@ -1608,14 +1633,15 @@ if(detailQtyPlus){
   detailQtyPlus.addEventListener("click", e=>{
     e.stopPropagation();
     detailQty++;
-    detailQtyValue.textContent = detailQty;
+    if(detailQtyValue) detailQtyValue.textContent = detailQty;
+    updateDetailPriceUI();
   });
 }
-// rasmga bosganda fullscreen / qaytish
+// rasmga bosganda — ENDI FULLSCREEN YO‘Q, faqat hech narsa qilmaydi
 if(detailImgWrap){
   detailImgWrap.addEventListener("click", e=>{
     e.stopPropagation();
-    toggleImageFullscreen();
+    // fullscreen o‘chirildi, shunchaki rasm ko‘rinadi
   });
 }
 

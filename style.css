@@ -1289,3 +1289,101 @@ body.theme-dark{
 .courier-body .toast{
   bottom:26px;
 }
+
+/* =========================================================
+   PATCH: Premium discount visuals (additions)
+   — eski narxga qizil chiziq
+   — rasm ustida gradient −% badge
+   — chegirmali kartalarda neon border
+   — modal karta uchun highlight
+   — qty +/− tugmalar (qizil)
+========================================================= */
+
+/* 1) Eski narx — premium qizil strikethrough (kartada va modalda) */
+.price-old,
+.p-old,
+.detail-price-old,
+.detail-oldprice,
+.old-price {
+  position: relative;
+  display: inline-block;
+  color: #c40000;         /* to‘q qizil matn rangi */
+  font-weight: 600;
+  text-decoration: none;  /* eski line-through ni o‘chirib, o‘zimiz chizamiz */
+  opacity: .92;
+}
+.price-old::after,
+.p-old::after,
+.detail-price-old::after,
+.detail-oldprice::after,
+.old-price::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  transform: translateY(-50%) rotate(-4deg);
+  background: linear-gradient(90deg,#ff0033,#ff0055);
+  border-radius: 2px;
+}
+
+/* 2) Skidka badge — rasmning yuqori o‘ngida premium gradient */
+.discount-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  border-radius: 12px;
+  letter-spacing: .5px;
+  background: linear-gradient(135deg, #ff0033, #ff005e);
+  box-shadow: 0 4px 14px rgba(255,0,80,.55);
+  z-index: 5;
+}
+/* badge konteyneri joylashuvi */
+.product-img-wrap .discount-badge { top: 12px; right: 12px; }
+.detail-img-wrap  .discount-badge { top: 22px; right: 22px; }
+
+/* 3) Chegirmali kartalarda neon qizil border va yaltirash */
+.product-card.discounted {
+  border: 2px solid #ff0033 !important;
+  box-shadow: 0 8px 25px rgba(255,0,50,.35);
+}
+
+/* 4) Modal karta chegirmali bo‘lsa highlight */
+.detail-card.discounted {
+  border-top: 3px solid #ff0033;
+  box-shadow: 0 0 25px rgba(255,0,60,.35);
+}
+
+/* 5) Kartadagi qty +/− tugmalar (agar bor bo‘lsa) — qizil, katta ko‘rinish */
+.qty-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#ffe3e3;
+  padding:6px 10px;
+  border-radius:999px;
+}
+.qty-minus, .qty-plus{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:none;
+  background:#e60023;
+  color:#fff;
+  font-size:18px;
+  cursor:pointer;
+}
+.qty-value{
+  width:18px;
+  text-align:center;
+  font-size:15px;
+  font-weight:700;
+}
+
+/* Agar avval .product-sale badge ishlatilgan bo‘lsa, endi yangisini qo‘yish uchun yashirish (ixtiyoriy) */
+/* .product-sale { display:none !important; } */
