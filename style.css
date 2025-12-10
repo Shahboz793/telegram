@@ -834,6 +834,20 @@ body.theme-dark{
   color:#4b5563;
   margin-top:6px;
 }
+
+/*
+ * Custom modifications
+ *
+ * The original design includes navigation buttons beneath the product
+ * image to cycle through multiple images (previous/next).  Per user
+ * request, these controls should no longer appear in the UI.  We
+ * therefore hide the buttons via CSS so the underlying markup and
+ * scripts remain intact but the controls are not visible.
+ */
+#detailPrevBtn,
+#detailNextBtn{
+  display:none!important;
+}
 .detail-tag{
   font-size:13px;
   color:#2563eb;

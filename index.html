@@ -10,9 +10,8 @@
   <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/5787/5787016.png">
 
   <!-- STYLE -->
-  <link rel="stylesheet" href="style.css" />
-  <!-- Telegram WebApp (ixtiyoriy) -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Updated to point to the correct CSS file provided by the user -->
+  <link rel="stylesheet" href="1474d7b7-99aa-46c6-81bb-c19a276d719d.css" />
 </head>
 
 <body>
@@ -29,7 +28,7 @@
       </div>
 
       <div class="header-right">
-        <button id="themeToggleBtn" type="button" class="icon-btn" title="Mavzuni almashtirish">🌙</button>
+        <button id="themeToggleBtn" type="button" class="icon-btn">🌙</button>
 
         <button class="cart-top-btn" onclick="toggleCartSheet(true)">
           <span>🛒 Savat</span>
@@ -37,11 +36,11 @@
           <span class="cart-top-total" id="cartTotalTop">0 so‘m</span>
         </button>
 
-        <button id="adminAccessBtn" type="button" class="icon-btn" title="Admin paneli">
-          👑
+        <button id="adminAccessBtn" type="button" class="icon-btn">
+          👑 Admin
         </button>
 
-        <button type="button" class="icon-btn" onclick="location.href='courier.html'" title="Kuryer paneli">
+        <button type="button" class="icon-btn" onclick="location.href='courier.html'">
           🚚
         </button>
       </div>
@@ -60,7 +59,6 @@
       <!-- === SHOP PAGE === -->
       <section id="shopPage" class="page">
 
-        <!-- Mijoz ma’lumoti -->
         <div class="customer-panel">
           <p id="customerInfoText" class="customer-info">
             Mijoz ma’lumotlari saqlanmagan. Buyurtma paytida ism va telefon so‘raladi.
@@ -71,16 +69,13 @@
           </div>
         </div>
 
-        <!-- Qidiruv / toolbar -->
         <div class="shop-toolbar">
           <input id="searchInput" class="search-input" type="search"
                  placeholder="Qidirish: taom nomi, kategoriya, tavsif..." />
         </div>
 
-        <!-- Kategoriyalar (4x chip grid) -->
         <div id="filterBar" class="chips-row"></div>
 
-        <!-- Mahsulotlar -->
         <section id="productsGrid" class="products-grid"></section>
 
       </section>
@@ -95,12 +90,11 @@
       <!-- === ADMIN PAGE === -->
       <section id="adminPage" class="page hidden admin-page">
 
-        <header class="admin-top-bar" style="padding:8px 16px 4px; display:flex; align-items:center; justify-content:space-between;">
+        <header class="admin-top-bar">
           <h2 class="section-title">👑 Admin paneli</h2>
-          <div class="admin-top-actions" style="display:flex; gap:8px; align-items:center;">
-            <button class="btn-xs btn-xs-secondary" onclick="location.href='courier.html'">🚚 Kuryer paneli</button>
-            <button class="btn-xs btn-xs-primary" id="exportBtn">⬇️ Export</button>
-          </div>
+          <button class="btn-xs btn-xs-secondary" onclick="location.href='courier.html'">
+            🚚 Kuryer paneli
+          </button>
         </header>
 
         <div class="admin-cols">
@@ -109,21 +103,34 @@
           <div class="admin-col">
             <article class="card">
               <h3 class="card-title">🍔 Mahsulotlar</h3>
-              <p class="card-sub">Yangi taomlar qo‘shing yoki mavjudlarini tahrirlang.</p>
-
               <div class="form-grid">
-                <label>Nomi <input id="adminName" type="text" placeholder="Masalan: Donar set"></label>
+
+                <label>Nomi <input id="adminName" type="text"></label>
+
                 <label>Kategoriya <select id="adminCategory"></select></label>
-                <label>Asosiy narx <input id="adminPriceBase" type="number" placeholder="Narx (so‘m)"></label>
-                <label class="checkbox-row"><input id="adminHasDiscount" type="checkbox"> Chegirma mavjud</label>
-                <label>Chegirmali narx <input id="adminPriceDiscount" type="number" placeholder="Chegirmali narx (so‘m)"></label>
-                <label>Tag / chip <input id="adminTag" type="text" placeholder="#yangilik #xit"></label>
-                <label>Tavsif <textarea id="adminDescription" placeholder="Qisqacha tavsif"></textarea></label>
-                <label>Rasmlar (URL, vergul bilan) <textarea id="adminImages" placeholder="https://...jpg, https://...png"></textarea></label>
+
+                <label>Asosiy narx <input id="adminPriceBase" type="number"></label>
+
+                <label class="checkbox-row">
+                  <input id="adminHasDiscount" type="checkbox"> Chegirma mavjud
+                </label>
+
+                <label>Chegirmali narx <input id="adminPriceDiscount" type="number"></label>
+
+                <label>Tag / chip <input id="adminTag" type="text"></label>
+
+                <label>Tavsif <textarea id="adminDescription"></textarea></label>
+
+                <label>Rasmlar <textarea id="adminImages"></textarea></label>
+
               </div>
 
-              <button class="btn-primary btn-full" onclick="addCustomProduct()">➕ Mahsulot qo‘shish</button>
+              <button class="btn-primary btn-full" onclick="addCustomProduct()">
+                ➕ Mahsulot qo‘shish
+              </button>
+
               <div id="adminCustomList" class="admin-list"></div>
+
             </article>
           </div>
 
@@ -133,12 +140,17 @@
             <article class="card">
               <h3 class="card-title">🏷 Kategoriyalar</h3>
               <div class="form-grid">
-                <label>Kategoriya kodi <input id="adminCatCode" placeholder="masalan: burgers"></label>
-                <label>Kategoriya nomi <input id="adminCatLabel" placeholder="Burgers"></label>
-                <label>Emoji <input id="adminCatEmoji" placeholder="🍔"></label>
+
+                <label>Kategoriya kodi <input id="adminCatCode"></label>
+                <label>Kategoriya nomi <input id="adminCatLabel"></label>
+                <label>Emoji <input id="adminCatEmoji"></label>
+
               </div>
 
-              <button class="btn-primary btn-full" onclick="saveCategory()">💾 Saqlash</button>
+              <button class="btn-primary btn-full" onclick="saveCategory()">
+                💾 Saqlash
+              </button>
+
               <div id="adminCategoryList" class="admin-list"></div>
             </article>
 
@@ -146,19 +158,22 @@
               <h3 class="card-title">🚚 Kuryer qo‘shish</h3>
 
               <div class="form-grid">
-                <label>Ism <input id="adminCourierName" placeholder="Ali Valiev"></label>
-                <label>Telefon <input id="adminCourierPhone" placeholder="+998..."></label>
-                <label>Avtomobil <input id="adminCourierCar" placeholder="Cobalt"></label>
-                <label>Raqam <input id="adminCourierPlate" placeholder="01 A 123 AB"></label>
-                <label>Login <input id="adminCourierLogin" placeholder="courier01"></label>
-                <label>Parol <input id="adminCourierPassword" type="password" placeholder="••••••••"></label>
+                <label>Ism <input id="adminCourierName"></label>
+                <label>Telefon <input id="adminCourierPhone"></label>
+                <label>Avtomobil <input id="adminCourierCar"></label>
+                <label>Raqam <input id="adminCourierPlate"></label>
+                <label>Login <input id="adminCourierLogin"></label>
+                <label>Parol <input id="adminCourierPassword" type="password"></label>
               </div>
 
-              <button id="adminCourierSaveBtn" class="btn-primary btn-full" onclick="saveCourier()">💾 Kuryerni saqlash</button>
+              <button id="adminCourierSaveBtn" class="btn-primary btn-full" onclick="saveCourier()">
+                💾 Kuryerni saqlash
+              </button>
+
               <div id="adminCourierList" class="admin-list" style="margin-top:12px;"></div>
             </article>
 
-            <article class="card" style="margin-top:20px;">
+            <article class="card">
               <h3 class="card-title">📍 Kuryer xaritasi</h3>
 
               <select id="courierOrderSelect" class="search-input"></select>
@@ -175,6 +190,7 @@
                 <button class="btn-xs btn-xs-secondary" onclick="centerToCourier()">📍 Marshrut</button>
                 <button class="btn-xs btn-xs-secondary" onclick="openSelectedCourierExternal()">🌐 Google Maps</button>
               </div>
+
             </article>
 
           </div>
@@ -227,22 +243,15 @@
   <audio id="notifySound" src="ding.mp3" preload="auto"></audio>
 
   <!-- ================================================== -->
-  <!--             PRODUCT DETAIL — PREMIUM FINAL         -->
+  <!--             PRODUCT DETAIL — FINAL                 -->
   <!-- ================================================== -->
   <div id="productDetailOverlay" class="detail-overlay hidden">
     <div class="detail-card">
 
-      <!-- Yopish -->
-      <button id="detailBackBtn" class="detail-close-btn" title="Yopish">✕</button>
-
-      <!-- RASM (badge konteyneri qo‘shildi) -->
+      <!-- RASM -->
       <div class="detail-img-wrap" id="detailImgWrap">
         <img id="detailImage" class="detail-main-img" alt="rasm">
 
-        <!-- Chegirma badge (premium) — JS bilan boshqariladi -->
-        <div id="detailDiscountBadge" class="discount-badge hidden"></div>
-
-        <!-- Agar galereya ishlatilsa, qo‘lda qoldiramiz -->
         <button id="detailPrevBtn" class="detail-nav prev">‹</button>
         <button id="detailNextBtn" class="detail-nav next">›</button>
 
@@ -254,25 +263,26 @@
 
         <div id="detailCategory" class="detail-category"></div>
         <h2 id="detailName" class="detail-name"></h2>
+        <div id="detailTag" class="detail-tag"></div>
 
         <p id="detailDesc" class="detail-desc"></p>
 
-        <div class="detail-price-row">
+        <div class="detail-prices">
           <span id="detailPrice" class="detail-price"></span>
-          <span id="detailOldPrice" class="detail-oldprice old-price hidden"></span>
+          <span id="detailOldPrice" class="detail-oldprice hidden"></span>
         </div>
 
-        <div class="detail-qty">
-          <button id="detailQtyMinus" class="qty-btn">-</button>
-          <span id="detailQtyValue" class="qty-value">1</span>
-          <button id="detailQtyPlus" class="qty-btn">+</button>
+        <div class="detail-qty-row">
+          <button id="detailQtyMinus">-</button>
+          <span id="detailQtyValue">1</span>
+          <button id="detailQtyPlus">+</button>
         </div>
 
-        <button id="detailAddBtn" class="detail-add-btn">
+        <button id="detailAddBtn" class="btn-primary btn-full">
           🛒 Savatga qo‘shish
         </button>
 
-        <button id="detailCloseBtnFallback" class="btn-outline btn-full hidden">
+        <button id="detailBackBtn" class="btn-outline btn-full hidden">
           ◀ Orqaga
         </button>
 
@@ -282,6 +292,8 @@
   </div>
 
   <!-- APP SCRIPT -->
-  <script type="module" src="app.js"></script>
+  <!-- Updated to point to the correct JavaScript file provided by the user -->
+  <script type="module" src="11c6e6e0-2bf8-4e24-a3d9-84fbf2006f4c.js"></script>
+
 </body>
 </html>
