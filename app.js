@@ -129,73 +129,12 @@ const detailGalleryListEl = document.getElementById("detailGalleryList"); // pas
 // The splash screen displays a welcome message while images are preloaded.
 const splashScreenEl = document.getElementById("splashScreen");
 
-/*
- * Local storage keys
- *
- * To allow the application to function when offline or when the
- * Firestore connection is temporarily unavailable, product data and
- * images can be cached in the browser.  The LOCAL_PRODUCTS_KEY is used
- * to serialize and persist the list of products (with minimal fields)
- * into localStorage.  When the page loads, the code attempts to
- * restore the cached list via loadProductsFromLocal().  When new
- * products arrive from Firestore, saveProductsToLocal() persists the
- * latest copy.
- */
-const LOCAL_PRODUCTS_KEY = "beauty_products_cache";
-
-/**
- * Persist the current remoteProducts array into localStorage.
- *
- * Only lightweight fields are saved (id, name, prices, category,
- * tag/emoji/description, and image URLs) to avoid exceeding
- * localStorage quotas.  If an error occurs (e.g. storage quota
- * exceeded), the exception is caught silently to prevent blocking
- * the main flow.  Subsequent remote updates will overwrite
- * previous cached data.
- */
-function saveProductsToLocal(){
-  try{
-    const data = (remoteProducts || []).map(p=>({
-      id: p.id,
-      name: p.name,
-      price: p.price,
-      oldPrice: p.oldPrice,
-      category: p.category,
-      emoji: p.emoji,
-      tag: p.tag,
-      description: p.description,
-      images: Array.isArray(p.images) ? p.images : []
-    }));
-    localStorage.setItem(LOCAL_PRODUCTS_KEY, JSON.stringify(data));
-  }catch(err){
-    console.warn('Error saving products to localStorage:', err);
-  }
-}
-
-/**
- * Attempt to load the product list from localStorage.
- *
- * If a cached list is found, remoteProducts is assigned the
- * parsed array and the UI is rebuilt using rebuildProducts().  This
- * allows the application to display previously viewed products
- * immediately when there is no network connectivity.  If parsing
- * fails or the key is absent, remoteProducts remains unchanged and
- * the function returns false to signal that no restore occurred.
- */
-function loadProductsFromLocal(){
-  try{
-    const raw = localStorage.getItem(LOCAL_PRODUCTS_KEY);
-    if(!raw) return false;
-    const arr = JSON.parse(raw);
-    if(!Array.isArray(arr)) return false;
-    remoteProducts = arr;
-    rebuildProducts();
-    return true;
-  }catch(err){
-    console.warn('Error loading products from localStorage:', err);
-    return false;
-  }
-}
+//
+// NOTE: Local storage caching of products has been removed.  Products
+// are now always loaded from Firestore in real time to prevent
+// conflicts and ensure the latest data is shown.  Preloading of
+// images still occurs to warm up the browser cache but nothing is
+// persisted into localStorage.
 
 /*
  * Preload product images
@@ -220,9 +159,9 @@ function preloadProductImages(){
         });
       }
     });
-    // Trigger caching of images in localStorage so that
-    // subsequent visits can load them directly from storage.
-    cacheProductImages();
+    // We no longer store images in localStorage.  Browsers will
+    // cache resources automatically once they are requested via
+    // Image objects above.
   }catch(err){
     console.warn('Image preloading error:', err);
   }
@@ -234,49 +173,9 @@ function preloadProductImages(){
  * FileReader.  If localStorage limits are exceeded, errors are
  * caught and logged.
  */
-function cacheImage(url, key){
-  return fetch(url)
-    .then(res => res.blob())
-    .then(blob => new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(blob);
-    }))
-    .then(dataUrl => {
-      try{
-        localStorage.setItem(key, dataUrl);
-      }catch(e){
-        console.warn('Unable to cache image', key, e);
-      }
-      return dataUrl;
-    })
-    .catch(err => {
-      console.warn('Error caching image', url, err);
-    });
-}
-
-/*
- * Iterate over all products and cache their image URLs.  Each
- * image is stored under a unique key composed of the product ID and
- * the image index.  Images already present in localStorage are not
- * fetched again.
- */
-function cacheProductImages(){
-  try{
-    (remoteProducts || []).forEach(p=>{
-      if(Array.isArray(p.images)){
-        p.images.forEach((url, idx) => {
-          const key = `image_cache_${p.id}_${idx}`;
-          if(url && typeof url === 'string' && !localStorage.getItem(key)){
-            cacheImage(url, key);
-          }
-        });
-      }
-    });
-  }catch(err){
-    console.warn('Error caching product images:', err);
-  }
-}
+// cacheImage and cacheProductImages functions removed: we no longer
+// persist images into localStorage.  Browsers handle caching of
+// fetched assets automatically.
 
 // Hide the splash screen a few seconds after the DOM is ready.
 // Using `DOMContentLoaded` ensures the overlay hides even if remote
@@ -599,25 +498,17 @@ function renderProducts(){
       ? (100 - Math.round(p.price*100/p.oldPrice))
       : null;
     const tag        = p.tag || "Ommabop mahsulot";
-    // Determine the first image to display.  If a cached version exists
-    // in localStorage (saved during image preloading), use it to
-    // avoid additional network requests.  Otherwise fall back to the
-    // provided URL or the RAW_PREFIX placeholder.
-    const cacheKey    = `image_cache_${p.id}_0`;
-    const cachedFirst = localStorage.getItem(cacheKey);
-    let firstImage;
+    // Determine the first image to display from the product list.  If
+    // no images are provided, fall back to a "noimage" placeholder
+    // hosted in the raw GitHub repository.  A PNG/JPG fallback is
+    // used only for placeholder images.
+    const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
     let imgHtml;
-    if(cachedFirst){
-      firstImage = cachedFirst;
-      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
+    if(firstImage.startsWith(RAW_PREFIX)){
+      const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
+      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
     }else{
-      firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
-      if(firstImage.startsWith(RAW_PREFIX)){
-        const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
-        imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
-      }else{
-        imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
-      }
+      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
 
@@ -669,10 +560,7 @@ function subscribeProductsRealtime(){
       });
     });
     remoteProducts = list;
-    // Persist the latest list of products locally so that subsequent
-    // visits can display products even when offline.  Saving is
-    // performed before UI rebuild to reduce latency.
-    saveProductsToLocal();
+    // Always rebuild products using the latest snapshot from Firestore.
     rebuildProducts();
     renderAdminCustomList();
   }, err=>{
@@ -1626,39 +1514,11 @@ function toggleImageFullscreen(){
 }
 
 function getDetailImages(){
-  // Attempt to retrieve images for the currently selected product.
-  // If cached versions exist in localStorage (saved via
-  // cacheProductImages()), they are used instead of remote URLs.
   if(detailIndex===null) return [RAW_PREFIX + "noimage.png"];
   const p = products[detailIndex];
   if(!p) return [RAW_PREFIX + "noimage.png"];
-  const images = [];
-  // Try to build a list of images using cached versions when available.
-  if(Array.isArray(p.images) && p.images.length){
-    p.images.forEach((url, idx) => {
-      const key = `image_cache_${p.id}_${idx}`;
-      const cached = localStorage.getItem(key);
-      images.push(cached || url);
-    });
-  }
-  // If no images were defined but cached versions exist, gather them.
-  if(images.length === 0){
-    let idx = 0;
-    let found = false;
-    while(true){
-      const key = `image_cache_${p.id}_${idx}`;
-      const cached = localStorage.getItem(key);
-      if(cached){
-        images.push(cached);
-        found = true;
-      } else {
-        break;
-      }
-      idx++;
-    }
-    if(!found) images.push(RAW_PREFIX + "noimage.png");
-  }
-  return images;
+  if(p.images && p.images.length) return p.images;
+  return [RAW_PREFIX + "noimage.png"];
 }
 
 // Asosiy katta rasm (tepada)
@@ -2201,20 +2061,13 @@ function centerToCourier(){
     searchInput.value = "";
     currentSearch = "";
   }
-  // Attempt to load cached products from localStorage so that the
-  // product grid is populated immediately if network is unavailable.
-  const restored = loadProductsFromLocal();
-  // Build the UI from any cached products.  If nothing was restored,
-  // renderProducts() will show an empty grid until Firestore
-  // snapshot loads.
-  if(restored){
-    // rebuildProducts() already called within loadProductsFromLocal().
-  } else {
-    renderProducts();
-  }
+  // Render an empty products grid initially until Firestore
+  // snapshot populates products.  Products are no longer restored from
+  // localStorage; the latest data is always obtained from Firestore.
+  renderProducts();
 
   // Listen for real-time updates from Firestore.  When data
-  // arrives, it overwrites the cached list and updates the UI.
+  // arrives, it populates the product grid.
   subscribeProductsRealtime();
   subscribeCategoriesRealtime();
   subscribeClientOrders();
