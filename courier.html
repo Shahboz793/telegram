@@ -20,7 +20,7 @@
       display:flex;
       justify-content:space-between;
       align-items:center;
-      border-bottom:2px solid #22c55e;
+      border-bottom:2px solid #7000ff;
     }
     .courier-logo{font-size:32px;}
     .courier-title{font-size:20px; font-weight:bold;}
@@ -28,11 +28,11 @@
 
     .btn-chip{
       padding:6px 12px;
-      background:#22c55e;
+      background:#7000ff;
       border:none;
       border-radius:6px;
       font-weight:bold;
-      color:#000;
+      color:#fff;
       cursor:pointer;
     }
     .btn-chip-danger{
@@ -99,7 +99,7 @@
       border:1px solid #333;
       text-align:center;
     }
-    .stat-value{font-size:22px; font-weight:bold; color:#22c55e;}
+    .stat-value{font-size:22px; font-weight:bold; color:#7000ff;}
 
     .courier-tabs{
       display:flex;
@@ -117,8 +117,8 @@
       font-weight:bold;
     }
     .courier-tab-btn.active{
-      background:#22c55e;
-      color:black;
+      background:#7000ff;
+      color:#fff;
     }
 
     .order-card{
@@ -144,8 +144,8 @@
       margin-top:6px;
     }
     .btn-xs-primary{
-      background:#22c55e;
-      color:black;
+      background:#7000ff;
+      color:#fff;
       font-weight:bold;
     }
     .btn-xs-secondary{
@@ -162,8 +162,8 @@
       bottom:20px;
       left:50%;
       transform:translateX(-50%);
-      background:#22c55e;
-      color:black;
+      background:#7000ff;
+      color:#fff;
       padding:12px 18px;
       border-radius:8px;
       font-weight:bold;
@@ -262,6 +262,8 @@
   <audio id="courierNotify" src="ding.mp3" preload="auto"></audio>
 
 <!-- ========================= JS START ============================== -->
+<!-- Telegram WebApp SDK -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script type="module">
 
 /* FIREBASE LOAD */
@@ -384,7 +386,8 @@ logoutBtn.onclick = ()=>{
 goOnline.onclick = ()=>{
   isOnline = true;
   badge.textContent="Onlayn";
-  badge.style.background="#22c55e";
+  // Use the purple accent colour for the online status badge to match the rest of the UI
+  badge.style.background="#7000ff";
   render();
 };
 goOffline.onclick = ()=>{
@@ -442,7 +445,7 @@ function renderCard_A(o){
       <div><strong>🧾 Buyurtma #${code}</strong></div>
 
       <div><strong>${c.name}</strong></div>
-      <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
+      <div>📱 <a style="color:#7000ff" href="tel:${c.phone}">${c.phone}</a></div>
 
       <div>📍 ${c.address}</div>
       <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
@@ -479,7 +482,7 @@ function renderCard_M(o){
       <div><strong>📦 Mening zakazim #${code}</strong></div>
 
       <div><strong>${c.name}</strong></div>
-      <div>📱 <a style="color:#22c55e" href="tel:${c.phone}">${c.phone}</a></div>
+      <div>📱 <a style="color:#7000ff" href="tel:${c.phone}">${c.phone}</a></div>
 
       <div>📍 ${c.address}</div>
       <div>📝 Izoh: ${(c.note || o.note || "-")}</div>
@@ -617,6 +620,14 @@ tabBtns.forEach(btn=>{
     if(btn.dataset.tab==="done")      tabD.classList.remove("hidden");
   };
 });
+
+// When running inside Telegram WebApp, mark the app ready and expand
+if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+  // Notify Telegram that the web app is ready. This hides the loading spinner
+  // and allows the app to expand to full height.
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+}
 
 </script>
 <!-- ========================= JS END ============================== -->
