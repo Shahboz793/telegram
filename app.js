@@ -130,6 +130,74 @@ const detailGalleryListEl = document.getElementById("detailGalleryList"); // pas
 const splashScreenEl = document.getElementById("splashScreen");
 
 /*
+ * Local storage keys
+ *
+ * To allow the application to function when offline or when the
+ * Firestore connection is temporarily unavailable, product data and
+ * images can be cached in the browser.  The LOCAL_PRODUCTS_KEY is used
+ * to serialize and persist the list of products (with minimal fields)
+ * into localStorage.  When the page loads, the code attempts to
+ * restore the cached list via loadProductsFromLocal().  When new
+ * products arrive from Firestore, saveProductsToLocal() persists the
+ * latest copy.
+ */
+const LOCAL_PRODUCTS_KEY = "beauty_products_cache";
+
+/**
+ * Persist the current remoteProducts array into localStorage.
+ *
+ * Only lightweight fields are saved (id, name, prices, category,
+ * tag/emoji/description, and image URLs) to avoid exceeding
+ * localStorage quotas.  If an error occurs (e.g. storage quota
+ * exceeded), the exception is caught silently to prevent blocking
+ * the main flow.  Subsequent remote updates will overwrite
+ * previous cached data.
+ */
+function saveProductsToLocal(){
+  try{
+    const data = (remoteProducts || []).map(p=>({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      oldPrice: p.oldPrice,
+      category: p.category,
+      emoji: p.emoji,
+      tag: p.tag,
+      description: p.description,
+      images: Array.isArray(p.images) ? p.images : []
+    }));
+    localStorage.setItem(LOCAL_PRODUCTS_KEY, JSON.stringify(data));
+  }catch(err){
+    console.warn('Error saving products to localStorage:', err);
+  }
+}
+
+/**
+ * Attempt to load the product list from localStorage.
+ *
+ * If a cached list is found, remoteProducts is assigned the
+ * parsed array and the UI is rebuilt using rebuildProducts().  This
+ * allows the application to display previously viewed products
+ * immediately when there is no network connectivity.  If parsing
+ * fails or the key is absent, remoteProducts remains unchanged and
+ * the function returns false to signal that no restore occurred.
+ */
+function loadProductsFromLocal(){
+  try{
+    const raw = localStorage.getItem(LOCAL_PRODUCTS_KEY);
+    if(!raw) return false;
+    const arr = JSON.parse(raw);
+    if(!Array.isArray(arr)) return false;
+    remoteProducts = arr;
+    rebuildProducts();
+    return true;
+  }catch(err){
+    console.warn('Error loading products from localStorage:', err);
+    return false;
+  }
+}
+
+/*
  * Preload product images
  *
  * To improve perceived performance on subsequent visits, we load all
@@ -601,6 +669,10 @@ function subscribeProductsRealtime(){
       });
     });
     remoteProducts = list;
+    // Persist the latest list of products locally so that subsequent
+    // visits can display products even when offline.  Saving is
+    // performed before UI rebuild to reduce latency.
+    saveProductsToLocal();
     rebuildProducts();
     renderAdminCustomList();
   }, err=>{
@@ -2094,8 +2166,20 @@ function centerToCourier(){
   updateAdminUI();
 
   renderCategoryFilter();
-  renderProducts();
+  // Attempt to load cached products from localStorage so that the
+  // product grid is populated immediately if network is unavailable.
+  const restored = loadProductsFromLocal();
+  // Build the UI from any cached products.  If nothing was restored,
+  // renderProducts() will show an empty grid until Firestore
+  // snapshot loads.
+  if(restored){
+    // rebuildProducts() already called within loadProductsFromLocal().
+  } else {
+    renderProducts();
+  }
 
+  // Listen for real-time updates from Firestore.  When data
+  // arrives, it overwrites the cached list and updates the UI.
   subscribeProductsRealtime();
   subscribeCategoriesRealtime();
   subscribeClientOrders();

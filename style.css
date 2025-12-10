@@ -866,11 +866,26 @@ body.theme-dark{
   display:flex;
   align-items:center;
   justify-content:center;
-  background:var(--bg);
-  color:var(--text);
+  /* Green welcome overlay
+   * Use a solid green background rather than the default page
+   * background to make the greeting stand out.  This colour can be
+   * adjusted as desired for your brand.  Text colour is set to
+   * white for contrast.
+   */
+  background:#10B981;
+  color:#ffffff;
   z-index:100;
   pointer-events:auto;
   transition:opacity .3s ease;
+}
+
+/* Ensure the splash content is responsive on mobile devices
+ * by constraining its width and adding horizontal padding.  This
+ * prevents the welcome text from overflowing on narrow screens. */
+.splash-screen .splash-content{
+  max-width:90%;
+  padding:0 20px;
+  text-align:center;
 }
 .splash-screen.hidden{
   opacity:0;
@@ -878,10 +893,12 @@ body.theme-dark{
   display:none;
 }
 .splash-screen .splash-content h2{
-  font-size:28px;
+  /* Responsive font size: scales between 24px and 36px depending
+   * on viewport width, ensuring the heading fits on smaller screens. */
+  font-size:clamp(24px, 6vw, 36px);
   font-weight:700;
   text-align:center;
-  color:var(--text);
+  color:#ffffff;
 }
 .detail-tag{
   font-size:13px;
