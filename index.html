@@ -141,6 +141,10 @@
 
                 <label>Rasmlar <textarea id="adminImages"></textarea></label>
 
+                <!-- Qo‘shimcha (set) uchun yangi maydonlar.  Admin mahsulotga ixtiyoriy qo‘shimcha tovar nomini va uning narxini belgilashi mumkin.  Bu qo‘shimcha faqat 0 yoki 1 dona qo‘shiladi va uning narxi asosiy mahsulot narxiga qo‘shiladi.  -->
+                <label>Qo‘shimcha nom <input id="adminSetName" type="text" placeholder="Masalan: salat, sous"></label>
+                <label>Qo‘shimcha narx <input id="adminSetPrice" type="number" placeholder="Qo‘shimcha narx"></label>
+
               </div>
 
               <button class="btn-primary btn-full" onclick="addCustomProduct()">
@@ -288,6 +292,19 @@
           <span id="detailOldPrice" class="detail-oldprice hidden"></span>
         </div>
 
+        <!-- Set (qo‘shimcha) qismi: mahsulotga yana bitta qo‘shimcha tovar qo‘shish mumkin -->
+        <div id="detailSetRow" class="detail-set-row hidden">
+          <div class="set-info">
+            <div id="detailSetName" class="set-name"></div>
+            <div id="detailSetPrice" class="set-price"></div>
+          </div>
+          <div class="set-qty-control">
+            <button id="detailSetMinus" class="set-qty-btn">-</button>
+            <span id="detailSetQtyValue">0</span>
+            <button id="detailSetPlus" class="set-qty-btn">+</button>
+          </div>
+        </div>
+
         <div class="detail-qty-row">
           <button id="detailQtyMinus">-</button>
           <span id="detailQtyValue">1</span>
@@ -295,7 +312,7 @@
         </div>
 
         <button id="detailAddBtn" class="btn-primary btn-full">
-          🛒 Savatga qo‘shish
+          🛒 Qo‘shish
         </button>
 
         <!-- Savatdan chiqarish uchun maxsus tugma; faqat mahsulot savatga qo‘shilganda ko‘rinadi -->

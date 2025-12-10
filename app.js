@@ -49,7 +49,7 @@ const LOCAL_ORDERS_BACKUP_KEY = "beauty_orders_history";
 const FAVORITES_KEY = "beauty_favorites";
 
 // CATEGORY DICTS
-const categoryEmoji = { default: "💅" };
+const categoryEmoji = { default: "🍽" };
 const categoryLabel = {};
 
 // STATE
@@ -125,6 +125,18 @@ const detailRemoveBtn      = document.getElementById("detailRemoveBtn");
 const detailPrevBtn      = document.getElementById("detailPrevBtn");
 const detailNextBtn      = document.getElementById("detailNextBtn");
 const detailImageIndexEl = document.getElementById("detailImageIndex");
+
+// === SET (Qo‘shimcha) DOM ELEMENTS ===
+// Modal oynasida qo‘shimcha mahsulot (set) uchun maydonlar.  Foydalanuvchi bu qo‘shimchani 0 yoki 1 dona qo‘shishi mumkin.
+const detailSetRow      = document.getElementById("detailSetRow");
+const detailSetNameEl   = document.getElementById("detailSetName");
+const detailSetPriceEl  = document.getElementById("detailSetPrice");
+const detailSetQtyValue = document.getElementById("detailSetQtyValue");
+const detailSetMinus    = document.getElementById("detailSetMinus");
+const detailSetPlus     = document.getElementById("detailSetPlus");
+
+// Qo‘shimcha soni (faqat 0 yoki 1) state
+let detailSetQty = 0;
 
 const detailQtyMinus = document.getElementById("detailQtyMinus");
 const detailQtyPlus  = document.getElementById("detailQtyPlus");
@@ -232,7 +244,7 @@ function renderFavoritesPage(){
     const discount = p.oldPrice && p.oldPrice > p.price
       ? (100 - Math.round(p.price*100/p.oldPrice))
       : null;
-    const tag = p.tag || "Ommabop mahsulot";
+    const tag = p.tag || "Ommabop taom";
     const firstImage = (p.images && p.images.length) ? p.images[0] : RAW_PREFIX + "noimage.png";
     let imgHtml;
     if(firstImage.startsWith(RAW_PREFIX)){
@@ -263,8 +275,8 @@ function renderFavoritesPage(){
               <div class="price-main">${formatPrice(p.price)} so‘m</div>
               ${p.oldPrice ? `<div class="price-old">${formatPrice(p.oldPrice)} so‘m</div>` : ``}
             </div>
-            <button class="btn-add" onclick="event.stopPropagation(); addToCart(${idx});">
-              ➕ Savatga
+            <button class="btn-add" onclick="event.stopPropagation(); addToCart(${idx}, 1, 0);">
+              ➕ Qo‘shish
             </button>
           </div>
         </div>
@@ -296,6 +308,10 @@ const adminPriceDiscountEl = document.getElementById("adminPriceDiscount");
 const adminTagEl           = document.getElementById("adminTag");
 const adminDescriptionEl   = document.getElementById("adminDescription");
 const adminImagesEl        = document.getElementById("adminImages");
+
+// Yangi: qo‘shimcha mahsulot (set) uchun admin maydonlari
+const adminSetNameEl       = document.getElementById("adminSetName");
+const adminSetPriceEl      = document.getElementById("adminSetPrice");
 
 // ADMIN CATEGORY FORM
 const adminCatCodeEl      = document.getElementById("adminCatCode");
@@ -596,7 +612,7 @@ function renderProducts(){
     const discount = p.oldPrice && p.oldPrice > p.price
       ? (100 - Math.round(p.price*100/p.oldPrice))
       : null;
-    const tag        = p.tag || "Ommabop mahsulot";
+    const tag        = p.tag || "Ommabop taom";
     // Determine the first image to display from the product list.  If
     // no images are provided, fall back to a "noimage" placeholder
     // hosted in the raw GitHub repository.  A PNG/JPG fallback is
@@ -635,8 +651,8 @@ function renderProducts(){
               <div class="price-main">${formatPrice(p.price)} so‘m</div>
               ${p.oldPrice ? `<div class="price-old">${formatPrice(p.oldPrice)} so‘m</div>` : ``}
             </div>
-            <button class="btn-add" onclick="event.stopPropagation(); addToCart(${index});">
-              ➕ Savatga
+            <button class="btn-add" onclick="event.stopPropagation(); addToCart(${index}, 1, 0);">
+              ➕ Qo‘shish
             </button>
           </div>
         </div>
@@ -661,6 +677,9 @@ function subscribeProductsRealtime(){
         tag: data.tag || "",
         description: data.description || "",
         images: Array.isArray(data.images) ? data.images : [],
+        // qo‘shimcha (set) nomi va narxi saqlanadi.  setName - matn, setPrice - raqam.
+        setName: data.setName || null,
+        setPrice: data.setPrice || 0,
         createdAt: data.createdAt || null
       });
     });
@@ -743,20 +762,15 @@ if(searchInput){
 }
 
 /* CART */
-function addToCart(index, qty=1){
+function addToCart(index, qty=1, setQty=0){
   if(qty<=0) return;
-  const found = cart.find(c=>c.index===index);
+  // Try to find an existing cart entry with the same product index and set quantity
+  const found = cart.find(c=>c.index===index && (c.setQty||0)===setQty);
   if(found) found.qty += qty;
-  else cart.push({index,qty});
+  else cart.push({index, qty, setQty});
   updateCartUI();
-
-  // Notify Telegram that the web app is ready when running inside
-  // In the updated implementation we no longer invoke Telegram.WebApp.ready() or
-  // Telegram.WebApp.expand() from here because the user requested not to send
-  // any data back to Telegram. The mini‑app will still function without
-  // explicitly notifying Telegram that the app is ready. We simply show
-  // a toast confirming the product was added to the cart.
-  showToast("Savatga qo‘shildi.");
+  // Foydalanuvchiga mahsulot qo‘shilgani haqida xabar bering
+  showToast("Mahsulot qo‘shildi.");
 }
 function updateCartUI(){
   let totalCount=0,totalPrice=0;
@@ -764,7 +778,10 @@ function updateCartUI(){
     const p = products[c.index];
     if(!p) return;
     totalCount += c.qty;
-    totalPrice += p.price*c.qty;
+    // Compute unit price including optional set price (if applicable)
+    const setUnit   = (c.setQty && p.setPrice) ? p.setPrice : 0;
+    const unitPrice = (p.price || 0) + setUnit;
+    totalPrice += unitPrice * c.qty;
   });
   if(cartCountTopEl) cartCountTopEl.textContent = totalCount;
   if(cartTotalTopEl) cartTotalTopEl.textContent = formatPrice(totalPrice)+" so‘m";
@@ -792,23 +809,31 @@ function renderCartItems(){
   cart.forEach(c=>{
     const p = products[c.index];
     if(!p) return;
-    const lineTotal = p.price*c.qty;
+    // Compute unit price including optional set price
+    const setUnit   = (c.setQty && p.setPrice) ? p.setPrice : 0;
+    const unitPrice = (p.price || 0) + setUnit;
+    const lineTotal = unitPrice * c.qty;
     total += lineTotal;
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
+    // Prepare meta string: show base price and set price separately if needed
+    let metaStr = `${formatPrice(p.price)} so‘m • ${catLabel}`;
+    if(c.setQty && p.setPrice){
+      metaStr += ` • Qo‘shimcha: +${formatPrice(p.setPrice)} so‘m`;
+    }
     html += `
       <div class="cart-item-row">
         <div class="cart-item-main">
           <div class="cart-item-name">${p.name}</div>
-          <div class="cart-item-meta">${formatPrice(p.price)} so‘m • ${catLabel}</div>
+          <div class="cart-item-meta">${metaStr}</div>
         </div>
         <div class="cart-item-actions">
           <div class="qty-control">
-            <button onclick="changeQty(${c.index},-1)">-</button>
+            <button onclick="changeQty(${c.index},-1,${c.setQty||0})">-</button>
             <span>${c.qty}</span>
-            <button onclick="changeQty(${c.index},1)">+</button>
+            <button onclick="changeQty(${c.index},1,${c.setQty||0})">+</button>
           </div>
           <div class="cart-item-total">${formatPrice(lineTotal)} so‘m</div>
-          <button class="cart-remove" onclick="removeFromCart(${c.index})">✕</button>
+          <button class="cart-remove" onclick="removeFromCart(${c.index},${c.setQty||0})">✕</button>
         </div>
       </div>
     `;
@@ -816,16 +841,36 @@ function renderCartItems(){
   cartItemsEl.innerHTML = html;
   cartSheetTotalEl.textContent = formatPrice(total)+" so‘m";
 }
-function changeQty(idx,delta){
-  const item = cart.find(c=>c.index===idx);
-  if(!item) return;
-  item.qty += delta;
-  if(item.qty<=0) cart = cart.filter(c=>c.index!==idx);
+function changeQty(idx, delta, setQty = 0){
+  let item;
+  if(setQty === undefined || setQty === null){
+    // Find the first cart item with the given index (ignore setQty)
+    item = cart.find(c => c.index === idx);
+    if(!item) return;
+    item.qty += delta;
+    if(item.qty <= 0){
+      // Remove all items with this index
+      cart = cart.filter(c => c.index !== idx);
+    }
+  } else {
+    // Adjust quantity for a specific set variation
+    item = cart.find(c => c.index === idx && (c.setQty||0) === setQty);
+    if(!item) return;
+    item.qty += delta;
+    if(item.qty <= 0){
+      cart = cart.filter(c => !(c.index === idx && (c.setQty||0) === setQty));
+    }
+  }
   updateCartUI();
   renderCartItems();
 }
-function removeFromCart(idx){
-  cart = cart.filter(c=>c.index!==idx);
+function removeFromCart(idx, setQty = 0){
+  if(setQty === undefined || setQty === null){
+    // Remove all items with this index regardless of set
+    cart = cart.filter(c => c.index !== idx);
+  } else {
+    cart = cart.filter(c => !(c.index === idx && (c.setQty||0) === setQty));
+  }
   updateCartUI();
   renderCartItems();
 }
@@ -1502,6 +1547,12 @@ async function addCustomProduct(){
   const tag         = adminTagEl.value.trim();
   const description = adminDescriptionEl.value.trim();
 
+  // Qo‘shimcha mahsulot (set) maydonlarini o‘qish.  Agar nom va narx mavjud bo‘lsa, qo‘shimcha sifatida saqlanadi.
+  const setNameInput  = adminSetNameEl ? adminSetNameEl.value.trim() : "";
+  const setPriceInput = adminSetPriceEl ? parseInt(adminSetPriceEl.value || "0",10) : 0;
+  const hasSetName    = setNameInput && setNameInput.length > 0;
+  const hasSetPrice   = setPriceInput && setPriceInput > 0;
+
   if(!name || !basePrice || basePrice<=0){
     showToast("❌ Nomi va narxini to‘g‘ri kiriting.");
     return;
@@ -1522,7 +1573,12 @@ async function addCustomProduct(){
   if(!images.length) images = [RAW_PREFIX + "noimage.png"];
 
   const emoji = categoryEmoji[category] || "💅";
-  const payload = { name,price,oldPrice,category,emoji,tag,description,images };
+  const payload = { name, price, oldPrice, category, emoji, tag, description, images };
+  // Agar qo‘shimcha belgilangan bo‘lsa, uni payloadga qo‘shamiz
+  if(hasSetName && hasSetPrice){
+    payload.setName  = setNameInput;
+    payload.setPrice = setPriceInput;
+  }
 
   try{
     if(editingProductId){
@@ -1554,6 +1610,10 @@ async function addCustomProduct(){
     adminTagEl.value            = "";
     adminDescriptionEl.value    = "";
     adminImagesEl.value         = "";
+
+    // Reset qo‘shimcha maydonlari
+    if(adminSetNameEl)  adminSetNameEl.value  = "";
+    if(adminSetPriceEl) adminSetPriceEl.value = "";
   }catch(e){
     console.error("Mahsulot saqlash xato:", e);
     showToast("⚠️ Mahsulot saqlashda xato.");
@@ -1614,6 +1674,9 @@ function editProduct(id){
   adminTagEl.value         = p.tag || "";
   adminDescriptionEl.value = p.description || "";
   adminImagesEl.value      = (p.images && p.images.length) ? p.images.join(", ") : "";
+  // Qo‘shimcha maydonlarini to‘ldirish
+  if(adminSetNameEl)  adminSetNameEl.value  = p.setName || "";
+  if(adminSetPriceEl) adminSetPriceEl.value = p.setPrice || "";
   const btn = document.querySelector(".admin-btn");
   if(btn) btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
   showToast("✏️ Tahrirlash rejimi.");
@@ -1661,14 +1724,20 @@ function updateDetailPriceUI(){
   const p = products[detailIndex];
   if(!p) return;
   const qty = detailQty || 1;
+  // Hisob-kitob: asosiy narx + qo‘shimcha narx (agar mavjud) -> per unit price
+  const basePrice    = p.price || 0;
+  const baseOldPrice = p.oldPrice || null;
+  const setPart      = (detailSetQty > 0 && p.setPrice) ? p.setPrice : 0;
+  const perUnit      = basePrice + setPart;
+  const total        = perUnit * qty;
 
   if(detailPriceEl){
-    const total = (p.price || 0) * qty;
     detailPriceEl.textContent = formatPrice(total) + " so‘m";
   }
   if(detailOldPriceEl){
-    if(p.oldPrice){
-      const totalOld = (p.oldPrice || 0) * qty;
+    if(baseOldPrice){
+      // Eski narx faqat asosiy mahsulotga taalluqlidir; qo‘shimcha uchun eski narx yo‘q
+      const totalOld = baseOldPrice * qty;
       detailOldPriceEl.textContent = formatPrice(totalOld) + " so‘m";
       detailOldPriceEl.classList.remove("hidden");
     }else{
@@ -1676,12 +1745,10 @@ function updateDetailPriceUI(){
     }
   }
 
-  // Show discount percentage if an old price exists.  The discount is
-  // calculated per unit and is independent of quantity.  When no
-  // discount exists, hide the element.
+  // Show discount percentage if an old price exists on the base product
   if(typeof detailDiscountEl !== 'undefined'){
-    if(p.oldPrice){
-      const discount = Math.round(100 - (p.price * 100) / p.oldPrice);
+    if(baseOldPrice){
+      const discount = Math.round(100 - (basePrice * 100) / baseOldPrice);
       detailDiscountEl.textContent = `-${discount}%`;
       detailDiscountEl.classList.remove("hidden");
     } else {
@@ -1768,12 +1835,27 @@ function openProductDetail(index){
 
   if(detailQtyValue) detailQtyValue.textContent = detailQty;
 
-  // narxlarni qty bo‘yicha yangilash
+  // Qo‘shimcha (set) bo‘lsa, ko‘rsatamiz; aks holda yashiramiz.  Set faqat 0 yoki 1 dona tanlanadi.
+  detailSetQty = 0;
+  if(p.setName && p.setPrice){
+    if(detailSetRow) detailSetRow.classList.remove("hidden");
+    if(detailSetNameEl) detailSetNameEl.textContent = p.setName;
+    if(detailSetPriceEl) detailSetPriceEl.textContent = formatPrice(p.setPrice) + " so‘m";
+    if(detailSetQtyValue) detailSetQtyValue.textContent = detailSetQty;
+    // Mahsulot rasmi balandligini kamaytirish (40–45% viewport) agar qo‘shimcha mavjud bo‘lsa
+    if(detailImageEl) detailImageEl.style.maxHeight = "45vh";
+  }else{
+    if(detailSetRow) detailSetRow.classList.add("hidden");
+    if(detailImageEl) detailImageEl.style.maxHeight = "60vh";
+  }
+
+  // narxlarni qty va set bo‘yicha yangilash
   updateDetailPriceUI();
 
   if(detailAddBtn){
     detailAddBtn.classList.remove("added");
-    detailAddBtn.textContent   = "🛒 Savatga qo‘shish";
+    // Show a simple "Qo‘shish" label without a cart icon per user request
+    detailAddBtn.textContent   = "➕ Qo‘shish";
   }
 
   // Show or hide the remove button depending on whether this product is already in the cart
@@ -1799,10 +1881,10 @@ function closeProductDetail(){
 }
 
 if(detailAddBtn){
-  detailAddBtn.addEventListener("click", ()=>{
+    detailAddBtn.addEventListener("click", ()=>{
     if(detailIndex===null) return;
-    // Always add the selected quantity of the current product to the cart
-    addToCart(detailIndex, detailQty);
+    // Qo‘shimcha sonini ham kartaga uzatamiz.  detailSetQty 0 yoki 1.
+    addToCart(detailIndex, detailQty, detailSetQty);
     // Once added, reveal the remove button so the user can undo if needed
     if(detailRemoveBtn) detailRemoveBtn.classList.remove("hidden");
   });
@@ -1815,11 +1897,13 @@ if(detailBackBtn){
 if(detailRemoveBtn){
   detailRemoveBtn.addEventListener("click", ()=>{
     if(detailIndex===null) return;
-    // Remove the item from the cart
-    removeFromCart(detailIndex);
-    // Reset quantity to 1 and update displayed value
+    // Remove the item from the cart with respect to its set quantity
+    removeFromCart(detailIndex, detailSetQty);
+    // Reset quantity to 1 and set qty to 0
     detailQty = 1;
+    detailSetQty = 0;
     if(detailQtyValue) detailQtyValue.textContent = detailQty;
+    if(detailSetQtyValue) detailSetQtyValue.textContent = detailSetQty;
     // Refresh the price so it reflects the base price (qty=1)
     updateDetailPriceUI();
     // Hide the remove button again since the item is no longer in the cart
@@ -1859,6 +1943,28 @@ if(detailQtyPlus){
     detailQty++;
     if(detailQtyValue) detailQtyValue.textContent = detailQty;
     updateDetailPriceUI();
+  });
+}
+// Qo‘shimcha set soni boshqaruvi: faqat 0 yoki 1
+if(detailSetMinus){
+  detailSetMinus.addEventListener("click", e=>{
+    e.stopPropagation();
+    if(detailSetQty > 0){
+      detailSetQty = 0;
+      if(detailSetQtyValue) detailSetQtyValue.textContent = detailSetQty;
+      updateDetailPriceUI();
+    }
+  });
+}
+if(detailSetPlus){
+  detailSetPlus.addEventListener("click", e=>{
+    e.stopPropagation();
+    // Qo‘shimcha faqat 1 dona qo‘shiladi
+    if(detailSetQty < 1){
+      detailSetQty = 1;
+      if(detailSetQtyValue) detailSetQtyValue.textContent = detailSetQty;
+      updateDetailPriceUI();
+    }
   });
 }
 // rasmga bosganda — ENDI FULLSCREEN YO‘Q, faqat hech narsa qilmaydi

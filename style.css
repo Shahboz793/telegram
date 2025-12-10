@@ -249,13 +249,19 @@ body.theme-dark{
 }
 
 /* CATEGORY GRID (4 ta) */
+/* Kategoriya chiplari – mobilda uzum.uz uslubida gorizontal scroll */
 .chips-row{
   background:var(--panel);
   border-bottom:1px solid var(--border);
   padding:10px 10px 12px;
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  display:flex;
   gap:8px;
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+  scrollbar-width:none; /* Firefox */
+}
+.chips-row::-webkit-scrollbar{
+  display:none; /* Chrome, Safari */
 }
 .chip{
   border-radius:var(--radius);
@@ -272,6 +278,8 @@ body.theme-dark{
   min-height:52px;
   color:#e5e7eb;
   box-shadow:0 8px 18px rgba(15,23,42,.55);
+  /* Prevent chips from stretching when in flex container */
+  flex:0 0 auto;
 }
 .chip span{display:block;}
 .chip.active{
@@ -300,7 +308,8 @@ body.theme-dark{
   }
 }
 .product-card{
-  background:radial-gradient(circle at top,#111827,var(--card));
+  /* Lighter card background for food/restaurant aesthetic */
+  background:var(--card);
   border-radius:var(--radius-lg);
   box-shadow:var(--shadow);
   overflow:hidden;
@@ -329,17 +338,8 @@ body.theme-dark{
   .product-img-wrap img{height:320px;} /* katta ekranlarda yanayam baland */
 }
 .product-img-tag{
-  position:absolute;
-  top:8px; left:8px;
-  display:flex;
-  gap:4px;
-  font-size:10px;
-}
-.product-img-tag span{
-  padding:2px 6px;
-  border-radius:999px;
-  background:rgba(0,0,0,.65);
-  color:#f9fafb;
+  /* Tag overlay (e.g., Beauty / Pro) is hidden for restaurant version */
+  display:none;
 }
 .product-sale{
   position:absolute;
@@ -1117,6 +1117,54 @@ body.theme-dark{
   opacity:0;
   transition:opacity .25s,transform .25s;
   z-index:200;
+}
+
+/* ============================
+   Qo‘shimcha SET elementi
+   ============================ */
+.detail-set-row{
+  margin-top:20px;
+  padding:12px;
+  background:var(--accent-soft);
+  border-radius:var(--radius);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.detail-set-row .set-info{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.detail-set-row .set-name{
+  font-size:16px;
+  font-weight:600;
+  color:var(--text);
+}
+.detail-set-row .set-price{
+  font-size:14px;
+  color:var(--muted);
+}
+.detail-set-row .set-qty-control{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.set-qty-btn{
+  width:36px;
+  height:36px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-strong));
+  color:#fff;
+  font-size:22px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(239,68,68,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 .toast.show{
   opacity:1;
