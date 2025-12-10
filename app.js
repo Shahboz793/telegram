@@ -113,6 +113,9 @@ const detailOldPriceEl     = document.getElementById("detailOldPrice");
 const detailAddBtn         = document.getElementById("detailAddBtn");
 const detailBackBtn        = document.getElementById("detailBackBtn");
 
+// New: button to remove an item from the cart on the detail screen
+const detailRemoveBtn      = document.getElementById("detailRemoveBtn");
+
 const detailPrevBtn      = document.getElementById("detailPrevBtn");
 const detailNextBtn      = document.getElementById("detailNextBtn");
 const detailImageIndexEl = document.getElementById("detailImageIndex");
@@ -1615,11 +1618,7 @@ function clearDetailCountdown(){
     clearInterval(detailCountdownTimer);
     detailCountdownTimer=null;
   }
-  if(detailBackBtn){
-    detailBackBtn.classList.add("hidden");
-    detailBackBtn.textContent = "◀ Magaziniga qaytish";
-    detailBackBtn.style.color = "";
-  }
+  // Do not alter the back button here – it remains visible with its own label
 }
 
 function openProductDetail(index){
@@ -1656,6 +1655,13 @@ function openProductDetail(index){
     detailAddBtn.textContent   = "🛒 Savatga qo‘shish";
   }
 
+  // Show or hide the remove button depending on whether this product is already in the cart
+  if(detailRemoveBtn){
+    const isInCart = cart.some(item => item.index === index);
+    if(isInCart) detailRemoveBtn.classList.remove("hidden");
+    else detailRemoveBtn.classList.add("hidden");
+  }
+
   productDetailOverlay.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 }
@@ -1670,18 +1676,24 @@ function closeProductDetail(){
 if(detailAddBtn){
   detailAddBtn.addEventListener("click", ()=>{
     if(detailIndex===null) return;
-    if(detailAddBtn.classList.contains("added")){
-      closeProductDetail();
-      return;
-    }
+    // Always add the selected quantity of the current product to the cart
     addToCart(detailIndex, detailQty);
-    detailAddBtn.classList.add("added");
-    detailAddBtn.textContent = "⬅️ Magaziniga qaytish";
-    if(detailBackBtn) detailBackBtn.classList.remove("hidden");
+    // Once added, reveal the remove button so the user can undo if needed
+    if(detailRemoveBtn) detailRemoveBtn.classList.remove("hidden");
   });
 }
 if(detailBackBtn){
   detailBackBtn.addEventListener("click", closeProductDetail);
+}
+
+// Allow the user to remove the current product from the cart directly from the detail screen
+if(detailRemoveBtn){
+  detailRemoveBtn.addEventListener("click", ()=>{
+    if(detailIndex===null) return;
+    removeFromCart(detailIndex);
+    // Hide the remove button again since the item is no longer in the cart
+    detailRemoveBtn.classList.add("hidden");
+  });
 }
 if(productDetailOverlay){
   productDetailOverlay.addEventListener("click", e=>{

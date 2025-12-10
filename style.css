@@ -777,14 +777,18 @@ body.theme-dark{
 }
 .detail-img-wrap img{
   width:100%;
-  height:260px;
+  /* Rasm ekranning katta qismini egallaydi – kamida 70% balandlikda */
+  height:70vh;
   border-radius:22px;
   object-fit:cover;
   box-shadow:0 22px 40px rgba(0,0,0,.5);
   background:#000;
 }
-@media(min-width:480px){
-  .detail-img-wrap img{height:300px;}
+/* Nav tugmalari va indeks endi ishlatilmaydi, ko‘rinmasin */
+#detailPrevBtn,
+#detailNextBtn,
+#detailImageIndex{
+  display:none !important;
 }
 .detail-img-index{
   position:absolute;
@@ -816,6 +820,83 @@ body.theme-dark{
   margin-top:12px;
   padding:0 20px 40px;
   color:#111827;
+}
+
+/* Narxlar blokini zamonaviy ko‘rinishda joylashish */
+.detail-prices{
+  margin-top:12px;
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+}
+#detailPrice{
+  font-size:24px;
+  font-weight:700;
+  color:#111827;
+}
+#detailOldPrice{
+  font-size:16px;
+  color:#ef4444;
+  text-decoration:line-through;
+}
+
+/* Mahsulot sonini tanlash ustunini kattalashtirish va diqqatga sazovor qilish */
+.detail-qty-row{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  margin-top:24px;
+  gap:0;
+}
+.detail-qty-row button{
+  width:48px;
+  height:48px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
+  color:#fff;
+  font-size:26px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 14px 28px rgba(239,68,68,.5);
+}
+.detail-qty-row span{
+  margin:0 18px;
+  font-size:22px;
+  font-weight:600;
+  color:#111827;
+}
+
+/* Buyurtma tugmalari: Savatga qo‘shish, olib tashlash va orqaga */
+#detailAddBtn{
+  margin-top:28px;
+  padding:14px 0;
+  font-size:16px;
+  border-radius:999px;
+}
+#detailRemoveBtn{
+  margin-top:16px;
+  width:100%;
+  border-radius:999px;
+  border:2px solid #ef4444;
+  background:transparent;
+  color:#ef4444;
+  padding:12px 0;
+  font-size:16px;
+  font-weight:600;
+  box-shadow:0 12px 24px rgba(239,68,68,.4);
+}
+#detailBackBtn{
+  margin-top:16px;
+  width:100%;
+  border-radius:999px;
+  border:2px solid #7000ff;
+  background:transparent;
+  color:#7000ff;
+  padding:12px 0;
+  font-size:16px;
+  font-weight:600;
+  box-shadow:0 12px 24px rgba(112,0,255,.3);
 }
 .detail-category{
   font-size:12px;
@@ -915,17 +996,25 @@ body.theme-dark{
   justify-content:center;
   gap:8px;
 }
+/* Deprecated: we no longer toggle an "added" state on the Add button.
+ * Keeping this selector for backward compatibility but reusing the primary button style. */
 #detailAddBtn.added{
-  background:linear-gradient(90deg,#16a34a,#22c55e);
+  background:linear-gradient(135deg,#7000ff,#4c1d95);
+  color:#fff;
 }
+
+/* Back to menu button styling – matches other primary actions */
 #detailBackBtn{
-  margin-top:10px;
-  font-size:13px;
-  color:#4c1d95;
+  margin-top:16px;
+  width:100%;
   border-radius:999px;
-  padding:6px 10px;
-  border:1px solid rgba(148,163,184,.5);
-  background:rgba(248,250,252,.9);
+  border:2px solid #7000ff;
+  background:transparent;
+  color:#7000ff;
+  padding:12px 0;
+  font-size:16px;
+  font-weight:600;
+  box-shadow:0 12px 24px rgba(112,0,255,.3);
 }
 
 /* RASMGA BOSGANDA TO‘LIQ EKRAN HOLAT */

@@ -260,12 +260,8 @@
 
       <!-- RASM -->
       <div class="detail-img-wrap" id="detailImgWrap">
+        <!-- Katta mahsulot rasmi; faqat bitta rasm ko‘rsatiladi, shu sababli navigatsiya tugmalari va indeks yo‘q -->
         <img id="detailImage" class="detail-main-img" alt="rasm">
-
-        <button id="detailPrevBtn" class="detail-nav prev">‹</button>
-        <button id="detailNextBtn" class="detail-nav next">›</button>
-
-        <div id="detailImageIndex" class="detail-index"></div>
       </div>
 
       <!-- MA'LUMOTLAR -->
@@ -292,8 +288,14 @@
           🛒 Savatga qo‘shish
         </button>
 
-        <button id="detailBackBtn" class="btn-outline btn-full hidden">
-          ◀ Orqaga
+        <!-- Savatdan chiqarish uchun maxsus tugma; faqat mahsulot savatga qo‘shilganda ko‘rinadi -->
+        <button id="detailRemoveBtn" class="btn-outline btn-full hidden">
+          🗑️ Savatdan olib tashlash
+        </button>
+
+        <!-- Bosh menyuga qaytish tugmasi; modalni yopadi -->
+        <button id="detailBackBtn" class="btn-outline btn-full">
+          ⬅ Menyu
         </button>
 
       </div>
