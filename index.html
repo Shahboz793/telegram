@@ -37,7 +37,8 @@
       </div>
 
       <div class="header-right">
-        <button id="themeToggleBtn" type="button" class="icon-btn">🌙</button>
+        <!-- Rejim (day/night) toggle button with label -->
+        <button id="themeToggleBtn" type="button" class="icon-btn">🌙 Rejim</button>
 
         <button class="cart-top-btn" onclick="toggleCartSheet(true)">
           <span>🛒 Savat</span>
@@ -60,7 +61,8 @@
       <button class="tab-btn active" data-page="shopPage">🍽 Menyu</button>
       <button class="tab-btn" data-page="ordersPage">📦 Buyurtmalarim</button>
       <!-- New favorites tab for liked products -->
-      <button class="tab-btn" data-page="favoritesPage">❤️ Sevimlilar</button>
+      <!-- Sevimlilar tab now uses a neutral heart icon to blend into the header.  The heart turns colored only when active via CSS. -->
+      <button class="tab-btn" data-page="favoritesPage">🤍 Sevimlilar</button>
       <button class="tab-btn hidden" id="adminTabBtn" data-page="adminPage">👑 Admin</button>
     </nav>
 

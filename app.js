@@ -82,6 +82,10 @@ let detailCountdownTimer     = null;
 let detailCountdownRemaining = 0;
 let isImageFullscreen        = false; // FULLSCREEN HOLATI
 
+// Rasm slayderi uchun interval.  Agar mahsulotda bir nechta rasm
+// bo‘lsa, bu interval har 3 soniyada rasmni avtomatik almashtiradi.
+let detailSliderInterval     = null;
+
 // COURIER STATE (xarita paneli ichida)
 let courierSelectedOrderId = null;
 
@@ -833,7 +837,7 @@ function renderCartItems(){
             <button onclick="changeQty(${c.index},1,${c.setQty||0})">+</button>
           </div>
           <div class="cart-item-total">${formatPrice(lineTotal)} so‘m</div>
-          <button class="cart-remove" onclick="removeFromCart(${c.index},${c.setQty||0})">✕</button>
+          <button class="cart-remove" onclick="removeFromCart(${c.index},${c.setQty||0})">🗑️</button>
         </div>
       </div>
     `;
@@ -1793,6 +1797,42 @@ function renderDetailGallery(){
   });
 }
 
+/*
+ * DETAL RASM SLAYDERINI BOSHLASH
+ *
+ * Agar mahsulot bir nechta rasmga ega bo‘lsa, bu funksiya har 3
+ * soniyada rasmni avtomatik o‘zgartirib boradi.  Slayder faqat
+ * modal oynasi ochilganida ishlaydi va modal yopilganda
+ * to‘xtatiladi.  Bu asosiy mahsulot kartasidagi rasmga
+ * ta’sir qilmaydi.
+ */
+function startDetailSlider(imgs){
+  try{
+    // Toza boshlash uchun avval intervalni to‘xtatamiz
+    stopDetailSlider();
+    if(!Array.isArray(imgs) || imgs.length <= 1) return;
+    let idx = 0;
+    // Dastlab rasm indeksini 0 ga o‘rnatamiz
+    detailImageIndex = 0;
+    detailSliderInterval = setInterval(()=>{
+      idx = (idx + 1) % imgs.length;
+      detailImageIndex = idx;
+      // Rasmni yangilash
+      setImageWithPngJpgFallback(detailImageEl, imgs[idx]);
+    }, 3000);
+  }catch(err){
+    console.warn('detail slider error:', err);
+  }
+}
+
+// Slayderni to‘xtatish.  Modal yopilganda chaqiriladi.
+function stopDetailSlider(){
+  if(detailSliderInterval){
+    clearInterval(detailSliderInterval);
+    detailSliderInterval = null;
+  }
+}
+
 function changeDetailImage(delta){
   if(detailIndex===null) return;
   const imgs = getDetailImages();
@@ -1820,8 +1860,13 @@ function openProductDetail(index){
 
   const catLbl = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
 
+  // Rasmni chizish va galereyani yaratish
   renderDetailImage();
-  renderDetailGallery(); // rasmlarni pastga chizish (agar konteyner bo‘lsa)
+  renderDetailGallery();
+
+  // Slayderni boshlash.  Faol rasmni har 3 soniyada almashtirish
+  const imgs = getDetailImages();
+  startDetailSlider(imgs);
 
   if(detailCategoryEl) detailCategoryEl.textContent = catLbl;
   if(detailNameEl)     detailNameEl.textContent     = p.name;
@@ -1875,6 +1920,8 @@ function openProductDetail(index){
 function closeProductDetail(){
   clearDetailCountdown();
   setImageFullscreen(false);
+  // Rasm slayderini to‘xtatamiz
+  stopDetailSlider();
   productDetailOverlay.classList.add("hidden");
   document.body.style.overflow = "";
   detailIndex = null;
@@ -2304,7 +2351,9 @@ function centerToCourier(){
 /* INIT */
 (function init(){
   // Apply any saved site theme (light/dark) for our own palette.
-  const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+  // Kunduzgi rejimni default qilib qo‘yamiz.  Agar saqlangan
+  // rejim bo‘lmasa, "light" bo‘ladi.
+  const savedTheme = localStorage.getItem(THEME_KEY) || "light";
   applyTheme(savedTheme);
   // If the Telegram WebApp API is available, synchronize our CSS
   // variables with the user's Telegram theme.  This ensures the app

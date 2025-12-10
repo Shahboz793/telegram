@@ -133,6 +133,12 @@ body.theme-dark{
   align-items:center;
   justify-content:center;
 }
+
+/* Rejim tugmasini kattalashtirish va yorqinlashtirish */
+#themeToggleBtn{
+  font-size:20px;
+  padding:10px 16px;
+}
 .icon-btn:hover{
   border-color:#fff;
 }
@@ -141,13 +147,14 @@ body.theme-dark{
   border:none;
   border-radius:999px;
   color:#fff;
-  padding:7px 12px;
+  /* Enlarge the cart button for better visibility on a men’s restaurant site */
+  padding:10px 20px;
   display:flex;
   align-items:center;
-  gap:6px;
-  font-size:13px;
+  gap:8px;
+  font-size:15px;
   cursor:pointer;
-  box-shadow:0 10px 25px rgba(112,0,255,.7);
+  box-shadow:0 12px 28px rgba(112,0,255,.7);
 }
 .cart-top-btn.hidden{display:none;}
 .pill{
@@ -356,9 +363,9 @@ body.theme-dark{
   padding:11px 13px 13px;
 }
 .product-name{
-  font-size:16px;
+  font-size:17px;
   font-weight:600;
-  color:#f9fafb;
+  color:var(--text);
 }
 .product-meta{
   font-size:12px;
@@ -381,9 +388,9 @@ body.theme-dark{
   align-items:center;
 }
 .price-main{
-  font-size:18px;
+  font-size:20px;
   font-weight:700;
-  color:#fee2e2;
+  color:var(--text);
 }
 .price-old{
   font-size:11px;
@@ -420,7 +427,8 @@ body.theme-dark{
   left:0; right:0;
   bottom:-100%;
   background:var(--panel);
-  max-height:80%;
+  /* Kattaroq savat varaqasi uchun balandlikni 90% ga oshirdik */
+  max-height:90%;
   border-top-left-radius:var(--radius-lg);
   border-top-right-radius:var(--radius-lg);
   padding:16px;
@@ -463,20 +471,24 @@ body.theme-dark{
   gap:4px;
 }
 .qty-control button{
-  width:22px;
-  height:22px;
+  /* Kattaroq va ko‘rinadigan plus/minus tugmalari */
+  width:32px;
+  height:32px;
   border-radius:999px;
   border:1px solid var(--border);
-  background:var(--bg);
-  font-size:13px;
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
+  color:#fff;
+  font-size:18px;
+  font-weight:700;
   cursor:pointer;
+  box-shadow:0 10px 22px rgba(239,68,68,.5);
 }
 .cart-item-total{font-size:13px;font-weight:600;}
 .cart-remove{
   border:none;
   background:none;
   color:var(--danger);
-  font-size:13px;
+  font-size:20px;
   cursor:pointer;
 }
 
@@ -792,8 +804,9 @@ body.theme-dark{
   justify-content:center;
   font-size:18px;
   cursor:pointer;
-  background:rgba(0,0,0,.4);
-  color:#fff;
+  /* Heart button default state: use a neutral grey so it blends into the card and looks unselected */
+  background:rgba(107,114,128,0.5);
+  color:#6b7280;
   transition:background .2s ease, transform .2s ease;
 }
 .product-fav-btn.active{
