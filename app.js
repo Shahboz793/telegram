@@ -2166,6 +2166,13 @@ function centerToCourier(){
   updateAdminUI();
 
   renderCategoryFilter();
+  // Ensure the search input is empty on initial load to prevent
+  // browsers from auto-filling previous query text.  Clearing it
+  // also resets the currentSearch state.
+  if(searchInput){
+    searchInput.value = "";
+    currentSearch = "";
+  }
   // Attempt to load cached products from localStorage so that the
   // product grid is populated immediately if network is unavailable.
   const restored = loadProductsFromLocal();
