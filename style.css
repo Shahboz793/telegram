@@ -623,6 +623,26 @@ body.theme-dark{
 .status-courier{background:var(--warning);color:#111827;}
 .status-delivered{background:var(--ok);color:#fff;}
 .status-rejected{background:var(--danger);color:#fff;}
+.status-completed{background:var(--ok);color:#fff;}
+
+/* Muammoli zakazlar uchun qizil rangli pill */
+.status-problem{background:var(--danger);color:#fff;}
+
+/* Muammoli buyurtmalar bo'limi (admin panelida) */
+.order-problem-info{
+  margin-top:8px;
+  padding:8px;
+  background:rgba(239,68,68,0.1); /* och qizil fon */
+  border-radius:6px;
+  font-size:13px;
+  color:var(--danger);
+}
+.order-problem-info .order-problem{
+  margin-bottom:4px;
+}
+.order-problem-info strong{
+  color:var(--danger);
+}
 
 .progress-wrap{margin:6px 0;}
 .progress-label{

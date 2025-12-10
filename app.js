@@ -880,7 +880,10 @@ function removeFromCart(idx, setQty = 0){
 }
 
 /* ORDER STATUS HELPERS */
-const ORDER_STEPS = ["pending","confirmed","courier","delivered"];
+// ORDER_STEPS: buyurtmalar uchun bosqichlar ketma-ketligi.  Yakunlangan (completed)
+// buyurtmalar eng oxirgi qadam sifatida qo‘shildi.  Muammoli (problem)
+// buyurtmalar lineer bosqichda bo‘lmagani uchun bu ro‘yxatga kiritilmagan.
+const ORDER_STEPS = ["pending","confirmed","courier","delivered","completed"];
 function statusLabel(status){
   switch(status){
     case "pending":   return "Tasdiqlash kutilmoqda";
@@ -888,6 +891,8 @@ function statusLabel(status){
     case "courier":   return "Kuryerga berildi";
     case "delivered": return "Yetkazildi";
     case "rejected":  return "Bekor qilindi";
+    case "completed": return "Yakunlandi";
+    case "problem":   return "Muammoli";
     default:          return status;
   }
 }
@@ -1054,10 +1059,20 @@ function renderClientOrders(){
           ` : ""}
           <footer class="order-footer">
             <span>Holat: ${statusLabel(o.status)}</span>
-            <span>${o.status==="delivered" ? "✅ Yakunlandi" :
-                    o.status==="rejected" ? "❌ Bekor qilingan" :
-                    "⏳ Jarayonda"}</span>
+            <span>
+              ${o.status === "completed" ? "✅ Yakunlandi" :
+                o.status === "delivered" ? "Tasdiq kutilyapti" :
+                o.status === "rejected" ? "❌ Bekor qilingan" :
+                o.status === "problem" ? "❗ Muammoli" :
+                "⏳ Jarayonda"}
+            </span>
           </footer>
+          ${o.status === "delivered" ? `
+          <div class="order-actions" style="margin-top:10px; display:flex; gap:8px;">
+            <button class="btn-xs btn-xs-primary" onclick="clientConfirmOrder('${o.id}', true)">Zakazni oldim</button>
+            <button class="btn-xs btn-xs-danger" onclick="clientConfirmOrder('${o.id}', false)">Zakazni olmadim</button>
+          </div>
+          ` : ""}
         </article>
       `;
     });
@@ -1183,6 +1198,14 @@ function renderAdminOrders(){
     if(customer.preferredTime) extraLines.push(`⏰ Vaqt: ${customer.preferredTime}`);
     if(customer.comment)       extraLines.push(`✏️ Izoh: ${customer.comment}`);
 
+    // Escape helper for comments to prevent HTML injection
+    const escapeHtml = (str) => {
+      return String(str || "").replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    };
     adminOrdersListEl.innerHTML += `
       <article class="order-card">
         <header class="order-header">
@@ -1216,11 +1239,25 @@ function renderAdminOrders(){
           <strong>Mahsulotlar:</strong>
           <ul>${itemsHtml}</ul>
         </section>
+        <!-- Muammoli zakazlar uchun qo'shimcha ma'lumotlar -->
+        ${o.status === 'problem' ? `
+          <section class="order-problem-info">
+            ${o.clientComment ? `<div class="order-problem"><strong>Mijoz izohi:</strong> ${escapeHtml(o.clientComment)}</div>` : ''}
+            ${o.courierStatus ? `<div class="order-problem"><strong>Kuryer holati:</strong> ${escapeHtml(o.courierStatus)}</div>` : ''}
+            ${o.adminComment ? `<div class="order-problem"><strong>Admin izohi:</strong> ${escapeHtml(o.adminComment)}</div>` : ''}
+          </section>
+        ` : ''}
         <div class="admin-order-actions">
-          <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','confirmed')">Tasdiqlash</button>
-          <button class="btn-xs btn-xs-danger"    onclick="updateOrderStatus('${o.id}','rejected')">Bekor qilish</button>
-          <button class="btn-xs btn-xs-secondary" onclick="updateOrderStatus('${o.id}','courier')">Kuryer oldi</button>
-          <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','delivered')">Yetkazildi</button>
+          ${o.status !== 'problem' ? `
+            <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','confirmed')">Tasdiqlash</button>
+            <button class="btn-xs btn-xs-danger"    onclick="updateOrderStatus('${o.id}','rejected')">Bekor qilish</button>
+            <button class="btn-xs btn-xs-secondary" onclick="updateOrderStatus('${o.id}','courier')">Kuryer oldi</button>
+            <button class="btn-xs btn-xs-primary"   onclick="updateOrderStatus('${o.id}','delivered')">Yetkazildi</button>
+          ` : ''}
+          ${o.status === 'problem' ? `
+            <button class="btn-xs btn-xs-primary" onclick="resolveProblemOrder('${o.id}')">Qayta aktivlashtirish</button>
+            <button class="btn-xs btn-xs-danger"  onclick="deleteOrder('${o.id}')">Zakazni o‘chirish</button>
+          ` : ''}
           ${hasLoc ? `
             <button class="btn-xs btn-xs-secondary"
               onclick="openOrderLocation(${o.location.lat},${o.location.lng})">
@@ -1295,6 +1332,62 @@ function openOrderLocation(lat,lng){
   const url = "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lng;
   window.open(url, "_blank");
 }
+
+/*
+ * Admin: muammoli buyurtmani qayta aktivlashtirish
+ *
+ * Admin muammoli statusdagi buyurtma uchun bu funksiyani bosadi.
+ * U buyurtmani yana kuryerga beradi, ixtiyoriy izohni
+ * adminComment maydonida saqlaydi va statusni "courier" ga o‘zgartiradi.
+ */
+async function resolveProblemOrder(orderId){
+  try{
+    if(!orderId) return;
+    let comment = prompt("Admin izohingizni kiriting (ixtiyoriy):") || "";
+    await updateDoc(doc(db,"orders",orderId),{
+      status: "courier",
+      adminComment: comment,
+      clientConfirmed: false,
+      courierStatus: "Qayta aktivlashtirildi",
+      updatedAt: serverTimestamp()
+    });
+    showToast("✅ Buyurtma qayta aktivlashtirildi");
+    // Agar admin sahifasida bo‘lsak, ro‘yxatni yangilaymiz
+    if(isAdmin){
+      renderAdminOrders();
+    }
+  }catch(e){
+    console.error("resolveProblemOrder xato:", e);
+    showToast("⚠️ Buyurtmani aktivlashtirishda xato");
+  }
+}
+
+/*
+ * Admin: buyurtmani o‘chirish
+ *
+ * Admin individual buyurtmani to‘liq o‘chirishi mumkin.
+ */
+async function deleteOrder(orderId){
+  try{
+    if(!orderId) return;
+    const ok = confirm("Ushbu buyurtmani o‘chirishni tasdiqlaysizmi?");
+    if(!ok) return;
+    await deleteDoc(doc(db, "orders", orderId));
+    showToast("🗑️ Buyurtma o‘chirildi");
+    // Mahalliy massivdan o‘chirib, ro‘yxatni yangilaymiz
+    if(isAdmin){
+      adminOrders = adminOrders.filter(o => o.id !== orderId);
+      renderAdminOrders();
+    }
+  }catch(e){
+    console.error("deleteOrder xato:", e);
+    showToast("⚠️ Buyurtmani o‘chirishda xato");
+  }
+}
+
+// Globalga eksport qilish (inline onClick qo‘llanadi)
+window.resolveProblemOrder = resolveProblemOrder;
+window.deleteOrder        = deleteOrder;
 
 /* SEND ORDER */
 async function sendOrder(){
@@ -2357,6 +2450,40 @@ function centerToCourier(){
   );
 }
 
+/*
+ * Mijozning buyurtma tasdiqlashi
+ *
+ * Foydalanuvchi “Zakazni oldim” yoki “Zakazni olmadim” tugmalaridan
+ * birini bosganda chaqiriladi.  Agar received=true bo‘lsa, buyurtma
+ * `completed` holatiga o‘tadi; aks holda `problem` holatiga o‘tadi va
+ * foydalanuvchi sababini `prompt()` orqali kiritishi mumkin.  Har ikki
+ * holatda ham buyurtma hujjati Firestore’da yangilanadi.
+ */
+async function clientConfirmOrder(orderId, received){
+  try{
+    if(!orderId) return;
+    const orderRef = doc(db, "orders", orderId);
+    if(received){
+      await updateDoc(orderRef, {
+        status: "completed",
+        clientConfirmed: true
+      });
+      showToast("✔ Buyurtma tasdiqlandi");
+    } else {
+      const reason = prompt("Zakazni olmadim. Sababini yozing:") || "";
+      await updateDoc(orderRef, {
+        status: "problem",
+        clientConfirmed: false,
+        clientComment: reason
+      });
+      showToast("❗ Muammo adminga bildirildi");
+    }
+  } catch(err){
+    console.error("clientConfirmOrder xato:", err);
+    showToast("⚠️ Tasdiqlashda xato");
+  }
+}
+
 /* INIT */
 (function init(){
   // Apply any saved site theme (light/dark) for our own palette.
@@ -2439,6 +2566,9 @@ window.updateOrderStatus           = updateOrderStatus;
 window.setAdminOrderFilter         = setAdminOrderFilter;
 window.clearAllOrders              = clearAllOrders;
 window.openOrderLocation           = openOrderLocation;
+
+// Mijoz buyurtmani tasdiqlash yoki rad etish funksiyasi
+window.clientConfirmOrder         = clientConfirmOrder;
 
 // Export favorites toggling so buttons in the HTML markup can invoke it.
 window.toggleFavorite              = toggleFavorite;
