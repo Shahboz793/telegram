@@ -637,19 +637,11 @@ function addToCart(index, qty=1){
   updateCartUI();
 
   // Notify Telegram that the web app is ready when running inside
-  // Telegram's mini app environment.  Expanding the app ensures
-  // maximum viewport height.  These calls have no effect when
-  // Telegram WebApp API is not available.
-  try{
-    if(window.Telegram && Telegram.WebApp){
-      Telegram.WebApp.ready();
-      if(typeof Telegram.WebApp.expand === 'function'){
-        Telegram.WebApp.expand();
-      }
-    }
-  }catch(e){
-    // Silently ignore errors if Telegram API is unavailable
-  }
+  // In the updated implementation we no longer invoke Telegram.WebApp.ready() or
+  // Telegram.WebApp.expand() from here because the user requested not to send
+  // any data back to Telegram. The mini‑app will still function without
+  // explicitly notifying Telegram that the app is ready. We simply show
+  // a toast confirming the product was added to the cart.
   showToast("Savatga qo‘shildi.");
 }
 function updateCartUI(){
@@ -2066,8 +2058,20 @@ function centerToCourier(){
 
 /* INIT */
 (function init(){
+  // Apply any saved site theme (light/dark) for our own palette.
   const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
   applyTheme(savedTheme);
+  // If the Telegram WebApp API is available, synchronize our CSS
+  // variables with the user's Telegram theme.  This ensures the app
+  // respects dark/light mode and Telegram colors when running inside
+  // Telegram.  We invoke this here before other rendering logic so
+  // that colors are set early.
+  applyTelegramTheme();
+  if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.onEvent === 'function') {
+    // Listen for theme changes while the app is open.  When the
+    // user changes Telegram’s theme, update our CSS variables.
+    Telegram.WebApp.onEvent('themeChanged', applyTelegramTheme);
+  }
 
   clientId = getOrCreateClientId();
   renderCustomerInfo();
@@ -2135,3 +2139,35 @@ window.blockCourier                = blockCourier;
 window.unblockCourier              = unblockCourier;
 window.softDeleteCourier           = softDeleteCourier;
 window.restoreCourier              = restoreCourier;
+
+/*
+ * Apply Telegram WebApp theme parameters to CSS custom properties.
+ * Telegram WebApp exposes a `themeParams` object containing colors for
+ * various UI elements such as `bg_color`, `secondary_bg_color`, `text_color`, etc.
+ * This helper copies those values into CSS variables prefixed with
+ * `--tg-theme-` so they can be referenced in stylesheets.  It also
+ * updates the `color-scheme` property based on Telegram’s `colorScheme`
+ * (either `light` or `dark`).  If Telegram WebApp API is not
+ * available, this function does nothing.
+ */
+function applyTelegramTheme() {
+  try {
+    if (window.Telegram && Telegram.WebApp) {
+      const params = Telegram.WebApp.themeParams || {};
+      // Iterate over provided theme parameters and register them as CSS vars
+      Object.keys(params).forEach(key => {
+        const cssVar = `--tg-theme-${key.replace(/_/g, '-')}`;
+        document.documentElement.style.setProperty(cssVar, params[key]);
+      });
+      // Set the color-scheme property so that native form controls adapt
+      const scheme = Telegram.WebApp.colorScheme;
+      if (scheme) {
+        document.documentElement.style.setProperty('color-scheme', scheme);
+      }
+    }
+  } catch (err) {
+    // If anything goes wrong, we silently ignore it.  The site will
+    // continue to use its default colors.
+    console.warn('Failed to apply Telegram theme:', err);
+  }
+}
