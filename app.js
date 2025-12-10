@@ -125,6 +125,49 @@ const detailQtyValue = document.getElementById("detailQtyValue");
 const detailImgWrap       = document.querySelector(".detail-img-wrap");
 const detailGalleryListEl = document.getElementById("detailGalleryList"); // pastga scroll bo‘ladigan galereya (agar HTML’da bo‘lsa)
 
+// SPLASH SCREEN ELEMENT
+// The splash screen displays a welcome message while images are preloaded.
+const splashScreenEl = document.getElementById("splashScreen");
+
+/*
+ * Preload product images
+ *
+ * To improve perceived performance on subsequent visits, we load all
+ * product images into the browser cache when the page first loads.
+ * This function iterates over the remoteProducts array, creates
+ * temporary Image objects for each image URL, and assigns the src
+ * property to trigger the download. Browsers will cache these
+ * resources so that when the user navigates to the product later,
+ * the images appear instantly from cache.
+ */
+function preloadProductImages(){
+  try{
+    (remoteProducts || []).forEach(p=>{
+      if(Array.isArray(p.images)){
+        p.images.forEach(url=>{
+          if(url && typeof url === 'string'){
+            const img = new Image();
+            img.src = url;
+          }
+        });
+      }
+    });
+  }catch(err){
+    console.warn('Image preloading error:', err);
+  }
+}
+
+// Hide the splash screen a few seconds after the DOM is ready.
+// Using `DOMContentLoaded` ensures the overlay hides even if remote
+// assets are still loading and the `load` event is delayed.
+document.addEventListener('DOMContentLoaded', () => {
+  if(splashScreenEl){
+    setTimeout(() => {
+      splashScreenEl.classList.add('hidden');
+    }, 5000);
+  }
+});
+
 // ADMIN FORM DOM
 const adminNameEl          = document.getElementById("adminName");
 const adminCategoryEl      = document.getElementById("adminCategory");
@@ -415,6 +458,9 @@ if(themeToggleBtn){
 function rebuildProducts(){
   products = [...remoteProducts];
   renderProducts();
+  // Preload images for all products to leverage browser caching.  This
+  // helps subsequent page visits load images instantly from cache.
+  preloadProductImages();
 }
 function renderProducts(){
   productsGrid.innerHTML = "";
