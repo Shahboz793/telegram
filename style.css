@@ -849,57 +849,6 @@ body.theme-dark{
   display:none!important;
 }
 
-/*
- * Splash screen styling
- *
- * Displays a full-screen welcome overlay when the user first enters
- * the site.  The overlay is centered and uses the current theme
- * colors.  It is hidden via a `.hidden` class once preloading of
- * product images completes.
- */
-.splash-screen{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  /* Green welcome overlay
-   * Use a solid green background rather than the default page
-   * background to make the greeting stand out.  This colour can be
-   * adjusted as desired for your brand.  Text colour is set to
-   * white for contrast.
-   */
-  background:#10B981;
-  color:#ffffff;
-  z-index:100;
-  pointer-events:auto;
-  transition:opacity .3s ease;
-}
-
-/* Ensure the splash content is responsive on mobile devices
- * by constraining its width and adding horizontal padding.  This
- * prevents the welcome text from overflowing on narrow screens. */
-.splash-screen .splash-content{
-  max-width:90%;
-  padding:0 20px;
-  text-align:center;
-}
-.splash-screen.hidden{
-  opacity:0;
-  pointer-events:none;
-  display:none;
-}
-.splash-screen .splash-content h2{
-  /* Responsive font size: scales between 24px and 36px depending
-   * on viewport width, ensuring the heading fits on smaller screens. */
-  font-size:clamp(24px, 6vw, 36px);
-  font-weight:700;
-  text-align:center;
-  color:#ffffff;
-}
 .detail-tag{
   font-size:13px;
   color:#2563eb;

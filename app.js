@@ -126,8 +126,8 @@ const detailImgWrap       = document.querySelector(".detail-img-wrap");
 const detailGalleryListEl = document.getElementById("detailGalleryList"); // pastga scroll bo‘ladigan galereya (agar HTML’da bo‘lsa)
 
 // SPLASH SCREEN ELEMENT
-// The splash screen displays a welcome message while images are preloaded.
-const splashScreenEl = document.getElementById("splashScreen");
+// The splash screen has been removed for faster loading.
+// const splashScreenEl = null;
 
 //
 // NOTE: Local storage caching of products has been removed.  Products
@@ -177,16 +177,9 @@ function preloadProductImages(){
 // persist images into localStorage.  Browsers handle caching of
 // fetched assets automatically.
 
-// Hide the splash screen a few seconds after the DOM is ready.
-// Using `DOMContentLoaded` ensures the overlay hides even if remote
-// assets are still loading and the `load` event is delayed.
-document.addEventListener('DOMContentLoaded', () => {
-  if(splashScreenEl){
-    setTimeout(() => {
-      splashScreenEl.classList.add('hidden');
-    }, 5000);
-  }
-});
+// Previously a DOMContentLoaded listener was used to hide the splash
+// screen after a delay.  The splash screen has been removed, so
+// there is no longer any need for this listener.
 
 // ADMIN FORM DOM
 const adminNameEl          = document.getElementById("adminName");
@@ -639,6 +632,21 @@ function addToCart(index, qty=1){
   if(found) found.qty += qty;
   else cart.push({index,qty});
   updateCartUI();
+
+  // Notify Telegram that the web app is ready when running inside
+  // Telegram's mini app environment.  Expanding the app ensures
+  // maximum viewport height.  These calls have no effect when
+  // Telegram WebApp API is not available.
+  try{
+    if(window.Telegram && Telegram.WebApp){
+      Telegram.WebApp.ready();
+      if(typeof Telegram.WebApp.expand === 'function'){
+        Telegram.WebApp.expand();
+      }
+    }
+  }catch(e){
+    // Silently ignore errors if Telegram API is unavailable
+  }
   showToast("Savatga qo‘shildi.");
 }
 function updateCartUI(){
@@ -825,7 +833,9 @@ function subscribeClientOrders(){
     }catch(e){}
 
     renderClientOrders();
-    checkDeliveredThankYou();
+    // Removed the thank-you toast on page load to avoid unnecessary
+    // notifications.  Users will still receive status updates via
+    // notifyClientStatus().
 
     if(hasStatusChange && lastChangedStatus){
       notifyClientStatus(lastChangedStatus);
