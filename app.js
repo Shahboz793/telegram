@@ -1471,7 +1471,7 @@ function renderAdminOrders() {
           }
         
         </section>      
-        }
+        
         <div class="admin-order-actions">
           ${
             o.status !== "problem"
