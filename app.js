@@ -1455,6 +1455,7 @@ function renderAdminOrders() {
                 )}</div>`
               : ""
           }
+        
           ${
             o.courierStatus
               ? `<div class="order-problem"><strong>Kuryer holati:</strong> ${escapeHtml(
@@ -1462,6 +1463,7 @@ function renderAdminOrders() {
                 )}</div>`
               : ""
           }
+        
           ${
             o.adminComment
               ? `<div class="order-problem"><strong>Admin izohi:</strong> ${escapeHtml(
@@ -1469,10 +1471,7 @@ function renderAdminOrders() {
                 )}</div>`
               : ""
           }
-        </section>
-
-        `
-            : ""
+        </section>      
         }
         <div class="admin-order-actions">
           ${
