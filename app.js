@@ -1196,16 +1196,16 @@ function renderClientOrders() {
           ${
             o.courierName
               ? `
-          <section class="order-courier">
-            <strong>🚚 Kuryer:</strong> ${o.courierName}${
-                  o.courierCar ? ` — ${o.courierCar}` : ""
-                }<br>
-            ${
-              o.courierPhone
+              <section class="order-courier">
+              <strong>🚚 Kuryer:</strong> ${o.courierName}${ o.courierCar ? ` — ${o.courierCar}` : ""}<br>
+            
+              ${o.courierPlate ? `🚘 ${o.courierPlate}<br>` : ""}
+            
+              ${o.courierPhone 
                 ? `📞 <a href="tel:${o.courierPhone}">${o.courierPhone}</a><br>`
-                : ""
-            }
-          </section>
+                : ""}
+            </section>
+            
           `
               : ""
           }
