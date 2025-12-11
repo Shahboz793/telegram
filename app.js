@@ -1590,24 +1590,35 @@ function openOrderLocation(lat, lng) {
 async function resolveProblemOrder(orderId) {
   try {
     if (!orderId) return;
+
+    let orderRef = doc(db, "orders", orderId);
+    let snap = await getDoc(orderRef);
+    if (!snap.exists()) return;
+
+    let data = snap.data();
+
+    // clientId yo‘qolib qolgan bo‘lsa — qayta tiklaymiz
+    let fixedClientId = data.clientId || clientId;
+
     let comment = prompt("Admin izohingizni kiriting (ixtiyoriy):") || "";
-    await updateDoc(doc(db, "orders", orderId), {
+
+    await updateDoc(orderRef, {
       status: "courier",
       adminComment: comment,
-      clientConfirmed: false,
       courierStatus: "Qayta aktivlashtirildi",
+      clientConfirmed: false,
+      clientId: fixedClientId, // MUHIM!
       updatedAt: serverTimestamp(),
     });
+
     showToast("✅ Buyurtma qayta aktivlashtirildi");
-    // Agar admin sahifasida bo‘lsak, ro‘yxatni yangilaymiz
-    if (isAdmin) {
-      renderAdminOrders();
-    }
+    if (isAdmin) renderAdminOrders();
   } catch (e) {
     console.error("resolveProblemOrder xato:", e);
     showToast("⚠️ Buyurtmani aktivlashtirishda xato");
   }
 }
+
 
 /*
  * Admin: buyurtmani o‘chirish
