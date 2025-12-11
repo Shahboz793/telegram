@@ -1448,57 +1448,29 @@ function renderAdminOrders() {
         </section>
         <!-- Muammoli zakazlar uchun qo'shimcha ma'lumotlar -->
         <section class="order-problem-info">
-            ${
-              o.clientComment
-                ? `<div class="order-problem"><strong>Mijoz izohi:</strong> ${escapeHtml(
-                    o.clientComment
-                  )}</div>`
-                : ""
-            }
         
-            ${
-              o.courierStatus
-                ? `<div class="order-problem"><strong>Kuryer holati:</strong> ${escapeHtml(
-                    o.courierStatus
-                  )}</div>`
-                : ""
-            }
+          ${o.clientComment 
+            ? `<div class="order-problem">
+                <strong>Mijoz izohi:</strong> ${escapeHtml(o.clientComment)}
+              </div>`
+            : ""
+          }
         
-            ${
-              o.adminComment
-                ? `<div class="order-problem"><strong>Admin izohi:</strong> ${escapeHtml(
-                    o.adminComment
-                  )}</div>`
-                : ""
-            }
-        </section>
-        <!-- Muammoli zakazlar uchun qo'shimcha ma'lumotlar -->
-        <section class="order-problem-info">
-            ${
-              o.clientComment
-                ? `<div class="order-problem"><strong>Mijoz izohi:</strong> ${escapeHtml(
-                    o.clientComment
-                  )}</div>`
-                : ""
-            }
+          ${o.courierStatus 
+            ? `<div class="order-problem">
+                <strong>Kuryer holati:</strong> ${escapeHtml(o.courierStatus)}
+              </div>`
+            : ""
+          }
         
-            ${
-              o.courierStatus
-                ? `<div class="order-problem"><strong>Kuryer holati:</strong> ${escapeHtml(
-                    o.courierStatus
-                  )}</div>`
-                : ""
-            }
+          ${o.adminComment 
+            ? `<div class="order-problem">
+                <strong>Admin izohi:</strong> ${escapeHtml(o.adminComment)}
+              </div>`
+            : ""
+          }
         
-            ${
-              o.adminComment
-                ? `<div class="order-problem"><strong>Admin izohi:</strong> ${escapeHtml(
-                    o.adminComment
-                  )}</div>`
-                : ""
-            }
-        </section>
-                
+        </section>      
         }
         <div class="admin-order-actions">
           ${
