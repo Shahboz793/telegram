@@ -1635,3 +1635,29 @@ body.theme-dark{
 
 /* Agar avval .product-sale badge ishlatilgan bo‘lsa, endi yangisini qo‘yish uchun yashirish (ixtiyoriy) */
 /* .product-sale { display:none !important; } */
+
+
+
+/* === PURPLE HEART FAVORITE BUTTON === */
+.product-fav-btn {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  background: rgba(112, 0, 255, 0.15);
+  border: 1px solid #7000ff;
+  color: #7000ff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.product-fav-btn.active {
+  background: #7000ff;
+  color: #ffffff;
+  border-color: #7000ff;
+}
