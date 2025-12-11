@@ -253,9 +253,9 @@ function renderFavoritesPage(){
     let imgHtml;
     if(firstImage.startsWith(RAW_PREFIX)){
       const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
-      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
+      imgHtml = `<img src="${base}.png" alt="${p.name}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${base}.jpg';">`;
     }else{
-      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
+      imgHtml = `<img src="${firstImage}" alt="${p.name}" loading="lazy" decoding="async">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     const favActive = favorites.includes(idx);
@@ -629,9 +629,9 @@ function renderProducts(){
     let imgHtml;
     if(firstImage.startsWith(RAW_PREFIX)){
       const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
-      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
+      imgHtml = `<img src="${base}.png" alt="${p.name}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${base}.jpg';">`;
     }else{
-      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
+      imgHtml = `<img src="${firstImage}" alt="${p.name}" loading="lazy" decoding="async">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     // Prepare favorite button state.  Use heart icon filled when this product
@@ -2552,8 +2552,22 @@ async function clientConfirmOrder(orderId, received){
   // respects dark/light mode and Telegram colors when running inside
   // Telegram.  We invoke this here before other rendering logic so
   // that colors are set early.
-  applyTelegramTheme();
-  if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.onEvent === 'function') {
+applyTelegramTheme();
+
+// Telegram WebApp init: ilova Telegram ichida ishlayotgan bo'lsa,
+// uni to'liq ekran qilish va vertikal swipe'larni o'chirish.
+try{
+  if(window.Telegram && Telegram.WebApp){
+    const tg = Telegram.WebApp;
+    if(typeof tg.ready === "function") tg.ready();
+    if(typeof tg.expand === "function") tg.expand();
+    if(typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
+  }
+}catch(e){
+  console.warn("Telegram WebApp init error:", e);
+}
+
+if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.onEvent === 'function') {
     // Listen for theme changes while the app is open.  When the
     // user changes Telegram’s theme, update our CSS variables.
     Telegram.WebApp.onEvent('themeChanged', applyTelegramTheme);
