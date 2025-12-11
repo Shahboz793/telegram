@@ -147,6 +147,20 @@
                 <label>Qo‘shimcha nom <input id="adminSetName" type="text" placeholder="Masalan: salat, sous"></label>
                 <label>Qo‘shimcha narx <input id="adminSetPrice" type="number" placeholder="Qo‘shimcha narx"></label>
 
+                <!-- Yangi: bir nechta qo‘shimcha mahsulot qo‘shish uchun dinamik ro‘yxat -->
+                <div class="admin-extras-block">
+                  <div class="admin-extras-head">
+                    <span>Qo‘shimcha mahsulotlar ro‘yxati</span>
+                    <button type="button" class="btn-xs btn-xs-secondary" id="adminExtraAddBtn">➕ Qo‘shish</button>
+                  </div>
+                  <div id="adminExtrasContainer" class="admin-extras-container">
+                    <!-- Qo‘shimcha mahsulot qatorlari JS orqali qo‘shiladi -->
+                  </div>
+                  <p class="admin-extras-hint">
+                    Masalan: salat – 5 000, sous – 3 000, ichimlik – 10 000 va hokazo. Istagancha qo‘shishingiz mumkin.
+                  </p>
+                </div>
+
               </div>
 
               <button class="btn-primary btn-full" onclick="addCustomProduct()">

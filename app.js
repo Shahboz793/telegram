@@ -259,7 +259,7 @@ function renderFavoritesPage(){
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     const favActive = favorites.includes(idx);
-    const favIcon = favActive ? "💚" : "🤍";
+    const favIcon = favActive ? "❤️" : "🤍";
     favGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${idx})">
         <div class="product-img-wrap">
@@ -312,6 +312,10 @@ const adminPriceDiscountEl = document.getElementById("adminPriceDiscount");
 const adminTagEl           = document.getElementById("adminTag");
 const adminDescriptionEl   = document.getElementById("adminDescription");
 const adminImagesEl        = document.getElementById("adminImages");
+
+// Yangi: bir nechta qo‘shimcha mahsulotlar ro‘yxati uchun admin DOM
+const adminExtrasContainer  = document.getElementById("adminExtrasContainer");
+const adminExtraAddBtn      = document.getElementById("adminExtraAddBtn");
 
 // Yangi: qo‘shimcha mahsulot (set) uchun admin maydonlari
 const adminSetNameEl       = document.getElementById("adminSetName");
@@ -633,7 +637,7 @@ function renderProducts(){
     // Prepare favorite button state.  Use heart icon filled when this product
     // index exists in the favorites array.
     const favActive = favorites.includes(index);
-    const favIcon   = favActive ? "💚" : "🤍";
+    const favIcon   = favActive ? "❤️" : "🤍";
 
     productsGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${index})">
@@ -681,6 +685,7 @@ function subscribeProductsRealtime(){
         tag: data.tag || "",
         description: data.description || "",
         images: Array.isArray(data.images) ? data.images : [],
+        extras: Array.isArray(data.extras) ? data.extras : [],
         // qo‘shimcha (set) nomi va narxi saqlanadi.  setName - matn, setPrice - raqam.
         setName: data.setName || null,
         setPrice: data.setPrice || 0,
@@ -1642,6 +1647,50 @@ function flashAdminButton(text){
       : "➕ Mahsulotni qo‘shish (Firestore)";
   }, 1500);
 }
+
+function createAdminExtraRow(extra){
+  if(!adminExtrasContainer) return;
+  const row = document.createElement("div");
+  row.className = "admin-extra-row";
+  row.innerHTML =
+    '<input type="text" class="admin-extra-name" placeholder="Nom (masalan, sous)">' +
+    '<input type="number" class="admin-extra-price" placeholder="Narx">' +
+    '<button type="button" class="admin-extra-remove">✕</button>';
+  const nameInput  = row.querySelector(".admin-extra-name");
+  const priceInput = row.querySelector(".admin-extra-price");
+  if(extra){
+    if(nameInput)  nameInput.value  = extra.name  || "";
+    if(priceInput) priceInput.value = extra.price || "";
+  }
+  const removeBtn = row.querySelector(".admin-extra-remove");
+  if(removeBtn){
+    removeBtn.addEventListener("click", ()=> row.remove());
+  }
+  adminExtrasContainer.appendChild(row);
+}
+
+function collectAdminExtras(){
+  const extras = [];
+  if(!adminExtrasContainer) return extras;
+  const rows = adminExtrasContainer.querySelectorAll(".admin-extra-row");
+  rows.forEach(row=>{
+    const nameInput  = row.querySelector(".admin-extra-name");
+    const priceInput = row.querySelector(".admin-extra-price");
+    const name  = nameInput ? nameInput.value.trim() : "";
+    const price = priceInput ? parseInt(priceInput.value || "0",10) : 0;
+    if(name && price>0){
+      extras.push({ name, price });
+    }
+  });
+  return extras;
+}
+
+if(adminExtraAddBtn){
+  adminExtraAddBtn.addEventListener("click", ()=>{
+    createAdminExtraRow();
+  });
+}
+
 async function addCustomProduct(){
   const name        = adminNameEl.value.trim();
   const category    = adminCategoryEl.value;
@@ -1686,6 +1735,12 @@ async function addCustomProduct(){
     payload.setPrice = setPriceInput;
   }
 
+  // Yangi: bir nechta qo‘shimcha mahsulotlar (extras) ro‘yxatini payloadga qo‘shamiz
+  const extras = collectAdminExtras();
+  if(extras.length){
+    payload.extras = extras;
+  }
+
   try{
     if(editingProductId){
       await updateDoc(doc(db,"beauty_products",editingProductId),{
@@ -1720,6 +1775,7 @@ async function addCustomProduct(){
     // Reset qo‘shimcha maydonlari
     if(adminSetNameEl)  adminSetNameEl.value  = "";
     if(adminSetPriceEl) adminSetPriceEl.value = "";
+    if(adminExtrasContainer) adminExtrasContainer.innerHTML = "";
   }catch(e){
     console.error("Mahsulot saqlash xato:", e);
     showToast("⚠️ Mahsulot saqlashda xato.");
