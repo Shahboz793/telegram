@@ -878,26 +878,26 @@ body.theme-dark{
 /* Like (favorite) button overlay on product cards */
 .product-fav-btn{
   position:absolute;
-  top:8px;
-  right:8px;
-  width:32px;
-  height:32px;
+  left:10px;
+  top:10px;
   border:none;
   border-radius:999px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
+  padding:6px 8px;
+  font-size:16px;
+  line-height:1;
   cursor:pointer;
-  /* Heart button default state: use a neutral grey so it blends into the card and looks unselected */
-  background:rgba(107,114,128,0.5);
-  color:#6b7280;
-  transition:background .2s ease, transform .2s ease;
+  background:rgba(0,0,0,.45);
+  color:#9ca3af;           /* kulrang yurak */
+  backdrop-filter:blur(8px);
 }
+
+/* Aktiv holatda biroz yorqinroq kulrang */
 .product-fav-btn.active{
-  background:#061b46;
-  color:#1db0eb;
+  background:rgba(148,163,184,.25);
+  color:#e5e7eb;
+  box-shadow:0 0 0 1px rgba(148,163,184,.7);
 }
+
 .product-fav-btn:hover{
   transform:scale(1.05);
 }
