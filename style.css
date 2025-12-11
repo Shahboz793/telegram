@@ -846,7 +846,7 @@ body.theme-dark{
   transition:background .2s ease, transform .2s ease;
 }
 .product-fav-btn.active{
-  background:var(--accent);
+  background:#2563eb;
   color:#fff;
 }
 .product-fav-btn:hover{
