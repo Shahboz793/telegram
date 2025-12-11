@@ -259,7 +259,7 @@ function renderFavoritesPage(){
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     const favActive = favorites.includes(idx);
-    const favIcon = favActive ? "❤️" : "🤍";
+    const favIcon = favActive ? "💚" : "🤍";
     favGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${idx})">
         <div class="product-img-wrap">
@@ -633,7 +633,7 @@ function renderProducts(){
     // Prepare favorite button state.  Use heart icon filled when this product
     // index exists in the favorites array.
     const favActive = favorites.includes(index);
-    const favIcon   = favActive ? "❤️" : "🤍";
+    const favIcon   = favActive ? "💚" : "🤍";
 
     productsGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${index})">
