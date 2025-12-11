@@ -1211,11 +1211,20 @@ function renderClientOrders() {
           }
           ${
             o.courierStatus
-              ? `
-          <div class="order-courier-status">${o.courierStatus}</div>
-          `
+              ? `<div class="order-courier-status">${o.courierStatus}</div>`
               : ""
           }
+          
+          ${
+            o.adminComment
+              ? `<div class="order-admin-comment">
+                   <strong>Admin izohi:</strong> ${escapeHtml(o.adminComment)}
+                 </div>`
+              : ""
+          }
+          
+          
+              
           <footer class="order-footer">
             <span>Holat: ${statusLabel(o.status)}</span>
             <span>
