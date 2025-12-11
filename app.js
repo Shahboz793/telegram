@@ -139,8 +139,16 @@ const detailSetQtyValue = document.getElementById("detailSetQtyValue");
 const detailSetMinus    = document.getElementById("detailSetMinus");
 const detailSetPlus     = document.getElementById("detailSetPlus");
 
+const detailExtrasEl        = document.getElementById("detailExtras");
+const detailExtrasContainer = document.getElementById("detailExtrasContainer");
+const detailExtrasHintEl    = document.getElementById("detailExtrasHint");
+
 // Qo‘shimcha soni (faqat 0 yoki 1) state
 let detailSetQty = 0;
+// Bir nechta qo‘shimcha mahsulotlar (sous, ichimlik va boshqalar) uchun state
+// Har bir element: { name, price, qty }
+let detailExtrasState = [];
+
 
 const detailQtyMinus = document.getElementById("detailQtyMinus");
 const detailQtyPlus  = document.getElementById("detailQtyPlus");
@@ -253,9 +261,9 @@ function renderFavoritesPage(){
     let imgHtml;
     if(firstImage.startsWith(RAW_PREFIX)){
       const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
-      imgHtml = `<img src="${base}.png" alt="${p.name}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${base}.jpg';">`;
+      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
     }else{
-      imgHtml = `<img src="${firstImage}" alt="${p.name}" loading="lazy" decoding="async">`;
+      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     const favActive = favorites.includes(idx);
@@ -312,10 +320,6 @@ const adminPriceDiscountEl = document.getElementById("adminPriceDiscount");
 const adminTagEl           = document.getElementById("adminTag");
 const adminDescriptionEl   = document.getElementById("adminDescription");
 const adminImagesEl        = document.getElementById("adminImages");
-
-// Yangi: bir nechta qo‘shimcha mahsulotlar ro‘yxati uchun admin DOM
-const adminExtrasContainer  = document.getElementById("adminExtrasContainer");
-const adminExtraAddBtn      = document.getElementById("adminExtraAddBtn");
 
 // Yangi: qo‘shimcha mahsulot (set) uchun admin maydonlari
 const adminSetNameEl       = document.getElementById("adminSetName");
@@ -629,9 +633,9 @@ function renderProducts(){
     let imgHtml;
     if(firstImage.startsWith(RAW_PREFIX)){
       const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
-      imgHtml = `<img src="${base}.png" alt="${p.name}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${base}.jpg';">`;
+      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
     }else{
-      imgHtml = `<img src="${firstImage}" alt="${p.name}" loading="lazy" decoding="async">`;
+      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     // Prepare favorite button state.  Use heart icon filled when this product
@@ -773,10 +777,53 @@ if(searchInput){
 /* CART */
 function addToCart(index, qty=1, setQty=0){
   if(qty<=0) return;
-  // Try to find an existing cart entry with the same product index and set quantity
-  const found = cart.find(c=>c.index===index && (c.setQty||0)===setQty);
-  if(found) found.qty += qty;
-  else cart.push({index, qty, setQty});
+  const p = products[index];
+  if(!p) return;
+
+  // Agar hozirgi mahsulot ochiq detal oynasida bo'lsa va extras tanlangan bo'lsa,
+  // ularni cart item ichida saqlab qo'yamiz.
+  let extrasForCart = [];
+  const fromDetail =
+    (typeof productDetailOverlay !== "undefined" &&
+     productDetailOverlay &&
+     !productDetailOverlay.classList.contains("hidden") &&
+     detailIndex === index);
+
+  if(fromDetail && Array.isArray(detailExtrasState) && detailExtrasState.length){
+    extrasForCart = detailExtrasState
+      .filter(ex => (ex.qty||0) > 0)
+      .map(ex => ({ name: ex.name, price: ex.price, qty: ex.qty }));
+  }
+
+  // Mijoz hech qanday qo‘shimcha tanlamagan bo‘lsa, ammo mahsulotda extras mavjud bo‘lsa,
+  // bir marta tushuntiruvchi bildirishnoma ko‘rsatamiz.
+  if(fromDetail && Array.isArray(p.extras) && p.extras.length && extrasForCart.length === 0){
+    if(typeof localStorage !== "undefined" && !localStorage.getItem("extras_hint_shown")){
+      showToast("Qo‘shimchalar majburiy emas 🙂 Xohlasangiz sous, ichimlik va boshqa qo‘shimchalarni + tugmasi bilan tanlang, aks holda taom oddiy holatda savatga qo‘shiladi.");
+      localStorage.setItem("extras_hint_shown","1");
+    }
+  }
+
+  // Mavjud cart itemni topamiz (index + setQty bo‘yicha). Extras esa shu item ichida jamlanadi.
+  let found = cart.find(c=>c.index===index && (c.setQty||0)===setQty);
+  if(found){
+    found.qty += qty;
+    if(extrasForCart.length){
+      if(!Array.isArray(found.extras)) found.extras = [];
+      extrasForCart.forEach(exNew=>{
+        const exOld = found.extras.find(e=>e.name===exNew.name && e.price===exNew.price);
+        if(exOld) exOld.qty = (exOld.qty||0) + exNew.qty;
+        else found.extras.push({...exNew});
+      });
+    }
+  } else {
+    const newItem = { index, qty, setQty };
+    if(extrasForCart.length){
+      newItem.extras = extrasForCart;
+    }
+    cart.push(newItem);
+  }
+
   updateCartUI();
   // Foydalanuvchiga mahsulot qo‘shilgani haqida xabar bering
   showToast("Mahsulot qo‘shildi.");
@@ -787,9 +834,12 @@ function updateCartUI(){
     const p = products[c.index];
     if(!p) return;
     totalCount += c.qty;
-    // Compute unit price including optional set price (if applicable)
+    // Compute unit price including optional set price (if applicable) va qo‘shimcha mahsulotlar
     const setUnit   = (c.setQty && p.setPrice) ? p.setPrice : 0;
-    const unitPrice = (p.price || 0) + setUnit;
+    const extraUnit = Array.isArray(c.extras)
+      ? c.extras.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
+      : 0;
+    const unitPrice = (p.price || 0) + setUnit + extraUnit;
     totalPrice += unitPrice * c.qty;
   });
   if(cartCountTopEl) cartCountTopEl.textContent = totalCount;
@@ -818,16 +868,23 @@ function renderCartItems(){
   cart.forEach(c=>{
     const p = products[c.index];
     if(!p) return;
-    // Compute unit price including optional set price
+    // Compute unit price including optional set price va qo‘shimcha mahsulotlar
     const setUnit   = (c.setQty && p.setPrice) ? p.setPrice : 0;
-    const unitPrice = (p.price || 0) + setUnit;
+    const extraUnit = Array.isArray(c.extras)
+      ? c.extras.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
+      : 0;
+    const unitPrice = (p.price || 0) + setUnit + extraUnit;
     const lineTotal = unitPrice * c.qty;
     total += lineTotal;
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     // Prepare meta string: show base price and set price separately if needed
     let metaStr = `${formatPrice(p.price)} so‘m • ${catLabel}`;
     if(c.setQty && p.setPrice){
-      metaStr += ` • Qo‘shimcha: +${formatPrice(p.setPrice)} so‘m`;
+      metaStr += ` • Qo‘shimcha set: +${formatPrice(p.setPrice)} so‘m`;
+    }
+    if(Array.isArray(c.extras) && c.extras.length){
+      const extrasLabel = c.extras.map(ex=>`${ex.name} ×${ex.qty}`).join(", ");
+      metaStr += ` • Qo‘shimcha: ${extrasLabel}`;
     }
     html += `
       <div class="cart-item-row">
@@ -1647,50 +1704,6 @@ function flashAdminButton(text){
       : "➕ Mahsulotni qo‘shish (Firestore)";
   }, 1500);
 }
-
-function createAdminExtraRow(extra){
-  if(!adminExtrasContainer) return;
-  const row = document.createElement("div");
-  row.className = "admin-extra-row";
-  row.innerHTML =
-    '<input type="text" class="admin-extra-name" placeholder="Nom (masalan, sous)">' +
-    '<input type="number" class="admin-extra-price" placeholder="Narx">' +
-    '<button type="button" class="admin-extra-remove">✕</button>';
-  const nameInput  = row.querySelector(".admin-extra-name");
-  const priceInput = row.querySelector(".admin-extra-price");
-  if(extra){
-    if(nameInput)  nameInput.value  = extra.name  || "";
-    if(priceInput) priceInput.value = extra.price || "";
-  }
-  const removeBtn = row.querySelector(".admin-extra-remove");
-  if(removeBtn){
-    removeBtn.addEventListener("click", ()=> row.remove());
-  }
-  adminExtrasContainer.appendChild(row);
-}
-
-function collectAdminExtras(){
-  const extras = [];
-  if(!adminExtrasContainer) return extras;
-  const rows = adminExtrasContainer.querySelectorAll(".admin-extra-row");
-  rows.forEach(row=>{
-    const nameInput  = row.querySelector(".admin-extra-name");
-    const priceInput = row.querySelector(".admin-extra-price");
-    const name  = nameInput ? nameInput.value.trim() : "";
-    const price = priceInput ? parseInt(priceInput.value || "0",10) : 0;
-    if(name && price>0){
-      extras.push({ name, price });
-    }
-  });
-  return extras;
-}
-
-if(adminExtraAddBtn){
-  adminExtraAddBtn.addEventListener("click", ()=>{
-    createAdminExtraRow();
-  });
-}
-
 async function addCustomProduct(){
   const name        = adminNameEl.value.trim();
   const category    = adminCategoryEl.value;
@@ -1735,12 +1748,6 @@ async function addCustomProduct(){
     payload.setPrice = setPriceInput;
   }
 
-  // Yangi: bir nechta qo‘shimcha mahsulotlar (extras) ro‘yxatini payloadga qo‘shamiz
-  const extras = collectAdminExtras();
-  if(extras.length){
-    payload.extras = extras;
-  }
-
   try{
     if(editingProductId){
       await updateDoc(doc(db,"beauty_products",editingProductId),{
@@ -1775,7 +1782,6 @@ async function addCustomProduct(){
     // Reset qo‘shimcha maydonlari
     if(adminSetNameEl)  adminSetNameEl.value  = "";
     if(adminSetPriceEl) adminSetPriceEl.value = "";
-    if(adminExtrasContainer) adminExtrasContainer.innerHTML = "";
   }catch(e){
     console.error("Mahsulot saqlash xato:", e);
     showToast("⚠️ Mahsulot saqlashda xato.");
@@ -1890,7 +1896,10 @@ function updateDetailPriceUI(){
   const basePrice    = p.price || 0;
   const baseOldPrice = p.oldPrice || null;
   const setPart      = (detailSetQty > 0 && p.setPrice) ? p.setPrice : 0;
-  const perUnit      = basePrice + setPart;
+  const extrasPart   = Array.isArray(detailExtrasState)
+    ? detailExtrasState.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
+    : 0;
+  const perUnit      = basePrice + setPart + extrasPart;
   const total        = perUnit * qty;
 
   if(detailPriceEl){
@@ -2038,22 +2047,81 @@ function openProductDetail(index){
 
   if(detailQtyValue) detailQtyValue.textContent = detailQty;
 
-  // Qo‘shimcha (set) bo‘lsa, ko‘rsatamiz; aks holda yashiramiz.  Set faqat 0 yoki 1 dona tanlanadi.
-  detailSetQty = 0;
-  if(p.setName && p.setPrice){
-    if(detailSetRow) detailSetRow.classList.remove("hidden");
-    if(detailSetNameEl) detailSetNameEl.textContent = p.setName;
-    if(detailSetPriceEl) detailSetPriceEl.textContent = formatPrice(p.setPrice) + " so‘m";
-    if(detailSetQtyValue) detailSetQtyValue.textContent = detailSetQty;
-    // Mahsulot rasmi balandligini kamaytirish (40–45% viewport) agar qo‘shimcha mavjud bo‘lsa
-    if(detailImageEl) detailImageEl.style.maxHeight = "45vh";
-  }else{
-    if(detailSetRow) detailSetRow.classList.add("hidden");
-    if(detailImageEl) detailImageEl.style.maxHeight = "60vh";
-  }
+// Qo‘shimcha (set) bo‘lsa, ko‘rsatamiz; aks holda yashiramiz.  Set faqat 0 yoki 1 dona tanlanadi.
+detailSetQty = 0;
+if(p.setName && p.setPrice){
+  if(detailSetRow) detailSetRow.classList.remove("hidden");
+  if(detailSetNameEl) detailSetNameEl.textContent = p.setName;
+  if(detailSetPriceEl) detailSetPriceEl.textContent = formatPrice(p.setPrice) + " so‘m";
+  if(detailSetQtyValue) detailSetQtyValue.textContent = detailSetQty;
+  // Mahsulot rasmi balandligini kamaytirish (40–45% viewport) agar qo‘shimcha mavjud bo‘lsa
+  if(detailImageEl) detailImageEl.style.maxHeight = "45vh";
+}else{
+  if(detailSetRow) detailSetRow.classList.add("hidden");
+  if(detailImageEl) detailImageEl.style.maxHeight = "60vh";
+}
 
-  // narxlarni qty va set bo‘yicha yangilash
-  updateDetailPriceUI();
+// Extras (bir nechta qo‘shimcha mahsulotlar) bo‘lsa, ularni tayyorlaymiz
+detailExtrasState = [];
+if(detailExtrasContainer) detailExtrasContainer.innerHTML = "";
+if(p.extras && Array.isArray(p.extras) && p.extras.length){
+  if(detailExtrasEl) detailExtrasEl.classList.remove("hidden");
+  if(detailExtrasHintEl) detailExtrasHintEl.classList.remove("hidden");
+  detailExtrasState = p.extras.map(ex => ({
+    name:  ex.name  || "",
+    price: ex.price || 0,
+    qty:   0
+  }));
+  if(detailExtrasContainer){
+    detailExtrasState.forEach((ex, idx)=>{
+      const row = document.createElement("div");
+      row.className = "detail-extra-row";
+      row.innerHTML = `
+        <div class="detail-extra-info">
+          <div class="detail-extra-name">${ex.name}</div>
+          <div class="detail-extra-price">+${formatPrice(ex.price)} so‘m</div>
+        </div>
+        <div class="detail-extra-qty">
+          <button class="extra-qty-btn" data-extra-idx="${idx}" data-dir="-1">-</button>
+          <span class="extra-qty-value">0</span>
+          <button class="extra-qty-btn" data-extra-idx="${idx}" data-dir="1">+</button>
+        </div>
+      `;
+      detailExtrasContainer.appendChild(row);
+
+      const minusBtn = row.querySelector('button[data-dir="-1"]');
+      const plusBtn  = row.querySelector('button[data-dir="1"]');
+      const valueEl  = row.querySelector(".extra-qty-value");
+
+      function updateExtra(delta){
+        const exState = detailExtrasState[idx];
+        if(!exState) return;
+        const newQty = Math.max(0, (exState.qty||0) + delta);
+        exState.qty  = newQty;
+        if(valueEl) valueEl.textContent = newQty;
+        updateDetailPriceUI();
+      }
+
+      if(minusBtn){
+        minusBtn.addEventListener("click", e=>{
+          e.stopPropagation();
+          updateExtra(-1);
+        });
+      }
+      if(plusBtn){
+        plusBtn.addEventListener("click", e=>{
+          e.stopPropagation();
+          updateExtra(1);
+        });
+      }
+    });
+  }
+}else{
+  if(detailExtrasEl) detailExtrasEl.classList.add("hidden");
+}
+
+// narxlarni qty va set bo‘yicha yangilash
+updateDetailPriceUI();
 
   if(detailAddBtn){
     detailAddBtn.classList.remove("added");
@@ -2552,22 +2620,8 @@ async function clientConfirmOrder(orderId, received){
   // respects dark/light mode and Telegram colors when running inside
   // Telegram.  We invoke this here before other rendering logic so
   // that colors are set early.
-applyTelegramTheme();
-
-// Telegram WebApp init: ilova Telegram ichida ishlayotgan bo'lsa,
-// uni to'liq ekran qilish va vertikal swipe'larni o'chirish.
-try{
-  if(window.Telegram && Telegram.WebApp){
-    const tg = Telegram.WebApp;
-    if(typeof tg.ready === "function") tg.ready();
-    if(typeof tg.expand === "function") tg.expand();
-    if(typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
-  }
-}catch(e){
-  console.warn("Telegram WebApp init error:", e);
-}
-
-if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.onEvent === 'function') {
+  applyTelegramTheme();
+  if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.onEvent === 'function') {
     // Listen for theme changes while the app is open.  When the
     // user changes Telegram’s theme, update our CSS variables.
     Telegram.WebApp.onEvent('themeChanged', applyTelegramTheme);

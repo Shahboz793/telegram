@@ -147,20 +147,6 @@
                 <label>Qo‘shimcha nom <input id="adminSetName" type="text" placeholder="Masalan: salat, sous"></label>
                 <label>Qo‘shimcha narx <input id="adminSetPrice" type="number" placeholder="Qo‘shimcha narx"></label>
 
-                <!-- Yangi: bir nechta qo‘shimcha mahsulot qo‘shish uchun dinamik ro‘yxat -->
-                <div class="admin-extras-block">
-                  <div class="admin-extras-head">
-                    <span>Qo‘shimcha mahsulotlar ro‘yxati</span>
-                    <button type="button" class="btn-xs btn-xs-secondary" id="adminExtraAddBtn">➕ Qo‘shish</button>
-                  </div>
-                  <div id="adminExtrasContainer" class="admin-extras-container">
-                    <!-- Qo‘shimcha mahsulot qatorlari JS orqali qo‘shiladi -->
-                  </div>
-                  <p class="admin-extras-hint">
-                    Masalan: salat – 5 000, sous – 3 000, ichimlik – 10 000 va hokazo. Istagancha qo‘shishingiz mumkin.
-                  </p>
-                </div>
-
               </div>
 
               <button class="btn-primary btn-full" onclick="addCustomProduct()">
@@ -319,9 +305,23 @@
             <span id="detailSetQtyValue">0</span>
             <button id="detailSetPlus" class="set-qty-btn">+</button>
           </div>
-        </div>
+</div>
 
-        <div class="detail-qty-row">
+<div id="detailExtras" class="detail-extras hidden">
+  <div class="detail-extras-header">
+    <div class="detail-extras-title">Qo‘shimchalar (ixtiyoriy)</div>
+    <div class="detail-extras-sub">Sous, ichimlik va boshqa qo‘shimchalar</div>
+  </div>
+  <div id="detailExtrasContainer" class="detail-extras-list">
+    <!-- Qo‘shimcha mahsulotlar (sous, ichimlik va boshqalar) JS orqali qo‘shiladi -->
+  </div>
+  <p id="detailExtrasHint" class="detail-extras-hint">
+    Qo‘shimchalar majburiy emas. Xohlasangiz pastdagi <b>+</b> tugmalari bilan sous, ichimlik va boshqa qo‘shimchalarni tanlang,
+    aks holda taom odatdagi holatda savatga qo‘shiladi.
+  </p>
+</div>
+
+<div class="detail-qty-row">
           <button id="detailQtyMinus">-</button>
           <span id="detailQtyValue">1</span>
           <button id="detailQtyPlus">+</button>
