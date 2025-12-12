@@ -147,6 +147,18 @@
                 <label>Qo‘shimcha nom <input id="adminSetName" type="text" placeholder="Masalan: salat, sous"></label>
                 <label>Qo‘shimcha narx <input id="adminSetPrice" type="number" placeholder="Qo‘shimcha narx"></label>
 
+<!-- Yangi: bir nechta qo‘shimcha mahsulot (sous, ichimlik va h.k.) qo‘shish -->
+<div class="admin-extras-block">
+  <div class="admin-extras-head">
+    <span>Qo‘shimcha mahsulotlar ro‘yxati</span>
+    <button type="button" class="btn-xs btn-xs-secondary" id="adminExtraAddBtn">➕ Qo‘shish</button>
+  </div>
+  <div id="adminExtrasContainer" class="admin-extras-container"></div>
+  <p class="admin-extras-hint">
+    Masalan: <b>sous</b> – 5 000, <b>ichimlik</b> – 10 000. Istagancha qo‘shishingiz mumkin.
+  </p>
+</div>
+
               </div>
 
               <button class="btn-primary btn-full" onclick="addCustomProduct()">
@@ -305,19 +317,16 @@
             <span id="detailSetQtyValue">0</span>
             <button id="detailSetPlus" class="set-qty-btn">+</button>
           </div>
-</div>
+        </div>
 
 <div id="detailExtras" class="detail-extras hidden">
   <div class="detail-extras-header">
     <div class="detail-extras-title">Qo‘shimchalar (ixtiyoriy)</div>
     <div class="detail-extras-sub">Sous, ichimlik va boshqa qo‘shimchalar</div>
   </div>
-  <div id="detailExtrasContainer" class="detail-extras-list">
-    <!-- Qo‘shimcha mahsulotlar (sous, ichimlik va boshqalar) JS orqali qo‘shiladi -->
-  </div>
+  <div id="detailExtrasContainer" class="detail-extras-list"></div>
   <p id="detailExtrasHint" class="detail-extras-hint">
-    Qo‘shimchalar majburiy emas. Xohlasangiz pastdagi <b>+</b> tugmalari bilan sous, ichimlik va boshqa qo‘shimchalarni tanlang,
-    aks holda taom odatdagi holatda savatga qo‘shiladi.
+    Qo‘shimchalar majburiy emas. Xohlasangiz <b>+</b> tugmalari bilan tanlang, aks holda mahsulot oddiy holatda savatga qo‘shiladi.
   </p>
 </div>
 

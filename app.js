@@ -259,7 +259,7 @@ function renderFavoritesPage(){
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     const favActive = favorites.includes(idx);
-    const favIcon = favActive ? "❤️" : "🤍";
+    const favIcon = favActive ? "💚" : "🤍";
     favGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${idx})">
         <div class="product-img-wrap">
@@ -316,6 +316,10 @@ const adminImagesEl        = document.getElementById("adminImages");
 // Yangi: qo‘shimcha mahsulot (set) uchun admin maydonlari
 const adminSetNameEl       = document.getElementById("adminSetName");
 const adminSetPriceEl      = document.getElementById("adminSetPrice");
+// Yangi: bir nechta qo‘shimcha mahsulotlar (extras) uchun admin DOM
+const adminExtraAddBtn     = document.getElementById("adminExtraAddBtn");
+const adminExtrasContainer = document.getElementById("adminExtrasContainer");
+
 
 // ADMIN CATEGORY FORM
 const adminCatCodeEl      = document.getElementById("adminCatCode");
@@ -348,6 +352,15 @@ const notifySoundEl = document.getElementById("notifySound");
 /* HELPERS */
 function formatPrice(v){
   return (v || 0).toLocaleString("uz-UZ");
+}
+
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
 function showToast(message, duration = 1800){
@@ -423,21 +436,16 @@ async function getOrAskLocation(){
     );
     if(ok) return saved;
     // eski lokatsiyani bekor qilsa – tozalaymiz
-    try{
-      localStorage.removeItem(STORAGE_LOCATION);
-    }catch(e){}
+    localStorage.removeItem(STORAGE_LOCATION);
   }
 
   const allow = confirm(
-    "📍 Joylashuvingizni aniqlashga ruxsat berasizmi?\n\n" +
-    "Bu maʼlumot kuryer uchun manzilingizni xaritada aniq topish va tezroq yetkazib berish uchun kerak bo‘ladi.\n\n" +
-    "ILTIMOS:\n" +
-    "1) Telefoningizning yuqori qismidan panelni tushirib, 'Joylashuv / Location' tugmasini yoqing.\n" +
-    "2) Telegram joylashuvga ruxsat so‘raganda, 'Ruxsat berish / Allow' tugmasini tanlang."
+    "📍 Joylashuvingiz aniqlansinmi?\n" +
+    "Bu ma’lumot kuryerga aniq marshrut tuzish uchun kerak bo‘ladi.\n\n" +
+    "Telefon sozlamalaridan GPS (Location) yoqilgan bo‘lishi kerak. 'Allow' / 'Ruxsat berish' tugmasini bosing."
   );
   if(!allow) return null;
 
-  // foydalanuvchiga fon rejimida hisoblanayotganini ko‘rsatamiz
   startLocationCountdown(7);
   try{
     const loc = await getBrowserLocation(7000);
@@ -446,41 +454,57 @@ async function getOrAskLocation(){
     return loc;
   }catch(e){
     console.error("Joylashuv aniqlanmadi:", e);
-
-    // navigator.geolocation xatosi bo'yicha batafsil xabarlar
-    if(e && typeof e.code === "number"){
-      if(e.code === 1){ // PERMISSION_DENIED
-        showToast(
-          "⚠️ Joylashuvga ruxsat berilmadi. Telegram ilovasida joylashuv ruxsatini yoqing: ilova oynasida 'Allow' ni bosing yoki telefon sozlamalarida Telegram → Permissions → Location ni 'Allow' qiling.",
-          5500
-        );
-      }else if(e.code === 2){ // POSITION_UNAVAILABLE
-        showToast(
-          "⚠️ Joylashuv aniqlanmadi. Telefoningizda GPS / Location tugmasini yoqing va ochiq joyda qayta urinib ko‘ring.",
-          5500
-        );
-      }else if(e.code === 3){ // TIMEOUT
-        showToast(
-          "⚠️ Joylashuv juda uzoq vaqt davomida aniqlanmadi. Internetingizni tekshiring va joylashuvni yoqib qayta urinib ko‘ring.",
-          5500
-        );
-      }else{
-        showToast(
-          "⚠️ Joylashuv aniqlanmadi. Telefoningizda GPS va internetni yoqing, Telegram ruxsat so‘raganda 'Allow' ni bosing.",
-          5500
-        );
-      }
-    }else{
-      showToast(
-        "⚠️ Joylashuv aniqlanmadi. Telefoningizda GPS va internetni yoqing, Telegram ruxsat so‘raganda 'Allow' ni bosing.",
-        5500
-      );
-    }
+    showToast("⚠️ Joylashuv aniqlanmadi. Telefoningizda GPS va internetni yoqing, brauzerda 'Allow' ni bosing.", 4000);
     return null;
   }
 }
 
 /* RASM URLLARI */
+// =========================================================
+//   ADMIN EXTRAS (bir nechta qo‘shimcha mahsulotlar)
+// =========================================================
+function clearAdminExtras(){
+  if(!adminExtrasContainer) return;
+  adminExtrasContainer.innerHTML = "";
+}
+
+function addAdminExtraRow(nameVal="", priceVal=""){
+  if(!adminExtrasContainer) return;
+  const row = document.createElement("div");
+  row.className = "admin-extra-row";
+  row.innerHTML = `
+    <input class="admin-extra-name" type="text" placeholder="Masalan: sous" value="${escapeHtml(nameVal)}">
+    <input class="admin-extra-price" type="number" placeholder="Narx" value="${priceVal ? priceVal : ""}">
+    <button type="button" class="admin-extra-remove" title="O‘chirish">✕</button>
+  `;
+  const rm = row.querySelector(".admin-extra-remove");
+  if(rm) rm.addEventListener("click", ()=> row.remove());
+  adminExtrasContainer.appendChild(row);
+}
+
+function collectAdminExtras(){
+  if(!adminExtrasContainer) return [];
+  const rows = Array.from(adminExtrasContainer.querySelectorAll(".admin-extra-row"));
+  const extras = [];
+  rows.forEach(r=>{
+    const n = (r.querySelector(".admin-extra-name")?.value || "").trim();
+    const p = parseInt(r.querySelector(".admin-extra-price")?.value || "0", 10);
+    if(n && p>0) extras.push({ name:n, price:p });
+  });
+  return extras;
+}
+
+function loadAdminExtras(extrasArr){
+  clearAdminExtras();
+  if(!Array.isArray(extrasArr) || !extrasArr.length) return;
+  extrasArr.forEach(ex=> addAdminExtraRow(ex?.name || "", ex?.price || ""));
+}
+
+// admin tugma
+if(adminExtraAddBtn){
+  adminExtraAddBtn.addEventListener("click", ()=> addAdminExtraRow());
+}
+
 function normalizeImagesInput(raw){
   if(!raw) return [];
   return raw
@@ -667,7 +691,7 @@ function renderProducts(){
     // Prepare favorite button state.  Use heart icon filled when this product
     // index exists in the favorites array.
     const favActive = favorites.includes(index);
-    const favIcon   = favActive ? "❤️" : "🤍";
+    const favIcon   = favActive ? "💚" : "🤍";
 
     productsGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${index})">
@@ -715,6 +739,7 @@ function subscribeProductsRealtime(){
         tag: data.tag || "",
         description: data.description || "",
         images: Array.isArray(data.images) ? data.images : [],
+        extras: Array.isArray(data.extras) ? data.extras : [],
         // qo‘shimcha (set) nomi va narxi saqlanadi.  setName - matn, setPrice - raqam.
         setName: data.setName || null,
         setPrice: data.setPrice || 0,
@@ -801,6 +826,13 @@ if(searchInput){
 
 /* CART */
 function addToCart(index, qty=1, setQty=0){
+  // detail oynasidan tanlangan extras (per-unit)
+  let extrasForCart = [];
+  const fromDetail = (typeof detailIndex !== "undefined" && detailIndex === index);
+  if(fromDetail && Array.isArray(detailExtrasState)){
+    extrasForCart = detailExtrasState.filter(e=>(e.qty||0)>0).map(e=>({name:e.name, price:e.price, qty:e.qty}));
+  }
+
   if(qty<=0) return;
   // Try to find an existing cart entry with the same product index and set quantity
   const found = cart.find(c=>c.index===index && (c.setQty||0)===setQty);
@@ -816,9 +848,12 @@ function updateCartUI(){
     const p = products[c.index];
     if(!p) return;
     totalCount += c.qty;
-    // Compute unit price including optional set price (if applicable)
+    // Compute unit price including optional set price va extras (per unit)
     const setUnit   = (c.setQty && p.setPrice) ? p.setPrice : 0;
-    const unitPrice = (p.price || 0) + setUnit;
+    const extraUnit = Array.isArray(c.extras)
+      ? c.extras.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
+      : 0;
+    const unitPrice = (p.price || 0) + setUnit + extraUnit;
     totalPrice += unitPrice * c.qty;
   });
   if(cartCountTopEl) cartCountTopEl.textContent = totalCount;
@@ -847,16 +882,23 @@ function renderCartItems(){
   cart.forEach(c=>{
     const p = products[c.index];
     if(!p) return;
-    // Compute unit price including optional set price
+    // Compute unit price including optional set price + extras (per unit)
     const setUnit   = (c.setQty && p.setPrice) ? p.setPrice : 0;
-    const unitPrice = (p.price || 0) + setUnit;
+    const extraUnit = Array.isArray(c.extras)
+      ? c.extras.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
+      : 0;
+    const unitPrice = (p.price || 0) + setUnit + extraUnit;
     const lineTotal = unitPrice * c.qty;
     total += lineTotal;
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     // Prepare meta string: show base price and set price separately if needed
     let metaStr = `${formatPrice(p.price)} so‘m • ${catLabel}`;
     if(c.setQty && p.setPrice){
-      metaStr += ` • Qo‘shimcha: +${formatPrice(p.setPrice)} so‘m`;
+      metaStr += ` • Qo‘shimcha set: +${formatPrice(p.setPrice)} so‘m`;
+    }
+    if(Array.isArray(c.extras) && c.extras.length){
+      const extrasLabel = c.extras.map(ex=>`${ex.name} ×${ex.qty}`).join(", ");
+      metaStr += ` • Qo‘shimcha: ${extrasLabel}`;
     }
     html += `
       <div class="cart-item-row">
@@ -1444,17 +1486,31 @@ async function sendOrder(){
 
   let totalPrice = 0;
   const items = cart.map(c=>{
-    const p = products[c.index];
-    if(!p) return null;
-    const lineTotal = p.price*c.qty;
-    totalPrice += lineTotal;
-    return {
-      name:p.name || "",
-      qty:c.qty,
-      price:p.price || 0,
-      category:p.category || ""
-    };
-  }).filter(Boolean);
+  const p = products[c.index];
+  if(!p) return null;
+
+  const setUnit = (c.setQty && p.setPrice) ? p.setPrice : 0;
+  const extraUnit = Array.isArray(c.extras)
+    ? c.extras.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
+    : 0;
+  const unitPrice = (p.price || 0) + setUnit + extraUnit;
+  const lineTotal = unitPrice * c.qty;
+
+  totalPrice += lineTotal;
+
+  return {
+    name: p.name || "",
+    qty: c.qty,
+    price: unitPrice,            // unit price (asosiy + set + extras)
+    basePrice: p.price || 0,      // faqat asosiy
+    category: p.category || "",
+    setQty: c.setQty || 0,
+    setName: (c.setQty && p.setName) ? p.setName : null,
+    setPrice: (c.setQty && p.setPrice) ? p.setPrice : 0,
+    extras: Array.isArray(c.extras) ? c.extras : [],
+    lineTotal
+  };
+}).filter(Boolean);
 
   try{
     const payload = {
@@ -1719,6 +1775,11 @@ async function addCustomProduct(){
     payload.setName  = setNameInput;
     payload.setPrice = setPriceInput;
   }
+  // Yangi: bir nechta qo‘shimcha mahsulotlar (extras)
+  const extras = collectAdminExtras();
+  if(extras.length){
+    payload.extras = extras;
+  }
 
   try{
     if(editingProductId){
@@ -1817,6 +1878,8 @@ function editProduct(id){
   // Qo‘shimcha maydonlarini to‘ldirish
   if(adminSetNameEl)  adminSetNameEl.value  = p.setName || "";
   if(adminSetPriceEl) adminSetPriceEl.value = p.setPrice || "";
+  // Yangi: bir nechta qo‘shimcha mahsulotlarni to‘ldirish
+  loadAdminExtras(p.extras || []);
   const btn = document.querySelector(".admin-btn");
   if(btn) btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
   showToast("✏️ Tahrirlash rejimi.");
@@ -1868,7 +1931,10 @@ function updateDetailPriceUI(){
   const basePrice    = p.price || 0;
   const baseOldPrice = p.oldPrice || null;
   const setPart      = (detailSetQty > 0 && p.setPrice) ? p.setPrice : 0;
-  const perUnit      = basePrice + setPart;
+  const extrasPart   = Array.isArray(detailExtrasState)
+    ? detailExtrasState.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
+    : 0;
+  const perUnit      = basePrice + setPart + extrasPart;
   const total        = perUnit * qty;
 
   if(detailPriceEl){
