@@ -48,10 +48,6 @@ const LOCAL_ORDERS_BACKUP_KEY = "beauty_orders_history";
 // Key to store list of favorite product indices in localStorage
 const FAVORITES_KEY = "beauty_favorites";
 
-// LOCATION (GPS) UX
-const LOCATION_TIMEOUT_MS    = 30000; // 30s: foydalanuvchi GPS yoqib ulgurishi uchun
-const LOCATION_COUNTDOWN_SEC = 30;
-
 // CATEGORY DICTS
 const categoryEmoji = { default: "🍽" };
 const categoryLabel = {};
@@ -390,35 +386,18 @@ function saveLocation(loc){
 
 function startLocationCountdown(seconds){
   let remain = seconds;
-  // Toastni ko‘p spam qilmaslik uchun faqat muhim soniyalarda ko‘rsatamiz
-  const marks = new Set([seconds, 20, 10, 5, 3, 2, 1]);
-
-  const updateModal = ()=>{
-    const el = document.getElementById("gpsModalCountdown");
-    if(el) el.textContent = `${remain}s`;
-  };
-
-  const tick = ()=>{
-    updateModal();
-    if(marks.has(remain)){
-      showToast(`📍 Joylashuv aniqlanmoqda... ${remain}s`, 1200);
-    }
-  };
-
-  tick();
+  showToast(`📍 Joylashuv aniqlanmoqda... ${remain} s`, 1000);
   const timer = setInterval(()=>{
     remain--;
-    if(remain <= 0){
+    if(remain > 0){
+      showToast(`📍 Joylashuv aniqlanmoqda... ${remain} s`, 1000);
+    }else{
       clearInterval(timer);
-      updateModal();
-      return;
     }
-    tick();
-  }, 1000);
+  },1000);
 }
 
-
-function getBrowserLocation(timeoutMs = LOCATION_TIMEOUT_MS){
+function getBrowserLocation(timeoutMs = 7000){
   return new Promise((resolve,reject)=>{
     if(!navigator.geolocation){
       reject(new Error("Geolocation qo‘llab-quvvatlanmaydi."));
@@ -438,217 +417,6 @@ function getBrowserLocation(timeoutMs = LOCATION_TIMEOUT_MS){
       { enableHighAccuracy:true, timeout:timeoutMs }
     );
   });
-}
-
-function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
-
-function tgOpenLink(url){
-  try{
-    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-    if(tg && typeof tg.openLink === "function"){
-      tg.openLink(url);
-      return true;
-    }
-  }catch(e){}
-  try{
-    window.location.href = url;
-    return true;
-  }catch(e){}
-  return false;
-}
-
-function openLocationSettings(){
-  const ua = navigator.userAgent || "";
-  const isAndroid = /Android/i.test(ua);
-
-  // Android’da GPS (Location) sozlamasini intent orqali ochishga urinib ko‘ramiz
-  if(isAndroid){
-    const urls = [
-      "intent:#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end",
-      "intent://settings/location_source_settings#Intent;scheme=android-app;package=com.android.settings;end",
-      "intent://com.android.settings/location#Intent;scheme=android-app;package=com.android.settings;end"
-    ];
-    for(const u of urls){
-      if(tgOpenLink(u)) return true;
-    }
-  }
-
-  // iOS / boshqa qurilmalarda to‘g‘ridan-to‘g‘ri sozlamani ochish cheklangan bo‘lishi mumkin
-  showToast("Sozlamalar → Joylashuv (Location) bo‘limidan GPS’ni yoqing.", 4500);
-  return false;
-}
-
-function ensureGpsModalUI(){
-  if(document.getElementById("gpsModalOverlay")) return;
-
-  // CSS (minimal, EVOSga o‘xshash)
-  const style = document.createElement("style");
-  style.id = "gpsModalStyle";
-  style.textContent = `
-    .gps-modal-overlay{
-      position:fixed; inset:0; z-index:99999;
-      display:flex; align-items:center; justify-content:center;
-      background:rgba(0,0,0,.55);
-      padding:16px;
-    }
-    .gps-modal-overlay.hidden{ display:none!important; }
-    .gps-modal{
-      width:min(420px, 100%);
-      border-radius:18px;
-      overflow:hidden;
-      background:var(--card, #111);
-      color:var(--text, #fff);
-      box-shadow:0 20px 60px rgba(0,0,0,.45);
-    }
-    .gps-modal-top{
-      background:#0ea5a4;
-      height:140px;
-      display:flex; align-items:center; justify-content:center;
-    }
-    .gps-target{
-      width:52px; height:52px; border-radius:999px;
-      position:relative;
-      border:4px solid rgba(255,255,255,.95);
-    }
-    .gps-target:before{
-      content:"";
-      position:absolute; inset:10px;
-      border:4px solid rgba(255,255,255,.95);
-      border-radius:999px;
-    }
-    .gps-modal-body{ padding:16px 16px 14px; }
-    .gps-modal-title{
-      font-weight:800; font-size:18px; margin:0 0 8px;
-    }
-    .gps-modal-text{
-      opacity:.9; font-size:14px; line-height:1.35;
-      white-space:pre-line;
-    }
-    .gps-modal-row{
-      margin-top:10px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px;
-    }
-    .gps-count{
-      font-size:12px; opacity:.75;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(0,0,0,.08);
-    }
-    .gps-actions{
-      margin-top:14px;
-      display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;
-    }
-    .gps-btn{
-      border:none; cursor:pointer;
-      border-radius:999px;
-      padding:10px 14px;
-      font-weight:800;
-      background:rgba(0,0,0,.08);
-      color:inherit;
-    }
-    .gps-btn.primary{
-      background:#16a34a;
-      color:#fff;
-    }
-    .gps-btn.danger{
-      background:rgba(239,68,68,.15);
-      color:#ef4444;
-    }
-    .gps-btn.hidden{ display:none!important; }
-  `;
-  document.head.appendChild(style);
-
-  // HTML
-  const overlay = document.createElement("div");
-  overlay.id = "gpsModalOverlay";
-  overlay.className = "gps-modal-overlay hidden";
-  overlay.innerHTML = `
-    <div class="gps-modal" role="dialog" aria-modal="true">
-      <div class="gps-modal-top">
-        <div class="gps-target" aria-hidden="true"></div>
-      </div>
-      <div class="gps-modal-body">
-        <div class="gps-modal-title">GPS (Joylashuv) yoqilishi kerak</div>
-        <div class="gps-modal-text" id="gpsModalMsg">
-          Joylashuv funksiyalaridan foydalanish uchun GPS’ni yoqing.
-        </div>
-
-        <div class="gps-modal-row">
-          <div class="gps-count">⏳ <span id="gpsModalCountdown">30s</span></div>
-        </div>
-
-        <div class="gps-actions">
-          <button class="gps-btn danger" id="gpsModalCancel">Bekor qilish</button>
-          <button class="gps-btn" id="gpsModalRetry">Qayta tekshirish</button>
-          <button class="gps-btn primary" id="gpsModalEnable">Yoqish</button>
-        </div>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-}
-
-function hideGpsEnableModal(){
-  const overlay = document.getElementById("gpsModalOverlay");
-  if(!overlay) return;
-  overlay.classList.add("hidden");
-  document.body.style.overflow = "";
-}
-
-function showGpsEnableModal(opts = {}){
-  ensureGpsModalUI();
-  const overlay   = document.getElementById("gpsModalOverlay");
-  const msgEl     = document.getElementById("gpsModalMsg");
-  const cancelBtn = document.getElementById("gpsModalCancel");
-  const enableBtn = document.getElementById("gpsModalEnable");
-  const retryBtn  = document.getElementById("gpsModalRetry");
-
-  if(msgEl){
-    msgEl.textContent = (opts.message || "Joylashuv funksiyalaridan foydalanish uchun GPS’ni yoqing.");
-  }
-  if(retryBtn){
-    retryBtn.classList.toggle("hidden", opts.showRetry === false);
-  }
-
-  overlay.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-
-  return new Promise((resolve)=>{
-    const cleanup = ()=>{
-      if(cancelBtn) cancelBtn.onclick = null;
-      if(enableBtn) enableBtn.onclick = null;
-      if(retryBtn)  retryBtn.onclick  = null;
-      overlay.onclick = null;
-    };
-    const finish = (ans)=>{
-      cleanup();
-      hideGpsEnableModal();
-      resolve(ans);
-    };
-
-    if(cancelBtn) cancelBtn.onclick = (e)=>{ e.preventDefault(); finish("cancel"); };
-    if(enableBtn) enableBtn.onclick = (e)=>{ e.preventDefault(); finish("enable"); };
-    if(retryBtn)  retryBtn.onclick  = (e)=>{ e.preventDefault(); finish("retry"); };
-
-    overlay.onclick = (e)=>{ if(e.target===overlay) finish("cancel"); };
-  });
-}
-
-async function waitForLocationAfterSettings(maxWaitMs = LOCATION_TIMEOUT_MS){
-  const started = Date.now();
-  // qisqa timeout bilan ko‘p urinish: foydalanuvchi sozlamadan qaytgan zahoti ushlash oson bo‘ladi
-  while(Date.now() - started < maxWaitMs){
-    try{
-      const loc = await getBrowserLocation(5000);
-      return loc;
-    }catch(e){
-      // permission denied bo‘lsa darhol to‘xtatamiz
-      if(e && typeof e.code === "number" && e.code === 1) throw e;
-      await sleep(1200);
-    }
-  }
-  throw Object.assign(new Error("Location timeout"), { code: 3 });
 }
 
 function setImgWithFallback(imgEl, basePathNoExt){
@@ -711,6 +479,7 @@ function showLocationGuide(){
   return new Promise(async (resolve)=>{
     const cleanup = ()=>{
       overlay.classList.add("hidden");
+      overlay.classList.remove("active");
       document.body.style.overflow = "";
       prevBtn.onclick = null;
       nextBtn.onclick = null;
@@ -724,6 +493,7 @@ function showLocationGuide(){
       resolve(ok);
     };
 
+    overlay.classList.add("active");
     overlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
 
@@ -758,6 +528,7 @@ function askLocationChoice(saved){
   return new Promise((resolve)=>{
     const cleanup = ()=>{
       overlay.classList.add("hidden");
+      overlay.classList.remove("active");
       document.body.style.overflow = "";
       savedBtn.onclick = null;
       newBtn.onclick = null;
@@ -775,6 +546,7 @@ function askLocationChoice(saved){
       "Lng: " + saved.lng.toFixed(5) + "\n\n" +
       "Qaysi birini yuborasiz?";
 
+    overlay.classList.add("active");
     overlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
 
@@ -799,57 +571,22 @@ async function getOrAskLocation(){
   // Qo‘llanma rasmlarini ko‘rsatamiz (2 ta qadam)
   await showLocationGuide();
 
-  // EVOSga o‘xshab: darhol joylashuv so‘raymiz (brauzer/Telegram ruxsat oynasi avtomatik chiqadi)
-  startLocationCountdown(LOCATION_COUNTDOWN_SEC);
+  // Foydalanuvchiga ruxsat so‘rash haqida eslatma
+  const allow = confirm(
+    "📍 Joylashuvni aniqlash uchun Telegram ruxsat so‘raydi.\n\n" +
+    "Iltimos, 'Ruxsat berish / Allow' ni bosing."
+  );
+  if(!allow) return null;
 
+  startLocationCountdown(7);
   try{
-    const loc = await getBrowserLocation(LOCATION_TIMEOUT_MS);
+    const loc = await getBrowserLocation(7000);
     saveLocation(loc);
     showToast("📍 Joylashuv aniqlandi.", 2000);
     return loc;
   }catch(e){
     console.error("Joylashuv aniqlanmadi:", e);
 
-    // GPS o‘chiq / signal yo‘q / timeout holatlarida foydalanuvchini Sozlamaga yo‘naltiramiz
-    if(e && typeof e.code === "number" && (e.code === 2 || e.code === 3)){
-      const action = await showGpsEnableModal({
-        message: "Please enable your GPS to access location-based features.
-
-Telefoningizda Joylashuv (Location) ON bo‘lsin, so‘ng qayta tekshiring.",
-        showRetry: true
-      });
-
-      if(action === "cancel") return null;
-
-      if(action === "enable"){
-        openLocationSettings();
-        startLocationCountdown(LOCATION_COUNTDOWN_SEC);
-
-        try{
-          const loc2 = await waitForLocationAfterSettings(LOCATION_TIMEOUT_MS);
-          saveLocation(loc2);
-          showToast("📍 Joylashuv aniqlandi.", 2000);
-          return loc2;
-        }catch(err2){
-          // agar yana ham bo‘lmasa, pastdagi umumiy xabarlar ishlaydi
-          e = err2;
-        }
-      }
-
-      if(action === "retry"){
-        startLocationCountdown(LOCATION_COUNTDOWN_SEC);
-        try{
-          const loc3 = await getBrowserLocation(LOCATION_TIMEOUT_MS);
-          saveLocation(loc3);
-          showToast("📍 Joylashuv aniqlandi.", 2000);
-          return loc3;
-        }catch(err3){
-          e = err3;
-        }
-      }
-    }
-
-    // Qolgan xatoliklar uchun eski xabarlarni saqlab qolamiz
     if(e && typeof e.code === "number"){
       if(e.code === 1){
         showToast(
@@ -878,11 +615,9 @@ Telefoningizda Joylashuv (Location) ON bo‘lsin, so‘ng qayta tekshiring.",
         5500
       );
     }
-
     return null;
   }
 }
-
 
 /* RASM URLLARI */
 function normalizeImagesInput(raw){
@@ -1049,6 +784,8 @@ function renderProducts(){
     productsGrid.innerHTML = "<p class='cart-empty'>Hozircha mahsulot qo‘shilmagan.</p>";
     return;
   }
+  let html = "";
+
   filtered.forEach(p=>{
     const index    = products.indexOf(p);
     const discount = p.oldPrice && p.oldPrice > p.price
@@ -1073,7 +810,7 @@ function renderProducts(){
     const favActive = favorites.includes(index);
     const favIcon   = favActive ? "💚" : "🤍";
 
-    productsGrid.innerHTML += `
+    html += `
       <article class="product-card" onclick="window.openProductDetail(${index})">
         <div class="product-img-wrap">
           ${imgHtml}
@@ -1101,7 +838,10 @@ function renderProducts(){
       </article>
     `;
   });
+
+  productsGrid.innerHTML = html;
 }
+
 
 function subscribeProductsRealtime(){
   onSnapshot(productsCol, snap=>{
