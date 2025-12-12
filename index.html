@@ -355,6 +355,97 @@
     </div>
   </div>
 
+<!-- LOCATION CHOICE MODAL -->
+<div id="locationChoiceModal" class="ff-modal-overlay hidden" aria-hidden="true">
+  <div class="ff-modal">
+    <div class="ff-modal-head">
+      <div class="ff-modal-title">📍 Joylashuv</div>
+      <button type="button" class="ff-modal-x" id="locChoiceCloseBtn" aria-label="Yopish">✕</button>
+    </div>
+
+    <div class="ff-modal-body">
+      <p class="ff-modal-text" id="locChoiceDesc">
+        Buyurtma uchun joylashuvni yuboramiz. Oldingi joylashuv bo‘lsa, tanlang.
+      </p>
+
+      <div class="ff-modal-box" id="locChoiceSavedBox">
+        <div class="ff-modal-box-title">Oldingi joylashuv (saqlangan)</div>
+        <div class="ff-modal-box-sub" id="locSavedText">—</div>
+      </div>
+
+      <div class="ff-modal-actions">
+        <button type="button" class="ff-btn ff-btn-green" id="locUseSavedBtn">Oldingi joylashuvni yuborish</button>
+        <button type="button" class="ff-btn ff-btn-primary" id="locUseNewBtn">Yangi joylashuv yuborish</button>
+      </div>
+
+      <button type="button" class="ff-btn ff-btn-ghost" id="locChoiceCancelBtn">Hozircha kerak emas</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOCATION GUIDE MODAL (2 ta rasm bilan yo‘riqnoma) -->
+<div id="locationGuideModal" class="ff-modal-overlay hidden" aria-hidden="true">
+  <div class="ff-modal ff-modal-wide">
+    <div class="ff-modal-head">
+      <div class="ff-modal-title">📌 Joylashuvni yoqish</div>
+      <button type="button" class="ff-modal-x" id="locGuideCloseBtn" aria-label="Yopish">✕</button>
+    </div>
+
+    <div class="ff-modal-body">
+      <div class="ff-steps">
+        <div class="ff-step-dot active" id="locStepDot1"></div>
+        <div class="ff-step-line"></div>
+        <div class="ff-step-dot" id="locStepDot2"></div>
+      </div>
+
+      <div class="ff-modal-text" id="locGuideText">
+        1) Telefoningiz yuqori qismidan panelni pastga tushiring.
+      </div>
+
+      <div class="ff-guide-imgwrap">
+        <img id="locGuideImg" class="ff-guide-img" alt="Joylashuvni yoqish bo‘yicha rasm" loading="lazy">
+      </div>
+
+      <div class="ff-modal-actions">
+        <button type="button" class="ff-btn ff-btn-primary" id="locGuideNextBtn">Keyingi</button>
+        <button type="button" class="ff-btn ff-btn-green hidden" id="locGuideStartBtn">Telegramda ruxsat berish</button>
+      </div>
+
+      <p class="ff-modal-hint">
+        Keyingi bosqichda Telegram “Joylashuvga ruxsat berasizmi?” deb so‘raydi — <b>Allow / Ruxsat berish</b> ni bosing.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- DELIVERY TIME MODAL -->
+<div id="timeModal" class="ff-modal-overlay hidden" aria-hidden="true">
+  <div class="ff-modal">
+    <div class="ff-modal-head">
+      <div class="ff-modal-title">⏰ Yetkazish vaqti</div>
+      <button type="button" class="ff-modal-x" id="timeCloseBtn" aria-label="Yopish">✕</button>
+    </div>
+
+    <div class="ff-modal-body">
+      <p class="ff-modal-text">Har bir buyurtma uchun yetkazish vaqtini kiriting (masalan: <b>18:00</b> yoki <b>30 minutdan keyin</b>).</p>
+
+      <input id="timeInput" class="ff-input" type="text" placeholder="Masalan: 18:00 / 30 minut / 1 soat">
+
+      <div class="ff-chips" id="timeChips">
+        <button type="button" class="ff-chip" data-val="15 minut">15 minut</button>
+        <button type="button" class="ff-chip" data-val="30 minut">30 minut</button>
+        <button type="button" class="ff-chip" data-val="1 soat">1 soat</button>
+        <button type="button" class="ff-chip" data-val="Tezroq">Tezroq</button>
+      </div>
+
+      <div class="ff-modal-actions">
+        <button type="button" class="ff-btn ff-btn-primary" id="timeOkBtn">Saqlash</button>
+        <button type="button" class="ff-btn ff-btn-ghost" id="timeCancelBtn">Bekor qilish</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   <!-- Telegram WebApp SDK for better integration inside Telegram mobile app -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 

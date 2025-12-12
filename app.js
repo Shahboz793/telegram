@@ -111,6 +111,31 @@ const searchInput        = document.getElementById("searchInput");
 const customerInfoTextEl = document.getElementById("customerInfoText");
 const quickOrderBtn      = document.getElementById("quickOrderBtn");
 
+// LOCATION / TIME MODALS
+const locationChoiceModal  = document.getElementById("locationChoiceModal");
+const locChoiceCloseBtn    = document.getElementById("locChoiceCloseBtn");
+const locChoiceCancelBtn   = document.getElementById("locChoiceCancelBtn");
+const locUseSavedBtn       = document.getElementById("locUseSavedBtn");
+const locUseNewBtn         = document.getElementById("locUseNewBtn");
+const locChoiceSavedBox    = document.getElementById("locChoiceSavedBox");
+const locSavedText         = document.getElementById("locSavedText");
+
+const locationGuideModal   = document.getElementById("locationGuideModal");
+const locGuideCloseBtn     = document.getElementById("locGuideCloseBtn");
+const locGuideText         = document.getElementById("locGuideText");
+const locGuideImg          = document.getElementById("locGuideImg");
+const locGuideNextBtn      = document.getElementById("locGuideNextBtn");
+const locGuideStartBtn     = document.getElementById("locGuideStartBtn");
+const locStepDot1          = document.getElementById("locStepDot1");
+const locStepDot2          = document.getElementById("locStepDot2");
+
+const timeModal            = document.getElementById("timeModal");
+const timeCloseBtn         = document.getElementById("timeCloseBtn");
+const timeInput            = document.getElementById("timeInput");
+const timeChips            = document.getElementById("timeChips");
+const timeOkBtn            = document.getElementById("timeOkBtn");
+const timeCancelBtn        = document.getElementById("timeCancelBtn");
+
 const productDetailOverlay = document.getElementById("productDetailOverlay");
 const detailImageEl        = document.getElementById("detailImage");
 const detailCategoryEl     = document.getElementById("detailCategory");
@@ -371,6 +396,183 @@ function showToast(message, duration = 1800){
   showToast._timer = setTimeout(()=>toastEl.classList.remove("show"), duration);
 }
 
+// =========================
+//  SIMPLE MODAL HELPERS
+// =========================
+function openOverlay(el){
+  if(!el) return;
+  el.classList.remove("hidden");
+  el.setAttribute("aria-hidden","false");
+}
+function closeOverlay(el){
+  if(!el) return;
+  el.classList.add("hidden");
+  el.setAttribute("aria-hidden","true");
+}
+
+function setImgWithFallback(imgEl, baseName){
+  if(!imgEl) return;
+  const exts = ["png","jpg","jpeg","webp"];
+  let i = 0;
+  const tryNext = ()=>{
+    if(i >= exts.length){
+      imgEl.removeAttribute("src");
+      return;
+    }
+    imgEl.src = `images/${baseName}.${exts[i++]}`;
+  };
+  imgEl.onerror = ()=> tryNext();
+  tryNext();
+}
+
+function chooseLocationMode(saved){
+  return new Promise(resolve=>{
+    // saved bo‘lsa ko‘rsatamiz, bo‘lmasa faqat "yangi" chiqadi
+    if(locChoiceSavedBox){
+      if(saved){
+        locChoiceSavedBox.classList.remove("hidden");
+      }else{
+        locChoiceSavedBox.classList.add("hidden");
+      }
+    }
+    if(locSavedText){
+      if(saved){
+        const acc = saved.accuracy ? `, aniqlik: ±${Math.round(saved.accuracy)}m` : "";
+        locSavedText.textContent = `Lat: ${saved.lat.toFixed(5)}, Lng: ${saved.lng.toFixed(5)}${acc}`;
+      }else{
+        locSavedText.textContent = "—";
+      }
+    }
+
+    openOverlay(locationChoiceModal);
+
+    const cleanup = ()=>{
+      if(locUseSavedBtn) locUseSavedBtn.onclick = null;
+      if(locUseNewBtn) locUseNewBtn.onclick = null;
+      if(locChoiceCancelBtn) locChoiceCancelBtn.onclick = null;
+      if(locChoiceCloseBtn) locChoiceCloseBtn.onclick = null;
+    };
+
+    if(locUseSavedBtn){
+      locUseSavedBtn.onclick = ()=>{
+        cleanup();
+        closeOverlay(locationChoiceModal);
+        resolve("saved");
+      };
+    }
+    if(locUseNewBtn){
+      locUseNewBtn.onclick = ()=>{
+        cleanup();
+        closeOverlay(locationChoiceModal);
+        resolve("new");
+      };
+    }
+    const cancel = ()=>{
+      cleanup();
+      closeOverlay(locationChoiceModal);
+      resolve(null);
+    };
+    if(locChoiceCancelBtn) locChoiceCancelBtn.onclick = cancel;
+    if(locChoiceCloseBtn)  locChoiceCloseBtn.onclick  = cancel;
+  });
+}
+
+function showLocationGuide(){
+  return new Promise(resolve=>{
+    let step = 1;
+    function render(){
+      if(step===1){
+        if(locGuideText) locGuideText.textContent = "1) Telefoningiz yuqori qismidan panelni pastga tushiring.";
+        if(locStepDot1) locStepDot1.classList.add("active");
+        if(locStepDot2) locStepDot2.classList.remove("active");
+        if(locGuideNextBtn) locGuideNextBtn.classList.remove("hidden");
+        if(locGuideStartBtn) locGuideStartBtn.classList.add("hidden");
+        setImgWithFallback(locGuideImg, "rasm1");
+      }else{
+        if(locGuideText) locGuideText.textContent = "2) 'Joylashuv / Location' tugmasini bosing (yoqing).";
+        if(locStepDot1) locStepDot1.classList.remove("active");
+        if(locStepDot2) locStepDot2.classList.add("active");
+        if(locGuideNextBtn) locGuideNextBtn.classList.add("hidden");
+        if(locGuideStartBtn) locGuideStartBtn.classList.remove("hidden");
+        setImgWithFallback(locGuideImg, "rasm2");
+      }
+    }
+
+    openOverlay(locationGuideModal);
+    render();
+
+    const cleanup = ()=>{
+      if(locGuideNextBtn) locGuideNextBtn.onclick = null;
+      if(locGuideStartBtn) locGuideStartBtn.onclick = null;
+      if(locGuideCloseBtn) locGuideCloseBtn.onclick = null;
+    };
+
+    if(locGuideNextBtn){
+      locGuideNextBtn.onclick = ()=>{
+        step = 2;
+        render();
+      };
+    }
+    if(locGuideStartBtn){
+      locGuideStartBtn.onclick = ()=>{
+        cleanup();
+        closeOverlay(locationGuideModal);
+        resolve(true);
+      };
+    }
+    const cancel = ()=>{
+      cleanup();
+      closeOverlay(locationGuideModal);
+      resolve(false);
+    };
+    if(locGuideCloseBtn) locGuideCloseBtn.onclick = cancel;
+  });
+}
+
+function askPreferredTimeModal(defaultVal=""){
+  return new Promise(resolve=>{
+    if(timeInput) timeInput.value = defaultVal || "";
+    openOverlay(timeModal);
+
+    const cleanup = ()=>{
+      if(timeOkBtn) timeOkBtn.onclick = null;
+      if(timeCancelBtn) timeCancelBtn.onclick = null;
+      if(timeCloseBtn) timeCloseBtn.onclick = null;
+    };
+
+    if(timeChips){
+      timeChips.onclick = (e)=>{
+        const btn = e.target.closest(".ff-chip");
+        if(!btn) return;
+        const v = btn.dataset.val || "";
+        if(timeInput) timeInput.value = v;
+      };
+    }
+
+    const ok = ()=>{
+      const v = (timeInput ? timeInput.value : "").trim();
+      if(!v){
+        showToast("⏰ Yetkazish vaqtini kiriting (masalan: 18:00 yoki 30 minut).", 2500);
+        return;
+      }
+      cleanup();
+      closeOverlay(timeModal);
+      resolve(v);
+    };
+
+    const cancel = ()=>{
+      cleanup();
+      closeOverlay(timeModal);
+      resolve(null);
+    };
+
+    if(timeOkBtn) timeOkBtn.onclick = ok;
+    if(timeCancelBtn) timeCancelBtn.onclick = cancel;
+    if(timeCloseBtn) timeCloseBtn.onclick = cancel;
+  });
+}
+
+
 /* GEOLOCATION — JOYLASHUV */
 function loadSavedLocation(){
   try{
@@ -426,26 +628,29 @@ function getBrowserLocation(timeoutMs = 7000){
 }
 
 async function getOrAskLocation(){
-  let saved = loadSavedLocation();
+  const saved = loadSavedLocation();
+
+  // Agar oldingi lokatsiya bo‘lsa — foydalanuvchiga tanlatamiz
   if(saved){
-    const ok = confirm(
-      "📍 Oldingi joylashuvingiz saqlangan.\n\n" +
-      "Lat: " + saved.lat.toFixed(5) + "\n" +
-      "Lng: " + saved.lng.toFixed(5) + "\n\n" +
-      "Shu joylashuvdan foydalanilsinmi?"
-    );
-    if(ok) return saved;
-    // eski lokatsiyani bekor qilsa – tozalaymiz
-    localStorage.removeItem(STORAGE_LOCATION);
+    const mode = await chooseLocationMode(saved);
+    if(mode === "saved"){
+      return saved;
+    }
+    if(mode === null){
+      return null;
+    }
+    // mode === "new" bo‘lsa davom etamiz
+  }else{
+    // saqlangan lokatsiya yo‘q bo‘lsa ham tanlash oynasini ko‘rsatamiz (yangi / bekor)
+    const mode = await chooseLocationMode(null);
+    if(mode === null) return null;
   }
 
-  const allow = confirm(
-    "📍 Joylashuvingiz aniqlansinmi?\n" +
-    "Bu ma’lumot kuryerga aniq marshrut tuzish uchun kerak bo‘ladi.\n\n" +
-    "Telefon sozlamalaridan GPS (Location) yoqilgan bo‘lishi kerak. 'Allow' / 'Ruxsat berish' tugmasini bosing."
-  );
-  if(!allow) return null;
+  // Yo‘riqnoma (2 ta rasm) — tezkor
+  const guideOk = await showLocationGuide();
+  if(!guideOk) return null;
 
+  // Browser geolocation so‘raymiz (Telegram permission chiqadi)
   startLocationCountdown(7);
   try{
     const loc = await getBrowserLocation(7000);
@@ -454,10 +659,39 @@ async function getOrAskLocation(){
     return loc;
   }catch(e){
     console.error("Joylashuv aniqlanmadi:", e);
-    showToast("⚠️ Joylashuv aniqlanmadi. Telefoningizda GPS va internetni yoqing, brauzerda 'Allow' ni bosing.", 4000);
+
+    if(e && typeof e.code === "number"){
+      if(e.code === 1){
+        showToast(
+          "⚠️ Joylashuvga ruxsat berilmadi. Telegram so‘raganda 'Allow / Ruxsat berish' ni bosing. Telefon sozlamalarida Telegram → Permissions → Location ni ham 'Allow' qiling.",
+          5500
+        );
+      }else if(e.code === 2){
+        showToast(
+          "⚠️ Joylashuv aniqlanmadi. Telefoningizda GPS / Location tugmasini yoqing va qayta urinib ko‘ring.",
+          5500
+        );
+      }else if(e.code === 3){
+        showToast(
+          "⚠️ Joylashuv vaqt tugab qoldi (timeout). Internetingizni tekshiring va qayta urinib ko‘ring.",
+          5500
+        );
+      }else{
+        showToast(
+          "⚠️ Joylashuv aniqlanmadi. GPS va internetni yoqing, Telegram so‘raganda 'Allow' ni bosing.",
+          5500
+        );
+      }
+    }else{
+      showToast(
+        "⚠️ Joylashuv aniqlanmadi. GPS va internetni yoqing, Telegram so‘raganda 'Allow' ni bosing.",
+        5500
+      );
+    }
     return null;
   }
 }
+
 
 /* RASM URLLARI */
 // =========================================================
@@ -1476,6 +1710,14 @@ async function sendOrder(){
     showToast("❌ Mijoz ma’lumoti kiritilmadi.");
     return;
   }
+
+// Har bir buyurtma uchun yetkazish vaqtini so‘raymiz
+const t = await askPreferredTimeModal(customer.preferredTime || "");
+if(t===null){
+  showToast("⏰ Yetkazish vaqti kiritilmadi (bekor qilindi).", 2500);
+  return;
+}
+customer.preferredTime = t;
 
   const extraComment = prompt("Buyurtmangizga qo‘shimcha izoh (ixtiyoriy):\nMasalan, eshik kod, pod’ezd, bolalar uxlayapti va h.k.") || "";
   if(extraComment.trim()){
