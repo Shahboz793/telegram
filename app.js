@@ -450,11 +450,11 @@ function showLocationGuide(){
 
   const steps = [
     {
-      imgBase: "images/rasm1",
+      imgBase: RAW_PREFIX + "rasm1",
       text: "1) Telefoningizda yuqori panelni pastga tushiring.\n\nJoylashuv belgisi (Location) OFF bo‘lsa, uni yoqing."
     },
     {
-      imgBase: "images/rasm2",
+      imgBase: RAW_PREFIX + "rasm2",
       text: "2) Joylashuv (Location) tugmasini bosing — ON bo‘ladi.\n\nKeyin Telegram joylashuvga ruxsat so‘rasa: 'Ruxsat berish / Allow' ni tanlang."
     }
   ];
