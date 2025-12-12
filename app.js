@@ -108,6 +108,7 @@ const cartSheetOverlay   = document.getElementById("cartSheetOverlay");
 const cartItemsEl        = document.getElementById("cartItems");
 const cartSheetTotalEl   = document.getElementById("cartSheetTotal");
 const themeToggleBtn     = document.getElementById("themeToggleBtn");
+const locationToggleBtn  = document.getElementById("locationToggleBtn");
 const tabsEl             = document.getElementById("tabs");
 const adminAccessBtn     = document.getElementById("adminAccessBtn");
 const adminTabBtn        = document.getElementById("adminTabBtn");
@@ -386,6 +387,37 @@ function saveLocation(loc){
   try{
     localStorage.setItem(STORAGE_LOCATION, JSON.stringify(loc));
   }catch(e){}
+  updateLocationToggleUI();
+}
+
+function updateLocationToggleUI(){
+  if(!locationToggleBtn) return;
+  const saved = loadSavedLocation();
+  const isOn = !!saved;
+  locationToggleBtn.textContent = isOn ? "📍 Joylashuv: ON" : "📍 Joylashuv: OFF";
+  locationToggleBtn.classList.toggle("is-on", isOn);
+}
+
+async function toggleLocationInApp(){
+  const saved = loadSavedLocation();
+  if(saved){
+    const ok = confirm(
+      "📍 Saqlangan joylashuvni o‘chirasizmi?\n\n" +
+      "Eslatma: bu telefoningizdagi GPS (Location) tugmasini o‘chirmaydi — faqat ilova ichida saqlangan joylashuvni tozalaydi."
+    );
+    if(!ok) return;
+    try{ localStorage.removeItem(STORAGE_LOCATION); }catch(e){}
+    updateLocationToggleUI();
+    showToast("📍 Joylashuv o‘chirildi (saqlangan joylashuv tozalandi).", 2500);
+    return;
+  }
+
+  const loc = await getOrAskLocation();
+  if(loc) updateLocationToggleUI();
+}
+
+if(locationToggleBtn){
+  locationToggleBtn.addEventListener("click", toggleLocationInApp);
 }
 
 function startLocationCountdown(seconds){
@@ -813,9 +845,7 @@ async function getOrAskLocation(){
     // GPS o‘chiq / signal yo‘q / timeout holatlarida foydalanuvchini Sozlamaga yo‘naltiramiz
     if(e && typeof e.code === "number" && (e.code === 2 || e.code === 3)){
       const action = await showGpsEnableModal({
-        message: "Please enable your GPS to access location-based features.
-
-Telefoningizda Joylashuv (Location) ON bo‘lsin, so‘ng qayta tekshiring.",
+        message: "Please enable your GPS to access location-based features.\n\nTelefoningizda Joylashuv (Location) ON bo‘lsin, so‘ng qayta tekshiring.",
         showRetry: true
       });
 
@@ -3056,6 +3086,7 @@ if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.onEvent === 'fu
   // Kuryerlarni ham real-time qilamiz (admin bo‘lmaganda ham DOM bo‘lmasa ishlamaydi)
   subscribeCouriersRealtime();
 
+  updateLocationToggleUI();
   updateCartUI();
 })();
 
