@@ -105,6 +105,7 @@ const cartTotalTopEl     = document.getElementById("cartTotalTop");
 const toastEl            = document.getElementById("toast");
 const cartSheet          = document.getElementById("cartSheet");
 const cartSheetOverlay   = document.getElementById("cartSheetOverlay");
+if(cartSheetOverlay){ cartSheetOverlay.classList.add("hidden"); }
 const cartItemsEl        = document.getElementById("cartItems");
 const cartSheetTotalEl   = document.getElementById("cartSheetTotal");
 const themeToggleBtn     = document.getElementById("themeToggleBtn");
@@ -706,6 +707,9 @@ function showLocationGuide(){
   const closeBtn= document.getElementById("locGuideClose");
   const dot1    = document.getElementById("locDot1");
   const dot2    = document.getElementById("locDot2");
+  const openSettingsBtn = document.getElementById("locGuideOpenSettings");
+  const tryAgainBtn     = document.getElementById("locGuideTryAgain");
+
 
   // If overlay not present, just resolve immediately
   if(!overlay || !imgEl || !textEl || !prevBtn || !nextBtn || !doneBtn){
@@ -758,6 +762,9 @@ function showLocationGuide(){
 
     overlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
+
+    if(openSettingsBtn) openSettingsBtn.onclick = (e)=>{ e.preventDefault(); openLocationSettings(); };
+    if(tryAgainBtn) tryAgainBtn.onclick = async (e)=>{ e.preventDefault(); finish(true); try{ await getOrAskLocation(); }catch(_e){} };
 
     prevBtn.onclick = async (e)=>{ e.preventDefault(); step=Math.max(0, step-1); await render(); };
     nextBtn.onclick = async (e)=>{ e.preventDefault(); step=Math.min(steps.length-1, step+1); await render(); };
@@ -1270,6 +1277,7 @@ function toggleCartSheet(force){
   const next   = typeof force==="boolean" ? force : !isOpen;
   cartSheet.classList.toggle("open", next);
   cartSheetOverlay.classList.toggle("show", next);
+  cartSheetOverlay.classList.toggle("hidden", !next);
   if(next) renderCartItems();
 }
 function renderCartItems(){
@@ -3143,6 +3151,10 @@ window.restoreCourier              = restoreCourier;
  * (either `light` or `dark`).  If Telegram WebApp API is not
  * available, this function does nothing.
  */
+
+// Expose helper to open OS Location settings (Android intent best-effort)
+window.openLocationSettings = openLocationSettings;
+
 function applyTelegramTheme() {
   try {
     if (window.Telegram && Telegram.WebApp) {

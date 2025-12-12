@@ -251,7 +251,7 @@
   </div>
 
   <!-- CART SHEET -->
-  <div id="cartSheetOverlay" class="overlay" onclick="toggleCartSheet(false)"></div>
+  <div id="cartSheetOverlay" class="overlay" hidden onclick="toggleCartSheet(false)"></div>
 
   <aside id="cartSheet" class="cart-sheet">
     <header>
@@ -379,7 +379,12 @@
       <button id="locGuideDone" class="btn loc-btn-primary hidden">Tushunarli</button>
     </div>
 
-    <div class="loc-guide-dots">
+    <div class="loc-guide-actions" style="display:flex; gap:10px; justify-content:space-between; margin-top:10px;">
+        <button id="locGuideOpenSettings" class="btn loc-btn-secondary" type="button">⚙️ Sozlamalarni ochish</button>
+        <button id="locGuideTryAgain" class="btn loc-btn-primary" type="button">🔄 Qayta urinish</button>
+      </div>
+
+      <div class="loc-guide-dots">
       <span id="locDot1" class="loc-dot active"></span>
       <span id="locDot2" class="loc-dot"></span>
     </div>
