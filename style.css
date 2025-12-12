@@ -302,6 +302,8 @@ body.theme-dark{
 
 /* PRODUCTS – KATTA KARTOCHKA, RASM BO‘YIGA (UZUM STYLE) */
 .products-grid{
+  contain: layout paint;
+
   display:flex;
   flex-direction:column;
   gap:14px;
@@ -316,6 +318,9 @@ body.theme-dark{
   }
 }
 .product-card{
+  content-visibility:auto;
+    contain-intrinsic-size: 360px 480px;
+
   /* Lighter card background for food/restaurant aesthetic */
   background:var(--card);
   border-radius:var(--radius-lg);
@@ -1837,4 +1842,9 @@ body.theme-dark{
 }
 .loc-dot.active{
   background:rgba(34,197,94,.9);
+}
+
+/* PERF PATCH: rasm va kartalarni yengillashtirish (qotib qolmasin) */
+.product-img-wrap img{
+  background: rgba(15,23,42,.35);
 }
