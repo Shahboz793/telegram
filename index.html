@@ -12,6 +12,12 @@
   <!-- STYLE -->
   <!-- Updated to point to the correct CSS file provided by the user -->
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* FIX: overlay default hidden */
+    #cartSheetOverlay.overlay{ display:none; pointer-events:none; }
+    #cartSheetOverlay.overlay.show{ display:block; pointer-events:auto; }
+  </style>
 </head>
 
 <body>
@@ -39,8 +45,6 @@
       <div class="header-right">
         <!-- Rejim (day/night) toggle button with label -->
         <button id="themeToggleBtn" type="button" class="icon-btn">🌙 Rejim</button>
-
-        <button id="locationToggleBtn" type="button" class="icon-btn">📍 Joylashuv: OFF</button>
 
         <button class="cart-top-btn" onclick="toggleCartSheet(true)">
           <span>🛒 Savat</span>
@@ -251,7 +255,7 @@
   </div>
 
   <!-- CART SHEET -->
-  <div id="cartSheetOverlay" class="overlay" hidden onclick="toggleCartSheet(false)"></div>
+  <div id="cartSheetOverlay" class="overlay" onclick="toggleCartSheet(false)" style="display:none;pointer-events:none;"></div>
 
   <aside id="cartSheet" class="cart-sheet">
     <header>
@@ -375,16 +379,12 @@
 
     <div class="loc-guide-actions">
       <button id="locGuidePrev" class="btn loc-btn-secondary">Orqaga</button>
+      <button id="locGuideSettings" class="btn loc-btn-secondary">⚙️ Sozlamalar</button>
       <button id="locGuideNext" class="btn loc-btn-primary">Keyingi</button>
       <button id="locGuideDone" class="btn loc-btn-primary hidden">Tushunarli</button>
     </div>
 
-    <div class="loc-guide-actions" style="display:flex; gap:10px; justify-content:space-between; margin-top:10px;">
-        <button id="locGuideOpenSettings" class="btn loc-btn-secondary" type="button">⚙️ Sozlamalarni ochish</button>
-        <button id="locGuideTryAgain" class="btn loc-btn-primary" type="button">🔄 Qayta urinish</button>
-      </div>
-
-      <div class="loc-guide-dots">
+    <div class="loc-guide-dots">
       <span id="locDot1" class="loc-dot active"></span>
       <span id="locDot2" class="loc-dot"></span>
     </div>

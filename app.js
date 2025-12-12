@@ -105,11 +105,20 @@ const cartTotalTopEl     = document.getElementById("cartTotalTop");
 const toastEl            = document.getElementById("toast");
 const cartSheet          = document.getElementById("cartSheet");
 const cartSheetOverlay   = document.getElementById("cartSheetOverlay");
-if(cartSheetOverlay){ cartSheetOverlay.classList.add("hidden"); }
+
+/* FIX: prevent overlay blocking clicks on load */
+if(cartSheetOverlay){
+  cartSheetOverlay.classList.remove("show");
+  cartSheetOverlay.style.display = "none";
+  cartSheetOverlay.style.pointerEvents = "none";
+}
+if(cartSheet){
+  cartSheet.classList.remove("open");
+}
+
 const cartItemsEl        = document.getElementById("cartItems");
 const cartSheetTotalEl   = document.getElementById("cartSheetTotal");
 const themeToggleBtn     = document.getElementById("themeToggleBtn");
-const locationToggleBtn  = document.getElementById("locationToggleBtn");
 const tabsEl             = document.getElementById("tabs");
 const adminAccessBtn     = document.getElementById("adminAccessBtn");
 const adminTabBtn        = document.getElementById("adminTabBtn");
@@ -388,37 +397,6 @@ function saveLocation(loc){
   try{
     localStorage.setItem(STORAGE_LOCATION, JSON.stringify(loc));
   }catch(e){}
-  updateLocationToggleUI();
-}
-
-function updateLocationToggleUI(){
-  if(!locationToggleBtn) return;
-  const saved = loadSavedLocation();
-  const isOn = !!saved;
-  locationToggleBtn.textContent = isOn ? "📍 Joylashuv: ON" : "📍 Joylashuv: OFF";
-  locationToggleBtn.classList.toggle("is-on", isOn);
-}
-
-async function toggleLocationInApp(){
-  const saved = loadSavedLocation();
-  if(saved){
-    const ok = confirm(
-      "📍 Saqlangan joylashuvni o‘chirasizmi?\n\n" +
-      "Eslatma: bu telefoningizdagi GPS (Location) tugmasini o‘chirmaydi — faqat ilova ichida saqlangan joylashuvni tozalaydi."
-    );
-    if(!ok) return;
-    try{ localStorage.removeItem(STORAGE_LOCATION); }catch(e){}
-    updateLocationToggleUI();
-    showToast("📍 Joylashuv o‘chirildi (saqlangan joylashuv tozalandi).", 2500);
-    return;
-  }
-
-  const loc = await getOrAskLocation();
-  if(loc) updateLocationToggleUI();
-}
-
-if(locationToggleBtn){
-  locationToggleBtn.addEventListener("click", toggleLocationInApp);
 }
 
 function startLocationCountdown(seconds){
@@ -707,9 +685,7 @@ function showLocationGuide(){
   const closeBtn= document.getElementById("locGuideClose");
   const dot1    = document.getElementById("locDot1");
   const dot2    = document.getElementById("locDot2");
-  const openSettingsBtn = document.getElementById("locGuideOpenSettings");
-  const tryAgainBtn     = document.getElementById("locGuideTryAgain");
-
+  const settingsBtn = document.getElementById("locGuideSettings");
 
   // If overlay not present, just resolve immediately
   if(!overlay || !imgEl || !textEl || !prevBtn || !nextBtn || !doneBtn){
@@ -752,6 +728,7 @@ function showLocationGuide(){
       nextBtn.onclick = null;
       doneBtn.onclick = null;
       if(closeBtn) closeBtn.onclick = null;
+      if(settingsBtn) settingsBtn.onclick = null;
       overlay.onclick = null;
     };
 
@@ -763,13 +740,11 @@ function showLocationGuide(){
     overlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
 
-    if(openSettingsBtn) openSettingsBtn.onclick = (e)=>{ e.preventDefault(); openLocationSettings(); };
-    if(tryAgainBtn) tryAgainBtn.onclick = async (e)=>{ e.preventDefault(); finish(true); try{ await getOrAskLocation(); }catch(_e){} };
-
     prevBtn.onclick = async (e)=>{ e.preventDefault(); step=Math.max(0, step-1); await render(); };
     nextBtn.onclick = async (e)=>{ e.preventDefault(); step=Math.min(steps.length-1, step+1); await render(); };
     doneBtn.onclick = (e)=>{ e.preventDefault(); finish(true); };
     if(closeBtn) closeBtn.onclick = (e)=>{ e.preventDefault(); finish(true); };
+    if(settingsBtn) settingsBtn.onclick = (e)=>{ e.preventDefault(); openLocationSettings(); showToast("⚙️ Sozlamalar ochildi. Location/GPS ni yoqing va qaytib kelib davom eting.", 3500); };
     overlay.onclick = (e)=>{ if(e.target===overlay) finish(true); };
 
     await render();
@@ -808,13 +783,18 @@ function askLocationChoice(saved){
       resolve(ans);
     };
 
-    descEl.textContent =
-      "Oldingi joylashuv mavjud:\n" +
-      "Lat: " + saved.lat.toFixed(5) + "\n" +
-      "Lng: " + saved.lng.toFixed(5) + "\n\n" +
-      "Qaysi birini yuborasiz?";
+    const savedTime = saved.ts ? new Date(saved.ts).toLocaleString() : "";
+descEl.textContent =
+  "Eski joylashuv saqlangan." +
+  (savedTime ? ("\nVaqt: " + savedTime) : "") +
+  "\n\nAgar hozir ham o‘sha joyda bo‘lsangiz: \n→  '📍 Oldingi joylashuvni yuborish' ni bosing." +
+  "\n\nAgar joylashuvingiz o‘zgargan bo‘lsa: \n→  '📍 Yangi joylashuv yuborish' ni bosing (Telegram joylashuvga ruxsat so‘rashi mumkin)." +
+  "\n\nSaqlangan koordinata:" +
+  "\nLat: " + saved.lat.toFixed(5) +
+  "\nLng: " + saved.lng.toFixed(5) +
+  "\n\nQaysi birini yuborasiz?";
 
-    overlay.classList.remove("hidden");
+overlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
 
     savedBtn.onclick = (e)=>{ e.preventDefault(); finish("saved"); };
@@ -844,6 +824,7 @@ async function getOrAskLocation(){
   try{
     const loc = await getBrowserLocation(LOCATION_TIMEOUT_MS);
     saveLocation(loc);
+    if(typeof renderCustomerInfo==="function") renderCustomerInfo();
     showToast("📍 Joylashuv aniqlandi.", 2000);
     return loc;
   }catch(e){
@@ -852,7 +833,7 @@ async function getOrAskLocation(){
     // GPS o‘chiq / signal yo‘q / timeout holatlarida foydalanuvchini Sozlamaga yo‘naltiramiz
     if(e && typeof e.code === "number" && (e.code === 2 || e.code === 3)){
       const action = await showGpsEnableModal({
-        message: "Please enable your GPS to access location-based features.\n\nTelefoningizda Joylashuv (Location) ON bo‘lsin, so‘ng qayta tekshiring.",
+        message: "📍 Joylashuv aniqlanmayapti (GPS o‘chiq bo‘lishi mumkin).\n\n1) ⚙️ Sozlamalarda Location/GPS ni ON qiling.\n2) Telegramga qaytib keling.\n\nBiz 30 soniya ichida joylashuvni avtomatik aniqlashga harakat qilamiz.",
         showRetry: true
       });
 
@@ -865,6 +846,7 @@ async function getOrAskLocation(){
         try{
           const loc2 = await waitForLocationAfterSettings(LOCATION_TIMEOUT_MS);
           saveLocation(loc2);
+          if(typeof renderCustomerInfo==="function") renderCustomerInfo();
           showToast("📍 Joylashuv aniqlandi.", 2000);
           return loc2;
         }catch(err2){
@@ -878,6 +860,7 @@ async function getOrAskLocation(){
         try{
           const loc3 = await getBrowserLocation(LOCATION_TIMEOUT_MS);
           saveLocation(loc3);
+          if(typeof renderCustomerInfo==="function") renderCustomerInfo();
           showToast("📍 Joylashuv aniqlandi.", 2000);
           return loc3;
         }catch(err3){
@@ -983,10 +966,12 @@ function renderCustomerInfo(){
     info = JSON.parse(localStorage.getItem(STORAGE_CUSTOMER) || "null");
   }catch(e){ info = null; }
   if(info && info.name && info.phone){
-    customerInfoTextEl.textContent =
-      "👤 " + info.name +
-      " • 📱 " + info.phone +
-      (info.address ? " • 📍 " + info.address : "");
+    const savedLoc = loadSavedLocation();
+customerInfoTextEl.textContent =
+  "👤 " + info.name +
+  " • 📱 " + info.phone +
+  (info.address ? " • 📍 " + info.address : "") +
+  (savedLoc ? " • 🧭 Joylashuv saqlangan" : "");
   }else{
     customerInfoTextEl.textContent =
       "Mijoz ma’lumotlari saqlanmagan. Buyurtma berganingizda ism va telefon so‘raladi.";
@@ -1276,8 +1261,13 @@ function toggleCartSheet(force){
   const isOpen = cartSheet.classList.contains("open");
   const next   = typeof force==="boolean" ? force : !isOpen;
   cartSheet.classList.toggle("open", next);
-  cartSheetOverlay.classList.toggle("show", next);
-  cartSheetOverlay.classList.toggle("hidden", !next);
+
+  if(cartSheetOverlay){
+    cartSheetOverlay.classList.toggle("show", next);
+    cartSheetOverlay.style.display = next ? "block" : "none";
+    cartSheetOverlay.style.pointerEvents = next ? "auto" : "none";
+  }
+
   if(next) renderCartItems();
 }
 function renderCartItems(){
@@ -1892,6 +1882,11 @@ customer.preferredTime = preferredTime;
   }
 
   const location = await getOrAskLocation();
+  if(!location){
+    showToast("📍 Joylashuv tasdiqlanmaguncha buyurtma yuborilmaydi. Yangi joylashuvni yuboring yoki eski joylashuvni tanlang.", 5000);
+    return;
+  }
+
 
   let totalPrice = 0;
   const items = cart.map(c=>{
@@ -3094,7 +3089,6 @@ if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.onEvent === 'fu
   // Kuryerlarni ham real-time qilamiz (admin bo‘lmaganda ham DOM bo‘lmasa ishlamaydi)
   subscribeCouriersRealtime();
 
-  updateLocationToggleUI();
   updateCartUI();
 })();
 
@@ -3151,10 +3145,6 @@ window.restoreCourier              = restoreCourier;
  * (either `light` or `dark`).  If Telegram WebApp API is not
  * available, this function does nothing.
  */
-
-// Expose helper to open OS Location settings (Android intent best-effort)
-window.openLocationSettings = openLocationSettings;
-
 function applyTelegramTheme() {
   try {
     if (window.Telegram && Telegram.WebApp) {
