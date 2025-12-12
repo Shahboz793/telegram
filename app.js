@@ -111,31 +111,6 @@ const searchInput        = document.getElementById("searchInput");
 const customerInfoTextEl = document.getElementById("customerInfoText");
 const quickOrderBtn      = document.getElementById("quickOrderBtn");
 
-// LOCATION / TIME MODALS
-const locationChoiceModal  = document.getElementById("locationChoiceModal");
-const locChoiceCloseBtn    = document.getElementById("locChoiceCloseBtn");
-const locChoiceCancelBtn   = document.getElementById("locChoiceCancelBtn");
-const locUseSavedBtn       = document.getElementById("locUseSavedBtn");
-const locUseNewBtn         = document.getElementById("locUseNewBtn");
-const locChoiceSavedBox    = document.getElementById("locChoiceSavedBox");
-const locSavedText         = document.getElementById("locSavedText");
-
-const locationGuideModal   = document.getElementById("locationGuideModal");
-const locGuideCloseBtn     = document.getElementById("locGuideCloseBtn");
-const locGuideText         = document.getElementById("locGuideText");
-const locGuideImg          = document.getElementById("locGuideImg");
-const locGuideNextBtn      = document.getElementById("locGuideNextBtn");
-const locGuideStartBtn     = document.getElementById("locGuideStartBtn");
-const locStepDot1          = document.getElementById("locStepDot1");
-const locStepDot2          = document.getElementById("locStepDot2");
-
-const timeModal            = document.getElementById("timeModal");
-const timeCloseBtn         = document.getElementById("timeCloseBtn");
-const timeInput            = document.getElementById("timeInput");
-const timeChips            = document.getElementById("timeChips");
-const timeOkBtn            = document.getElementById("timeOkBtn");
-const timeCancelBtn        = document.getElementById("timeCancelBtn");
-
 const productDetailOverlay = document.getElementById("productDetailOverlay");
 const detailImageEl        = document.getElementById("detailImage");
 const detailCategoryEl     = document.getElementById("detailCategory");
@@ -258,6 +233,9 @@ function toggleFavorite(index){
   renderProducts();
   renderFavoritesPage();
 }
+
+window.toggleFavorite = toggleFavorite;
+
 function renderFavoritesPage(){
   const favGrid = document.getElementById("favoritesGrid");
   if(!favGrid) return;
@@ -278,13 +256,13 @@ function renderFavoritesPage(){
     let imgHtml;
     if(firstImage.startsWith(RAW_PREFIX)){
       const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
-      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
+      imgHtml = `<img src="${base}.png" alt="${p.name}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${base}.jpg';">`;
     }else{
-      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
+      imgHtml = `<img src="${firstImage}" alt="${p.name}" loading="lazy" decoding="async">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     const favActive = favorites.includes(idx);
-    const favIcon = favActive ? "💚" : "🤍";
+    const favIcon = favActive ? "❤️" : "🤍";
     favGrid.innerHTML += `
       <article class="product-card" onclick="openProductDetail(${idx})">
         <div class="product-img-wrap">
@@ -338,13 +316,13 @@ const adminTagEl           = document.getElementById("adminTag");
 const adminDescriptionEl   = document.getElementById("adminDescription");
 const adminImagesEl        = document.getElementById("adminImages");
 
+// Yangi: bir nechta qo‘shimcha mahsulotlar ro‘yxati uchun admin DOM
+const adminExtrasContainer  = document.getElementById("adminExtrasContainer");
+const adminExtraAddBtn      = document.getElementById("adminExtraAddBtn");
+
 // Yangi: qo‘shimcha mahsulot (set) uchun admin maydonlari
 const adminSetNameEl       = document.getElementById("adminSetName");
 const adminSetPriceEl      = document.getElementById("adminSetPrice");
-// Yangi: bir nechta qo‘shimcha mahsulotlar (extras) uchun admin DOM
-const adminExtraAddBtn     = document.getElementById("adminExtraAddBtn");
-const adminExtrasContainer = document.getElementById("adminExtrasContainer");
-
 
 // ADMIN CATEGORY FORM
 const adminCatCodeEl      = document.getElementById("adminCatCode");
@@ -379,15 +357,6 @@ function formatPrice(v){
   return (v || 0).toLocaleString("uz-UZ");
 }
 
-function escapeHtml(s){
-  return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
 function showToast(message, duration = 1800){
   if(!toastEl) return;
   toastEl.textContent = message;
@@ -395,183 +364,6 @@ function showToast(message, duration = 1800){
   if(showToast._timer) clearTimeout(showToast._timer);
   showToast._timer = setTimeout(()=>toastEl.classList.remove("show"), duration);
 }
-
-// =========================
-//  SIMPLE MODAL HELPERS
-// =========================
-function openOverlay(el){
-  if(!el) return;
-  el.classList.remove("hidden");
-  el.setAttribute("aria-hidden","false");
-}
-function closeOverlay(el){
-  if(!el) return;
-  el.classList.add("hidden");
-  el.setAttribute("aria-hidden","true");
-}
-
-function setImgWithFallback(imgEl, baseName){
-  if(!imgEl) return;
-  const exts = ["png","jpg","jpeg","webp"];
-  let i = 0;
-  const tryNext = ()=>{
-    if(i >= exts.length){
-      imgEl.removeAttribute("src");
-      return;
-    }
-    imgEl.src = `images/${baseName}.${exts[i++]}`;
-  };
-  imgEl.onerror = ()=> tryNext();
-  tryNext();
-}
-
-function chooseLocationMode(saved){
-  return new Promise(resolve=>{
-    // saved bo‘lsa ko‘rsatamiz, bo‘lmasa faqat "yangi" chiqadi
-    if(locChoiceSavedBox){
-      if(saved){
-        locChoiceSavedBox.classList.remove("hidden");
-      }else{
-        locChoiceSavedBox.classList.add("hidden");
-      }
-    }
-    if(locSavedText){
-      if(saved){
-        const acc = saved.accuracy ? `, aniqlik: ±${Math.round(saved.accuracy)}m` : "";
-        locSavedText.textContent = `Lat: ${saved.lat.toFixed(5)}, Lng: ${saved.lng.toFixed(5)}${acc}`;
-      }else{
-        locSavedText.textContent = "—";
-      }
-    }
-
-    openOverlay(locationChoiceModal);
-
-    const cleanup = ()=>{
-      if(locUseSavedBtn) locUseSavedBtn.onclick = null;
-      if(locUseNewBtn) locUseNewBtn.onclick = null;
-      if(locChoiceCancelBtn) locChoiceCancelBtn.onclick = null;
-      if(locChoiceCloseBtn) locChoiceCloseBtn.onclick = null;
-    };
-
-    if(locUseSavedBtn){
-      locUseSavedBtn.onclick = ()=>{
-        cleanup();
-        closeOverlay(locationChoiceModal);
-        resolve("saved");
-      };
-    }
-    if(locUseNewBtn){
-      locUseNewBtn.onclick = ()=>{
-        cleanup();
-        closeOverlay(locationChoiceModal);
-        resolve("new");
-      };
-    }
-    const cancel = ()=>{
-      cleanup();
-      closeOverlay(locationChoiceModal);
-      resolve(null);
-    };
-    if(locChoiceCancelBtn) locChoiceCancelBtn.onclick = cancel;
-    if(locChoiceCloseBtn)  locChoiceCloseBtn.onclick  = cancel;
-  });
-}
-
-function showLocationGuide(){
-  return new Promise(resolve=>{
-    let step = 1;
-    function render(){
-      if(step===1){
-        if(locGuideText) locGuideText.textContent = "1) Telefoningiz yuqori qismidan panelni pastga tushiring.";
-        if(locStepDot1) locStepDot1.classList.add("active");
-        if(locStepDot2) locStepDot2.classList.remove("active");
-        if(locGuideNextBtn) locGuideNextBtn.classList.remove("hidden");
-        if(locGuideStartBtn) locGuideStartBtn.classList.add("hidden");
-        setImgWithFallback(locGuideImg, "rasm1");
-      }else{
-        if(locGuideText) locGuideText.textContent = "2) 'Joylashuv / Location' tugmasini bosing (yoqing).";
-        if(locStepDot1) locStepDot1.classList.remove("active");
-        if(locStepDot2) locStepDot2.classList.add("active");
-        if(locGuideNextBtn) locGuideNextBtn.classList.add("hidden");
-        if(locGuideStartBtn) locGuideStartBtn.classList.remove("hidden");
-        setImgWithFallback(locGuideImg, "rasm2");
-      }
-    }
-
-    openOverlay(locationGuideModal);
-    render();
-
-    const cleanup = ()=>{
-      if(locGuideNextBtn) locGuideNextBtn.onclick = null;
-      if(locGuideStartBtn) locGuideStartBtn.onclick = null;
-      if(locGuideCloseBtn) locGuideCloseBtn.onclick = null;
-    };
-
-    if(locGuideNextBtn){
-      locGuideNextBtn.onclick = ()=>{
-        step = 2;
-        render();
-      };
-    }
-    if(locGuideStartBtn){
-      locGuideStartBtn.onclick = ()=>{
-        cleanup();
-        closeOverlay(locationGuideModal);
-        resolve(true);
-      };
-    }
-    const cancel = ()=>{
-      cleanup();
-      closeOverlay(locationGuideModal);
-      resolve(false);
-    };
-    if(locGuideCloseBtn) locGuideCloseBtn.onclick = cancel;
-  });
-}
-
-function askPreferredTimeModal(defaultVal=""){
-  return new Promise(resolve=>{
-    if(timeInput) timeInput.value = defaultVal || "";
-    openOverlay(timeModal);
-
-    const cleanup = ()=>{
-      if(timeOkBtn) timeOkBtn.onclick = null;
-      if(timeCancelBtn) timeCancelBtn.onclick = null;
-      if(timeCloseBtn) timeCloseBtn.onclick = null;
-    };
-
-    if(timeChips){
-      timeChips.onclick = (e)=>{
-        const btn = e.target.closest(".ff-chip");
-        if(!btn) return;
-        const v = btn.dataset.val || "";
-        if(timeInput) timeInput.value = v;
-      };
-    }
-
-    const ok = ()=>{
-      const v = (timeInput ? timeInput.value : "").trim();
-      if(!v){
-        showToast("⏰ Yetkazish vaqtini kiriting (masalan: 18:00 yoki 30 minut).", 2500);
-        return;
-      }
-      cleanup();
-      closeOverlay(timeModal);
-      resolve(v);
-    };
-
-    const cancel = ()=>{
-      cleanup();
-      closeOverlay(timeModal);
-      resolve(null);
-    };
-
-    if(timeOkBtn) timeOkBtn.onclick = ok;
-    if(timeCancelBtn) timeCancelBtn.onclick = cancel;
-    if(timeCloseBtn) timeCloseBtn.onclick = cancel;
-  });
-}
-
 
 /* GEOLOCATION — JOYLASHUV */
 function loadSavedLocation(){
@@ -627,30 +419,161 @@ function getBrowserLocation(timeoutMs = 7000){
   });
 }
 
-async function getOrAskLocation(){
-  const saved = loadSavedLocation();
+function setImgWithFallback(imgEl, basePathNoExt){
+  const exts = ["png","jpg","jpeg","webp"];
+  let i = 0;
+  const apply = ()=>{
+    imgEl.src = `${basePathNoExt}.${exts[i]}`;
+  };
+  imgEl.onerror = ()=>{
+    i++;
+    if(i < exts.length) apply();
+  };
+  apply();
+}
 
-  // Agar oldingi lokatsiya bo‘lsa — foydalanuvchiga tanlatamiz
-  if(saved){
-    const mode = await chooseLocationMode(saved);
-    if(mode === "saved"){
-      return saved;
-    }
-    if(mode === null){
-      return null;
-    }
-    // mode === "new" bo‘lsa davom etamiz
-  }else{
-    // saqlangan lokatsiya yo‘q bo‘lsa ham tanlash oynasini ko‘rsatamiz (yangi / bekor)
-    const mode = await chooseLocationMode(null);
-    if(mode === null) return null;
+function showLocationGuide(){
+  const overlay = document.getElementById("locGuideOverlay");
+  const imgEl   = document.getElementById("locGuideImg");
+  const textEl  = document.getElementById("locGuideText");
+  const prevBtn = document.getElementById("locGuidePrev");
+  const nextBtn = document.getElementById("locGuideNext");
+  const doneBtn = document.getElementById("locGuideDone");
+  const closeBtn= document.getElementById("locGuideClose");
+  const dot1    = document.getElementById("locDot1");
+  const dot2    = document.getElementById("locDot2");
+
+  // If overlay not present, just resolve immediately
+  if(!overlay || !imgEl || !textEl || !prevBtn || !nextBtn || !doneBtn){
+    return Promise.resolve(true);
   }
 
-  // Yo‘riqnoma (2 ta rasm) — tezkor
-  const guideOk = await showLocationGuide();
-  if(!guideOk) return null;
+  const steps = [
+    {
+      imgBase: "images/rasm1",
+      text: "1) Telefoningizda yuqori panelni pastga tushiring.\n\nJoylashuv belgisi (Location) OFF bo‘lsa, uni yoqing."
+    },
+    {
+      imgBase: "images/rasm2",
+      text: "2) Joylashuv (Location) tugmasini bosing — ON bo‘ladi.\n\nKeyin Telegram joylashuvga ruxsat so‘rasa: 'Ruxsat berish / Allow' ni tanlang."
+    }
+  ];
 
-  // Browser geolocation so‘raymiz (Telegram permission chiqadi)
+  let step = 0;
+
+  const render = async ()=>{
+    const s = steps[step];
+    textEl.textContent = s.text;
+    if(dot1 && dot2){
+      dot1.classList.toggle("active", step===0);
+      dot2.classList.toggle("active", step===1);
+    }
+    prevBtn.disabled = step===0;
+    nextBtn.classList.toggle("hidden", step===steps.length-1);
+    doneBtn.classList.toggle("hidden", step!==steps.length-1);
+
+    // rasm1/rasm2: png → jpg → jpeg → webp fallback
+    setImgWithFallback(imgEl, s.imgBase);
+  };
+
+  return new Promise(async (resolve)=>{
+    const cleanup = ()=>{
+      overlay.classList.add("hidden");
+      document.body.style.overflow = "";
+      prevBtn.onclick = null;
+      nextBtn.onclick = null;
+      doneBtn.onclick = null;
+      if(closeBtn) closeBtn.onclick = null;
+      overlay.onclick = null;
+    };
+
+    const finish = (ok)=>{
+      cleanup();
+      resolve(ok);
+    };
+
+    overlay.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+
+    prevBtn.onclick = async (e)=>{ e.preventDefault(); step=Math.max(0, step-1); await render(); };
+    nextBtn.onclick = async (e)=>{ e.preventDefault(); step=Math.min(steps.length-1, step+1); await render(); };
+    doneBtn.onclick = (e)=>{ e.preventDefault(); finish(true); };
+    if(closeBtn) closeBtn.onclick = (e)=>{ e.preventDefault(); finish(true); };
+    overlay.onclick = (e)=>{ if(e.target===overlay) finish(true); };
+
+    await render();
+  });
+}
+
+function askLocationChoice(saved){
+  const overlay = document.getElementById("locChoiceOverlay");
+  const descEl  = document.getElementById("locChoiceDesc");
+  const savedBtn= document.getElementById("locUseSavedBtn");
+  const newBtn  = document.getElementById("locUseNewBtn");
+  const cancel  = document.getElementById("locChoiceCancelBtn");
+
+  if(!overlay || !descEl || !savedBtn || !newBtn || !cancel){
+    // fallback confirm
+    const ok = confirm(
+      "📍 Oldingi joylashuv saqlangan.\n\n" +
+      "Lat: " + saved.lat.toFixed(5) + "\n" +
+      "Lng: " + saved.lng.toFixed(5) + "\n\n" +
+      "OK = Oldingi joylashuv\nCancel = Yangi joylashuv"
+    );
+    return Promise.resolve(ok ? "saved" : "new");
+  }
+
+  return new Promise((resolve)=>{
+    const cleanup = ()=>{
+      overlay.classList.add("hidden");
+      document.body.style.overflow = "";
+      savedBtn.onclick = null;
+      newBtn.onclick = null;
+      cancel.onclick = null;
+      overlay.onclick = null;
+    };
+    const finish = (ans)=>{
+      cleanup();
+      resolve(ans);
+    };
+
+    descEl.textContent =
+      "Oldingi joylashuv mavjud:\n" +
+      "Lat: " + saved.lat.toFixed(5) + "\n" +
+      "Lng: " + saved.lng.toFixed(5) + "\n\n" +
+      "Qaysi birini yuborasiz?";
+
+    overlay.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+
+    savedBtn.onclick = (e)=>{ e.preventDefault(); finish("saved"); };
+    newBtn.onclick   = (e)=>{ e.preventDefault(); finish("new"); };
+    cancel.onclick   = (e)=>{ e.preventDefault(); finish(null); };
+    overlay.onclick  = (e)=>{ if(e.target===overlay) finish(null); };
+  });
+}
+
+async function getOrAskLocation(){
+  let saved = loadSavedLocation();
+
+  if(saved){
+    const choice = await askLocationChoice(saved);
+    if(choice === "saved") return saved;
+    if(choice === null) return null;
+    // choice === "new"
+    try{ localStorage.removeItem(STORAGE_LOCATION); }catch(e){}
+  }
+
+  // Qo‘llanma rasmlarini ko‘rsatamiz (2 ta qadam)
+  await showLocationGuide();
+
+  // Foydalanuvchiga ruxsat so‘rash haqida eslatma
+  const allow = confirm(
+    "📍 Joylashuvni aniqlash uchun Telegram ruxsat so‘raydi.\n\n" +
+    "Iltimos, 'Ruxsat berish / Allow' ni bosing."
+  );
+  if(!allow) return null;
+
   startLocationCountdown(7);
   try{
     const loc = await getBrowserLocation(7000);
@@ -663,7 +586,7 @@ async function getOrAskLocation(){
     if(e && typeof e.code === "number"){
       if(e.code === 1){
         showToast(
-          "⚠️ Joylashuvga ruxsat berilmadi. Telegram so‘raganda 'Allow / Ruxsat berish' ni bosing. Telefon sozlamalarida Telegram → Permissions → Location ni ham 'Allow' qiling.",
+          "⚠️ Joylashuvga ruxsat berilmadi. Telefon sozlamalarida Telegram → Permissions → Location ni 'Allow' qiling.",
           5500
         );
       }else if(e.code === 2){
@@ -673,18 +596,18 @@ async function getOrAskLocation(){
         );
       }else if(e.code === 3){
         showToast(
-          "⚠️ Joylashuv vaqt tugab qoldi (timeout). Internetingizni tekshiring va qayta urinib ko‘ring.",
+          "⚠️ Joylashuv aniqlanishi uzoq davom etdi. Internet/GPS ni tekshirib qayta urinib ko‘ring.",
           5500
         );
       }else{
         showToast(
-          "⚠️ Joylashuv aniqlanmadi. GPS va internetni yoqing, Telegram so‘raganda 'Allow' ni bosing.",
+          "⚠️ Joylashuv aniqlanmadi. GPS va internetni yoqing, Telegram ruxsat so‘raganda 'Allow' ni bosing.",
           5500
         );
       }
     }else{
       showToast(
-        "⚠️ Joylashuv aniqlanmadi. GPS va internetni yoqing, Telegram so‘raganda 'Allow' ni bosing.",
+        "⚠️ Joylashuv aniqlanmadi. GPS va internetni yoqing, Telegram ruxsat so‘raganda 'Allow' ni bosing.",
         5500
       );
     }
@@ -692,53 +615,7 @@ async function getOrAskLocation(){
   }
 }
 
-
 /* RASM URLLARI */
-// =========================================================
-//   ADMIN EXTRAS (bir nechta qo‘shimcha mahsulotlar)
-// =========================================================
-function clearAdminExtras(){
-  if(!adminExtrasContainer) return;
-  adminExtrasContainer.innerHTML = "";
-}
-
-function addAdminExtraRow(nameVal="", priceVal=""){
-  if(!adminExtrasContainer) return;
-  const row = document.createElement("div");
-  row.className = "admin-extra-row";
-  row.innerHTML = `
-    <input class="admin-extra-name" type="text" placeholder="Masalan: sous" value="${escapeHtml(nameVal)}">
-    <input class="admin-extra-price" type="number" placeholder="Narx" value="${priceVal ? priceVal : ""}">
-    <button type="button" class="admin-extra-remove" title="O‘chirish">✕</button>
-  `;
-  const rm = row.querySelector(".admin-extra-remove");
-  if(rm) rm.addEventListener("click", ()=> row.remove());
-  adminExtrasContainer.appendChild(row);
-}
-
-function collectAdminExtras(){
-  if(!adminExtrasContainer) return [];
-  const rows = Array.from(adminExtrasContainer.querySelectorAll(".admin-extra-row"));
-  const extras = [];
-  rows.forEach(r=>{
-    const n = (r.querySelector(".admin-extra-name")?.value || "").trim();
-    const p = parseInt(r.querySelector(".admin-extra-price")?.value || "0", 10);
-    if(n && p>0) extras.push({ name:n, price:p });
-  });
-  return extras;
-}
-
-function loadAdminExtras(extrasArr){
-  clearAdminExtras();
-  if(!Array.isArray(extrasArr) || !extrasArr.length) return;
-  extrasArr.forEach(ex=> addAdminExtraRow(ex?.name || "", ex?.price || ""));
-}
-
-// admin tugma
-if(adminExtraAddBtn){
-  adminExtraAddBtn.addEventListener("click", ()=> addAdminExtraRow());
-}
-
 function normalizeImagesInput(raw){
   if(!raw) return [];
   return raw
@@ -917,9 +794,9 @@ function renderProducts(){
     let imgHtml;
     if(firstImage.startsWith(RAW_PREFIX)){
       const base = firstImage.replace(/\.(png|jpg|jpeg)$/i,"");
-      imgHtml = `<img src="${base}.png" alt="${p.name}" onerror="this.onerror=null;this.src='${base}.jpg';">`;
+      imgHtml = `<img src="${base}.png" alt="${p.name}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${base}.jpg';">`;
     }else{
-      imgHtml = `<img src="${firstImage}" alt="${p.name}">`;
+      imgHtml = `<img src="${firstImage}" alt="${p.name}" loading="lazy" decoding="async">`;
     }
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     // Prepare favorite button state.  Use heart icon filled when this product
@@ -928,11 +805,11 @@ function renderProducts(){
     const favIcon   = favActive ? "💚" : "🤍";
 
     productsGrid.innerHTML += `
-      <article class="product-card" onclick="openProductDetail(${index})">
+      <article class="product-card" onclick="window.openProductDetail(${index})">
         <div class="product-img-wrap">
           ${imgHtml}
           <!-- Like button overlay -->
-          <button class="product-fav-btn ${favActive ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${index});">${favIcon}</button>
+          <button class="product-fav-btn ${favActive ? 'active' : ''}" onclick="(event&&event.stopPropagation?event.stopPropagation():null); window.toggleFavorite(${index});">${favIcon}</button>
           <div class="product-img-tag">
             <span>Beauty</span><span>Pro</span>
           </div>
@@ -1060,13 +937,6 @@ if(searchInput){
 
 /* CART */
 function addToCart(index, qty=1, setQty=0){
-  // detail oynasidan tanlangan extras (per-unit)
-  let extrasForCart = [];
-  const fromDetail = (typeof detailIndex !== "undefined" && detailIndex === index);
-  if(fromDetail && Array.isArray(detailExtrasState)){
-    extrasForCart = detailExtrasState.filter(e=>(e.qty||0)>0).map(e=>({name:e.name, price:e.price, qty:e.qty}));
-  }
-
   if(qty<=0) return;
   // Try to find an existing cart entry with the same product index and set quantity
   const found = cart.find(c=>c.index===index && (c.setQty||0)===setQty);
@@ -1082,12 +952,9 @@ function updateCartUI(){
     const p = products[c.index];
     if(!p) return;
     totalCount += c.qty;
-    // Compute unit price including optional set price va extras (per unit)
+    // Compute unit price including optional set price (if applicable)
     const setUnit   = (c.setQty && p.setPrice) ? p.setPrice : 0;
-    const extraUnit = Array.isArray(c.extras)
-      ? c.extras.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
-      : 0;
-    const unitPrice = (p.price || 0) + setUnit + extraUnit;
+    const unitPrice = (p.price || 0) + setUnit;
     totalPrice += unitPrice * c.qty;
   });
   if(cartCountTopEl) cartCountTopEl.textContent = totalCount;
@@ -1116,23 +983,16 @@ function renderCartItems(){
   cart.forEach(c=>{
     const p = products[c.index];
     if(!p) return;
-    // Compute unit price including optional set price + extras (per unit)
+    // Compute unit price including optional set price
     const setUnit   = (c.setQty && p.setPrice) ? p.setPrice : 0;
-    const extraUnit = Array.isArray(c.extras)
-      ? c.extras.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
-      : 0;
-    const unitPrice = (p.price || 0) + setUnit + extraUnit;
+    const unitPrice = (p.price || 0) + setUnit;
     const lineTotal = unitPrice * c.qty;
     total += lineTotal;
     const catLabel = categoryLabel[p.category] || p.category || "Kategoriya yo‘q";
     // Prepare meta string: show base price and set price separately if needed
     let metaStr = `${formatPrice(p.price)} so‘m • ${catLabel}`;
     if(c.setQty && p.setPrice){
-      metaStr += ` • Qo‘shimcha set: +${formatPrice(p.setPrice)} so‘m`;
-    }
-    if(Array.isArray(c.extras) && c.extras.length){
-      const extrasLabel = c.extras.map(ex=>`${ex.name} ×${ex.qty}`).join(", ");
-      metaStr += ` • Qo‘shimcha: ${extrasLabel}`;
+      metaStr += ` • Qo‘shimcha: +${formatPrice(p.setPrice)} so‘m`;
     }
     html += `
       <div class="cart-item-row">
@@ -1711,13 +1571,13 @@ async function sendOrder(){
     return;
   }
 
-// Har bir buyurtma uchun yetkazish vaqtini so‘raymiz
-const t = await askPreferredTimeModal(customer.preferredTime || "");
-if(t===null){
-  showToast("⏰ Yetkazish vaqti kiritilmadi (bekor qilindi).", 2500);
+// Har bir buyurtmada yetkazish vaqtini so‘raymiz
+const preferredTime = (prompt("⏰ Yetkazish vaqti (masalan: 18:00 yoki 30 minut):") || "").trim();
+if(!preferredTime){
+  showToast("⏰ Yetkazish vaqtini kiriting.", 2500);
   return;
 }
-customer.preferredTime = t;
+customer.preferredTime = preferredTime;
 
   const extraComment = prompt("Buyurtmangizga qo‘shimcha izoh (ixtiyoriy):\nMasalan, eshik kod, pod’ezd, bolalar uxlayapti va h.k.") || "";
   if(extraComment.trim()){
@@ -1728,36 +1588,23 @@ customer.preferredTime = t;
 
   let totalPrice = 0;
   const items = cart.map(c=>{
-  const p = products[c.index];
-  if(!p) return null;
-
-  const setUnit = (c.setQty && p.setPrice) ? p.setPrice : 0;
-  const extraUnit = Array.isArray(c.extras)
-    ? c.extras.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
-    : 0;
-  const unitPrice = (p.price || 0) + setUnit + extraUnit;
-  const lineTotal = unitPrice * c.qty;
-
-  totalPrice += lineTotal;
-
-  return {
-    name: p.name || "",
-    qty: c.qty,
-    price: unitPrice,            // unit price (asosiy + set + extras)
-    basePrice: p.price || 0,      // faqat asosiy
-    category: p.category || "",
-    setQty: c.setQty || 0,
-    setName: (c.setQty && p.setName) ? p.setName : null,
-    setPrice: (c.setQty && p.setPrice) ? p.setPrice : 0,
-    extras: Array.isArray(c.extras) ? c.extras : [],
-    lineTotal
-  };
-}).filter(Boolean);
+    const p = products[c.index];
+    if(!p) return null;
+    const lineTotal = p.price*c.qty;
+    totalPrice += lineTotal;
+    return {
+      name:p.name || "",
+      qty:c.qty,
+      price:p.price || 0,
+      category:p.category || ""
+    };
+  }).filter(Boolean);
 
   try{
     const payload = {
       clientId,
       customer,
+      preferredTime,
       items,
       totalPrice,
       status:"pending",
@@ -1974,6 +1821,50 @@ function flashAdminButton(text){
       : "➕ Mahsulotni qo‘shish (Firestore)";
   }, 1500);
 }
+
+function createAdminExtraRow(extra){
+  if(!adminExtrasContainer) return;
+  const row = document.createElement("div");
+  row.className = "admin-extra-row";
+  row.innerHTML =
+    '<input type="text" class="admin-extra-name" placeholder="Nom (masalan, sous)">' +
+    '<input type="number" class="admin-extra-price" placeholder="Narx">' +
+    '<button type="button" class="admin-extra-remove">✕</button>';
+  const nameInput  = row.querySelector(".admin-extra-name");
+  const priceInput = row.querySelector(".admin-extra-price");
+  if(extra){
+    if(nameInput)  nameInput.value  = extra.name  || "";
+    if(priceInput) priceInput.value = extra.price || "";
+  }
+  const removeBtn = row.querySelector(".admin-extra-remove");
+  if(removeBtn){
+    removeBtn.addEventListener("click", ()=> row.remove());
+  }
+  adminExtrasContainer.appendChild(row);
+}
+
+function collectAdminExtras(){
+  const extras = [];
+  if(!adminExtrasContainer) return extras;
+  const rows = adminExtrasContainer.querySelectorAll(".admin-extra-row");
+  rows.forEach(row=>{
+    const nameInput  = row.querySelector(".admin-extra-name");
+    const priceInput = row.querySelector(".admin-extra-price");
+    const name  = nameInput ? nameInput.value.trim() : "";
+    const price = priceInput ? parseInt(priceInput.value || "0",10) : 0;
+    if(name && price>0){
+      extras.push({ name, price });
+    }
+  });
+  return extras;
+}
+
+if(adminExtraAddBtn){
+  adminExtraAddBtn.addEventListener("click", ()=>{
+    createAdminExtraRow();
+  });
+}
+
 async function addCustomProduct(){
   const name        = adminNameEl.value.trim();
   const category    = adminCategoryEl.value;
@@ -2017,7 +1908,8 @@ async function addCustomProduct(){
     payload.setName  = setNameInput;
     payload.setPrice = setPriceInput;
   }
-  // Yangi: bir nechta qo‘shimcha mahsulotlar (extras)
+
+  // Yangi: bir nechta qo‘shimcha mahsulotlar (extras) ro‘yxatini payloadga qo‘shamiz
   const extras = collectAdminExtras();
   if(extras.length){
     payload.extras = extras;
@@ -2057,6 +1949,7 @@ async function addCustomProduct(){
     // Reset qo‘shimcha maydonlari
     if(adminSetNameEl)  adminSetNameEl.value  = "";
     if(adminSetPriceEl) adminSetPriceEl.value = "";
+    if(adminExtrasContainer) adminExtrasContainer.innerHTML = "";
   }catch(e){
     console.error("Mahsulot saqlash xato:", e);
     showToast("⚠️ Mahsulot saqlashda xato.");
@@ -2120,8 +2013,6 @@ function editProduct(id){
   // Qo‘shimcha maydonlarini to‘ldirish
   if(adminSetNameEl)  adminSetNameEl.value  = p.setName || "";
   if(adminSetPriceEl) adminSetPriceEl.value = p.setPrice || "";
-  // Yangi: bir nechta qo‘shimcha mahsulotlarni to‘ldirish
-  loadAdminExtras(p.extras || []);
   const btn = document.querySelector(".admin-btn");
   if(btn) btn.textContent = "💾 Mahsulotni saqlash (tahrirlash)";
   showToast("✏️ Tahrirlash rejimi.");
@@ -2173,10 +2064,7 @@ function updateDetailPriceUI(){
   const basePrice    = p.price || 0;
   const baseOldPrice = p.oldPrice || null;
   const setPart      = (detailSetQty > 0 && p.setPrice) ? p.setPrice : 0;
-  const extrasPart   = Array.isArray(detailExtrasState)
-    ? detailExtrasState.reduce((sum, ex)=> sum + (ex.price||0) * (ex.qty||0), 0)
-    : 0;
-  const perUnit      = basePrice + setPart + extrasPart;
+  const perUnit      = basePrice + setPart;
   const total        = perUnit * qty;
 
   if(detailPriceEl){
@@ -2361,6 +2249,10 @@ function openProductDetail(index){
   const detailBody = document.querySelector(".detail-body");
   if(detailBody) detailBody.scrollTop = 0;
 }
+
+// Make sure detail open works with inline onclick
+window.openProductDetail = openProductDetail;
+
 function closeProductDetail(){
   clearDetailCountdown();
   setImageFullscreen(false);
@@ -2838,8 +2730,22 @@ async function clientConfirmOrder(orderId, received){
   // respects dark/light mode and Telegram colors when running inside
   // Telegram.  We invoke this here before other rendering logic so
   // that colors are set early.
-  applyTelegramTheme();
-  if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.onEvent === 'function') {
+applyTelegramTheme();
+
+// Telegram WebApp init: ilova Telegram ichida ishlayotgan bo'lsa,
+// uni to'liq ekran qilish va vertikal swipe'larni o'chirish.
+try{
+  if(window.Telegram && Telegram.WebApp){
+    const tg = Telegram.WebApp;
+    if(typeof tg.ready === "function") tg.ready();
+    if(typeof tg.expand === "function") tg.expand();
+    if(typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes();
+  }
+}catch(e){
+  console.warn("Telegram WebApp init error:", e);
+}
+
+if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.onEvent === 'function') {
     // Listen for theme changes while the app is open.  When the
     // user changes Telegram’s theme, update our CSS variables.
     Telegram.WebApp.onEvent('themeChanged', applyTelegramTheme);
