@@ -12,12 +12,6 @@
   <!-- STYLE -->
   <!-- Updated to point to the correct CSS file provided by the user -->
   <link rel="stylesheet" href="style.css" />
-
-  <style>
-    /* FIX: overlay default hidden */
-    #cartSheetOverlay.overlay{ display:none; pointer-events:none; }
-    #cartSheetOverlay.overlay.show{ display:block; pointer-events:auto; }
-  </style>
 </head>
 
 <body>
@@ -153,20 +147,6 @@
                 <label>Qo‘shimcha nom <input id="adminSetName" type="text" placeholder="Masalan: salat, sous"></label>
                 <label>Qo‘shimcha narx <input id="adminSetPrice" type="number" placeholder="Qo‘shimcha narx"></label>
 
-                <!-- Yangi: bir nechta qo‘shimcha mahsulot qo‘shish uchun dinamik ro‘yxat -->
-                <div class="admin-extras-block">
-                  <div class="admin-extras-head">
-                    <span>Qo‘shimcha mahsulotlar ro‘yxati</span>
-                    <button type="button" class="btn-xs btn-xs-secondary" id="adminExtraAddBtn">➕ Qo‘shish</button>
-                  </div>
-                  <div id="adminExtrasContainer" class="admin-extras-container">
-                    <!-- Qo‘shimcha mahsulot qatorlari JS orqali qo‘shiladi -->
-                  </div>
-                  <p class="admin-extras-hint">
-                    Masalan: salat – 5 000, sous – 3 000, ichimlik – 10 000 va hokazo. Istagancha qo‘shishingiz mumkin.
-                  </p>
-                </div>
-
               </div>
 
               <button class="btn-primary btn-full" onclick="addCustomProduct()">
@@ -255,7 +235,7 @@
   </div>
 
   <!-- CART SHEET -->
-  <div id="cartSheetOverlay" class="overlay" onclick="toggleCartSheet(false)" style="display:none;pointer-events:none;"></div>
+  <div id="cartSheetOverlay" class="overlay" onclick="toggleCartSheet(false)"></div>
 
   <aside id="cartSheet" class="cart-sheet">
     <header>
@@ -352,46 +332,7 @@
     </div>
   </div>
 
-  <!-- LOCATION CHOICE (saved vs new) -->
-<div id="locChoiceOverlay" class="loc-choice-overlay hidden">
-  <div class="loc-choice-card">
-    <div class="loc-choice-title">📍 Joylashuvni yuborish</div>
-    <div id="locChoiceDesc" class="loc-choice-desc"></div>
-    <div class="loc-choice-actions">
-      <button id="locUseSavedBtn" class="btn loc-btn-primary">📍 Oldingi joylashuvni yuborish</button>
-      <button id="locUseNewBtn" class="btn loc-btn-secondary">📍 Yangi joylashuv yuborish</button>
-    </div>
-    <button id="locChoiceCancelBtn" class="loc-choice-cancel">Bekor qilish</button>
-  </div>
-</div>
-
-<!-- LOCATION GUIDE (2-step images) -->
-<div id="locGuideOverlay" class="loc-guide-overlay hidden">
-  <div class="loc-guide-card">
-    <div class="loc-guide-head">
-      <div class="loc-guide-title">Joylashuvni yoqing</div>
-      <button id="locGuideClose" class="loc-guide-close" aria-label="Yopish">✕</button>
-    </div>
-
-    <img id="locGuideImg" class="loc-guide-img" src="" alt="Joylashuv yoqish yo‘riqnomasi" loading="lazy" decoding="async">
-
-    <div id="locGuideText" class="loc-guide-text"></div>
-
-    <div class="loc-guide-actions">
-      <button id="locGuidePrev" class="btn loc-btn-secondary">Orqaga</button>
-      <button id="locGuideSettings" class="btn loc-btn-secondary">⚙️ Sozlamalar</button>
-      <button id="locGuideNext" class="btn loc-btn-primary">Keyingi</button>
-      <button id="locGuideDone" class="btn loc-btn-primary hidden">Tushunarli</button>
-    </div>
-
-    <div class="loc-guide-dots">
-      <span id="locDot1" class="loc-dot active"></span>
-      <span id="locDot2" class="loc-dot"></span>
-    </div>
-  </div>
-</div>
-
-<!-- Telegram WebApp SDK for better integration inside Telegram mobile app -->
+  <!-- Telegram WebApp SDK for better integration inside Telegram mobile app -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <!-- APP SCRIPT -->
