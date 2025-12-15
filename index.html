@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Telegram WebApp Video Player</title>
+  <title>YT Player WebApp</title>
 
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -13,10 +13,10 @@
       color-scheme: dark;
       --bg:#0b0c10;
       --card:rgba(255,255,255,.07);
-      --stroke:rgba(255,255,255,.12);
+      --stroke:rgba(255,255,255,.14);
       --muted:rgba(255,255,255,.72);
-      --accent1:#ff3b3b;
-      --accent2:#ff7a18;
+      --a1:#ff3b3b;
+      --a2:#ff7a18;
     }
     *{box-sizing:border-box}
     body{
@@ -36,15 +36,15 @@
       border:1px solid var(--stroke);
       backdrop-filter: blur(10px);
     }
-    .brand{display:flex;flex-direction:column;gap:2px}
+    .brand{display:flex;flex-direction:column;gap:2px;min-width:0}
     .brand .t{font-weight:900}
-    .brand .s{font-size:12px;color:var(--muted)}
+    .brand .s{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .pill{
       padding:8px 10px;border-radius:999px;
       border:1px solid var(--stroke);
       background:rgba(255,255,255,.06);
       font-size:12px;color:var(--muted);white-space:nowrap;
-      max-width: 50%;
+      max-width: 52%;
       overflow:hidden;text-overflow:ellipsis;
     }
 
@@ -65,7 +65,7 @@
       cursor:pointer;
     }
     .tab.active{
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      background: linear-gradient(135deg, var(--a1), var(--a2));
       border-color: rgba(255,255,255,.18);
     }
 
@@ -85,7 +85,7 @@
     }
     .btn{
       padding:12px 14px;border-radius:14px;border:0;
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      background: linear-gradient(135deg, var(--a1), var(--a2));
       color:#fff;font-weight:900;cursor:pointer;
       white-space:nowrap;
     }
@@ -110,7 +110,7 @@
       background:rgba(255,255,255,.06);
     }
     .left{min-width:0}
-    .name{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55vw}
+    .name{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:56vw}
     .url{color:var(--muted);font-size:12px;word-break:break-all;margin-top:6px}
     .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 
@@ -132,14 +132,18 @@
     }
     #pTitle{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
     #pBody{position:absolute;inset:0; padding-top:64px;}
-    #pBody iframe, #pBody video{
-      width:100%;height:100%;border:0;background:#000;
+    #frameWrap{position:absolute;inset:0;}
+    #frameWrap iframe{
+      width:100%;height:100%;
+      border:0;background:#000;
     }
-    .mini{
-      font-size:12px;color:var(--muted);
-      padding:8px 10px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
+
+    /* Pseudo-landscape (agar orientation lock bo‘lmasa) */
+    body.pseudo-landscape #frameWrap{
+      position:absolute; left:50%; top:50%;
+      width:100vh; height:100vw;
+      transform: translate(-50%,-50%) rotate(90deg);
+      transform-origin:center;
     }
   </style>
 </head>
@@ -147,8 +151,8 @@
   <div class="app" id="app">
     <div class="top">
       <div class="brand">
-        <div class="t">Video WebApp</div>
-        <div class="s" id="statusLine">Telegram WebApp orqali oching</div>
+        <div class="t">YT Player WebApp</div>
+        <div class="s" id="statusLine">Bot Menu Button orqali oching</div>
       </div>
       <div class="pill" id="userPill">User: —</div>
     </div>
@@ -167,12 +171,8 @@
           <button class="btn ghost" id="importBtn" type="button">Import</button>
         </div>
         <div class="sep"></div>
-        <div class="muted">
-          YouTube link (watch/youtu.be/shorts) qo‘shing. “Play” bosilganda WebApp ichida player ochiladi.
-          Fullscreen/landscape bloklansa, “YouTube’da ochish” tugmasi orqali tashqarida oching.
-        </div>
+        <div class="muted" id="capNote"></div>
       </div>
-
       <div class="list" id="list"></div>
     </div>
 
@@ -183,12 +183,18 @@
           <input class="input" id="titleInput" placeholder="Video nomi (masalan: 1-dars)" />
         </div>
         <div class="row" style="margin-top:10px">
-          <input class="input" id="urlInput" placeholder="YouTube link (https://youtu.be/... yoki https://www.youtube.com/watch?v=...)" />
+          <input class="input" id="urlInput" placeholder="YouTube link (watch/youtu.be/shorts)" />
         </div>
         <div class="row" style="margin-top:10px">
           <button class="btn" id="saveBtn" type="button">Saqlash</button>
           <button class="btn danger" id="clearBtn" type="button">Tozalash</button>
-          <span class="mini" id="hintMini">Saqlash localStorage’da</span>
+        </div>
+        <div class="sep"></div>
+        <div class="muted">
+          Misollar (code ichida):
+          <br><code>https://youtu.be/VIDEO_ID</code>
+          <br><code>https://www.youtube.com/watch?v=VIDEO_ID</code>
+          <br><code>https://www.youtube.com/shorts/VIDEO_ID</code>
         </div>
       </div>
     </div>
@@ -200,18 +206,19 @@
       <button class="btn ghost" id="pBack" type="button">← Orqaga</button>
       <div id="pTitle">—</div>
       <div class="row" style="justify-content:flex-end">
+        <button class="btn ghost" id="pPseudo" type="button">Rotate</button>
         <button class="btn ghost" id="pLand" type="button">Landscape</button>
         <button class="btn ghost" id="pFull" type="button">Fullscreen</button>
         <button class="btn" id="pOpen" type="button">YouTube’da ochish</button>
       </div>
     </div>
-    <div id="pBody"></div>
+    <div id="pBody">
+      <div id="frameWrap"></div>
+    </div>
   </div>
 
   <script>
-    /* =====================
-       Telegram init
-    ====================== */
+    /* ===== Telegram init ===== */
     const tg = window.Telegram?.WebApp;
     try {
       tg?.ready?.();
@@ -224,30 +231,35 @@
 
     const userPill = document.getElementById("userPill");
     const statusLine = document.getElementById("statusLine");
+    const capNote = document.getElementById("capNote");
 
     const user = tg?.initDataUnsafe?.user || null;
+    const tgVer = tg?.version ? String(tg.version) : "unknown";
+
     if (user) {
       const name = [user.first_name, user.last_name].filter(Boolean).join(" ");
       userPill.textContent = `User: ${name || "—"} (${user.id})`;
-      statusLine.textContent = "WebApp ulandi";
+      statusLine.textContent = `WebApp ulandi (TG API v${tgVer})`;
     } else {
       userPill.textContent = "User: aniqlanmadi";
-      statusLine.textContent = "Eslatma: Botdan WebApp qilib oching";
+      statusLine.textContent = "Eslatma: bot Menu Button orqali WebApp oching";
     }
 
-    /* =====================
-       Storage
-    ====================== */
-    const KEY = "yt_webapp_videos_v1";
+    const hasTgFs = typeof tg?.requestFullscreen === "function";
+    capNote.textContent =
+      hasTgFs
+        ? "Fullscreen: Telegram API mavjud. Landscape tugmasi ishlashi ehtimoli yuqori."
+        : "Sizda Telegram Fullscreen API ko‘rinmayapti (eski Telegram bo‘lishi mumkin). Fullscreen/landscape cheklanishi mumkin; kerak bo‘lsa Telegram’ni yangilang. (Mini Apps full-screen API keyinroq qo‘shilgan.)";
+
+    /* ===== Storage ===== */
+    const KEY = "yt_webapp_videos_v2";
 
     function loadItems() {
       try {
         const raw = localStorage.getItem(KEY);
         const arr = raw ? JSON.parse(raw) : [];
         return Array.isArray(arr) ? arr : [];
-      } catch {
-        return [];
-      }
+      } catch { return []; }
     }
     function saveItems(arr) {
       localStorage.setItem(KEY, JSON.stringify(arr));
@@ -258,18 +270,11 @@
 
     let items = loadItems();
     if (!items.length) {
-      items = [{
-        id: makeId(),
-        title: "Namuna video",
-        url: "https://youtu.be/dQw4w9WgXcQ",
-        createdAt: Date.now()
-      }];
+      items = [{ id: makeId(), title: "Namuna video", url: "https://youtu.be/dQw4w9WgXcQ", createdAt: Date.now() }];
       saveItems(items);
     }
 
-    /* =====================
-       Tabs
-    ====================== */
+    /* ===== Tabs ===== */
     const tabView = document.getElementById("tabView");
     const tabAdd  = document.getElementById("tabAdd");
     const viewPanel = document.getElementById("viewPanel");
@@ -285,51 +290,51 @@
     tabView.onclick = () => setTab("view");
     tabAdd.onclick  = () => setTab("add");
 
-    /* =====================
-       Helpers (YouTube)
-    ====================== */
+    /* ===== Helpers (YouTube) ===== */
     function normalizeUrl(u) {
       u = (u || "").trim();
       if (!u) return "";
       if (/^youtu\.be\//i.test(u)) u = "https://" + u;
-      if (/^www\.youtube\.com\//i.test(u)) u = "https://" + u;
       if (/^youtube\.com\//i.test(u)) u = "https://" + u;
+      if (/^www\.youtube\.com\//i.test(u)) u = "https://" + u;
       return u;
     }
 
-    function toEmbed(url) {
+    function extractYouTubeId(url) {
       try {
         const u = new URL(url);
         const host = u.hostname.replace(/^www\./, "");
-        // youtu.be/ID
         if (host === "youtu.be") {
           const id = u.pathname.replace("/", "");
-          if (!id) return "";
-          return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+          return id || "";
         }
-        // youtube.com/watch?v=ID
         if (host === "youtube.com" || host === "m.youtube.com") {
-          const id = u.searchParams.get("v");
-          if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
-          // /shorts/ID
+          const v = u.searchParams.get("v");
+          if (v) return v;
           const m = u.pathname.match(/\/shorts\/([^\/]+)/i);
-          if (m) return `https://www.youtube.com/embed/${m[1]}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+          if (m) return m[1];
         }
       } catch {}
       return "";
     }
 
-    /* =====================
-       Render list
-    ====================== */
-    const listEl = document.getElementById("list");
-    const searchEl = document.getElementById("search");
+    function toEmbed(url) {
+      const id = extractYouTubeId(url);
+      if (!id) return "";
+      // YouTube iframe fullscreen tugmasi WebView’da ko‘p hollarda cheklanadi,
+      // shuning uchun biz custom fullscreen qilamiz. Parametrlar:
+      return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&fs=1&rel=0&modestbranding=1`;
+    }
 
     function esc(s) {
       return String(s||"")
         .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
         .replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
+
+    /* ===== Render list ===== */
+    const listEl = document.getElementById("list");
+    const searchEl = document.getElementById("search");
 
     function render() {
       const q = (searchEl.value || "").trim().toLowerCase();
@@ -373,25 +378,20 @@
       if (act === "del") delItem(it);
     });
 
-    /* =====================
-       Add / edit / delete
-    ====================== */
+    /* ===== Add / edit / delete ===== */
     const titleInput = document.getElementById("titleInput");
     const urlInput   = document.getElementById("urlInput");
     const saveBtn    = document.getElementById("saveBtn");
     const clearBtn   = document.getElementById("clearBtn");
 
-    function resetForm() {
-      titleInput.value = "";
-      urlInput.value = "";
-    }
+    function resetForm(){ titleInput.value=""; urlInput.value=""; }
 
     saveBtn.onclick = () => {
       const title = (titleInput.value || "").trim();
       const url = normalizeUrl(urlInput.value || "");
-      if (!title) { alert("Video nomini kiriting."); return; }
-      if (!url) { alert("YouTube link kiriting."); return; }
-      if (!toEmbed(url)) { alert("YouTube link noto‘g‘ri (watch/youtu.be/shorts format bo‘lsin)."); return; }
+      if (!title) return alert("Video nomini kiriting.");
+      if (!url) return alert("YouTube link kiriting.");
+      if (!toEmbed(url)) return alert("YouTube link noto‘g‘ri (watch/youtu.be/shorts bo‘lsin).");
 
       items.push({ id: makeId(), title, url, createdAt: Date.now() });
       saveItems(items);
@@ -399,42 +399,34 @@
       setTab("view");
       render();
     };
-
     clearBtn.onclick = resetForm;
 
-    function editItem(it) {
+    function editItem(it){
       const t = prompt("Yangi nom:", it.title || "");
       if (t === null) return;
       const u = prompt("Yangi YouTube link:", it.url || "");
       if (u === null) return;
 
       const nu = normalizeUrl(u);
-      if (!toEmbed(nu)) { alert("YouTube link noto‘g‘ri."); return; }
-
+      if (!toEmbed(nu)) return alert("YouTube link noto‘g‘ri.");
       it.title = (t || "").trim() || it.title;
       it.url = nu;
       saveItems(items);
       render();
     }
 
-    function delItem(it) {
+    function delItem(it){
       if (!confirm(`O‘chirish: "${it.title}" ?`)) return;
       items = items.filter(x => x.id !== it.id);
       saveItems(items);
       render();
     }
 
-    /* =====================
-       Export / Import
-    ====================== */
+    /* ===== Export / Import ===== */
     document.getElementById("exportBtn").onclick = async () => {
       const data = JSON.stringify(items, null, 2);
-      try {
-        await navigator.clipboard.writeText(data);
-        alert("Export clipboardga nusxa olindi.");
-      } catch {
-        prompt("Quyidagini nusxa oling:", data);
-      }
+      try { await navigator.clipboard.writeText(data); alert("Export clipboardga nusxa olindi."); }
+      catch { prompt("Quyidagini nusxa oling:", data); }
     };
 
     document.getElementById("importBtn").onclick = () => {
@@ -458,142 +450,121 @@
       }
     };
 
-    /* =====================
-       Player (Fullscreen + Landscape)
-    ====================== */
+    /* ===== Player overlay + Fullscreen/Landscape ===== */
     const player = document.getElementById("player");
-    const pBody  = document.getElementById("pBody");
+    const frameWrap = document.getElementById("frameWrap");
     const pTitle = document.getElementById("pTitle");
     const pBack  = document.getElementById("pBack");
     const pOpen  = document.getElementById("pOpen");
     const pFull  = document.getElementById("pFull");
     const pLand  = document.getElementById("pLand");
+    const pPseudo= document.getElementById("pPseudo");
 
     let currentUrl = "";
 
-    function showBackButton(on) {
-      try {
+    function showTgBack(on){
+      try{
         if (!tg?.BackButton) return;
-        if (on) {
-          tg.BackButton.show();
-          tg.BackButton.onClick(closePlayer);
-        } else {
-          tg.BackButton.hide();
-        }
-      } catch {}
+        if (on) { tg.BackButton.show(); tg.BackButton.onClick(closePlayer); }
+        else tg.BackButton.hide();
+      }catch{}
     }
 
-    async function requestAppFullscreen() {
-      // 1) Telegram fullscreen (agar mavjud bo‘lsa)
-      try { await tg?.requestFullscreen?.(); } catch {}
-
-      // 2) Browser fullscreen (ko‘p WebView’da shu yordam beradi)
+    async function requestFs(){
+      // 1) Telegram fullscreen (yangi versiyalarda)
+      try { if (typeof tg?.requestFullscreen === "function") await tg.requestFullscreen(); } catch {}
+      // 2) Browser fullscreen fallback (hamma joyda ishlamasligi mumkin)
       try {
         const el = document.documentElement;
-        if (!document.fullscreenElement && el.requestFullscreen) {
-          await el.requestFullscreen();
-        }
+        if (!document.fullscreenElement && el.requestFullscreen) await el.requestFullscreen();
       } catch {}
     }
 
-    async function exitAppFullscreen() {
-      try { await tg?.exitFullscreen?.(); } catch {}
-      try {
-        if (document.fullscreenElement && document.exitFullscreen) {
-          await document.exitFullscreen();
-        }
-      } catch {}
+    async function exitFs(){
+      try { if (typeof tg?.exitFullscreen === "function") await tg.exitFullscreen(); } catch {}
+      try { if (document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen(); } catch {}
     }
 
-    async function lockLandscape() {
-      // Landscape lock faqat ayrim qurilma/brauzerda ishlaydi va ko‘pincha fullscreen talab qiladi.
-      try {
+    async function lockLandscape(){
+      // Ko‘p brauzerlar buni faqat fullscreen + user gesture bilan ruxsat beradi
+      try{
         if (screen.orientation && screen.orientation.lock) {
           await screen.orientation.lock("landscape");
           return true;
         }
-      } catch {}
+      }catch{}
       return false;
     }
 
-    async function unlockOrientation() {
-      try {
-        if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
-      } catch {}
+    function openExternal(url){
+      // WebApp ichidan faqat http/https ochish ishonchli; boshqa scheme ko‘pincha bloklanadi.
+      try { tg?.openLink?.(url, { try_instant_view:false }); }
+      catch { window.open(url, "_blank"); }
     }
 
-    function openPlayer(it) {
+    function openPlayer(it){
       const embed = toEmbed(it.url);
-      if (!embed) {
-        alert("YouTube link noto‘g‘ri.");
-        return;
-      }
+      if (!embed) return alert("YouTube link noto‘g‘ri.");
 
       currentUrl = it.url;
       pTitle.textContent = it.title || "—";
 
-      // Player overlay
       document.body.classList.add("player-on");
-      pBody.innerHTML = `
+      document.body.classList.remove("pseudo-landscape");
+
+      frameWrap.innerHTML = `
         <iframe
-          id="ytFrame"
           src="${esc(embed)}"
-          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowfullscreen
+          webkitallowfullscreen
+          mozallowfullscreen
           referrerpolicy="origin"
         ></iframe>
       `;
 
-      // Telegram BackButton
-      showBackButton(true);
-
-      // History (back)
-      history.pushState({ player: true }, "");
+      showTgBack(true);
+      history.pushState({ player:true }, "");
     }
 
-    async function closePlayer() {
-      pBody.innerHTML = "";
+    async function closePlayer(){
+      frameWrap.innerHTML = "";
       document.body.classList.remove("player-on");
-      showBackButton(false);
+      document.body.classList.remove("pseudo-landscape");
+      showTgBack(false);
       currentUrl = "";
-      await unlockOrientation();
-      await exitAppFullscreen();
+      await exitFs();
     }
 
     pBack.onclick = closePlayer;
 
-    // “YouTube’da ochish” (fallback, full native)
-    pOpen.onclick = () => {
-      if (!currentUrl) return;
-      try {
-        // Telegram ichida tashqi brauzer/app’da ochish
-        tg?.openLink?.(currentUrl, { try_instant_view: false });
-      } catch {
-        window.open(currentUrl, "_blank");
+    // Fallback: YouTube app/externals
+    pOpen.onclick = () => currentUrl && openExternal(currentUrl);
+
+    // Custom fullscreen (YouTube ichki knopkasi ishlamasa ham shu ishlashi mumkin)
+    pFull.onclick = async () => {
+      await requestFs();
+    };
+
+    // Landscape: avval fullscreen so‘raydi, keyin orientation lock
+    pLand.onclick = async () => {
+      await requestFs();
+      const ok = await lockLandscape();
+      if (!ok) {
+        alert("Landscape lock Telegram/WebView tomonidan bloklangan bo‘lishi mumkin. Rotate (pseudo) yoki YouTube’da ochishni sinang.");
       }
     };
 
-    // Bizning Fullscreen tugma (YouTube tugmasi ishlamasa ham)
-    pFull.onclick = async () => {
-      await requestAppFullscreen();
+    // Rotate (pseudo-landscape): orientation lock bo‘lmasa ham ekranda “yonboshlatib” ko‘rsatadi
+    pPseudo.onclick = () => {
+      document.body.classList.toggle("pseudo-landscape");
     };
 
-    // Landscape tugma (muvaffaqiyatsiz bo‘lsa ogohlantiradi)
-    pLand.onclick = async () => {
-      // Landscape lock ko‘p joyda fullscreen talab qiladi
-      await requestAppFullscreen();
-      const ok = await lockLandscape();
-      if (!ok) alert("Landscape lock qurilmangizda bloklangan bo‘lishi mumkin. Fullscreen + “YouTube’da ochish”ni sinang.");
-    };
-
-    // Back button via browser history
     window.addEventListener("popstate", () => {
       if (document.body.classList.contains("player-on")) closePlayer();
     });
 
-    /* =====================
-       First render
-    ====================== */
+    /* ===== Start ===== */
     render();
   </script>
 </body>
