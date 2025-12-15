@@ -3,85 +3,85 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Video Menyu (Telegram WebApp)</title>
+  <title>Telegram WebApp Video Player</title>
 
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     :root{
+      color-scheme: dark;
       --bg:#0b0c10;
-      --card:rgba(255,255,255,.06);
-      --card2:rgba(0,0,0,.25);
+      --card:rgba(255,255,255,.07);
       --stroke:rgba(255,255,255,.12);
-      --text:#fff;
       --muted:rgba(255,255,255,.72);
       --accent1:#ff3b3b;
       --accent2:#ff7a18;
-      --ok:#4cd964;
-      --warn:#ffcc00;
-      --danger:#ff3b3b;
-      color-scheme: dark;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 800px at 20% -10%, rgba(255,59,59,.18), transparent 55%),
-                  radial-gradient(900px 600px at 90% 10%, rgba(255,122,24,.14), transparent 60%),
+      background: radial-gradient(1000px 700px at 20% -10%, rgba(255,59,59,.18), transparent 55%),
+                  radial-gradient(900px 650px at 90% 10%, rgba(255,122,24,.14), transparent 60%),
                   var(--bg);
-      color:var(--text);
+      color:#fff;
     }
-    .app{max-width:820px;margin:0 auto;padding:14px 14px 84px}
-    .topbar{
+    .app{max-width:860px;margin:0 auto;padding:14px 14px 90px}
+    .top{
+      position:sticky;top:10px;z-index:10;
       display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:12px;border:1px solid var(--stroke);border-radius:16px;background:var(--card);
-      position:sticky;top:10px;z-index:5;backdrop-filter: blur(10px);
+      padding:12px;border-radius:16px;
+      background:rgba(0,0,0,.35);
+      border:1px solid var(--stroke);
+      backdrop-filter: blur(10px);
     }
     .brand{display:flex;flex-direction:column;gap:2px}
-    .brand .t{font-weight:900;letter-spacing:.2px}
+    .brand .t{font-weight:900}
     .brand .s{font-size:12px;color:var(--muted)}
     .pill{
-      padding:8px 10px;border-radius:999px;border:1px solid var(--stroke);background:var(--card2);
+      padding:8px 10px;border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.06);
       font-size:12px;color:var(--muted);white-space:nowrap;
+      max-width: 50%;
+      overflow:hidden;text-overflow:ellipsis;
     }
+
     .tabs{
       margin-top:12px;
       display:flex;gap:10px;
       border:1px solid var(--stroke);
-      background:var(--card);
+      background:rgba(255,255,255,.06);
       padding:10px;border-radius:16px;
     }
-    .tabbtn{
+    .tab{
       flex:1;
+      padding:12px 10px;border-radius:14px;
       border:1px solid transparent;
       background:rgba(255,255,255,.06);
-      color:var(--text);
-      padding:12px 10px;border-radius:14px;
-      font-weight:800;
+      color:#fff;
+      font-weight:900;
       cursor:pointer;
     }
-    .tabbtn.active{
-      background: linear-gradient(135deg, rgba(255,59,59,.95), rgba(255,122,24,.95));
+    .tab.active{
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
       border-color: rgba(255,255,255,.18);
     }
 
-    .panel{margin-top:12px}
     .card{
+      margin-top:12px;
+      padding:12px;border-radius:16px;
       border:1px solid var(--stroke);
       background:var(--card);
-      border-radius:16px;
-      padding:12px;
     }
-    .row{display:flex;gap:10px;align-items:center}
-    .row.wrap{flex-wrap:wrap}
-    .input, select{
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .input{
       width:100%;
       padding:12px 12px;border-radius:14px;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.28);
-      color:var(--text);
-      outline:none;
+      color:#fff;outline:none;
     }
     .btn{
       padding:12px 14px;border-radius:14px;border:0;
@@ -96,732 +96,504 @@
     }
     .btn.danger{
       background: rgba(255,59,59,.18);
-      border:1px solid rgba(255,59,59,.35);
-    }
-    .btn.ok{
-      background: rgba(76,217,100,.18);
-      border:1px solid rgba(76,217,100,.35);
+      border: 1px solid rgba(255,59,59,.35);
+      font-weight:900;
     }
     .muted{color:var(--muted);font-size:13px;line-height:1.5}
     .sep{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
 
     .list{display:grid;gap:10px;margin-top:12px}
     .item{
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      border-radius:16px;
-      padding:12px;
       display:flex;gap:12px;align-items:flex-start;justify-content:space-between;
+      padding:12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
     }
-    .item .left{display:flex;flex-direction:column;gap:6px;min-width:0}
-    .item .name{font-weight:900}
-    .item .meta{font-size:12px;color:var(--muted);word-break:break-all}
-    .tag{
-      display:inline-flex;align-items:center;gap:6px;
-      font-size:11px;color:rgba(255,255,255,.84);
-      padding:6px 8px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
-      width:max-content;
-    }
-    .tag.tg{border-color:rgba(255,122,24,.35);background:rgba(255,122,24,.10)}
-    .tag.mp4{border-color:rgba(76,217,100,.35);background:rgba(76,217,100,.10)}
-    .tag.yt{border-color:rgba(255,59,59,.35);background:rgba(255,59,59,.10)}
-    .tag.pdf{border-color:rgba(255,204,0,.35);background:rgba(255,204,0,.10)}
+    .left{min-width:0}
+    .name{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55vw}
+    .url{color:var(--muted);font-size:12px;word-break:break-all;margin-top:6px}
     .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 
-    /* Fullscreen viewer */
-    body.viewer-on{overflow:hidden}
-    #viewer{
+    /* PLAYER OVERLAY */
+    body.player-on{overflow:hidden}
+    #player{
       position:fixed;inset:0;z-index:99999;
       background:#000;
       display:none;
     }
-    body.viewer-on #viewer{display:block}
-    #viewerHeader{
+    body.player-on #player{display:block}
+    #pHeader{
       position:fixed;top:10px;left:10px;right:10px;z-index:100000;
       display:flex;gap:10px;align-items:center;justify-content:space-between;
-      padding:10px 10px;border-radius:16px;
+      padding:10px;border-radius:16px;
       border:1px solid rgba(255,255,255,.14);
       background: rgba(0,0,0,.45);
       backdrop-filter: blur(10px);
     }
-    #viewerTitle{font-weight:900;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    #viewerBody{
-      position:absolute;inset:0;
-      display:grid;place-items:center;
-      padding-top:64px;
+    #pTitle{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+    #pBody{position:absolute;inset:0; padding-top:64px;}
+    #pBody iframe, #pBody video{
+      width:100%;height:100%;border:0;background:#000;
     }
-    #viewerBody video{width:100%;height:100%;object-fit:contain}
-    #viewerBody iframe{width:100%;height:100%;border:0;background:#111}
-    .centerBox{
-      max-width:540px;
-      margin:0 14px;
-      padding:16px;
-      border-radius:16px;
+    .mini{
+      font-size:12px;color:var(--muted);
+      padding:8px 10px;border-radius:12px;
       border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      text-align:center;
-    }
-    .centerBox .big{font-weight:900;margin-bottom:6px}
-    .centerBox .small{color:var(--muted);font-size:13px;line-height:1.5}
-    .footerBar{
-      position:fixed;left:0;right:0;bottom:0;z-index:4;
-      padding:12px 14px;
-      background: linear-gradient(180deg, transparent, rgba(0,0,0,.55));
-    }
-    .footerBar .note{
-      max-width:820px;margin:0 auto;
-      font-size:12px;color:rgba(255,255,255,.75);
+      background:rgba(255,255,255,.06);
     }
   </style>
 </head>
 <body>
   <div class="app" id="app">
-    <div class="topbar">
+    <div class="top">
       <div class="brand">
-        <div class="t">Video Menyu</div>
-        <div class="s" id="subline">Telegram WebApp ichida ishlaydi</div>
+        <div class="t">Video WebApp</div>
+        <div class="s" id="statusLine">Telegram WebApp orqali oching</div>
       </div>
       <div class="pill" id="userPill">User: —</div>
     </div>
 
     <div class="tabs">
-      <button class="tabbtn active" id="tabView">Ko‘rish</button>
-      <button class="tabbtn" id="tabAdd">Qo‘shish</button>
+      <button class="tab active" id="tabView">Ko‘rish</button>
+      <button class="tab" id="tabAdd">Qo‘shish</button>
     </div>
 
-    <!-- VIEW PANEL -->
-    <div class="panel" id="panelView">
+    <!-- VIEW -->
+    <div id="viewPanel">
       <div class="card">
-        <div class="row wrap">
+        <div class="row">
           <input class="input" id="search" placeholder="Qidirish (nom bo‘yicha)..." />
           <button class="btn ghost" id="exportBtn" type="button">Export</button>
           <button class="btn ghost" id="importBtn" type="button">Import</button>
         </div>
         <div class="sep"></div>
         <div class="muted">
-          Ochiq Telegram postlar, yopiq <code>t.me/c/...</code> postlar, MP4 yoki YouTube linklar qo‘shishingiz mumkin.
-          Yopiq postlar bosilganda Telegram ichida ochiladi.
+          YouTube link (watch/youtu.be/shorts) qo‘shing. “Play” bosilganda WebApp ichida player ochiladi.
+          Fullscreen/landscape bloklansa, “YouTube’da ochish” tugmasi orqali tashqarida oching.
         </div>
       </div>
 
       <div class="list" id="list"></div>
     </div>
 
-    <!-- ADD PANEL -->
-    <div class="panel" id="panelAdd" style="display:none">
+    <!-- ADD -->
+    <div id="addPanel" style="display:none">
       <div class="card">
-        <div class="muted" id="adminHint">
-          Link qo‘shish menyusi.
+        <div class="row">
+          <input class="input" id="titleInput" placeholder="Video nomi (masalan: 1-dars)" />
         </div>
-        <div class="sep"></div>
-
-        <div class="row wrap">
-          <input class="input" id="titleInput" placeholder="Video nomi (masalan: 1-dars video)" />
+        <div class="row" style="margin-top:10px">
+          <input class="input" id="urlInput" placeholder="YouTube link (https://youtu.be/... yoki https://www.youtube.com/watch?v=...)" />
         </div>
-
-        <div class="row wrap" style="margin-top:10px">
-          <input class="input" id="urlInput" placeholder="Video link (MP4 / YouTube / t.me/...)" />
-        </div>
-
-        <div class="row wrap" style="margin-top:10px">
-          <select id="typeSelect" class="input" style="max-width:240px">
-            <option value="auto" selected>Auto aniqlash</option>
-            <option value="mp4">Direct MP4 (video)</option>
-            <option value="youtube">YouTube</option>
-            <option value="tg">Telegram post</option>
-            <option value="pdf">PDF</option>
-            <option value="link">Oddiy link</option>
-          </select>
-          <button class="btn ok" id="saveBtn" type="button">Saqlash</button>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="saveBtn" type="button">Saqlash</button>
           <button class="btn danger" id="clearBtn" type="button">Tozalash</button>
-        </div>
-
-        <div class="sep"></div>
-        <div class="muted">
-          Masalan yopiq link: <code>https://t.me/c/3086001686/2/17260</code><br>
-          Masalan ochiq link: <code>https://t.me/kanalNomi/123</code><br>
-          MP4: <code>https://site.com/video.mp4</code>
+          <span class="mini" id="hintMini">Saqlash localStorage’da</span>
         </div>
       </div>
     </div>
-
-    <div class="footerBar">
-      <div class="note" id="footNote">Host: HTTPS bo‘lsin (GitHub Pages). WebApp sifatida bot menyusidan oching.</div>
-    </div>
   </div>
 
-  <!-- FULLSCREEN VIEWER -->
-  <div id="viewer">
-    <div id="viewerHeader">
-      <button class="btn ghost" id="backBtn" type="button">← Orqaga</button>
-      <div id="viewerTitle">—</div>
-      <button class="btn" id="openTgBtn" type="button">Telegram’da ochish</button>
+  <!-- PLAYER OVERLAY -->
+  <div id="player">
+    <div id="pHeader">
+      <button class="btn ghost" id="pBack" type="button">← Orqaga</button>
+      <div id="pTitle">—</div>
+      <div class="row" style="justify-content:flex-end">
+        <button class="btn ghost" id="pLand" type="button">Landscape</button>
+        <button class="btn ghost" id="pFull" type="button">Fullscreen</button>
+        <button class="btn" id="pOpen" type="button">YouTube’da ochish</button>
+      </div>
     </div>
-    <div id="viewerBody"></div>
+    <div id="pBody"></div>
   </div>
 
   <script>
-    /* =========================
-       SETTINGS
-    ========================== */
-
-    // (Ixtiyoriy) faqat siz link qo‘sha olishingiz uchun admin ID lar:
-    // Agar bo‘sh qoldirsangiz hamma qo‘sha oladi.
-    const ADMIN_TG_IDS = []; // masalan: [123456789]
-
-    const STORAGE_KEY = "video_menu_items_v1";
-
-    /* =========================
-       TELEGRAM INIT
-    ========================== */
+    /* =====================
+       Telegram init
+    ====================== */
     const tg = window.Telegram?.WebApp;
     try {
       tg?.ready?.();
       tg?.expand?.();
       tg?.disableVerticalSwipes?.();
-    } catch(e){}
+      tg?.setHeaderColor?.("#000000");
+      tg?.setBackgroundColor?.("#000000");
+      tg?.setBottomBarColor?.("#000000");
+    } catch (e) {}
 
     const userPill = document.getElementById("userPill");
-    const subline  = document.getElementById("subline");
+    const statusLine = document.getElementById("statusLine");
 
-    function getTgUser() {
-      return tg?.initDataUnsafe?.user || null;
+    const user = tg?.initDataUnsafe?.user || null;
+    if (user) {
+      const name = [user.first_name, user.last_name].filter(Boolean).join(" ");
+      userPill.textContent = `User: ${name || "—"} (${user.id})`;
+      statusLine.textContent = "WebApp ulandi";
+    } else {
+      userPill.textContent = "User: aniqlanmadi";
+      statusLine.textContent = "Eslatma: Botdan WebApp qilib oching";
     }
-    function isAdmin() {
-      if (!ADMIN_TG_IDS.length) return true;
-      const u = getTgUser();
-      return !!u && ADMIN_TG_IDS.includes(Number(u.id));
-    }
 
-    (function renderUser(){
-      const u = getTgUser();
-      if (u) {
-        const name = [u.first_name, u.last_name].filter(Boolean).join(" ");
-        userPill.textContent = `User: ${name || "—"} (${u.id})`;
-        subline.textContent = "Telegram WebApp: ulangan";
-      } else {
-        userPill.textContent = "User: aniqlanmadi";
-        subline.textContent = "Eslatma: Botdan WebApp qilib oching";
-      }
-    })();
+    /* =====================
+       Storage
+    ====================== */
+    const KEY = "yt_webapp_videos_v1";
 
-    /* =========================
-       DATA
-    ========================== */
-    function loadItems(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
+    function loadItems() {
+      try {
+        const raw = localStorage.getItem(KEY);
         const arr = raw ? JSON.parse(raw) : [];
         return Array.isArray(arr) ? arr : [];
-      }catch(e){ return []; }
+      } catch {
+        return [];
+      }
     }
-    function saveItems(items){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    function saveItems(arr) {
+      localStorage.setItem(KEY, JSON.stringify(arr));
     }
-    function uid(){
+    function makeId() {
       return Math.random().toString(16).slice(2) + Date.now().toString(16);
     }
 
     let items = loadItems();
+    if (!items.length) {
+      items = [{
+        id: makeId(),
+        title: "Namuna video",
+        url: "https://youtu.be/dQw4w9WgXcQ",
+        createdAt: Date.now()
+      }];
+      saveItems(items);
+    }
 
-    /* =========================
-       UI ELEMENTS
-    ========================== */
+    /* =====================
+       Tabs
+    ====================== */
     const tabView = document.getElementById("tabView");
     const tabAdd  = document.getElementById("tabAdd");
-    const panelView = document.getElementById("panelView");
-    const panelAdd  = document.getElementById("panelAdd");
+    const viewPanel = document.getElementById("viewPanel");
+    const addPanel  = document.getElementById("addPanel");
 
-    const listEl = document.getElementById("list");
-    const searchEl = document.getElementById("search");
-
-    const titleInput = document.getElementById("titleInput");
-    const urlInput   = document.getElementById("urlInput");
-    const typeSelect = document.getElementById("typeSelect");
-    const saveBtn    = document.getElementById("saveBtn");
-    const clearBtn   = document.getElementById("clearBtn");
-
-    const exportBtn  = document.getElementById("exportBtn");
-    const importBtn  = document.getElementById("importBtn");
-
-    const viewer     = document.getElementById("viewer");
-    const viewerBody = document.getElementById("viewerBody");
-    const viewerTitle= document.getElementById("viewerTitle");
-    const backBtn    = document.getElementById("backBtn");
-    const openTgBtn  = document.getElementById("openTgBtn");
-
-    const adminHint  = document.getElementById("adminHint");
-
-    /* =========================
-       TABS
-    ========================== */
-    function setTab(which){
-      const addAllowed = isAdmin();
-      tabAdd.style.display = addAllowed ? "" : "none";
-      adminHint.textContent = addAllowed
-        ? "Link qo‘shish menyusi."
-        : "Sizda link qo‘shish huquqi yo‘q.";
-
-      if (which === "add" && !addAllowed) which = "view";
-
-      tabView.classList.toggle("active", which === "view");
-      tabAdd.classList.toggle("active", which === "add");
-      panelView.style.display = which === "view" ? "" : "none";
-      panelAdd.style.display  = which === "add"  ? "" : "none";
+    function setTab(which) {
+      const isView = which === "view";
+      tabView.classList.toggle("active", isView);
+      tabAdd.classList.toggle("active", !isView);
+      viewPanel.style.display = isView ? "" : "none";
+      addPanel.style.display  = isView ? "none" : "";
     }
-    tabView.addEventListener("click", () => setTab("view"));
-    tabAdd.addEventListener("click",  () => setTab("add"));
-    setTab("view");
+    tabView.onclick = () => setTab("view");
+    tabAdd.onclick  = () => setTab("add");
 
-    /* =========================
-       LINK TYPE HELPERS
-    ========================== */
-    function normalizeUrl(u){
+    /* =====================
+       Helpers (YouTube)
+    ====================== */
+    function normalizeUrl(u) {
       u = (u || "").trim();
       if (!u) return "";
-      // Allow "t.me/xxx" without protocol
-      if (/^t\.me\//i.test(u)) u = "https://" + u;
-      if (/^telegram\.me\//i.test(u)) u = "https://" + u;
+      if (/^youtu\.be\//i.test(u)) u = "https://" + u;
+      if (/^www\.youtube\.com\//i.test(u)) u = "https://" + u;
+      if (/^youtube\.com\//i.test(u)) u = "https://" + u;
       return u;
     }
 
-    function hostOf(url){
-      try{ return new URL(url).hostname.replace(/^www\./,''); } catch(e){ return ""; }
-    }
-
-    function isTelegramUrl(url){
-      const h = hostOf(url);
-      return (h === "t.me" || h === "telegram.me");
-    }
-
-    function isPrivateTgC(url){
-      try{
+    function toEmbed(url) {
+      try {
         const u = new URL(url);
-        return isTelegramUrl(url) && u.pathname.startsWith("/c/");
-      }catch(e){ return false; }
+        const host = u.hostname.replace(/^www\./, "");
+        // youtu.be/ID
+        if (host === "youtu.be") {
+          const id = u.pathname.replace("/", "");
+          if (!id) return "";
+          return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+        }
+        // youtube.com/watch?v=ID
+        if (host === "youtube.com" || host === "m.youtube.com") {
+          const id = u.searchParams.get("v");
+          if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+          // /shorts/ID
+          const m = u.pathname.match(/\/shorts\/([^\/]+)/i);
+          if (m) return `https://www.youtube.com/embed/${m[1]}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+        }
+      } catch {}
+      return "";
     }
 
-    function isYouTube(url){
-      const h = hostOf(url);
-      return ["youtube.com","m.youtube.com","youtu.be"].includes(h);
-    }
+    /* =====================
+       Render list
+    ====================== */
+    const listEl = document.getElementById("list");
+    const searchEl = document.getElementById("search");
 
-    function isDirectVideo(url){
-      return /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
-    }
-
-    function isPdf(url){
-      return /\.pdf(\?.*)?$/i.test(url);
-    }
-
-    function detectType(url){
-      if (isTelegramUrl(url)) return "tg";
-      if (isDirectVideo(url)) return "mp4";
-      if (isYouTube(url)) return "youtube";
-      if (isPdf(url)) return "pdf";
-      return "link";
-    }
-
-    function tgSingle(url){
-      // add ?single=1 for Telegram message view
-      try{
-        const u = new URL(url);
-        if (isTelegramUrl(url) && !u.searchParams.has("single")) u.searchParams.set("single","1");
-        return u.toString();
-      }catch(e){
-        return url;
-      }
-    }
-
-    /* =========================
-       RENDER LIST
-    ========================== */
-    function tagHtml(type){
-      if (type === "tg") return `<span class="tag tg">Telegram</span>`;
-      if (type === "mp4") return `<span class="tag mp4">MP4</span>`;
-      if (type === "youtube") return `<span class="tag yt">YouTube</span>`;
-      if (type === "pdf") return `<span class="tag pdf">PDF</span>`;
-      return `<span class="tag">Link</span>`;
-    }
-
-    function render(){
-      const q = (searchEl.value || "").trim().toLowerCase();
-      const filtered = items
-        .slice()
-        .sort((a,b) => (b.createdAt||0) - (a.createdAt||0))
-        .filter(it => !q || (it.title||"").toLowerCase().includes(q));
-
-      if (!filtered.length){
-        listEl.innerHTML = `
-          <div class="card">
-            <div class="muted">
-              Hali hech narsa yo‘q. “Qo‘shish” bo‘limidan video link qo‘shing.
-            </div>
-          </div>
-        `;
-        return;
-      }
-
-      listEl.innerHTML = filtered.map(it => {
-        const t = it.type === "auto" ? detectType(it.url) : it.type;
-        return `
-          <div class="item" data-id="${it.id}">
-            <div class="left">
-              <div class="row" style="gap:8px;align-items:center">
-                <div class="name" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(it.title || "Nomsiz")}</div>
-                ${tagHtml(t)}
-              </div>
-              <div class="meta">${escapeHtml(it.url)}</div>
-            </div>
-            <div class="actions">
-              <button class="btn" data-act="open">Ochish</button>
-              <button class="btn ghost" data-act="edit">Tahrir</button>
-              <button class="btn danger ghost" data-act="del">O‘chirish</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function escapeHtml(s){
+    function esc(s) {
       return String(s||"")
         .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
         .replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
 
-    searchEl.addEventListener("input", render);
+    function render() {
+      const q = (searchEl.value || "").trim().toLowerCase();
+      const filtered = items
+        .slice()
+        .sort((a,b)=> (b.createdAt||0)-(a.createdAt||0))
+        .filter(x => !q || (x.title||"").toLowerCase().includes(q));
+
+      if (!filtered.length) {
+        listEl.innerHTML = `<div class="card"><div class="muted">Hali video yo‘q. “Qo‘shish”dan kiriting.</div></div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(it => `
+        <div class="item" data-id="${it.id}">
+          <div class="left">
+            <div class="name">${esc(it.title || "Nomsiz")}</div>
+            <div class="url">${esc(it.url)}</div>
+          </div>
+          <div class="actions">
+            <button class="btn" data-act="play">Play</button>
+            <button class="btn ghost" data-act="edit">Tahrir</button>
+            <button class="btn danger" data-act="del">O‘chirish</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    searchEl.oninput = render;
 
     listEl.addEventListener("click", (e) => {
-      const itemEl = e.target.closest(".item");
-      if (!itemEl) return;
-      const id = itemEl.getAttribute("data-id");
+      const card = e.target.closest(".item");
+      if (!card) return;
+      const id = card.getAttribute("data-id");
       const it = items.find(x => x.id === id);
       if (!it) return;
 
       const act = e.target.getAttribute("data-act");
-      if (act === "open") openItem(it);
+      if (act === "play") openPlayer(it);
       if (act === "edit") editItem(it);
-      if (act === "del") deleteItem(it);
+      if (act === "del") delItem(it);
     });
 
-    /* =========================
-       ADD / EDIT / DELETE
-    ========================== */
-    function resetForm(){
+    /* =====================
+       Add / edit / delete
+    ====================== */
+    const titleInput = document.getElementById("titleInput");
+    const urlInput   = document.getElementById("urlInput");
+    const saveBtn    = document.getElementById("saveBtn");
+    const clearBtn   = document.getElementById("clearBtn");
+
+    function resetForm() {
       titleInput.value = "";
       urlInput.value = "";
-      typeSelect.value = "auto";
     }
 
-    saveBtn.addEventListener("click", () => {
-      if (!isAdmin()){
-        alert("Sizda link qo‘shish huquqi yo‘q.");
-        return;
-      }
+    saveBtn.onclick = () => {
       const title = (titleInput.value || "").trim();
-      const urlRaw = (urlInput.value || "").trim();
-      const url = normalizeUrl(urlRaw);
-      const type = typeSelect.value;
-
+      const url = normalizeUrl(urlInput.value || "");
       if (!title) { alert("Video nomini kiriting."); return; }
-      if (!url)   { alert("Link kiriting."); return; }
+      if (!url) { alert("YouTube link kiriting."); return; }
+      if (!toEmbed(url)) { alert("YouTube link noto‘g‘ri (watch/youtu.be/shorts format bo‘lsin)."); return; }
 
-      items.push({ id: uid(), title, url, type, createdAt: Date.now() });
+      items.push({ id: makeId(), title, url, createdAt: Date.now() });
       saveItems(items);
       resetForm();
       setTab("view");
       render();
-    });
+    };
 
-    clearBtn.addEventListener("click", resetForm);
+    clearBtn.onclick = resetForm;
 
-    function editItem(it){
-      if (!isAdmin()){
-        alert("Sizda tahrirlash huquqi yo‘q.");
-        return;
-      }
-      const newTitle = prompt("Yangi nom:", it.title || "");
-      if (newTitle === null) return;
-      const newUrl = prompt("Yangi link:", it.url || "");
-      if (newUrl === null) return;
-
-      const t = prompt("Type: auto / mp4 / youtube / tg / pdf / link", it.type || "auto");
+    function editItem(it) {
+      const t = prompt("Yangi nom:", it.title || "");
       if (t === null) return;
+      const u = prompt("Yangi YouTube link:", it.url || "");
+      if (u === null) return;
 
-      it.title = (newTitle || "").trim() || it.title;
-      it.url   = normalizeUrl(newUrl || it.url);
-      it.type  = (t || "auto").trim().toLowerCase();
+      const nu = normalizeUrl(u);
+      if (!toEmbed(nu)) { alert("YouTube link noto‘g‘ri."); return; }
+
+      it.title = (t || "").trim() || it.title;
+      it.url = nu;
       saveItems(items);
       render();
     }
 
-    function deleteItem(it){
-      if (!isAdmin()){
-        alert("Sizda o‘chirish huquqi yo‘q.");
-        return;
-      }
+    function delItem(it) {
       if (!confirm(`O‘chirish: "${it.title}" ?`)) return;
       items = items.filter(x => x.id !== it.id);
       saveItems(items);
       render();
     }
 
-    /* =========================
-       EXPORT / IMPORT
-    ========================== */
-    exportBtn.addEventListener("click", async () => {
+    /* =====================
+       Export / Import
+    ====================== */
+    document.getElementById("exportBtn").onclick = async () => {
       const data = JSON.stringify(items, null, 2);
-      try{
+      try {
         await navigator.clipboard.writeText(data);
-        alert("Export nusxa olindi (clipboard).");
-      }catch(e){
+        alert("Export clipboardga nusxa olindi.");
+      } catch {
         prompt("Quyidagini nusxa oling:", data);
       }
-    });
+    };
 
-    importBtn.addEventListener("click", () => {
-      if (!isAdmin()){
-        alert("Sizda import huquqi yo‘q.");
-        return;
-      }
-      const raw = prompt("JSON ni joylang (paste):");
+    document.getElementById("importBtn").onclick = () => {
+      const raw = prompt("JSON ni paste qiling:");
       if (!raw) return;
-      try{
+      try {
         const arr = JSON.parse(raw);
         if (!Array.isArray(arr)) throw new Error("not array");
-        // minimal validation
-        const cleaned = arr
-          .filter(x => x && typeof x === "object")
-          .map(x => ({
-            id: String(x.id || uid()),
-            title: String(x.title || "Nomsiz"),
-            url: normalizeUrl(String(x.url || "")),
-            type: String(x.type || "auto"),
-            createdAt: Number(x.createdAt || Date.now())
-          }))
-          .filter(x => x.url);
-
+        const cleaned = arr.map(x => ({
+          id: String(x.id || makeId()),
+          title: String(x.title || "Nomsiz"),
+          url: normalizeUrl(String(x.url || "")),
+          createdAt: Number(x.createdAt || Date.now())
+        })).filter(x => x.url && toEmbed(x.url));
         items = cleaned;
         saveItems(items);
         render();
         alert("Import bo‘ldi.");
-      }catch(e){
-        alert("JSON xato. Tekshirib qayta urinib ko‘ring.");
+      } catch {
+        alert("JSON xato yoki linklar yaroqsiz.");
       }
-    });
+    };
 
-    /* =========================
-       VIEWER OPEN/CLOSE
-    ========================== */
-    let currentOpenUrl = "";
+    /* =====================
+       Player (Fullscreen + Landscape)
+    ====================== */
+    const player = document.getElementById("player");
+    const pBody  = document.getElementById("pBody");
+    const pTitle = document.getElementById("pTitle");
+    const pBack  = document.getElementById("pBack");
+    const pOpen  = document.getElementById("pOpen");
+    const pFull  = document.getElementById("pFull");
+    const pLand  = document.getElementById("pLand");
 
-    function showViewer(title, url){
-      currentOpenUrl = url;
-      viewerTitle.textContent = title || "—";
-      document.body.classList.add("viewer-on");
+    let currentUrl = "";
 
-      if (tg?.BackButton){
-        tg.BackButton.show();
-        tg.BackButton.onClick(closeViewer);
-      }
-      history.pushState({ viewer: true }, "");
+    function showBackButton(on) {
+      try {
+        if (!tg?.BackButton) return;
+        if (on) {
+          tg.BackButton.show();
+          tg.BackButton.onClick(closePlayer);
+        } else {
+          tg.BackButton.hide();
+        }
+      } catch {}
     }
 
-    function closeViewer(){
-      viewerBody.innerHTML = "";
-      document.body.classList.remove("viewer-on");
-      currentOpenUrl = "";
+    async function requestAppFullscreen() {
+      // 1) Telegram fullscreen (agar mavjud bo‘lsa)
+      try { await tg?.requestFullscreen?.(); } catch {}
 
-      if (tg?.BackButton) tg.BackButton.hide();
+      // 2) Browser fullscreen (ko‘p WebView’da shu yordam beradi)
+      try {
+        const el = document.documentElement;
+        if (!document.fullscreenElement && el.requestFullscreen) {
+          await el.requestFullscreen();
+        }
+      } catch {}
     }
 
-    backBtn.addEventListener("click", closeViewer);
+    async function exitAppFullscreen() {
+      try { await tg?.exitFullscreen?.(); } catch {}
+      try {
+        if (document.fullscreenElement && document.exitFullscreen) {
+          await document.exitFullscreen();
+        }
+      } catch {}
+    }
 
-    openTgBtn.addEventListener("click", () => {
-      if (!currentOpenUrl) return;
-      openInTelegram(currentOpenUrl);
-    });
+    async function lockLandscape() {
+      // Landscape lock faqat ayrim qurilma/brauzerda ishlaydi va ko‘pincha fullscreen talab qiladi.
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock("landscape");
+          return true;
+        }
+      } catch {}
+      return false;
+    }
 
+    async function unlockOrientation() {
+      try {
+        if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+      } catch {}
+    }
+
+    function openPlayer(it) {
+      const embed = toEmbed(it.url);
+      if (!embed) {
+        alert("YouTube link noto‘g‘ri.");
+        return;
+      }
+
+      currentUrl = it.url;
+      pTitle.textContent = it.title || "—";
+
+      // Player overlay
+      document.body.classList.add("player-on");
+      pBody.innerHTML = `
+        <iframe
+          id="ytFrame"
+          src="${esc(embed)}"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          allowfullscreen
+          referrerpolicy="origin"
+        ></iframe>
+      `;
+
+      // Telegram BackButton
+      showBackButton(true);
+
+      // History (back)
+      history.pushState({ player: true }, "");
+    }
+
+    async function closePlayer() {
+      pBody.innerHTML = "";
+      document.body.classList.remove("player-on");
+      showBackButton(false);
+      currentUrl = "";
+      await unlockOrientation();
+      await exitAppFullscreen();
+    }
+
+    pBack.onclick = closePlayer;
+
+    // “YouTube’da ochish” (fallback, full native)
+    pOpen.onclick = () => {
+      if (!currentUrl) return;
+      try {
+        // Telegram ichida tashqi brauzer/app’da ochish
+        tg?.openLink?.(currentUrl, { try_instant_view: false });
+      } catch {
+        window.open(currentUrl, "_blank");
+      }
+    };
+
+    // Bizning Fullscreen tugma (YouTube tugmasi ishlamasa ham)
+    pFull.onclick = async () => {
+      await requestAppFullscreen();
+    };
+
+    // Landscape tugma (muvaffaqiyatsiz bo‘lsa ogohlantiradi)
+    pLand.onclick = async () => {
+      // Landscape lock ko‘p joyda fullscreen talab qiladi
+      await requestAppFullscreen();
+      const ok = await lockLandscape();
+      if (!ok) alert("Landscape lock qurilmangizda bloklangan bo‘lishi mumkin. Fullscreen + “YouTube’da ochish”ni sinang.");
+    };
+
+    // Back button via browser history
     window.addEventListener("popstate", () => {
-      if (document.body.classList.contains("viewer-on")) closeViewer();
+      if (document.body.classList.contains("player-on")) closePlayer();
     });
 
-    function openInTelegram(url){
-      const finalUrl = tgSingle(url);
-      try{
-        if (tg?.openTelegramLink){
-          tg.openTelegramLink(finalUrl);
-          return;
-        }
-        if (tg?.openLink){
-          tg.openLink(finalUrl, { try_instant_view: false });
-          return;
-        }
-      }catch(e){}
-      window.location.href = finalUrl;
-    }
-
-    /* =========================
-       OPEN ITEM LOGIC
-    ========================== */
-    function openItem(it){
-      const url = normalizeUrl(it.url);
-      const type = (it.type === "auto") ? detectType(url) : it.type;
-
-      showViewer(it.title, url);
-
-      // Always keep a Telegram-open option visible:
-      openTgBtn.style.display = isTelegramUrl(url) ? "" : "none";
-
-      // Telegram links:
-      if (type === "tg" && isTelegramUrl(url)){
-        // Private t.me/c/... => cannot embed => open in Telegram
-        if (isPrivateTgC(url)){
-          viewerBody.innerHTML = `
-            <div class="centerBox">
-              <div class="big">Yopiq post</div>
-              <div class="small">
-                Bu <code>t.me/c/...</code> link. Uni sayt ichida player qilib ko‘rsatib bo‘lmaydi.
-                “Telegram’da ochish” tugmasini bosing.
-              </div>
-              <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-                <button class="btn" onclick="window.__openTgNow()">Telegram’da ochish</button>
-                <button class="btn ghost" onclick="window.__closeViewerNow()">Orqaga</button>
-              </div>
-            </div>
-          `;
-          window.__openTgNow = () => openInTelegram(url);
-          window.__closeViewerNow = () => closeViewer();
-          return;
-        }
-
-        // Public t.me/... => try embed widget, fallback openTelegramLink
-        renderTelegramWidget(url, it.title);
-        return;
-      }
-
-      // Direct MP4
-      if (type === "mp4"){
-        viewerBody.innerHTML = `<video src="${escapeHtml(url)}" controls playsinline></video>`;
-        return;
-      }
-
-      // YouTube
-      if (type === "youtube"){
-        const embed = youtubeEmbedUrl(url);
-        viewerBody.innerHTML = `<iframe src="${escapeHtml(embed)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
-        return;
-      }
-
-      // PDF
-      if (type === "pdf"){
-        viewerBody.innerHTML = `<iframe src="${escapeHtml(url)}#toolbar=0&navpanes=0&scrollbar=0"></iframe>`;
-        return;
-      }
-
-      // Fallback link
-      viewerBody.innerHTML = `
-        <div class="centerBox">
-          <div class="big">Link</div>
-          <div class="small">Bu link uchun ichki player topilmadi. “Telegram’da ochish” yoki brauzerda oching.</div>
-          <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-            <button class="btn" onclick="window.open('${escapeJs(url)}','_blank')">Brauzerda ochish</button>
-            ${isTelegramUrl(url) ? `<button class="btn" onclick="window.__openTgNow()">Telegram’da ochish</button>` : ``}
-            <button class="btn ghost" onclick="window.__closeViewerNow()">Orqaga</button>
-          </div>
-        </div>
-      `;
-      window.__openTgNow = () => openInTelegram(url);
-      window.__closeViewerNow = () => closeViewer();
-    }
-
-    function escapeJs(s){
-      return String(s||"").replaceAll("\\","\\\\").replaceAll("'","\\'");
-    }
-
-    function youtubeEmbedUrl(url){
-      try{
-        const u = new URL(url);
-        if (u.hostname === "youtu.be"){
-          const id = u.pathname.replace("/","");
-          return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
-        }
-        if (u.hostname.includes("youtube.com")){
-          const id = u.searchParams.get("v");
-          if (id) return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
-          // /shorts/ID
-          const m = u.pathname.match(/\/shorts\/([^\/]+)/i);
-          if (m) return `https://www.youtube.com/embed/${m[1]}?rel=0&modestbranding=1`;
-        }
-      }catch(e){}
-      return url;
-    }
-
-    function renderTelegramWidget(url, title){
-      // Try to embed public post using Telegram widget.
-      // If widget cannot render, user can still open in Telegram.
-      viewerBody.innerHTML = `
-        <div class="centerBox">
-          <div class="big">Telegram post</div>
-          <div class="small">Agar post embed bo‘lmasa, “Telegram’da ochish”dan foydalaning.</div>
-          <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-            <button class="btn" onclick="window.__openTgNow()">Telegram’da ochish</button>
-            <button class="btn ghost" onclick="window.__closeViewerNow()">Orqaga</button>
-          </div>
-        </div>
-        <div style="width:min(720px,100%);margin:14px auto 0;padding:0 14px">
-          <div id="tgWidgetMount"></div>
-        </div>
-      `;
-      window.__openTgNow = () => openInTelegram(url);
-      window.__closeViewerNow = () => closeViewer();
-
-      const ref = publicPostRef(url);
-      if (!ref){
-        return; // can’t embed => keep fallback
-      }
-
-      const mount = document.getElementById("tgWidgetMount");
-      mount.innerHTML = "";
-
-      const block = document.createElement("blockquote");
-      block.className = "telegram-post";
-      block.setAttribute("data-telegram-post", ref);
-      block.setAttribute("data-width", "100%");
-      mount.appendChild(block);
-
-      // Load widget script fresh
-      const s = document.createElement("script");
-      s.async = true;
-      s.src = "https://telegram.org/js/telegram-widget.js?22";
-      mount.appendChild(s);
-    }
-
-    // Build ref like "channel/123" from https://t.me/channel/123
-    function publicPostRef(url){
-      try{
-        const u = new URL(url);
-        if (!isTelegramUrl(url)) return null;
-
-        const parts = u.pathname.split("/").filter(Boolean);
-        // expected: [username, msgid] or [username, topic, msgid]
-        if (parts.length < 2) return null;
-        const username = parts[0];
-        const last = parts[parts.length - 1];
-        if (!/^\d+$/.test(last)) return null;
-
-        // Widget typically supports "username/msgid"
-        return `${username}/${last}`;
-      }catch(e){
-        return null;
-      }
-    }
-
-    /* =========================
-       INIT
-    ========================== */
+    /* =====================
+       First render
+    ====================== */
     render();
   </script>
 </body>
