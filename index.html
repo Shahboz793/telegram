@@ -674,7 +674,6 @@
       position:absolute;
       inset:0;
       padding-top:64px;
-      padding-bottom:74px; /* footer space */
     }
     #lesson-video-mount{
       position:absolute;
@@ -687,58 +686,6 @@
       border:0;
       background:#000;
     }
-    #lesson-video-footer{
-      position:fixed;
-      left:10px;
-      right:10px;
-      bottom:10px;
-      z-index:100000;
-      pointer-events:none;
-    }
-    .overlay-bottom-bar{
-      pointer-events:auto;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:flex-end;
-      justify-content:space-between;
-      padding:10px;
-      border-radius:14px;
-      background:rgba(0,0,0,.45);
-      border:1px solid rgba(255,255,255,.14);
-      backdrop-filter: blur(10px);
-    }
-    .ob-item{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      min-width:140px;
-      flex:0 0 auto;
-    }
-    .ob-label{
-      font-size:12px;
-      color:rgba(255,255,255,.75);
-      font-weight:800;
-      letter-spacing:.2px;
-    }
-    .ob-select{
-      width:100%;
-      padding:10px 10px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(255,255,255,.10);
-      color:#fff;
-      outline:none;
-      font-weight:800;
-    }
-    .ob-note{
-      flex:1 1 220px;
-      font-size:12px;
-      color:rgba(255,255,255,.78);
-      line-height:1.35;
-      padding-bottom:2px;
-    }
-
     body.pseudo-landscape #lesson-video-mount{
       position:absolute;
       left:50%;
@@ -1031,25 +978,6 @@
       <div id="yt-player"></div>
     </div>
   </div>
-
-  <!-- OVERLAY BOTTOM CONTROLS (Quality / Speed) -->
-  <div id="lesson-video-footer">
-    <div class="overlay-bottom-bar">
-      <div class="ob-item">
-        <div class="ob-label">Sifat</div>
-        <select id="overlay-quality-select" class="ob-select">
-          <option value="auto">Auto</option>
-        </select>
-      </div>
-      <div class="ob-item">
-        <div class="ob-label">Tezlik</div>
-        <select id="overlay-speed-select" class="ob-select">
-          <option value="1">1x</option>
-        </select>
-      </div>
-      <div class="ob-note" id="overlay-quality-note">Eslatma: YouTube sifatni qurilma/tarmoq bo‘yicha cheklashi mumkin.</div>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -1082,7 +1010,6 @@
 
   /* VIDEO OVERLAY CONTROLS (FULLSCREEN / LANDSCAPE / ROTATE) */
   let currentLessonVideoId = null;
-  let currentLessonVideoUrl = "";
 
   const overlayTitleEl = document.getElementById("overlay-video-title");
   const overlayCloseBtn = document.getElementById("overlay-close-btn");
@@ -1090,117 +1017,6 @@
   const overlayLandscapeBtn = document.getElementById("overlay-landscape-btn");
   const overlayFullscreenBtn = document.getElementById("overlay-fullscreen-btn");
   const overlayOpenBtn = document.getElementById("overlay-open-btn");
-
-  const overlayQualitySelect = document.getElementById("overlay-quality-select");
-  const overlaySpeedSelect = document.getElementById("overlay-speed-select");
-  const overlayQualityNote = document.getElementById("overlay-quality-note");
-
-  const QUALITY_LABELS = {
-    highres: "Eng yuqori",
-    hd2160: "2160p (4K)",
-    hd1440: "1440p",
-    hd1080: "1080p",
-    hd720: "720p",
-    large: "480p",
-    medium: "360p",
-    small: "240p",
-    tiny: "144p",
-    auto: "Auto"
-  };
-
-  function qLabel(code){
-    return QUALITY_LABELS[code] || code;
-  }
-
-  function uniq(arr){
-    return Array.from(new Set(arr));
-  }
-
-  function refreshQualityOptions(player){
-    if(!overlayQualitySelect || !player) return;
-
-    let levels = [];
-    try{
-      levels = player.getAvailableQualityLevels ? (player.getAvailableQualityLevels() || []) : [];
-    }catch(e){ levels = []; }
-
-    // Always allow "auto" as option
-    levels = uniq(["auto", ...levels]);
-
-    const current = (()=>{
-      try{ return player.getPlaybackQuality ? (player.getPlaybackQuality() || "auto") : "auto"; }
-      catch(e){ return "auto"; }
-    })();
-
-    // Rebuild options only if changed
-    const existing = Array.from(overlayQualitySelect.options).map(o=>o.value);
-    const same = existing.length===levels.length && existing.every((v,i)=>v===levels[i]);
-    if(!same){
-      overlayQualitySelect.innerHTML = levels.map(l=>`<option value="${l}">${qLabel(l)}</option>`).join("");
-    }
-    // Try select current
-    try{
-      overlayQualitySelect.value = levels.includes(current) ? current : "auto";
-    }catch(e){}
-
-    if(overlayQualityNote){
-      overlayQualityNote.textContent = "Eslatma: YouTube sifatni qurilma/tarmoq bo‘yicha cheklashi mumkin. Tanlangan sifat majburiy emas, tavsiya sifatida qo‘llanadi.";
-    }
-  }
-
-  function refreshSpeedOptions(player){
-    if(!overlaySpeedSelect || !player) return;
-
-    let rates = [];
-    try{
-      rates = player.getAvailablePlaybackRates ? (player.getAvailablePlaybackRates() || []) : [];
-    }catch(e){ rates = []; }
-
-    if(!rates.length) rates = [0.5, 1, 1.25, 1.5, 2];
-
-    const current = (()=>{
-      try{ return String(player.getPlaybackRate ? player.getPlaybackRate() : 1); }
-      catch(e){ return "1"; }
-    })();
-
-    const vals = rates.map(r=>String(r));
-    const existing = Array.from(overlaySpeedSelect.options).map(o=>o.value);
-    const same = existing.length===vals.length && existing.every((v,i)=>v===vals[i]);
-    if(!same){
-      overlaySpeedSelect.innerHTML = vals.map(v=>`<option value="${v}">${v}x</option>`).join("");
-    }
-    try{
-      overlaySpeedSelect.value = vals.includes(current) ? current : "1";
-    }catch(e){}
-  }
-
-  function bindOverlaySelectors(){
-    if(overlayQualitySelect){
-      overlayQualitySelect.addEventListener("change", ()=>{
-        if(!currentPlayer) return;
-        const q = overlayQualitySelect.value || "auto";
-        try{
-          if(q === "auto"){
-            // YouTube doesn't have explicit 'auto' setter; best-effort: set highest available or do nothing.
-            // We'll do nothing; player will adapt.
-            return;
-          }
-          if(currentPlayer.setPlaybackQuality) currentPlayer.setPlaybackQuality(q);
-        }catch(e){}
-      });
-    }
-
-    if(overlaySpeedSelect){
-      overlaySpeedSelect.addEventListener("change", ()=>{
-        if(!currentPlayer) return;
-        const v = parseFloat(overlaySpeedSelect.value || "1");
-        try{
-          if(currentPlayer.setPlaybackRate) currentPlayer.setPlaybackRate(v);
-        }catch(e){}
-      });
-    }
-  }
-  bindOverlaySelectors();
 
   function showTelegramBackButtonForVideo(on){
     try{
@@ -1256,15 +1072,11 @@
   function openExternalLink(url){
     try{
       if(isTelegramMiniApp && tgWebApp && typeof tgWebApp.openLink==="function"){
-        // Some TG versions support extra params; keep it best-effort.
-        try{ tgWebApp.openLink(url, {try_instant_view:false}); }
-        catch(e){ tgWebApp.openLink(url); }
+        tgWebApp.openLink(url);
         return;
       }
     }catch(e){}
-    // window.open is often blocked in WebView; fallback to navigation.
-    try{ window.open(url,"_blank"); }
-    catch(e){ window.location.href = url; }
+    window.open(url,"_blank");
   }
 
   async function closeVideoOverlay(){
@@ -1296,12 +1108,11 @@
   });
 
   if(overlayOpenBtn) overlayOpenBtn.addEventListener("click",()=>{
-    const url = currentLessonVideoUrl || (currentLessonVideoId ? ("https://www.youtube.com/watch?v=" + currentLessonVideoId) : "");
-    if(!url) return;
-    openExternalLink(url);
+    if(!currentLessonVideoId) return;
+    openExternalLink("https://youtu.be/"+currentLessonVideoId);
   });
 
-// Android back (history) — overlay ochiq bo‘lsa yopish
+  // Android back (history) — overlay ochiq bo‘lsa yopish
   window.addEventListener("popstate",()=>{
     const w = document.getElementById("lesson-video-wrapper");
     if(w && !w.classList.contains("hidden")){
@@ -1447,40 +1258,14 @@
   }
   function extractYouTubeId(input){
     if(!input) return "";
-    const s = String(input).trim();
-
-    // If looks like a bare videoId (11-ish chars) return as-is
-    if(/^[a-zA-Z0-9_-]{8,20}$/.test(s) && !s.includes("/") && !s.includes("?") && !s.includes("&")){
-      return s;
-    }
-
-    // Common YouTube URL forms
-    let m = s.match(/youtu\.be\/([^?&\/]+)/i);
+    let url = input.trim();
+    let m = url.match(/youtu\.be\/([^?&]+)/);
     if(m) return m[1];
-
-    m = s.match(/[?&]v=([^?&\/]+)/i);
+    m = url.match(/v=([^&]+)/);
     if(m) return m[1];
-
-    m = s.match(/\/embed\/([^?&\/]+)/i);
+    m = url.match(/embed\/([^?&]+)/);
     if(m) return m[1];
-
-    m = s.match(/\/shorts\/([^?&\/]+)/i);
-    if(m) return m[1];
-
-    // Fallback: try last path segment if it resembles an id
-    try{
-      const u = new URL(s);
-      const seg = u.pathname.split("/").filter(Boolean).pop() || "";
-      if(/^[a-zA-Z0-9_-]{8,20}$/.test(seg)) return seg;
-    }catch(e){}
-
-    return "";
-  }
-
-  function normalizeYouTubeUrl(input){
-    const id = extractYouTubeId(input);
-    if(!id) return "";
-    return "https://www.youtube.com/watch?v=" + id;
+    return url;
   }
   function getMotivationMessage(score,total){
     if(!total) return "";
@@ -2212,15 +1997,6 @@
       currentPlayer=null;
     }
     resetPlayerContainer();   // YouTube iframe konteyneri tozalanadi
-    try{
-      if(overlayQualitySelect){
-        overlayQualitySelect.innerHTML = '<option value="auto">Auto</option>';
-      }
-      if(overlaySpeedSelect){
-        overlaySpeedSelect.innerHTML = '<option value="1">1x</option>';
-      }
-    }catch(e){}
-
     lessonVideoWrapper.classList.add("hidden");
     document.body.classList.remove("pseudo-landscape");
     showTelegramBackButtonForVideo(false);
@@ -2807,18 +2583,10 @@
     lessonPlayerTitle.textContent = lesson.title;
 
     // Overlay player ochish (fullscreen/rotate/landscape)
-    const _src = (lesson.videoUrl || lesson.videoLink || lesson.url || lesson.videoId || "");
-    currentLessonVideoId = extractYouTubeId(_src) || null;
-    currentLessonVideoUrl = normalizeYouTubeUrl(_src) || "";
+    currentLessonVideoId = lesson.videoId || null;
     if(overlayTitleEl) overlayTitleEl.textContent = lesson.title || "Video";
     document.body.classList.remove("pseudo-landscape");
     lessonVideoWrapper.classList.remove("hidden");
-
-    if(!currentLessonVideoId){
-      lessonProgressText.textContent = "Video ID topilmadi. YouTube linkni tekshiring.";
-      return;
-    }
-
     showTelegramBackButtonForVideo(true);
 
     // Android back tugmasi uchun history (best-effort)
@@ -2857,7 +2625,7 @@
     }
 
     currentPlayer = new YT.Player("yt-player",{
-      videoId: currentLessonVideoId,
+      videoId: lesson.videoId,
       playerVars:{rel:0,modestbranding:1,playsinline:1,fs:1},
       events:{
         onReady:(event)=>{
@@ -2870,13 +2638,6 @@
             }
             player.playVideo();
             startProgressInterval();
-            // Populate quality/speed dropdowns (best-effort; sometimes levels appear after playback starts)
-            try{
-              refreshQualityOptions(player);
-              refreshSpeedOptions(player);
-              setTimeout(()=>{ try{ refreshQualityOptions(player); }catch(e){} }, 1200);
-            }catch(e){}
-
           }catch(e){
             console.error("onReady error",e);
           }
