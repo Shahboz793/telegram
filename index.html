@@ -1010,6 +1010,7 @@
 
   /* VIDEO OVERLAY CONTROLS (FULLSCREEN / LANDSCAPE / ROTATE) */
   let currentLessonVideoId = null;
+  let currentLessonVideoUrl = "";
 
   const overlayTitleEl = document.getElementById("overlay-video-title");
   const overlayCloseBtn = document.getElementById("overlay-close-btn");
@@ -1072,11 +1073,15 @@
   function openExternalLink(url){
     try{
       if(isTelegramMiniApp && tgWebApp && typeof tgWebApp.openLink==="function"){
-        tgWebApp.openLink(url);
+        // Some TG versions support extra params; keep it best-effort.
+        try{ tgWebApp.openLink(url, {try_instant_view:false}); }
+        catch(e){ tgWebApp.openLink(url); }
         return;
       }
     }catch(e){}
-    window.open(url,"_blank");
+    // window.open is often blocked in WebView; fallback to navigation.
+    try{ window.open(url,"_blank"); }
+    catch(e){ window.location.href = url; }
   }
 
   async function closeVideoOverlay(){
@@ -1108,11 +1113,12 @@
   });
 
   if(overlayOpenBtn) overlayOpenBtn.addEventListener("click",()=>{
-    if(!currentLessonVideoId) return;
-    openExternalLink("https://youtu.be/"+currentLessonVideoId);
+    const url = currentLessonVideoUrl || (currentLessonVideoId ? ("https://www.youtube.com/watch?v=" + currentLessonVideoId) : "");
+    if(!url) return;
+    openExternalLink(url);
   });
 
-  // Android back (history) — overlay ochiq bo‘lsa yopish
+// Android back (history) — overlay ochiq bo‘lsa yopish
   window.addEventListener("popstate",()=>{
     const w = document.getElementById("lesson-video-wrapper");
     if(w && !w.classList.contains("hidden")){
@@ -1258,14 +1264,40 @@
   }
   function extractYouTubeId(input){
     if(!input) return "";
-    let url = input.trim();
-    let m = url.match(/youtu\.be\/([^?&]+)/);
+    const s = String(input).trim();
+
+    // If looks like a bare videoId (11-ish chars) return as-is
+    if(/^[a-zA-Z0-9_-]{8,20}$/.test(s) && !s.includes("/") && !s.includes("?") && !s.includes("&")){
+      return s;
+    }
+
+    // Common YouTube URL forms
+    let m = s.match(/youtu\.be\/([^?&\/]+)/i);
     if(m) return m[1];
-    m = url.match(/v=([^&]+)/);
+
+    m = s.match(/[?&]v=([^?&\/]+)/i);
     if(m) return m[1];
-    m = url.match(/embed\/([^?&]+)/);
+
+    m = s.match(/\/embed\/([^?&\/]+)/i);
     if(m) return m[1];
-    return url;
+
+    m = s.match(/\/shorts\/([^?&\/]+)/i);
+    if(m) return m[1];
+
+    // Fallback: try last path segment if it resembles an id
+    try{
+      const u = new URL(s);
+      const seg = u.pathname.split("/").filter(Boolean).pop() || "";
+      if(/^[a-zA-Z0-9_-]{8,20}$/.test(seg)) return seg;
+    }catch(e){}
+
+    return "";
+  }
+
+  function normalizeYouTubeUrl(input){
+    const id = extractYouTubeId(input);
+    if(!id) return "";
+    return "https://www.youtube.com/watch?v=" + id;
   }
   function getMotivationMessage(score,total){
     if(!total) return "";
@@ -2583,10 +2615,18 @@
     lessonPlayerTitle.textContent = lesson.title;
 
     // Overlay player ochish (fullscreen/rotate/landscape)
-    currentLessonVideoId = lesson.videoId || null;
+    const _src = (lesson.videoUrl || lesson.videoLink || lesson.url || lesson.videoId || "");
+    currentLessonVideoId = extractYouTubeId(_src) || null;
+    currentLessonVideoUrl = normalizeYouTubeUrl(_src) || "";
     if(overlayTitleEl) overlayTitleEl.textContent = lesson.title || "Video";
     document.body.classList.remove("pseudo-landscape");
     lessonVideoWrapper.classList.remove("hidden");
+
+    if(!currentLessonVideoId){
+      lessonProgressText.textContent = "Video ID topilmadi. YouTube linkni tekshiring.";
+      return;
+    }
+
     showTelegramBackButtonForVideo(true);
 
     // Android back tugmasi uchun history (best-effort)
@@ -2625,7 +2665,7 @@
     }
 
     currentPlayer = new YT.Player("yt-player",{
-      videoId: lesson.videoId,
+      videoId: currentLessonVideoId,
       playerVars:{rel:0,modestbranding:1,playsinline:1,fs:1},
       events:{
         onReady:(event)=>{
