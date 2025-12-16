@@ -674,6 +674,7 @@
       position:absolute;
       inset:0;
       padding-top:64px;
+      padding-bottom:74px; /* footer space */
     }
     #lesson-video-mount{
       position:absolute;
@@ -686,6 +687,58 @@
       border:0;
       background:#000;
     }
+    #lesson-video-footer{
+      position:fixed;
+      left:10px;
+      right:10px;
+      bottom:10px;
+      z-index:100000;
+      pointer-events:none;
+    }
+    .overlay-bottom-bar{
+      pointer-events:auto;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      justify-content:space-between;
+      padding:10px;
+      border-radius:14px;
+      background:rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+    }
+    .ob-item{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:140px;
+      flex:0 0 auto;
+    }
+    .ob-label{
+      font-size:12px;
+      color:rgba(255,255,255,.75);
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .ob-select{
+      width:100%;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.10);
+      color:#fff;
+      outline:none;
+      font-weight:800;
+    }
+    .ob-note{
+      flex:1 1 220px;
+      font-size:12px;
+      color:rgba(255,255,255,.78);
+      line-height:1.35;
+      padding-bottom:2px;
+    }
+
     body.pseudo-landscape #lesson-video-mount{
       position:absolute;
       left:50%;
@@ -978,6 +1031,25 @@
       <div id="yt-player"></div>
     </div>
   </div>
+
+  <!-- OVERLAY BOTTOM CONTROLS (Quality / Speed) -->
+  <div id="lesson-video-footer">
+    <div class="overlay-bottom-bar">
+      <div class="ob-item">
+        <div class="ob-label">Sifat</div>
+        <select id="overlay-quality-select" class="ob-select">
+          <option value="auto">Auto</option>
+        </select>
+      </div>
+      <div class="ob-item">
+        <div class="ob-label">Tezlik</div>
+        <select id="overlay-speed-select" class="ob-select">
+          <option value="1">1x</option>
+        </select>
+      </div>
+      <div class="ob-note" id="overlay-quality-note">Eslatma: YouTube sifatni qurilma/tarmoq bo‘yicha cheklashi mumkin.</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1018,6 +1090,117 @@
   const overlayLandscapeBtn = document.getElementById("overlay-landscape-btn");
   const overlayFullscreenBtn = document.getElementById("overlay-fullscreen-btn");
   const overlayOpenBtn = document.getElementById("overlay-open-btn");
+
+  const overlayQualitySelect = document.getElementById("overlay-quality-select");
+  const overlaySpeedSelect = document.getElementById("overlay-speed-select");
+  const overlayQualityNote = document.getElementById("overlay-quality-note");
+
+  const QUALITY_LABELS = {
+    highres: "Eng yuqori",
+    hd2160: "2160p (4K)",
+    hd1440: "1440p",
+    hd1080: "1080p",
+    hd720: "720p",
+    large: "480p",
+    medium: "360p",
+    small: "240p",
+    tiny: "144p",
+    auto: "Auto"
+  };
+
+  function qLabel(code){
+    return QUALITY_LABELS[code] || code;
+  }
+
+  function uniq(arr){
+    return Array.from(new Set(arr));
+  }
+
+  function refreshQualityOptions(player){
+    if(!overlayQualitySelect || !player) return;
+
+    let levels = [];
+    try{
+      levels = player.getAvailableQualityLevels ? (player.getAvailableQualityLevels() || []) : [];
+    }catch(e){ levels = []; }
+
+    // Always allow "auto" as option
+    levels = uniq(["auto", ...levels]);
+
+    const current = (()=>{
+      try{ return player.getPlaybackQuality ? (player.getPlaybackQuality() || "auto") : "auto"; }
+      catch(e){ return "auto"; }
+    })();
+
+    // Rebuild options only if changed
+    const existing = Array.from(overlayQualitySelect.options).map(o=>o.value);
+    const same = existing.length===levels.length && existing.every((v,i)=>v===levels[i]);
+    if(!same){
+      overlayQualitySelect.innerHTML = levels.map(l=>`<option value="${l}">${qLabel(l)}</option>`).join("");
+    }
+    // Try select current
+    try{
+      overlayQualitySelect.value = levels.includes(current) ? current : "auto";
+    }catch(e){}
+
+    if(overlayQualityNote){
+      overlayQualityNote.textContent = "Eslatma: YouTube sifatni qurilma/tarmoq bo‘yicha cheklashi mumkin. Tanlangan sifat majburiy emas, tavsiya sifatida qo‘llanadi.";
+    }
+  }
+
+  function refreshSpeedOptions(player){
+    if(!overlaySpeedSelect || !player) return;
+
+    let rates = [];
+    try{
+      rates = player.getAvailablePlaybackRates ? (player.getAvailablePlaybackRates() || []) : [];
+    }catch(e){ rates = []; }
+
+    if(!rates.length) rates = [0.5, 1, 1.25, 1.5, 2];
+
+    const current = (()=>{
+      try{ return String(player.getPlaybackRate ? player.getPlaybackRate() : 1); }
+      catch(e){ return "1"; }
+    })();
+
+    const vals = rates.map(r=>String(r));
+    const existing = Array.from(overlaySpeedSelect.options).map(o=>o.value);
+    const same = existing.length===vals.length && existing.every((v,i)=>v===vals[i]);
+    if(!same){
+      overlaySpeedSelect.innerHTML = vals.map(v=>`<option value="${v}">${v}x</option>`).join("");
+    }
+    try{
+      overlaySpeedSelect.value = vals.includes(current) ? current : "1";
+    }catch(e){}
+  }
+
+  function bindOverlaySelectors(){
+    if(overlayQualitySelect){
+      overlayQualitySelect.addEventListener("change", ()=>{
+        if(!currentPlayer) return;
+        const q = overlayQualitySelect.value || "auto";
+        try{
+          if(q === "auto"){
+            // YouTube doesn't have explicit 'auto' setter; best-effort: set highest available or do nothing.
+            // We'll do nothing; player will adapt.
+            return;
+          }
+          if(currentPlayer.setPlaybackQuality) currentPlayer.setPlaybackQuality(q);
+        }catch(e){}
+      });
+    }
+
+    if(overlaySpeedSelect){
+      overlaySpeedSelect.addEventListener("change", ()=>{
+        if(!currentPlayer) return;
+        const v = parseFloat(overlaySpeedSelect.value || "1");
+        try{
+          if(currentPlayer.setPlaybackRate) currentPlayer.setPlaybackRate(v);
+        }catch(e){}
+      });
+    }
+  }
+  bindOverlaySelectors();
 
   function showTelegramBackButtonForVideo(on){
     try{
@@ -2029,6 +2212,15 @@
       currentPlayer=null;
     }
     resetPlayerContainer();   // YouTube iframe konteyneri tozalanadi
+    try{
+      if(overlayQualitySelect){
+        overlayQualitySelect.innerHTML = '<option value="auto">Auto</option>';
+      }
+      if(overlaySpeedSelect){
+        overlaySpeedSelect.innerHTML = '<option value="1">1x</option>';
+      }
+    }catch(e){}
+
     lessonVideoWrapper.classList.add("hidden");
     document.body.classList.remove("pseudo-landscape");
     showTelegramBackButtonForVideo(false);
@@ -2678,6 +2870,13 @@
             }
             player.playVideo();
             startProgressInterval();
+            // Populate quality/speed dropdowns (best-effort; sometimes levels appear after playback starts)
+            try{
+              refreshQualityOptions(player);
+              refreshSpeedOptions(player);
+              setTimeout(()=>{ try{ refreshQualityOptions(player); }catch(e){} }, 1200);
+            }catch(e){}
+
           }catch(e){
             console.error("onReady error",e);
           }
