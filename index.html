@@ -625,7 +625,78 @@
       .quiz-overlay-title{font-size:22px;}
       .quiz-overlay-sub{font-size:15px;}
     }
-  </style>
+  
+    /* ===== VIDEO OVERLAY (FULLSCREEN + ROTATE) ===== */
+    .video-overlay{
+      position:fixed;
+      inset:0;
+      z-index:99999;
+      background:#000 !important;
+      padding-bottom:0 !important;
+      padding-top:0 !important;
+      border-radius:0 !important;
+      box-shadow:none !important;
+      margin:0 !important;
+      width:100%;
+      height:100%;
+    }
+    #lesson-video-header{
+      position:fixed;
+      top:10px;
+      left:10px;
+      right:10px;
+      z-index:100000;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px;
+      border-radius:14px;
+      background:rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+    }
+    #lesson-video-header .overlay-title{
+      font-weight:900;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    #lesson-video-header .overlay-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    #lesson-video-body{
+      position:absolute;
+      inset:0;
+      padding-top:64px;
+    }
+    #lesson-video-mount{
+      position:absolute;
+      inset:0;
+      background:#000;
+    }
+    #lesson-video-mount iframe{
+      width:100%;
+      height:100%;
+      border:0;
+      background:#000;
+    }
+    body.pseudo-landscape #lesson-video-mount{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:100vh;
+      height:100vw;
+      transform: translate(-50%,-50%) rotate(90deg);
+      transform-origin:center;
+    }
+
+</style>
 
   <!-- FIREBASE (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -821,9 +892,7 @@
 
             <div class="lesson-player-box">
               <div class="muted" id="lesson-player-title">Dars tanlanmagan.</div>
-              <div class="video-wrapper hidden" id="lesson-video-wrapper">
-                <div id="yt-player"></div>
-              </div>
+              <div class="hint" id="lesson-video-placeholder" style="margin-top:6px;">Video dars tanlang — video to‘liq ekranda (overlay) ochiladi.</div>
               <!-- Katta qizil quiz tugmasi -->
               <button type="button" class="btn-quiz-main hidden" id="lesson-quiz-btn" style="margin-top:6px;align-self:flex-start;">
                 QUIZNI ISHLASH
@@ -891,6 +960,26 @@
   </div>
 </div>
 
+
+<!-- VIDEO OVERLAY (FULLSCREEN/ROTATE) -->
+<div class="video-wrapper video-overlay hidden" id="lesson-video-wrapper" aria-hidden="true">
+  <div id="lesson-video-header">
+    <button type="button" class="btn-xs" id="overlay-close-btn">← Orqaga</button>
+    <div class="overlay-title" id="overlay-video-title">Video</div>
+    <div class="overlay-actions">
+      <button type="button" class="btn-xs" id="overlay-rotate-btn">Rotate</button>
+      <button type="button" class="btn-xs" id="overlay-landscape-btn">Landscape</button>
+      <button type="button" class="btn-xs" id="overlay-fullscreen-btn">Fullscreen</button>
+      <button type="button" class="btn-xs" id="overlay-open-btn">YouTube</button>
+    </div>
+  </div>
+  <div id="lesson-video-body">
+    <div id="lesson-video-mount">
+      <div id="yt-player"></div>
+    </div>
+  </div>
+</div>
+
 <script>
   /* YOUTUBE API HOLATI */
   let ytApiReady = false;
@@ -917,6 +1006,120 @@
       console.log("Telegram WebApp topilmadi yoki ishlamadi",e);
     }
   }
+
+
+  /* VIDEO OVERLAY CONTROLS (FULLSCREEN / LANDSCAPE / ROTATE) */
+  let currentLessonVideoId = null;
+
+  const overlayTitleEl = document.getElementById("overlay-video-title");
+  const overlayCloseBtn = document.getElementById("overlay-close-btn");
+  const overlayRotateBtn = document.getElementById("overlay-rotate-btn");
+  const overlayLandscapeBtn = document.getElementById("overlay-landscape-btn");
+  const overlayFullscreenBtn = document.getElementById("overlay-fullscreen-btn");
+  const overlayOpenBtn = document.getElementById("overlay-open-btn");
+
+  function showTelegramBackButtonForVideo(on){
+    try{
+      if(!isTelegramMiniApp || !tgWebApp || !tgWebApp.BackButton) return;
+      if(on){
+        tgWebApp.BackButton.show();
+        tgWebApp.BackButton.onClick(()=>{ closeVideoOverlay(); });
+      }else{
+        tgWebApp.BackButton.hide();
+      }
+    }catch(e){}
+  }
+
+  async function requestFullscreenAll(){
+    // Telegram API (yangi versiyalarda bo‘lishi mumkin)
+    try{
+      if(isTelegramMiniApp && tgWebApp && typeof tgWebApp.requestFullscreen==="function"){
+        await tgWebApp.requestFullscreen();
+      }
+    }catch(e){}
+    // Browser fullscreen fallback (WebView’da har doim ham ishlamasligi mumkin)
+    try{
+      const el = document.documentElement;
+      if(!document.fullscreenElement && el.requestFullscreen){
+        await el.requestFullscreen();
+      }
+    }catch(e){}
+  }
+
+  async function exitFullscreenAll(){
+    try{
+      if(isTelegramMiniApp && tgWebApp && typeof tgWebApp.exitFullscreen==="function"){
+        await tgWebApp.exitFullscreen();
+      }
+    }catch(e){}
+    try{
+      if(document.fullscreenElement && document.exitFullscreen){
+        await document.exitFullscreen();
+      }
+    }catch(e){}
+  }
+
+  async function lockLandscape(){
+    try{
+      if(screen.orientation && screen.orientation.lock){
+        await screen.orientation.lock("landscape");
+        return true;
+      }
+    }catch(e){}
+    return false;
+  }
+
+  function openExternalLink(url){
+    try{
+      if(isTelegramMiniApp && tgWebApp && typeof tgWebApp.openLink==="function"){
+        tgWebApp.openLink(url);
+        return;
+      }
+    }catch(e){}
+    window.open(url,"_blank");
+  }
+
+  async function closeVideoOverlay(){
+    try{
+      await saveCurrentLessonProgressOnce();
+    }catch(e){}
+    stopCurrentPlayer(); // bu ichida overlay yopiladi
+  }
+
+  // Overlay tugmalar
+  if(overlayCloseBtn) overlayCloseBtn.addEventListener("click",()=>{ closeVideoOverlay(); });
+
+  if(overlayRotateBtn) overlayRotateBtn.addEventListener("click",()=>{
+    document.body.classList.toggle("pseudo-landscape");
+  });
+
+  if(overlayFullscreenBtn) overlayFullscreenBtn.addEventListener("click",()=>{
+    requestFullscreenAll();
+  });
+
+  if(overlayLandscapeBtn) overlayLandscapeBtn.addEventListener("click",async ()=>{
+    await requestFullscreenAll();
+    const ok = await lockLandscape();
+    if(!ok){
+      // Orientation lock bo‘lmasa — pseudo rotate bilan “yonboshlatib” ko‘rsatamiz
+      document.body.classList.add("pseudo-landscape");
+      alert("Landscape lock bloklangan bo‘lishi mumkin. Rotate ishlatildi (pseudo).");
+    }
+  });
+
+  if(overlayOpenBtn) overlayOpenBtn.addEventListener("click",()=>{
+    if(!currentLessonVideoId) return;
+    openExternalLink("https://youtu.be/"+currentLessonVideoId);
+  });
+
+  // Android back (history) — overlay ochiq bo‘lsa yopish
+  window.addEventListener("popstate",()=>{
+    const w = document.getElementById("lesson-video-wrapper");
+    if(w && !w.classList.contains("hidden")){
+      closeVideoOverlay();
+    }
+  });
+
 
   /* FIREBASE INIT */
   const firebaseConfig = {
@@ -1088,11 +1291,13 @@
 
   /* YouTube konteynerini toza qayta yaratish — qotishning asosiy yechimi */
   function resetPlayerContainer(){
-    if(!lessonVideoWrapper) return;
-    lessonVideoWrapper.innerHTML = "";
+    // YouTube iframe konteynerini toza qayta yaratish — qotishning asosiy yechimi
+    const mount = document.getElementById("lesson-video-mount");
+    if(!mount) return;
+    mount.innerHTML = "";
     const div = document.createElement("div");
     div.id = "yt-player";
-    lessonVideoWrapper.appendChild(div);
+    mount.appendChild(div);
   }
 
   /* PDF: QUIZ BLANK (FAQAT SAVOL+VARIANT, OXIRIDA KALIT) */
@@ -1793,6 +1998,10 @@
     }
     resetPlayerContainer();   // YouTube iframe konteyneri tozalanadi
     lessonVideoWrapper.classList.add("hidden");
+    document.body.classList.remove("pseudo-landscape");
+    showTelegramBackButtonForVideo(false);
+    // Fullscreen'dan chiqish (best-effort)
+    exitFullscreenAll();
   }
 
   function renderCourseLessonsList(){
@@ -2372,7 +2581,20 @@
         : QUIZ_TOTAL_MINUTES;
 
     lessonPlayerTitle.textContent = lesson.title;
+
+    // Overlay player ochish (fullscreen/rotate/landscape)
+    currentLessonVideoId = lesson.videoId || null;
+    if(overlayTitleEl) overlayTitleEl.textContent = lesson.title || "Video";
+    document.body.classList.remove("pseudo-landscape");
     lessonVideoWrapper.classList.remove("hidden");
+    showTelegramBackButtonForVideo(true);
+
+    // Android back tugmasi uchun history (best-effort)
+    try{ history.pushState({videoOverlay:true}, ""); }catch(e){}
+
+    // Fullscreen'ni avtomatik so‘rash (best-effort; bloklanishi mumkin)
+    requestFullscreenAll();
+
     lessonProgressText.textContent = "Ko‘rilmoqda: 0%";
     lessonProgressBar.style.width = "0%";
     lastSavedPercent = 0;
@@ -2404,7 +2626,7 @@
 
     currentPlayer = new YT.Player("yt-player",{
       videoId: lesson.videoId,
-      playerVars:{rel:0,modestbranding:1},
+      playerVars:{rel:0,modestbranding:1,playsinline:1,fs:1},
       events:{
         onReady:(event)=>{
           const player = event.target;
