@@ -1,37 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Intercity Taxi</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-<div class="topbar">
-  <span>🚖 Haydovchi</span>
-  <input id="driverCode" placeholder="Kod" maxlength="4">
-  <button onclick="unlockDriver()">Kirish</button>
-</div>
+<header class="topbar">
+  <div class="brand">🚕 Intercity Taxi</div>
+  <div class="codes">
+    <span class="role">🚖 Haydovchi</span>
+    <input id="driverCode" placeholder="Kod" maxlength="4"/>
+    <button onclick="unlockDriver()">Kirish</button>
+  </div>
+</header>
 
-<div class="app">
+<main class="container">
 
-<div id="driverPanel" style="display:none">
-  <h3>Eʼlon berish</h3>
-  <input id="route" placeholder="Yo‘nalish">
-  <input id="date" type="date">
-  <input id="time" type="time">
-  <input id="seats" type="number" placeholder="Bo‘sh joy">
-  <input id="phone" placeholder="Telefon">
-  <button onclick="addTaxi()">➕ Eʼlon berish</button>
-</div>
+<section id="driverPanel" class="card hidden">
+  <h3>🚖 Eʼlon berish</h3>
+  <input id="route" placeholder="Yo‘nalish (Balandchaqir → Toshkent)"/>
+  <div class="row">
+    <input id="date" type="date"/>
+    <input id="time" type="time"/>
+  </div>
+  <input id="seats" type="number" placeholder="Bo‘sh joylar"/>
+  <input id="phone" placeholder="Telefon"/>
+  <button class="primary" onclick="addTaxi()">➕ Eʼlon berish</button>
+</section>
 
-<hr>
+<section class="card">
+  <h3>📋 Mijozlar uchun eʼlonlar</h3>
+  <div id="list" class="list"></div>
+</section>
 
-<h3>Mijozlar uchun eʼlonlar</h3>
-<div id="list"></div>
-
-</div>
+</main>
 
 <script type="module" src="app.js"></script>
 </body>

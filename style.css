@@ -1,7 +1,22 @@
-body{font-family:Arial;background:#f2f2f2;margin:0;}
-.topbar{background:#1e88e5;color:#fff;padding:10px;display:flex;gap:6px;}
-.topbar input{flex:1;}
-.app{max-width:480px;margin:auto;background:#fff;padding:15px;}
-.card{background:#eee;padding:10px;margin-top:10px;border-radius:8px;}
-input,button{padding:10px;margin-top:6px;width:100%;}
-button{background:#1e88e5;color:#fff;border:none;border-radius:6px;}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial;background:#f3f6fb;color:#222}
+.topbar{display:flex;justify-content:space-between;align-items:center;
+background:#1e88e5;color:#fff;padding:12px 16px}
+.brand{font-weight:700}
+.codes{display:flex;gap:6px;align-items:center}
+.codes input{width:70px;padding:6px;border-radius:6px;border:none}
+.codes button{padding:6px 10px;border:none;border-radius:6px;background:#0d47a1;color:#fff}
+.container{max-width:520px;margin:16px auto;padding:0 12px}
+.card{background:#fff;border-radius:12px;padding:14px;margin-bottom:14px;
+box-shadow:0 8px 20px rgba(0,0,0,.06)}
+.hidden{display:none}
+.row{display:flex;gap:8px}
+input{width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ddd}
+button.primary{margin-top:10px;width:100%;padding:12px;border:none;border-radius:10px;
+background:#1e88e5;color:#fff;font-weight:600}
+.list .item{border:1px solid #eee;border-radius:10px;padding:10px;margin-top:10px}
+.item .title{font-weight:600}
+.item .meta{font-size:13px;color:#555;margin-top:4px}
+.item button{margin-top:8px;width:100%;padding:8px;border-radius:8px;border:none;
+background:#43a047;color:#fff}
+.item .admin-del{background:#e53935}
