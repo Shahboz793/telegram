@@ -7,20 +7,30 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="app">
-<h2>🚕 Intercity Taxi</h2>
 
-<h3>Mijoz</h3>
-<div id="list"></div>
+<div class="topbar">
+  <span>🚖 Haydovchi</span>
+  <input id="driverCode" placeholder="Kod" maxlength="4">
+  <button onclick="unlockDriver()">Kirish</button>
+</div>
+
+<div class="app">
+
+<div id="driverPanel" style="display:none">
+  <h3>Eʼlon berish</h3>
+  <input id="route" placeholder="Yo‘nalish">
+  <input id="date" type="date">
+  <input id="time" type="time">
+  <input id="seats" type="number" placeholder="Bo‘sh joy">
+  <input id="phone" placeholder="Telefon">
+  <button onclick="addTaxi()">➕ Eʼlon berish</button>
+</div>
 
 <hr>
 
-<h3>🚖 Haydovchi</h3>
-<input id="route" placeholder="Yo‘nalish">
-<input id="seats" type="number" placeholder="Bo‘sh joy">
-<input id="phone" placeholder="Telefon">
-<input id="time" type="time">
-<button onclick="addTaxi()">➕ Eʼlon qo‘shish</button>
+<h3>Mijozlar uchun eʼlonlar</h3>
+<div id="list"></div>
+
 </div>
 
 <script type="module" src="app.js"></script>
